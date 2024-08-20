@@ -24,9 +24,14 @@ final class LazyList<R extends InputRow, E extends InputError<R, ?>> {
      * @param error error to be appended to this list
      */
     void addWithOrder(E error) {
-        synchronized (errors) {
-            error.getKey().setOrder(counter.getAsInt() + errors.size());
-            errors.add(error);
+        if (error != null) {
+            synchronized (errors) {
+                final int order = counter.getAsInt() + errors.size();
+                if (error.getKey() != null) {
+                    error.getKey().setOrder(order);
+                }
+                errors.add(error);
+            }
         }
     }
 

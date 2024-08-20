@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.misc.SeverityType;
+import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.persistence.InputError;
 import io.github.up2jakarta.csv.persistence.InputRow;
 
@@ -13,8 +13,6 @@ import io.github.up2jakarta.csv.persistence.InputRow;
  */
 public abstract class EventCreator<R extends InputRow, K extends InputError.Key<R>, E extends InputError<R, K>> {
 
-    public static final String CSV_CODE_VIOLATION = "CSV-ER01";
-
     protected EventCreator() {
     }
 
@@ -26,15 +24,16 @@ public abstract class EventCreator<R extends InputRow, K extends InputError.Key<
      * @param severity the error severity
      * @param row      the input row source
      * @param offset   the input index
+     * @param code     the error code
      * @param message  the error message
      * @return the full-filled input error
      */
-    protected E create(SeverityType severity, R row, int offset, String message) {
+    protected E create(SeverityType severity, R row, int offset, String code, String message) {
         final E error = this.newInstance();
         error.getKey().setRow(row);
         error.setSeverity(severity);
         error.setOffset(offset);
-        error.setCode(EventCreator.CSV_CODE_VIOLATION);
+        error.setCode(code);
         error.setMessage(message);
         return error;
     }

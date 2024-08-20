@@ -10,7 +10,6 @@ import static java.util.Arrays.stream;
 public final class Beans {
 
     public static final Type[] NO_TYPES = {};
-    public static final String[] NO_ARGUMENTS = {};
 
     private Beans() {
     }
@@ -27,10 +26,14 @@ public final class Beans {
                     return getClassArguments((Class<?>) c.getRawType(), finalType, cArguments);
                 }).orElseGet(() -> {
                     var cArguments = typeArguments;
-                    if (beanType.getGenericSuperclass() instanceof ParameterizedType pType) {
-                        cArguments = resolveArguments(beanType, pType, typeArguments);
+                    final Type superType = beanType.getGenericSuperclass();
+                    if (superType != null) {
+                        if (beanType.getGenericSuperclass() instanceof ParameterizedType pType) {
+                            cArguments = resolveArguments(beanType, pType, typeArguments);
+                        }
+                        return getInterfaceArguments(beanType.getSuperclass(), finalType, cArguments);
                     }
-                    return getInterfaceArguments(beanType.getSuperclass(), finalType, cArguments);
+                    return NO_TYPES;
                 });
     }
 
@@ -137,14 +140,10 @@ public final class Beans {
     }
 
     public static <V> void setValue(Object bean, V value, Method setter) throws BeanException {
-        invoke(bean, setter, void.class, value);
-    }
-
-    public static <R> R invoke(Object bean, Method method, Class<R> returnType, Object... args) throws BeanException {
         try {
-            return returnType.cast(method.invoke(bean, args));
+            setter.invoke(bean, value);
         } catch (Throwable ex) {
-            throw new BeanException(bean.getClass(), method, ex.getMessage());
+            throw new BeanException(bean.getClass(), setter, ex.getMessage());
         }
     }
 

@@ -1,18 +1,43 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2-divers</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.3</version>
     </parent>
 
     <artifactId>up2csv-core</artifactId>
     <name>Up2CSV :: Core</name>
-    <description>CSV :: Modern framework</description>
+    <description>Up2CSV :: Core</description>
+    <url>https://github.com/up2jakarta/up2-divers/tree/master/up2csv-core</url>
+
+    <developers>
+        <developer>
+            <name>A.ABBESSI</name>
+            <email>up2Abbessi[at]gmail.com</email>
+            <roles>
+                <role>Software engineer</role>
+                <role>Technical Lead</role>
+                <role>Application Architect</role>
+            </roles>
+            <url>https://up2jakarta.github.io/</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/up2jakarta/up2-divers.git</connection>
+        <developerConnection>scm:git:ssh://github.com/up2jakarta/up2-divers.git</developerConnection>
+        <url>https://github.com/up2jakarta/up2-divers.git</url>
+    </scm>
 
     <dependencies>
         <!-- Required API Dependencies -->
+        <dependency>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>

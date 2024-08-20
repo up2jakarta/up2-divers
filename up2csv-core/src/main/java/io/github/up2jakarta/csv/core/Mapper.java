@@ -1,20 +1,20 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.Severity;
 import io.github.up2jakarta.csv.annotation.Truncated;
 import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.extension.BeanContext;
-import io.github.up2jakarta.csv.misc.Phase;
+import io.github.up2jakarta.csv.extension.Parsed;
+import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.persistence.InputError;
 import io.github.up2jakarta.csv.persistence.InputRow;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Set;
+import java.lang.reflect.Type;
 
-import static java.util.Arrays.stream;
+import static io.github.up2jakarta.csv.core.Beans.getTypeArguments;
+import static io.github.up2jakarta.csv.core.EventHandler.failFast;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Map and validate input data to a configurable bean that supports only {@link String} type.
@@ -23,83 +23,92 @@ import static java.util.Arrays.stream;
  */
 public abstract class Mapper<S extends Segment> {
 
-    final Validator validator;
-    final Property<?>[] properties;
-    final Class<S> type;
-    final int offset;
+    final static Logger LOGGER = LoggerFactory.getLogger(Mapper.class);
+
+    protected final int offset;
+    protected final Class<S> type;
     private final ValidationContext validation;
 
-    Mapper(Class<S> type, BeanContext context, Validator validator) throws BeanException {
+    Mapper(Class<S> type) throws BeanException {
         final Truncated truncated = type.getAnnotation(Truncated.class);
         this.offset = (truncated != null) ? truncated.value() : 0;
-        this.properties = BeanSupport.getProperties(context, type, 0);
         this.type = type;
-        this.validator = validator;
         this.validation = ValidationContext.of(type);
     }
 
     /**
-     * Map and validate input data to java bean depending on annotations like {@link Position}.
+     * Map input data to java bean depending on annotations like {@link Position} with fail-fast principle.
      *
      * @param columns the input data
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
+     * @see #map(InputRow, EventHandler)
+     * @see EventHandler#failFast()
      */
-    public abstract S map(final String... columns) throws BeanException;
+    public final S map(final String... columns) throws BeanException {
+        return map(failFast(), columns);
+    }
+
+    /**
+     * Map without validation input data to java bean depending on annotations like {@link Position}.
+     * and collect errors in the given collector after full-filling the error properties.
+     *
+     * @param handler the error collector, must be not null
+     * @param columns the input data
+     * @param <R>     the row type
+     * @param <V>     the error type
+     * @return the parsed segment
+     * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
+     */
+    public abstract <R extends InputRow, V extends InputError<R, ?>> S map(EventHandler<R, ?, V> handler, String... columns) throws BeanException;
 
     /**
      * Map and validate input data to java bean depending on annotations like {@link Position}.
      * and collect errors in the given collector after full-filling the error properties.
      *
-     * @param row       the input data
-     * @param collector the error collector
-     * @param <R>       the row type
-     * @param <V>       the error type
+     * @param row     the input data
+     * @param handler the error collector, must be not null
+     * @param <R>     the row type
+     * @param <V>     the error type
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
      */
-    public final <R extends InputRow, V extends InputError<R, ?>> S map(R row, EventHandler<R, ?, V> collector) throws BeanException {
-        collector.check(row);
-        final S segment = map(row.getColumns());
+    @SuppressWarnings("unchecked")
+    public final <R extends InputRow, V extends InputError<R, ?>> S map(R row, EventHandler<R, ?, V> handler) throws BeanException {
+        if (row == null || row.getColumns() == null) {
+            return null;
+        }
+        requireNonNull(handler, "handler is required");
+        final R source = handler.getSource();
+        if (source != null && source != row) {
+            throw new BeanException(EventHandler.class, "source", "does not match with row argument");
+        }
+        final S segment = map(handler, row.getColumns());
+        if (segment instanceof Parsed<?> parsed) {
+            final Class<? extends Segment> segmentType = segment.getClass();
+            final Type[] arguments = getTypeArguments(segmentType, Parsed.class);
+            if (arguments.length == 0 || row.getClass() != arguments[0]) {
+                throw new BeanException(segment.getClass(), "must implements Parsed<" + row.getClass().getSimpleName() + ">");
+            }
+            //noinspection unchecked
+            ((Parsed<R>) parsed).setRow(row);
+        }
         if (validation.isEnabled()) {
-            this.validate(segment, validation.getGroups(), collector);
+            this.validate(segment, validation.getGroups(), handler);
         }
         return segment;
     }
 
-    <R extends InputRow, V extends InputError<R, ?>> void validate(Object b, Class<?>[] g, EventHandler<R, ?, V> h) {
-        final Set<ConstraintViolation<Object>> violations = validator.validate(b, g);
-        for (final ConstraintViolation<?> v : violations) {
-            final Property<?> p = findProperty(v);
-            if (p != null) {
-                h.handleEvent(p.getOffset() + this.offset, v, p.getField().getAnnotation(Severity.class));
-            } else {
-                final Logger logger = Phase.MAPPING.getLogger();
-                logger.warn("Unknown {}.{} has error: {}", v.getRootBeanClass(), v.getPropertyPath(), v.getMessage());
-            }
-        }
-    }
-
     /**
-     * Compute the property of the given {@link ConstraintViolation}.
+     * Validates the given bean with the given JSR-303 validation groups and gathering
+     * {@link jakarta.validation.ConstraintViolation} in the given handler.
      *
-     * @param violation the constraint violation
-     * @return the found one
+     * @param bean      the bean that is being validated
+     * @param groups    the validation groups
+     * @param collector the event handler
+     * @param <R>       the input row type
+     * @param <V>       the input error type
      */
-    private Property<?> findProperty(final ConstraintViolation<?> violation) {
-        final String path = violation.getPropertyPath().toString();
-        final String[] fieldNames = path.split("\\.");
-        Property<?> property = null;
-        Property<?>[] properties = this.properties;
-        for (String fieldName : fieldNames) {
-            property = stream(properties).filter(p -> fieldName.equals(p.getField().getName())).findFirst().orElse(null);
-            if (property instanceof FragmentProperty fp) {
-                properties = fp.getProperties();
-            } else {
-                return property;
-            }
-        }
-        return property;
-    }
+    abstract <R extends InputRow, V extends InputError<R, ?>> void validate(Object bean, Class<?>[] groups, EventHandler<R, ?, V> collector);
 
 }

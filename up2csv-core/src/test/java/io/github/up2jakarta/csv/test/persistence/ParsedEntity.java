@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.test.persistence;
 
-import io.github.up2jakarta.csv.persistence.Parsed;
+import io.github.up2jakarta.csv.extension.Parsed;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;

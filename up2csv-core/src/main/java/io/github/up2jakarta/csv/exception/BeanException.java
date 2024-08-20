@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
  */
 public class BeanException extends Exception implements MessageFormatter {
 
-    private static final String FORMAT = "%s[%s] causes an error: %s";
+    private static final String FORMAT = "%s[%s] - %s";
 
     private final Class<?> beanType;
     private final String attribute;
@@ -54,8 +54,13 @@ public class BeanException extends Exception implements MessageFormatter {
     }
 
     @Override
+    public String getMessage() {
+        return getFormattedMessage();
+    }
+
+    @Override
     public String getFormattedMessage() {
-        return String.format(FORMAT, beanType.getSimpleName(), attribute, getMessage());
+        return String.format(FORMAT, beanType.getSimpleName(), attribute, super.getMessage());
     }
 
 }

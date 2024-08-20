@@ -2,7 +2,7 @@
 
 `Up2CSV` is an open-source, light and modern framework that maps and validates easily flat-data to javaBeans.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.bytebuddy/byte-buddy/badge.svg?style=for-the-badge&version=1.1.0)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2csv-core)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.bytebuddy/byte-buddy/badge.svg?style=for-the-badge&version=1.2.3)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2csv-core)
 
 # Features
 
@@ -16,9 +16,10 @@
 - Support of Java OOP (Object-Oriented Programming)
 - Extensions
     - Processor API
-    - Converter API (Coming soon ...)
-    - Extension API (Coming soon ...)
-    - Context API (Coming soon ...)
+    - Conversion Resolver API
+    - Error API
+    - Conversion Extension API (Coming soon)
+    - Bean Checker API (Coming soon)
     - and more ...
 
 # Requirements
@@ -29,13 +30,14 @@
 
 ``` xml
     <dependency>
-        <groupId>io.github.up2jakarta.divers</groupId>
+        <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.3</version>
     </dependency>
     <!-- Optional SLF4J Provider -->
     <!-- Optional JSR-303 Validation Provider -->
-    <!-- Optional IoC Provider -->
+    <!-- Optional JPA Provider -->
+    <!-- Optional CDI Provider -->
 ```
 
 # Annotations
@@ -81,20 +83,11 @@ public Up2Segment implements Segment {
 
 ## @Processor API
 
-Up2 Processor API is configurable and reusable
-
-``` java
-public Up2Segment implements Segment {
-    
-    @Position(0)
-    @Processor(value = TrimTransformer.class, arguments = {"", "-", "null", "undefined"})
-    private String code;
-}
-```
+Up2 Processor API is useful to create configurable processor activated by annotation on fields.
 
 Up2 Core comes with 3 built-in shortcut annotations:
 
-### @Default
+### @Up2Default
 
 Setting the default value
 
@@ -102,56 +95,251 @@ Setting the default value
 public Up2Segment implements Segment {
 
     @Position(0)
-    @Default("null")
+    @Up2Default("null")
     private String code;
 }
 ```
 
-### Token
+### @Up2Token
 
 ``` java
 public Up2Segment implements Segment {
 
     @Position(0)
-    @Token
+    @Up2Token
     private String code;
 }
 ```
 
-### Trim
+### @Up2Trim
 
 ``` java
 public Up2Segment implements Segment {
 
     @Position(0)
-    @Trim({"", "-", "null", "undefined"}) // Order 1
-    @Token // Order 2
-    @Default("UP2") // Order 3
+    @Up2Trim({"", "-", "null", "undefined"}) 
     private String code;
 }
 ```
 
-# Validation
+### Put all together
 
-## @Severity
+``` java
+public Up2Segment implements Segment {
 
-Helps the engine to consider
+    @Position(0)
+    @Up2Trim({"", "-", "null", "undefined"}) // 1st order
+    @Up2Token // 2nd order
+    @Up2Default("UP2") // 3rd order
+    private String code;
+}
+```
+
+## @Converter
+
+Any type different from `String` needs to be converted, so the utility of @Converter
+
+``` java
+public Up2Segment implements Segment {
+
+    @Converter(CurrencyConverter.class)
+    private CurrencyCodeType currency;
+}
+```
+
+## @Resolver API
+
+Up2 @Resolver allows the resolution of the conversion function for one or more type.
+
+Up2 @Resolver is activated by shortcut annotation like @Processor.
+
+Up2 Core comes with 6 built-in shortcut annotations:
+
+### @Up2Boolean
+
+This annotation allows the automatic conversion of `boolean` and its wrapper.
+
+``` java
+public Up2Segment implements Segment {
+
+    @Position(0)
+    @Up2Boolean("Yes")
+    private Boolean valid;
+}
+```
+
+### @Up2Number
+
+This annotation allows the automatic conversion of non-decimal `Number` and their wrappers:
+
+- int
+- long
+- short
+- byte
+- BigInteger
+
+``` java
+public Up2Segment implements Segment {
+
+    @Position(0)
+    @Up2Default("0")
+    @Up2Number
+    private int anInt;
+    
+    @Position(2)
+    @Up2Number
+    private Integer anInteger;
+    
+    // ...
+}
+```
+
+### @Up2Decimal
+
+This annotation allows the automatic conversion of decimal `Number` and their wrappers:
+
+- BigDecimal
+- double
+- float
+
+``` java
+public Up2Segment implements Segment {
+
+    @Position(0)
+    @Up2Decimal(value = 4, roundingMode = RoundingMode.HALF_EVEN)
+    private BigDecimal aDecimal;
+    
+    @Position(2)
+    @Up2Default("0")
+     @Up2Decimal(value = 4)
+    private double aDouble;
+    
+    // ...
+}
+```
+
+### @Up2Temporal
+
+This annotation allows the automatic conversion of `java.time.Temporal`:
+
+- LocalTime
+- LocalDate
+- LocalDateTime
+- OffsetTime
+- OffsetDateTime
+- ZonedDateTime
+- Year
+- YearMonth
+- Instant
+
+``` java
+public Up2Segment implements Segment {
+
+    @Position(2)
+    @Up2Temporal
+    private LocalDate date;
+    
+    // ...
+}
+```
+
+### @Up2TemporalAmount
+
+This annotation allows the automatic conversion of `java.time.TemporalAmount`:
+
+- Period
+- Duration
+
+``` java
+public Up2Segment implements Segment {
+
+    @Position(2)
+    @Up2TemporalAmount
+    private Period perid;
+    
+    // ...
+}
+```
+
+### @Up2CodeList
+
+This annotation allows the automatic conversion of Up2 `CodeList` API
+
+- `CodeList` based on `enum`
+
+``` java
+public Up2Segment implements Segment {
+
+    @Position(0)
+    @Up2CodeList
+    private CurrencyCodeType currency;
+
+    @Position(9)
+    @Up2CodeList
+    private CountryCodeType country;
+    
+    // ...
+}
+```
+
+# Validation and Error API
+
+## @Error
+
+Helps the engine to full-fill the right error code and severity.
+
+This annotation is fully integrated with @Processor, @Converter, @Resolver and JSR-303 Payload.
 
 ``` java
 public TestSegment implements Segment {
 
+    public static final String TU_P_021 = "TU-P021";
+
     @Position(0)
-    @Severity(FATAL) // any error caused by this property will be considered as a fatal error
+    @Error(value = TU_P_021, severity = FATAL) // for any error caused by this property
     private String code;
 
 }
 ```
 
-You can also use the JSR-303 validation `Payload`
+## Support of JSR-303 Payload
 
-- SeverityType.Level.Fatal.class
-- SeverityType.Level.Error.class
-- SeverityType.Level.Warning.class
+You can also use the JSR-303 validation `Payload` to override the error severity and error code.
+
+Up2 comes with three predefined payloads to override the error severity.
+
+- Errors.Fatal.class
+- Errors.Error.class
+- Errors.Warning.class
+
+You can define your own payload of course:
+
+``` java
+@Error(value = "UP2-000100", severity = SeverityType.ERROR)
+public interface CustomPayload extends Error.Payload {
+}
+```
+
+## Support of JSR-303 @Constraint
+
+Also, Up2 supports @Error on JSR-303 constraint annotations:
+
+``` java
+@Documented
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = {CustomValidator.class})
+@Error(value = "UP2-000100", severity = SeverityType.FATAL)
+@SuppressWarnings("unused")
+public @interface CustomConstraint {
+
+    String message() default "{jakarta.validation.constraints.CustomConstraint.message}";
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
+}
+```
 
 ## @jakarta.validation.Valid
 
@@ -162,7 +350,7 @@ Enables JSR-303 validation
 public TestSegment implements Segment {
 
     @Position(0)
-    @Size(min = 1, max = 3, payload = SeverityType.Level.Fatal.class)
+    @Size(min = 1, max = 3, payload = Errors.Fatal.class)
     private String code;
 
 }
@@ -173,12 +361,12 @@ public TestSegment implements Segment {
 Enables JSR-303 validation within specific groups
 
 ``` java
-@Validated(groups =  Group.Mapping.class)
+@Validated(groups =  CustomGroup.class)
 public TestSegment implements Segment {
 
     @Position(0)
-    @Size(min = 1, max = 3, payload = Level.Fatal.class, groups = Group.Mapping.class)
-    @Size(min = 1, max = 2, payload = Level.Error.class) // Default
+    @Size(min = 1, max = 3, payload = Errors.Fatal.class, groups = CustomGroup.class)
+    @Size(min = 1, max = 2, payload = Errors.Error.class) // Default
     private String code;
 
 }
@@ -258,65 +446,41 @@ private EventCreator<InputRowImpl, InputErrorKeyImpl, InputErrorImpl> creator;
 # Configuration
 
 ``` java
-{
+@Configuration
+@ComponentScan(basePackageClasses = {MapperFactory.class, TokenProcessor.class, DecimalResolver.class}) // mandatory scans
+public class TUConfiguration {
 
     @Bean
-    @Scope(SCOPE_SINGLETON)
+    @Scope(value = SCOPE_SINGLETON)
     public CollapsedStringAdapter tokenAdapter() {
-      return new CollapsedStringAdapter(); // required for @Token
+        return new CollapsedStringAdapter(); // for @Up2Token
     }
 
     @Bean
-    @Scope(SCOPE_SINGLETON)
-    public TokenTransformer tokenTransformer(CollapsedStringAdapter tokenAdapter) {
-        return new TokenTransformer(tokenAdapter); // required for @Token
-    }
-
-    @Bean
-    @Scope(SCOPE_SINGLETON)
-    public TrimTransformer trimTransformer() {
-        return new TrimTransformer(); // required for @Trim
-    }
-
-    @Bean
-    @Scope(SCOPE_SINGLETON)
-    public DefaultValueTransformer defaultValueTransformer() {
-        return new DefaultValueTransformer(); // required for @Default
-    }
-
-    @Bean
-    @Scope(SCOPE_SINGLETON)
+    @Scope(value = SCOPE_SINGLETON)
     public Validator validator() {
-        return CSV.validator(messageInterpolator()); // required for MapperFactory
+        return CSV.validator(messageInterpolator());
     }
 
     @Bean
-    @Scope(SCOPE_SINGLETON)
+    @Scope(value = SCOPE_SINGLETON)
     public BeanContext beanContext(final ApplicationContext context) {
-        return context::getBean; // required for MapperFactory
+        return context::getBean;
     }
 
     @Bean
-    @Scope(SCOPE_SINGLETON)
-    public MapperFactory mapperFactory(final BeanContext context, Validator validator) {
-        return new MapperFactory(context, validator); // Here we go
-    }
-    
-    // Custom implementations of Persistence API
-
-    @Bean
-    @Scope(SCOPE_SINGLETON)
+    @Scope(value = SCOPE_SINGLETON)
     public InputRepository<InputRowEntity> inputRepository() {
-        return (r) -> 0; // No errors already saved for input rows
+        return r -> 0; // Simplified
     }
 
     @Bean
-    @Scope(SCOPE_SINGLETON)
-    public EventCreator<InputRowImpl, InputErrorKeyImpl, InputErrorImpl> eventCreator() {
-        return new CompositeKeyCreator<>(InputErrorImpl::new, InputErrorKeyImpl::new); // required for EventHandler
+    @Scope(value = SCOPE_SINGLETON)
+    public CompositeKeyCreator<InputRowImpl, InputErrorKeyImpl, InputErrorImpl> compositeKeyCreator() {
+        return new CompositeKeyCreator<>(InputErrorImpl::new, InputErrorKeyImpl::new);
     }
 
-    // ... Define custom Transformers
+    // ... Define custom processors
 }
 ```
 
@@ -325,4 +489,4 @@ private EventCreator<InputRowImpl, InputErrorKeyImpl, InputErrorImpl> creator;
 - Define your mapper as singleton to avoid scanning javaBeans always
 - If the javaBeans are manipulated by Bytecode-Enhancement you must provide jakarta.persistence.Cache and sync
   operations.
-- By design, transformers (used by @Processor or its shortcuts) must be singleton also.
+- Use of `CodeList` because it is compatible with both JPA `AttributeConverter` and `XmlAdapter`

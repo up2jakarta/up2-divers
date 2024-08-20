@@ -1,18 +1,21 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.Fragment;
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.Processor;
+import io.github.up2jakarta.csv.annotation.Error;
+import io.github.up2jakarta.csv.annotation.*;
+import io.github.up2jakarta.csv.core.MapperFactory.FragmentProperty;
 import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.extension.BeanContext;
-import io.github.up2jakarta.csv.extension.ConfigurableTransformer;
-import io.github.up2jakarta.csv.processor.SingleArgumentTransformer;
+import io.github.up2jakarta.csv.extension.*;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.LinkedList;
 import java.util.List;
 
+import static io.github.up2jakarta.csv.core.Beans.getBean;
+import static io.github.up2jakarta.csv.core.MapperFactory.LOGGER;
 import static java.util.Arrays.asList;
 
 final class BeanSupport {
@@ -33,29 +36,13 @@ final class BeanSupport {
         return field.getType();
     }
 
-    private static String[] lookupArguments(Annotation annotation, Processor processor) throws BeanException {
-        for (final Method method : annotation.annotationType().getDeclaredMethods()) {
-            var overriding = method.getAnnotation(Processor.Override.class);
-            if (overriding != null && overriding.value() == processor.value()) {
-                var value = Beans.invoke(annotation, method, Object.class);
-                if (value instanceof String[] args && args.length != 0) {
-                    return args;
-                }
-                if (value instanceof String arg && SingleArgumentTransformer.class.isAssignableFrom(processor.value())) {
-                    return new String[]{arg};
-                }
-            }
-        }
-        return Beans.NO_ARGUMENTS;
-    }
-
     private static Fragment getAndCheckFragment(Field field) throws BeanException {
         final Fragment csv = field.getAnnotation(Fragment.class);
-        if (csv == null) {
-            throw new BeanException(field, "should be annotated by @Fragment");
-        }
-        if (csv.value() < 0) {
+        if (csv != null && csv.value() < 0) {
             throw new BeanException(field, "@Fragment[value] should be positive");
+        }
+        if (csv != null && !Segment.class.isAssignableFrom(field.getType())) {
+            throw new BeanException(field, "type must implements Segment");
         }
         return csv;
     }
@@ -70,10 +57,10 @@ final class BeanSupport {
 
     private static void checkField(Class<? extends Segment> beanType, Field field) throws BeanException {
         if (Character.isUpperCase(field.getName().charAt(0))) {
-            throw new BeanException(beanType, field, "must starts with an lowercase character");
+            LOGGER.warn("{}[{}] : should starts with an lowercase character", beanType.getSimpleName(), field.getName());
         }
-        if (!Modifier.isPrivate(field.getModifiers()) && !Modifier.isProtected(field.getModifiers())) {
-            throw new BeanException(beanType, field, "should be private or protected");
+        if (Modifier.isPublic(field.getModifiers())) {
+            throw new BeanException(beanType, field, "must not be public");
         }
         if (Modifier.isFinal(field.getModifiers())) {
             throw new BeanException(beanType, field, "must not be final");
@@ -86,6 +73,17 @@ final class BeanSupport {
     private static void checkInner(Class<? extends Segment> beanType) throws BeanException {
         if (beanType.getEnclosingClass() != null && !Modifier.isStatic(beanType.getModifiers())) {
             throw new BeanException(beanType, "inner class is not allowed");
+        }
+    }
+
+    private static void checkDefault(Field field, Conversion<?> conversion) throws BeanException {
+        final Up2Default defaultValue = field.getAnnotation(Up2Default.class);
+        if (defaultValue != null) {
+            try {
+                conversion.apply(defaultValue.value());
+            } catch (Throwable ex) {
+                throw new BeanException(field, "@Up2Default[value] cannot be converted");
+            }
         }
     }
 
@@ -102,56 +100,95 @@ final class BeanSupport {
         if (beanType.getTypeParameters().length != 0) {
             throw new BeanException(beanType, "generic class is not allowed");
         }
+        if (beanType.isRecord()) {
+            throw new BeanException(beanType, "record class is not allowed");
+        }
         checkInner(beanType);
     }
 
-    static ConfigurableTransformer[] getTransformers(BeanContext context, Field field) throws BeanException {
-        final List<ConfigurableTransformer> result = new LinkedList<>();
-        // Add Processors
-        for (final Processor processor : field.getAnnotationsByType(Processor.class)) {
-            result.add(TransformerWrapper.of(context, processor));
-        }
-        // Add Shortcut Annotations
+    static ProcessorWrapper<?>[] getProcessors(BeanContext context, Field field) throws BeanException {
+        final List<ProcessorWrapper<?>> result = new LinkedList<>();
         for (final Annotation annotation : field.getAnnotations()) {
-            final Processor[] processors = annotation.annotationType().getAnnotationsByType(Processor.class);
-            for (final Processor processor : processors) {
-                final String[] arguments = lookupArguments(annotation, processor);
-                result.add(TransformerWrapper.of(context, processor, arguments));
+            final Class<? extends Annotation> aType = annotation.annotationType();
+            final Processor processor = aType.getAnnotation(Processor.class);
+            if (processor != null) {
+                final Class<? extends ConfigurableProcessor<?>> pType = processor.value();
+                final Type[] types = Beans.getTypeArguments(pType, ConfigurableProcessor.class);
+                if (types.length == 0 || aType != types[0]) {
+                    final String aName = aType.getSimpleName();
+                    throw new BeanException(aType, "@Processor[value] must implements ConfigurableProcessor<" + aName + ">");
+                }
+                final ConfigurableProcessor<? extends Annotation> delegate = getBean(context, pType);
+                //noinspection rawtypes,unchecked
+                result.add(new ProcessorWrapper(delegate, processor.skip(), annotation));
             }
         }
-        return result.toArray(new ConfigurableTransformer[0]);
+        return result.toArray(new ProcessorWrapper[0]);
     }
 
-    @SuppressWarnings("unchecked")
-    static Property<?>[] getProperties(BeanContext context, Class<? extends Segment> beanType, final int offset, Type... typeArguments) throws BeanException {
-        final Field[] fields = beanType.getDeclaredFields();
-        final List<Property<?>> properties = new LinkedList<>();
-        for (final Field field : fields) {
-            final Class<?> fieldType = getFieldType(field, typeArguments);
-            final Position position = getAndCheckPosition(field);
-            if (position != null) {
-                if (!String.class.equals(fieldType)) {
-                    throw new BeanException(beanType, field, "type should be String");
-                }
-                checkField(beanType, field);
-                final ConfigurableTransformer[] transformers = getTransformers(context, field);
-                properties.add(new StringProperty(field, offset + position.value(), transformers));
-
-            } else if (Segment.class.isAssignableFrom(fieldType)) {
-                checkField(beanType, field);
-                final Fragment csv = getAndCheckFragment(field);
-                final Class<? extends Segment> fragmentType = (Class<? extends Segment>) fieldType;
-                checkInner(fragmentType);
-                final int fragmentOffset = offset + csv.value();
-                final Property<?>[] fragmentProperties = getProperties(context, fragmentType, fragmentOffset);
-                properties.add(new FragmentProperty(fragmentType, field, fragmentOffset, fragmentProperties));
+    static Conversion<?> getConversion(BeanContext context, Field field) throws BeanException {
+        final Converter converter = field.getAnnotation(Converter.class);
+        final Error error = field.getAnnotation(Error.class);
+        if (converter != null) {
+            final TypeConverter<?> tConverter = Beans.getBean(context, converter.value());
+            if (!tConverter.getSupportedType().isAssignableFrom(field.getType())) {
+                throw new BeanException(field, "@Converter[value] does support " + field.getType().getSimpleName());
+            }
+            if (error == null) {
+                return Conversion.of(tConverter::parse, tConverter.getErrorSeverity(), tConverter.getErrorCode());
+            }
+            return Conversion.of(tConverter::parse, error);
+        }
+        for (final Annotation annotation : field.getAnnotations()) {
+            final Resolver resolver = annotation.annotationType().getAnnotation(Resolver.class);
+            if (resolver != null) {
+                //noinspection unchecked
+                var conversionResolver = (ConversionResolver<Annotation>) Beans.getBean(context, resolver.value());
+                final Conversion<?> conversion = conversionResolver.resolve(annotation, field);
+                return Conversion.of(conversion, error);
             }
         }
+        throw new BeanException(field, "must be annotated with @Converter or one of its shortcuts");
+    }
+
+    static Property<?>[] getProperties(Class<? extends Segment> beanType, final BeanStack stack) throws BeanException {
+        if (stack.push(beanType)) {
+            throw new BeanException(beanType, "cyclic fragment is not allowed");
+        }
+        final List<Property<?>> properties = new LinkedList<>();
         final Class<?> superClass = beanType.getSuperclass();
         if (Segment.class.isAssignableFrom(superClass)) {
             final Type[] arguments = Beans.getTypeArguments(beanType);
-            final Property<?>[] superProperties = getProperties(context, (Class<? extends Segment>) superClass, offset, arguments);
+            //noinspection unchecked
+            final Class<? extends Segment> fragmentType = (Class<? extends Segment>) superClass;
+            final Property<?>[] superProperties = getProperties(fragmentType, stack.with(arguments));
             properties.addAll(asList(superProperties));
+        }
+        final Field[] fields = beanType.getDeclaredFields();
+        final int offset = stack.getOffset();
+        for (final Field field : fields) {
+            final Class<?> fieldType = getFieldType(field, stack.getArguments());
+            final Position position = getAndCheckPosition(field);
+            final Fragment fragment = getAndCheckFragment(field);
+            if (position != null) {
+                checkField(beanType, field);
+                final ProcessorWrapper<?>[] processors = getProcessors(stack.getContext(), field);
+                if (CharSequence.class == fieldType || fieldType == String.class) {
+                    properties.add(new StringProperty(field, offset + position.value(), processors));
+                } else {
+                    final Conversion<?> conversion = getConversion(stack.getContext(), field);
+                    checkDefault(field, conversion);
+                    properties.add(new ConvertedProperty<>(field, offset + position.value(), processors, conversion));
+                }
+            } else if (fragment != null) {
+                checkField(beanType, field);
+                //noinspection unchecked
+                final Class<? extends Segment> fragmentType = (Class<? extends Segment>) fieldType;
+                checkInner(fragmentType);
+                final int fragmentOffset = offset + fragment.value();
+                final Property<?>[] fragmentProperties = getProperties(fragmentType, stack.with(fragmentOffset));
+                properties.add(new FragmentProperty<>(fragmentType, field, fragmentOffset, fragmentProperties));
+            }
         }
         return properties.toArray(new Property[0]);
     }

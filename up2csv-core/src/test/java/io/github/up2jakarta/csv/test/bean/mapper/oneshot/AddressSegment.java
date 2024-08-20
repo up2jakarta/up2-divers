@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.test.bean.mapper.oneshot;
 
 import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.core.Segment;
+import io.github.up2jakarta.csv.extension.Segment;
 
 @SuppressWarnings("unused")
 public abstract class AddressSegment<K extends Comparable<K>> implements Segment {

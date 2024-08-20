@@ -3,7 +3,9 @@ package io.github.up2jakarta.csv.extension;
 /**
  * Contract interface for JavaBean container, useful for contained application that use JSR-365 (CDI) or whatever.
  *
- * @see ConfigurableTransformer
+ * @see io.github.up2jakarta.csv.annotation.Processor
+ * @see io.github.up2jakarta.csv.annotation.Resolver
+ * @see io.github.up2jakarta.csv.annotation.Converter
  */
 @FunctionalInterface
 public interface BeanContext {

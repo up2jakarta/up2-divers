@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.persistence;
 
-import io.github.up2jakarta.csv.misc.SeverityType;
+import io.github.up2jakarta.csv.extension.SeverityType;
 
 /**
  * Contact interface for an input error.
@@ -41,6 +41,11 @@ public interface InputError<R extends InputRow, K extends InputError.Key<R>> {
      * @param message the error message
      */
     void setMessage(String message);
+
+    /**
+     * @param trace the error stack trace
+     */
+    void setTrace(String trace);
 
     /**
      * Contact interface for input error identifier.

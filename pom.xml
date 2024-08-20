@@ -1,9 +1,10 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.up2jakarta</groupId>
     <artifactId>up2-divers</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.3</version>
     <packaging>pom</packaging>
 
     <name>Up2Jakarta :: Divers</name>
@@ -109,10 +110,21 @@
                             </excludePackageNames>
                             <sourceFileExcludes>
                                 <exclude>**/io/github/up2jakarta/csv/exception/*.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/resolver/*.java</exclude>
                                 <exclude>**/io/github/up2jakarta/csv/misc/*.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/*.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/processor/*.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/CSV.java</exclude>
+                                <!-- Core -->
+                                <exclude>**/io/github/up2jakarta/csv/core/Beans.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/BeanStack.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/BeanSupport.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/CodeListResolver.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/ConvertedProperty.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/LazyCounter.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/LazyList.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/PositionProperty.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/ProcessorWrapper.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/Property.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/StringProperty.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/ValidationContext.java</exclude>
                             </sourceFileExcludes>
                         </configuration>
                     </plugin>
@@ -130,6 +142,7 @@
                             </execution>
                         </executions>
                         <configuration>
+                            <!-- gpg-connect-agent -v -->
                             <keyname>${gpg.key.name}</keyname>
                         </configuration>
                     </plugin>

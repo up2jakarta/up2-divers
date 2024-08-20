@@ -1,19 +1,15 @@
 package io.github.up2jakarta.csv.annotation;
 
-import io.github.up2jakarta.csv.extension.ConfigurableTransformer;
+import io.github.up2jakarta.csv.extension.ConfigurableProcessor;
 
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports {@link ConfigurableTransformer} or shortcut annotations for processors.
- * Also supports {@link Processor#arguments()} overriding.
- *
- * @see Trim
+ * Up2 Annotation that supports {@link ConfigurableProcessor} used for processor's shortcut annotations.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
-@Repeatable(Processors.class)
+@Target(ElementType.ANNOTATION_TYPE)
 public @interface Processor {
 
     /**
@@ -21,27 +17,11 @@ public @interface Processor {
      *
      * @return the class of the processor
      */
-    Class<? extends ConfigurableTransformer> value();
+    Class<? extends ConfigurableProcessor<?>> value();
 
     /**
-     * @return The processor arguments
+     * @return the top-level error type to be skipped
      */
-    String[] arguments() default {};
-
-    /**
-     * Up2 Annotation that allows shortcut annotations for processors to override {@link Processor#arguments()}.
-     *
-     * @see Trim
-     * @see Default
-     */
-    @Documented
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.METHOD})
-    @interface Override {
-        /**
-         * @return the processor identified by its transformer class.
-         */
-        Class<? extends ConfigurableTransformer> value();
-    }
+    Class<? extends RuntimeException> skip() default RuntimeException.class;
 
 }

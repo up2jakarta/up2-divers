@@ -1,8 +1,9 @@
 package io.github.up2jakarta.csv.test.persistence;
 
-import io.github.up2jakarta.csv.misc.SeverityType;
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
+import io.github.up2jakarta.csv.extension.SeverityType;
+import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.type.descriptor.jdbc.LongVarcharJdbcType;
 
 @MappedSuperclass
 @SuppressWarnings("unused")
@@ -19,6 +20,12 @@ abstract class AbstractError {
 
     @Column(name = "ERR_MESSAGE", length = 1023, nullable = false)
     private String message;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @JdbcType(LongVarcharJdbcType.class)
+    @Column(name = "ERR_TRACE", nullable = false)
+    private String trace;
 
     public final SeverityType getSeverity() {
         return severity;
@@ -52,5 +59,12 @@ abstract class AbstractError {
         this.message = message;
     }
 
+    public String getTrace() {
+        return trace;
+    }
+
+    public void setTrace(String trace) {
+        this.trace = trace;
+    }
 }
 

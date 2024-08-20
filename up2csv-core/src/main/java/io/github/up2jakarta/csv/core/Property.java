@@ -14,7 +14,7 @@ abstract class Property<V> {
 
     protected final Field field;
     protected final Method setter;
-    private final int offset;
+    protected final int offset;
 
     Property(Field field, int offset) throws BeanException {
         this.field = field;
@@ -23,26 +23,14 @@ abstract class Property<V> {
     }
 
     /**
-     * @return the property index
-     */
-    final int getOffset() {
-        return offset;
-    }
-
-    /**
-     * @return the property field
-     */
-    final Field getField() {
-        return field;
-    }
-
-    /**
      * Set the given bean property by the given value.
      *
-     * @param bean  the bean object
-     * @param value the property value
+     * @param bean    the bean object
+     * @param value   the property value
+     * @param offset  the truncated offset
+     * @param handler the event handler
      * @throws BeanException if the property is not accessible for write
      */
-    abstract void setValue(Object bean, V value) throws BeanException;
+    abstract void setValue(Object bean, V value, int offset, EventHandler<?, ?, ?> handler) throws BeanException;
 
 }

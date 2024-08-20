@@ -2,10 +2,16 @@ package io.github.up2jakarta.csv;
 
 import io.github.up2jakarta.csv.core.MapperFactory;
 import io.github.up2jakarta.csv.extension.BeanContext;
-import io.github.up2jakarta.csv.processor.DefaultValueTransformer;
-import io.github.up2jakarta.csv.processor.TokenTransformer;
-import io.github.up2jakarta.csv.processor.TrimTransformer;
-import io.github.up2jakarta.csv.test.DummyTransformer;
+import io.github.up2jakarta.csv.misc.CompositeKeyCreator;
+import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
+import io.github.up2jakarta.csv.persistence.InputRepository;
+import io.github.up2jakarta.csv.processor.TokenProcessor;
+import io.github.up2jakarta.csv.resolver.DecimalResolver;
+import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
+import io.github.up2jakarta.csv.test.extension.DummyConverter;
+import io.github.up2jakarta.csv.test.persistence.InputErrorEntity;
+import io.github.up2jakarta.csv.test.persistence.InputRowEntity;
+import io.github.up2jakarta.csv.test.persistence.SimpleErrorEntity;
 import jakarta.validation.Validator;
 import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import org.springframework.context.ApplicationContext;
@@ -18,31 +24,16 @@ import static io.github.up2jakarta.csv.test.Tests.messageInterpolator;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_SINGLETON;
 
 @Configuration
-@ComponentScan(basePackageClasses = {DummyTransformer.class})
+@ComponentScan(basePackageClasses = {
+        MapperFactory.class, TokenProcessor.class, DecimalResolver.class,
+        DummyConverter.class, CurrencyConverter.class // Test
+})
 public class TUConfiguration {
 
     @Bean
     @Scope(value = SCOPE_SINGLETON)
     public CollapsedStringAdapter tokenAdapter() {
-        return new CollapsedStringAdapter();
-    }
-
-    @Bean
-    @Scope(value = SCOPE_SINGLETON)
-    public TokenTransformer tokenTransformer(CollapsedStringAdapter tokenAdapter) {
-        return new TokenTransformer(tokenAdapter);
-    }
-
-    @Bean
-    @Scope(value = SCOPE_SINGLETON)
-    public TrimTransformer trimTransformer() {
-        return new TrimTransformer();
-    }
-
-    @Bean
-    @Scope(value = SCOPE_SINGLETON)
-    public DefaultValueTransformer defaultValueTransformer() {
-        return new DefaultValueTransformer();
+        return new CollapsedStringAdapter(); // for @Up2Token
     }
 
     @Bean
@@ -59,8 +50,32 @@ public class TUConfiguration {
 
     @Bean
     @Scope(value = SCOPE_SINGLETON)
-    public MapperFactory mapperFactory(final BeanContext context, Validator validator) {
-        return new MapperFactory(context, validator);
+    public InputRepository<InputRowEntity> inputRepository() {
+        return r -> 0;
+    }
+
+    /**
+     * Choose one {@link io.github.up2jakarta.csv.core.EventCreator} depends on your implementation:
+     *
+     * @see #compositeKeyCreator() for composite key implementation
+     */
+    @Bean
+    @Scope(value = SCOPE_SINGLETON)
+    @Deprecated(forRemoval = true)
+    public SimpleKeyCreator<InputRowEntity, SimpleErrorEntity> simpleKeyCreator() {
+        return new SimpleKeyCreator<>(SimpleErrorEntity::new);
+    }
+
+    /**
+     * Choose one {@link io.github.up2jakarta.csv.core.EventCreator} depends on your implementation:
+     *
+     * @see #simpleKeyCreator() for simple key implementation
+     */
+    @Bean
+    @Scope(value = SCOPE_SINGLETON)
+    @Deprecated(forRemoval = true)
+    public CompositeKeyCreator<InputRowEntity, InputErrorEntity.PKey, InputErrorEntity> compositeKeyCreator() {
+        return new CompositeKeyCreator<>(InputErrorEntity::new, InputErrorEntity.PKey::new);
     }
 
 }

@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.persistence;
 
-import io.github.up2jakarta.csv.misc.CodeList;
+import io.github.up2jakarta.csv.extension.CodeList;
 
 /**
  * Contact marker for the type of input row.
  */
-public interface InputType<T extends Enum<T>> extends CodeList<T> {
+public interface InputType<T extends Enum<T> & InputType<T>> extends CodeList<T> {
 
 }
