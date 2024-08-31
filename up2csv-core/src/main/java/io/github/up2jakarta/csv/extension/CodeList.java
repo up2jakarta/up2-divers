@@ -6,7 +6,7 @@ package io.github.up2jakarta.csv.extension;
  * @param <T> the type of enum implementation
  */
 @SuppressWarnings("unused")
-public interface CodeList<T extends Enum<T> & CodeList<T>> {
+public interface CodeList<T extends CodeList<T>> {
 
     /**
      * @return the code value.

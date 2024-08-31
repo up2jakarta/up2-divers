@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  * @param <K> the error key type
  * @param <E> the error type
  */
-public final class CompositeKeyCreator<R extends InputRow, K extends InputError.Key<R>, E extends InputError<R, K>> extends EventCreator<R, K, E> {
+public class CompositeKeyCreator<R extends InputRow, K extends InputError.Key<R>, E extends InputError<R, K>> extends EventCreator<R, K, E> {
 
     private final Supplier<E> errorCreator;
     private final Supplier<K> keyCreator;
@@ -30,7 +30,7 @@ public final class CompositeKeyCreator<R extends InputRow, K extends InputError.
     }
 
     @Override
-    protected E newInstance() {
+    protected final E newInstance() {
         final E error = errorCreator.get();
         if (!(error instanceof InputError.Key<?>)) {
             final K key = keyCreator.get();

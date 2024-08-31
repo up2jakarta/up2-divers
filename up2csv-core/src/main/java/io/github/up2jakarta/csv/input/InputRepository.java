@@ -9,11 +9,11 @@ package io.github.up2jakarta.csv.input;
 public interface InputRepository<R extends InputRow> {
 
     /**
-     * Count and return the number of existing errors related to the given input row.
+     * Get and return the max key-order of existing errors related to the given input row.
      *
      * @param row the input row
-     * @return the number of existing errors
+     * @return the max of used key-order
      */
-    int countErrorsBy(R row);
+    int max(R row);
 
 }

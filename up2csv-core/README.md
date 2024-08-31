@@ -2,7 +2,7 @@
 
 `Up2CSV` is an open-source, light and modern framework that maps and validates easily flat-data to javaBeans.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.bytebuddy/byte-buddy/badge.svg?style=for-the-badge&version=1.3.0)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2csv-core)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.bytebuddy/byte-buddy/badge.svg?style=for-the-badge&version=1.4.0)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2csv-core)
 
 # Features
 
@@ -32,7 +32,7 @@
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.3.0</version>
+        <version>1.4.0</version>
     </dependency>
     <!-- Optional SLF4J Provider -->
     <!-- Optional JSR-303 Validation Provider -->

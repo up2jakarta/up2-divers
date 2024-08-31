@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.annotation;
 
-import io.github.up2jakarta.csv.core.JpaConvertExtension;
-import io.github.up2jakarta.csv.core.JpaEnumeratedExtension;
+import io.github.up2jakarta.csv.core.*;
 
 import java.lang.annotation.*;
 
@@ -14,5 +13,9 @@ import java.lang.annotation.*;
 // Extensions
 @Extension(value = JpaEnumeratedExtension.class)
 @Extension(value = JpaConvertExtension.class)
+// Checkers
+@Checker(UniqueOffsetChecker.class)
+@Checker(JpaTableChecker.class)
+@Checker(JpaColumnChecker.class)
 public @interface Up2EnableJPA {
 }

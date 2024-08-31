@@ -43,10 +43,10 @@ class DiversTest {
         final LazyList<InputRowEntity, SimpleErrorEntity> lazyList = new LazyList<>(() -> 3);
         final SimpleErrorEntity error = new SimpleErrorEntity();
         // WHEN
-        lazyList.addWithOrder(null);
+        lazyList.addWithOrder(0,null, false);
         assertEquals(0, lazyList.toList().size());
         // WHEN
-        lazyList.addWithOrder(error);
+        lazyList.addWithOrder(0, error, false);
         // THEN
         {
             final List<SimpleErrorEntity> errors = lazyList.toList();
@@ -57,17 +57,12 @@ class DiversTest {
         }
         // WHEN
         final List<SimpleErrorEntity> target = new LinkedList<>();
-        lazyList.addWithOrder(error); // Duplication
+        lazyList.addWithOrder(0, error, false); // Duplication
         lazyList.addTo(target);
         // THEN
-        {
-            assertEquals(2, target.size());
-            var rowError = target.get(0);
-            assertEquals(4, rowError.getKey().getOrder());
-            rowError = target.get(1);
-            assertSame(error, rowError);
-            assertEquals(4, rowError.getKey().getOrder());
-        }
+        assertEquals(1, target.size());
+        final SimpleErrorEntity rowError = target.get(0);
+        assertEquals(4, rowError.getKey().getOrder());
     }
 
     @Test
@@ -76,10 +71,10 @@ class DiversTest {
         final LazyList<InputRowEntity, InputErrorEntity> lazyList = new LazyList<>(() -> 3);
         final InputErrorEntity error = new InputErrorEntity();
         // WHEN null
-        lazyList.addWithOrder(null);
+        lazyList.addWithOrder(0,null, false);
         assertEquals(0, lazyList.toList().size());
         // WHEN Key null
-        lazyList.addWithOrder(error);
+        lazyList.addWithOrder(0, error, false);
         // THEN
         final List<InputErrorEntity> errors = lazyList.toList();
         assertEquals(1, errors.size());

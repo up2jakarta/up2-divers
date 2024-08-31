@@ -23,11 +23,13 @@ final class MapperContext {
     private final ConversionExtension<?, Annotation>[] extensions;
     private final Stack<Class<? extends Segment>> stack;
     private final Class<? extends Segment> type;
+    private final CompositeChecker checker;
     private final BeanContext context;
     private final Type[] arguments;
     private final int offset;
 
     public MapperContext(BeanContext context, Class<? extends Segment> type) throws BeanException {
+        this.checker = CompositeChecker.of(type, context);
         this.extensions = getExtensions(type, context);
         this.arguments = Beans.NO_TYPES;
         this.stack = new Stack<>();
@@ -38,6 +40,7 @@ final class MapperContext {
 
     private MapperContext(MapperContext origin, int offset, Type... arguments) {
         this.extensions = origin.extensions;
+        this.checker = origin.checker;
         this.type = origin.type;
         this.stack = origin.newStack();
         this.context = origin.context;
@@ -100,6 +103,10 @@ final class MapperContext {
             }
         }
         throw new BeanException(field, "must be annotated with @Converter or one of its shortcuts");
+    }
+
+    public CompositeChecker getChecker() {
+        return checker;
     }
 
 }

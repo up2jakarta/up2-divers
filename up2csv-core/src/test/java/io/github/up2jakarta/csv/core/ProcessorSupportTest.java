@@ -179,8 +179,8 @@ public class ProcessorSupportTest {
         // When
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test5Processor.class));
         // THEN
-        assertEquals(Dummy4.class, thrown.getBeanType());
-        assertEquals("class", thrown.getAttribute());
+        assertEquals(Dummy4.class, thrown.getSource());
+        assertEquals("class", thrown.getLocator());
         assertEquals("Dummy4[class] - @Processor[value] must implements ConfigurableProcessor<Dummy4>", thrown.getMessage());
     }
 

@@ -332,8 +332,8 @@ class MapperTest {
         // When
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(LocalSegment.class));
         // THEN
-        assertEquals(LocalSegment.class, thrown.getBeanType());
-        assertEquals("class", thrown.getAttribute());
+        assertEquals(LocalSegment.class, thrown.getSource());
+        assertEquals("class", thrown.getLocator());
         assertEquals("LocalSegment[class] - local class is not allowed", thrown.getFormattedMessage());
     }
 
@@ -342,8 +342,8 @@ class MapperTest {
         // When
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(AddressSegment.class));
         // THEN
-        assertEquals(AddressSegment.class, thrown.getBeanType());
-        assertEquals("class", thrown.getAttribute());
+        assertEquals(AddressSegment.class, thrown.getSource());
+        assertEquals("class", thrown.getLocator());
         assertEquals("AddressSegment[class] - abstract class is not allowed", thrown.getMessage());
     }
 
@@ -352,8 +352,8 @@ class MapperTest {
         // When
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Segment.class));
         // THEN
-        assertEquals(Segment.class, thrown.getBeanType());
-        assertEquals("class", thrown.getAttribute());
+        assertEquals(Segment.class, thrown.getSource());
+        assertEquals("class", thrown.getLocator());
         assertEquals("Segment[class] - interface is not allowed", thrown.getMessage());
     }
 
@@ -362,8 +362,8 @@ class MapperTest {
         // When
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test8Segment.class));
         // THEN
-        assertEquals(Test8Segment.class, thrown.getBeanType());
-        assertEquals("class", thrown.getAttribute());
+        assertEquals(Test8Segment.class, thrown.getSource());
+        assertEquals("class", thrown.getLocator());
         assertEquals("Test8Segment[class] - generic class is not allowed", thrown.getMessage());
     }
 
@@ -372,8 +372,8 @@ class MapperTest {
         // When
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(InnerSegment.class));
         // THEN
-        assertEquals(InnerSegment.InnerFragment.class, thrown.getBeanType());
-        assertEquals("class", thrown.getAttribute());
+        assertEquals(InnerSegment.InnerFragment.class, thrown.getSource());
+        assertEquals("class", thrown.getLocator());
         assertEquals("InnerFragment[class] - inner class is not allowed", thrown.getMessage());
     }
 
@@ -382,8 +382,8 @@ class MapperTest {
         // When
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(InnerSegment.InnerFragment.class));
         // THEN
-        assertEquals(InnerSegment.InnerFragment.class, thrown.getBeanType());
-        assertEquals("class", thrown.getAttribute());
+        assertEquals(InnerSegment.InnerFragment.class, thrown.getSource());
+        assertEquals("class", thrown.getLocator());
         assertEquals("InnerFragment[class] - inner class is not allowed", thrown.getMessage());
     }
 
@@ -392,8 +392,8 @@ class MapperTest {
         // When
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(TestRecursive1Segment.class));
         // THEN
-        assertEquals(TestRecursive1Segment.class, thrown.getBeanType());
-        assertEquals("class", thrown.getAttribute());
+        assertEquals(TestRecursive1Segment.class, thrown.getSource());
+        assertEquals("class", thrown.getLocator());
         assertEquals("TestRecursive1Segment[class] - cyclic fragment is not allowed", thrown.getMessage());
     }
 
@@ -402,8 +402,8 @@ class MapperTest {
         // When
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(TestRecursive3Segment.class));
         // THEN
-        assertEquals(TestRecursive1Segment.class, thrown.getBeanType());
-        assertEquals("class", thrown.getAttribute());
+        assertEquals(TestRecursive1Segment.class, thrown.getSource());
+        assertEquals("class", thrown.getLocator());
         assertEquals("TestRecursive1Segment[class] - cyclic fragment is not allowed", thrown.getMessage());
     }
 
@@ -412,8 +412,8 @@ class MapperTest {
         // WHEN
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(RecordBean.class));
         // THEN
-        assertEquals(RecordBean.class, thrown.getBeanType());
-        assertEquals("class", thrown.getAttribute());
+        assertEquals(RecordBean.class, thrown.getSource());
+        assertEquals("class", thrown.getLocator());
         assertEquals("RecordBean[class] - record class is not allowed", thrown.getMessage());
     }
 
@@ -422,8 +422,8 @@ class MapperTest {
         // WHEN
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(BeanWithInteger.class));
         // THEN
-        assertEquals(BeanWithInteger.class, thrown.getBeanType());
-        assertEquals("id", thrown.getAttribute());
+        assertEquals(BeanWithInteger.class, thrown.getSource());
+        assertEquals("id", thrown.getLocator());
         assertEquals("BeanWithInteger[id] - must be annotated with @Converter or one of its shortcuts", thrown.getMessage());
     }
 
@@ -432,8 +432,8 @@ class MapperTest {
         // WHEN
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test1Segment.class));
         // THEN
-        assertEquals(Test1Segment.class, thrown.getBeanType());
-        assertEquals("p", thrown.getAttribute());
+        assertEquals(Test1Segment.class, thrown.getSource());
+        assertEquals("p", thrown.getLocator());
         assertEquals("Test1Segment[p] - type must implements Segment", thrown.getMessage());
     }
 
@@ -442,8 +442,8 @@ class MapperTest {
         // WHEN
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test2Segment.class));
         // THEN
-        assertEquals(Test2Segment.class, thrown.getBeanType());
-        assertEquals("p", thrown.getAttribute());
+        assertEquals(Test2Segment.class, thrown.getSource());
+        assertEquals("p", thrown.getLocator());
         assertEquals("Test2Segment[p] - @Fragment[value] must be positive", thrown.getMessage());
     }
 
@@ -452,8 +452,8 @@ class MapperTest {
         // WHEN
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test3Segment.class));
         // THEN
-        assertEquals(Test3Segment.class, thrown.getBeanType());
-        assertEquals("p", thrown.getAttribute());
+        assertEquals(Test3Segment.class, thrown.getSource());
+        assertEquals("p", thrown.getLocator());
         assertEquals("Test3Segment[p] - @Position[value] must be positive", thrown.getMessage());
     }
 
@@ -477,8 +477,8 @@ class MapperTest {
         // WHEN
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test5Segment.class));
         // THEN
-        assertEquals(Test5Segment.class, thrown.getBeanType());
-        assertEquals("publicField", thrown.getAttribute());
+        assertEquals(Test5Segment.class, thrown.getSource());
+        assertEquals("publicField", thrown.getLocator());
         assertEquals("Test5Segment[publicField] - must not be public", thrown.getMessage());
     }
 
@@ -487,8 +487,8 @@ class MapperTest {
         // WHEN
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test6Segment.class));
         // THEN
-        assertEquals(Test6Segment.class, thrown.getBeanType());
-        assertEquals("finalField", thrown.getAttribute());
+        assertEquals(Test6Segment.class, thrown.getSource());
+        assertEquals("finalField", thrown.getLocator());
         assertEquals("Test6Segment[finalField] - must not be final", thrown.getMessage());
     }
 
@@ -497,8 +497,8 @@ class MapperTest {
         // WHEN
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test7Segment.class));
         // THEN
-        assertEquals(Test7Segment.class, thrown.getBeanType());
-        assertEquals("staticField", thrown.getAttribute());
+        assertEquals(Test7Segment.class, thrown.getSource());
+        assertEquals("staticField", thrown.getLocator());
         assertEquals("Test7Segment[staticField] - must not be static", thrown.getMessage());
     }
 

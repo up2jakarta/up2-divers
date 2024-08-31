@@ -7,12 +7,11 @@ import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.test.codelist.TestCodeList;
 import io.github.up2jakarta.csv.test.codelist.TestCodeListConverter;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 
 @Entity
 @Up2EnableJPA
+@Table(name = "TU_SEGMENT")
 @SuppressWarnings("unused")
 public class Test2Bean implements Segment {
 
@@ -23,16 +22,19 @@ public class Test2Bean implements Segment {
     @Position(0)
     @Error(value = XML_001, severity = SeverityType.FATAL)
     @Enumerated
+    @Transient
     private XML1Enum enum1;
 
     @Position(1)
     @Error(value = XML_002, severity = SeverityType.WARNING)
     @Enumerated
+    @Transient
     private XML2Enum enum2;
 
     @Position(2)
     @Error(value = XML_003, severity = SeverityType.FATAL)
     @Convert(converter = TestCodeListConverter.class)
+    @Transient
     private TestCodeList adapter;
 
     public XML1Enum getEnum1() {

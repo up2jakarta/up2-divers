@@ -12,7 +12,7 @@ import java.util.function.Supplier;
  * @param <R> the input row
  * @param <E> the simple error
  */
-public final class SimpleKeyCreator<R extends InputRow, E extends InputError.Key<R> & InputError<R, E>> extends EventCreator<R, E, E> {
+public class SimpleKeyCreator<R extends InputRow, E extends InputError.Key<R> & InputError<R, E>> extends EventCreator<R, E, E> {
 
     private final Supplier<E> errorCreator;
 
@@ -26,7 +26,7 @@ public final class SimpleKeyCreator<R extends InputRow, E extends InputError.Key
     }
 
     @Override
-    protected E newInstance() {
+    protected final E newInstance() {
         return errorCreator.get();
     }
 

@@ -34,7 +34,7 @@ public enum SeverityType implements CodeList<SeverityType> {
     /**
      * Find to the corresponding constant to the given XML {@link ValidationEvent}.
      *
-     * @param level the XML level
+     * @param level the severity level
      * @return the corresponding constant, else {@link #ERROR}
      */
     public static SeverityType of(int level) {
@@ -42,9 +42,27 @@ public enum SeverityType implements CodeList<SeverityType> {
             return FATAL;
         } else if (level == WARNING.level) {
             return WARNING;
-        } else {
+        }
+        return ERROR;
+    }
+
+    /**
+     * Find to the corresponding constant to the given XML {@link ValidationEvent}.
+     *
+     * @param name the name of severity
+     * @return the corresponding constant, else {@link #ERROR}
+     */
+    public static SeverityType of(String name) {
+        if(name == null) {
             return ERROR;
         }
+        name = name.toUpperCase();
+        if (FATAL.name().equals(name)) {
+            return FATAL;
+        } else if (WARNING.name().equals(name)) {
+            return WARNING;
+        }
+        return ERROR;
     }
 
     /**

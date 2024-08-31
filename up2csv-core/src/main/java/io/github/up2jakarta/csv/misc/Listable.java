@@ -13,4 +13,5 @@ public interface Listable<T> {
      * @return the list of contained element
      */
     List<T> toList();
+
 }

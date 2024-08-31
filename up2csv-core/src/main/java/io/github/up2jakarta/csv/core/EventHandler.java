@@ -16,10 +16,7 @@ import jakarta.validation.metadata.ConstraintDescriptor;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static io.github.up2jakarta.csv.misc.Errors.ERROR_CONVERTER;
 import static io.github.up2jakarta.csv.misc.Errors.ERROR_VALIDATOR;
@@ -102,7 +99,7 @@ public abstract class EventHandler<A extends InputRow, B extends InputError.Key<
      * @return pre-configured event handler
      * @see io.github.up2jakarta.csv.misc.CompositeKeyCreator
      */
-    public static <R extends InputRow, K extends InputError.Key<R>, E extends InputError<R, K>> EventHandler<R, K, E> of(R row, EventCreator<R, K, E> creator, InputRepository<R> repository) {
+    public static <R extends InputRow, K extends InputError.Key<R>, E extends InputError<R, K>> DefaultHandler<R, K, E> of(R row, EventCreator<R, K, E> creator, InputRepository<R> repository) {
         return new DefaultHandler<>(row, creator, repository);
     }
 
@@ -183,7 +180,7 @@ public abstract class EventHandler<A extends InputRow, B extends InputError.Key<
     /**
      * Default internal implementation.
      */
-    private static class DefaultHandler<R extends InputRow, K extends InputError.Key<R>, E extends InputError<R, K>> extends EventHandler<R, K, E> {
+    public static class DefaultHandler<R extends InputRow, K extends InputError.Key<R>, E extends InputError<R, K>> extends EventHandler<R, K, E> {
 
         private static final List<String> CLASS_NAMES = List.of(
                 ConvertedProperty.class.getName(),
@@ -192,7 +189,9 @@ public abstract class EventHandler<A extends InputRow, B extends InputError.Key<
                 EventHandler.class.getName(),
                 MapperFactory.FragmentProperty.class.getName(),
                 MapperFactory.class.getName() + "$DefaultMapper",
-                ProcessorWrapper.class.getName()
+                ProcessorWrapper.class.getName(),
+                TechnicalChecker.class.getName(),
+                CompositeChecker.class.getName()
         );
 
         private final R row;
@@ -202,7 +201,7 @@ public abstract class EventHandler<A extends InputRow, B extends InputError.Key<
         private DefaultHandler(R row, EventCreator<R, K, E> creator, InputRepository<R> repository) {
             this.row = row;
             this.creator = creator;
-            this.collector = new LazyList<>(() -> repository.countErrorsBy(row));
+            this.collector = new LazyList<>(() -> repository.max(row));
         }
 
         private static void stackTrace(Throwable error, PrintWriter printer) {
@@ -221,10 +220,12 @@ public abstract class EventHandler<A extends InputRow, B extends InputError.Key<
 
         @Override
         void handleEvent(int offset, ConstraintViolation<?> violation, Error config) {
-            final SeverityType type = getSeverity(violation, config);
-            final String code = getErrorCode(violation, config);
-            final E error = creator.create(type, row, offset, code, violation.getMessage());
-            this.collector.addWithOrder(error);
+            if(!collector.contains(offset)) {
+                final SeverityType type = getSeverity(violation, config);
+                final String code = getErrorCode(violation, config);
+                final E error = creator.create(type, row, offset, code, violation.getMessage());
+                this.collector.addWithOrder(offset, error, false);
+            }
         }
 
         @Override
@@ -237,7 +238,7 @@ public abstract class EventHandler<A extends InputRow, B extends InputError.Key<
                 stackTrace(exception, new PrintWriter(writer));
                 error.setTrace(writer.toString());
             }
-            this.collector.addWithOrder(error);
+            this.collector.addWithOrder(offset, error, true);
         }
 
         @Override
@@ -248,6 +249,16 @@ public abstract class EventHandler<A extends InputRow, B extends InputError.Key<
         @Override
         public List<E> toList() {
             return collector.toList();
+        }
+
+        @SuppressWarnings("unused")
+        public void add(E error) {
+            collector.addWithOrder(null, error, false);
+        }
+
+        @SuppressWarnings("unused")
+        public void addTo(Collection<E> target) {
+            collector.addTo(target);
         }
 
     }

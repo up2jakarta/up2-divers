@@ -1,9 +1,6 @@
-package io.github.up2jakarta.csv.misc;
+package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.EventHandler;
-import io.github.up2jakarta.csv.core.Mapper;
-import io.github.up2jakarta.csv.core.MapperFactory;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.exception.CodeListException;
 import io.github.up2jakarta.csv.exception.MapperException;

@@ -153,7 +153,9 @@ final class BeanSupport {
             final Type[] arguments = Beans.getTypeArguments(beanType);
             //noinspection unchecked
             final Class<? extends Segment> superType = (Class<? extends Segment>) superClass;
+            context.getChecker().beforeSuperSegment(superType);
             final Property<?>[] superProperties = getProperties(superType, context.with(arguments));
+            context.getChecker().afterSuperSegment(superType);
             properties.addAll(asList(superProperties));
         }
         final Field[] fields = beanType.getDeclaredFields();
@@ -164,7 +166,7 @@ final class BeanSupport {
             final Fragment fragment = getAndCheckFragment(field);
             if (position != null) {
                 final int index = offset + position.value();
-                TechnicalChecker.checkPositionProperty(field);
+                context.getChecker().beforePositionProperty(field, fieldType, index);
                 final ProcessorWrapper<?>[] processors = getProcessors(context.getContext(), field);
                 if (CharSequence.class == fieldType || fieldType == String.class) {
                     properties.add(new StringProperty(field, index, processors));
@@ -173,13 +175,17 @@ final class BeanSupport {
                     checkDefault(field, conversion);
                     properties.add(new ConvertedProperty<>(field, index, processors, conversion));
                 }
+                context.getChecker().afterPositionProperty(field, fieldType, index);
             } else if (fragment != null) {
                 //noinspection unchecked
                 final Class<? extends Segment> fragmentType = (Class<? extends Segment>) fieldType;
                 final int fragmentOffset = offset + fragment.value();
-                TechnicalChecker.checkFragmentProperty(field, fragmentType);
+                context.getChecker().beforeFragmentProperty(field, fragmentType);
                 final Property<?>[] fragmentProperties = getProperties(fragmentType, context.with(fragmentOffset));
+                context.getChecker().afterFragmentProperty(field, fragmentType);
                 properties.add(new FragmentProperty<>(fragmentType, field, fragmentOffset, fragmentProperties));
+            } else {
+                context.getChecker().unknownProperty(field, fieldType);
             }
         }
         return properties.toArray(Property[]::new);

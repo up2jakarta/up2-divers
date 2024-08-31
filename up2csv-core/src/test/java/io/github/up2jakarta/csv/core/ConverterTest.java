@@ -1,12 +1,10 @@
-package io.github.up2jakarta.csv.misc;
+package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.EventHandler;
 import io.github.up2jakarta.csv.core.EventHandler.SimpleHandler;
-import io.github.up2jakarta.csv.core.Mapper;
-import io.github.up2jakarta.csv.core.MapperFactory;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.input.InputRepository;
+import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
 import io.github.up2jakarta.csv.test.bean.converter.*;
 import io.github.up2jakarta.csv.test.codelist.CountryCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
@@ -173,8 +171,8 @@ class ConverterTest {
         // GIVEN
         final BeanException error = assertThrows(BeanException.class, () -> factory.build(CodeList1Entity.class));
         // THEN
-        assertEquals(CodeList1Entity.class, error.getBeanType());
-        assertEquals("key", error.getAttribute());
+        assertEquals(CodeList1Entity.class, error.getSource());
+        assertEquals("key", error.getLocator());
         assertEquals("CodeList1Entity[key] - type must implements CodeList<Test1CodeList>", error.getMessage());
     }
 
@@ -183,8 +181,8 @@ class ConverterTest {
         // GIVEN
         final BeanException error = assertThrows(BeanException.class, () -> factory.build(CodeList2Entity.class));
         // THEN
-        assertEquals(CodeList2Entity.class, error.getBeanType());
-        assertEquals("key", error.getAttribute());
+        assertEquals(CodeList2Entity.class, error.getSource());
+        assertEquals("key", error.getLocator());
         assertEquals("CodeList2Entity[key] - type must implements CodeList<Test2CodeList>", error.getMessage());
     }
 
@@ -193,8 +191,8 @@ class ConverterTest {
         // GIVEN
         final BeanException error = assertThrows(BeanException.class, () -> factory.build(CodeList3Entity.class));
         // THEN
-        assertEquals(CodeList3Entity.class, error.getBeanType());
-        assertEquals("key", error.getAttribute());
+        assertEquals(CodeList3Entity.class, error.getSource());
+        assertEquals("key", error.getLocator());
         assertEquals("CodeList3Entity[key] - type must be enum", error.getMessage());
     }
 
@@ -203,8 +201,8 @@ class ConverterTest {
         // GIVEN
         final BeanException error = assertThrows(BeanException.class, () -> factory.build(DefaultBean.class));
         // THEN
-        assertEquals(DefaultBean.class, error.getBeanType());
-        assertEquals("key", error.getAttribute());
+        assertEquals(DefaultBean.class, error.getSource());
+        assertEquals("key", error.getLocator());
         assertEquals("DefaultBean[key] - @Up2Default[value] cannot be converted", error.getMessage());
     }
 
@@ -213,8 +211,8 @@ class ConverterTest {
         // GIVEN
         final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test3Converter.class));
         // THEN
-        assertEquals(Test3Converter.class, error.getBeanType());
-        assertEquals("test", error.getAttribute());
+        assertEquals(Test3Converter.class, error.getSource());
+        assertEquals("test", error.getLocator());
         assertEquals("Test3Converter[test] - @Converter[value] does not support CurrencyCodeType", error.getMessage());
     }
 

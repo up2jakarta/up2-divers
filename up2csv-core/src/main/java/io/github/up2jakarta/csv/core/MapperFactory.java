@@ -34,7 +34,7 @@ public final class MapperFactory {
     /**
      * Mapper Factory Logger.
      */
-    public final static Logger LOGGER = LoggerFactory.getLogger(MapperFactory.class);
+    final static Logger LOGGER = LoggerFactory.getLogger(MapperFactory.class);
 
     private final BeanContext context;
     private final Validator validator;
@@ -78,9 +78,9 @@ public final class MapperFactory {
         private DefaultMapper(Class<S> type, BeanContext context, Validator validator) throws BeanException {
             super(type);
             this.validator = validator;
-            TechnicalChecker.checkSegment(type);
             final MapperContext mapperContext = new MapperContext(context, type);
             this.properties = BeanSupport.getProperties(type, mapperContext);
+            mapperContext.getChecker().afterSegment();
             this.constructor = Beans.getDefaultConstructor(type);
         }
 

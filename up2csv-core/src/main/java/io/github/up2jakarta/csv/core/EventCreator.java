@@ -28,7 +28,7 @@ public abstract class EventCreator<R extends InputRow, K extends InputError.Key<
      * @param message  the error message
      * @return the full-filled input error
      */
-    protected E create(SeverityType severity, R row, int offset, String code, String message) {
+    protected final E create(SeverityType severity, R row, int offset, String code, String message) {
         final E error = this.newInstance();
         error.getKey().setRow(row);
         error.setSeverity(severity);

@@ -171,8 +171,8 @@ public class XmlExtensionTest {
         // WHEN
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test3Bean.class));
         // THEN
-        assertEquals(Test3Bean.class, thrown.getBeanType());
-        assertEquals("enum1", thrown.getAttribute());
+        assertEquals(Test3Bean.class, thrown.getSource());
+        assertEquals("enum1", thrown.getLocator());
         assertEquals("Test3Bean[enum1] - must be annotated with @Converter or one of its shortcuts", thrown.getMessage());
     }
 
