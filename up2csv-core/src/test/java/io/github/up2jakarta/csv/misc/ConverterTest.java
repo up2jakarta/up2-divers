@@ -6,14 +6,14 @@ import io.github.up2jakarta.csv.core.EventHandler.SimpleHandler;
 import io.github.up2jakarta.csv.core.Mapper;
 import io.github.up2jakarta.csv.core.MapperFactory;
 import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.persistence.InputRepository;
+import io.github.up2jakarta.csv.input.InputRepository;
 import io.github.up2jakarta.csv.test.bean.converter.*;
 import io.github.up2jakarta.csv.test.codelist.CountryCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.codelist.MeasurementUnitCode;
-import io.github.up2jakarta.csv.test.persistence.InputRowEntity;
-import io.github.up2jakarta.csv.test.persistence.SegmentType;
-import io.github.up2jakarta.csv.test.persistence.SimpleErrorEntity;
+import io.github.up2jakarta.csv.test.input.InputRowEntity;
+import io.github.up2jakarta.csv.test.input.SegmentType;
+import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -206,6 +206,16 @@ class ConverterTest {
         assertEquals(DefaultBean.class, error.getBeanType());
         assertEquals("key", error.getAttribute());
         assertEquals("DefaultBean[key] - @Up2Default[value] cannot be converted", error.getMessage());
+    }
+
+    @Test
+    void testConverterArgument() {
+        // GIVEN
+        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test3Converter.class));
+        // THEN
+        assertEquals(Test3Converter.class, error.getBeanType());
+        assertEquals("test", error.getAttribute());
+        assertEquals("Test3Converter[test] - @Converter[value] does not support CurrencyCodeType", error.getMessage());
     }
 
 }

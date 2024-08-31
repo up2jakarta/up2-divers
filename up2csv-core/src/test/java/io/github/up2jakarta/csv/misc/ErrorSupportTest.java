@@ -7,18 +7,18 @@ import io.github.up2jakarta.csv.core.Mapper;
 import io.github.up2jakarta.csv.core.MapperFactory;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.SeverityType;
-import io.github.up2jakarta.csv.persistence.InputRepository;
+import io.github.up2jakarta.csv.input.InputRepository;
 import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.converter.*;
 import io.github.up2jakarta.csv.test.bean.processor.Test3Processor;
 import io.github.up2jakarta.csv.test.bean.processor.Test4Processor;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
 import io.github.up2jakarta.csv.test.codelist.MeasurementUnitConverter;
-import io.github.up2jakarta.csv.test.extension.Dummy1Processor;
-import io.github.up2jakarta.csv.test.extension.DummyConverter;
-import io.github.up2jakarta.csv.test.persistence.InputRowEntity;
-import io.github.up2jakarta.csv.test.persistence.SegmentType;
-import io.github.up2jakarta.csv.test.persistence.SimpleErrorEntity;
+import io.github.up2jakarta.csv.test.ext.Dummy1Processor;
+import io.github.up2jakarta.csv.test.ext.DummyConverter;
+import io.github.up2jakarta.csv.test.input.InputRowEntity;
+import io.github.up2jakarta.csv.test.input.SegmentType;
+import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
 import io.github.up2jakarta.csv.test.validation.Up2Warn;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,7 +77,7 @@ public class ErrorSupportTest {
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(ERROR_PROCESSOR, error.getCode());
-            assertEquals("io.github.up2jakarta.csv.test.extension.DummyException: dummy", error.getMessage());
+            assertEquals("io.github.up2jakarta.csv.test.ext.DummyException: dummy", error.getMessage());
             assertNotNull(error.getTrace());
         }
     }
@@ -112,7 +112,7 @@ public class ErrorSupportTest {
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.FATAL, error.getSeverity());
             assertEquals(Test4Processor.TU_P_003, error.getCode());
-            assertEquals("io.github.up2jakarta.csv.test.extension.DummyException: dummy", error.getMessage());
+            assertEquals("io.github.up2jakarta.csv.test.ext.DummyException: dummy", error.getMessage());
             assertNotNull(error.getTrace());
         }
     }

@@ -2,7 +2,7 @@
 
 `Up2CSV` is an open-source, light and modern framework that maps and validates easily flat-data to javaBeans.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.bytebuddy/byte-buddy/badge.svg?style=for-the-badge&version=1.2.3)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2csv-core)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.bytebuddy/byte-buddy/badge.svg?style=for-the-badge&version=1.3.0)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2csv-core)
 
 # Features
 
@@ -18,9 +18,9 @@
     - Processor API
     - Conversion Resolver API
     - Error API
-    - Conversion Extension API (Coming soon)
+    - Input API
+    - Conversion Extension API
     - Bean Checker API (Coming soon)
-    - and more ...
 
 # Requirements
 
@@ -32,7 +32,7 @@
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.2.3</version>
+        <version>1.3.0</version>
     </dependency>
     <!-- Optional SLF4J Provider -->
     <!-- Optional JSR-303 Validation Provider -->
@@ -282,6 +282,108 @@ public Up2Segment implements Segment {
 }
 ```
 
+## @Extension API
+
+Up2 @Extension allows the resolution of the conversion function for one or more type for third-party annotation.
+
+Up2 @Extension is activated by shortcut annotation like @Processor and @Resolver.
+
+Up2 Core comes with 2 built-in shortcut annotations:
+
+### @Up2EnableXML
+
+Automatic detection for `XmlEnum` and `XmlJavaTypeAdapter` XML annotations on segments annotated by `XmlType`.
+
+``` java
+@XmlType
+@XmlEnum
+public enum TestXmlEnumValue {
+    @XmlEnumValue("1") ONE
+}
+
+@XmlType
+@XmlEnum
+public enum TestXmlEnum {
+    TWO
+}
+
+@XmlJavaTypeAdapter(CurrencyConverter.class)
+public enum CurrencyCodeType implements CodeList<CurrencyCodeType> {
+
+    EUR("EUR", "Euro"),
+    TND("TND", "Tunisian Dinar"),
+    ;
+
+    private final String name;
+    private final String code;
+
+    CurrencyCodeType(String code, String name) {
+        this.code = code;
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getCode() {
+        return code;
+    }
+
+}
+
+@XmlType
+@Up2EnableXML
+public Up2Segment implements Segment {
+
+    @Position(0)
+    private TestXmlEnumValue enum1; // enum within @XmlEnumValue
+    
+    @Position(1)
+    private TestXmlEnum enum2; // enum without @XmlEnumValue
+
+    @Position(3)
+    private CurrencyCodeType currency; // type annotated with XmlJavaTypeAdapter
+    
+    @Position(4)
+    @XmlJavaTypeAdapter(CountryXmlAdapter.class) // property annotated with XmlJavaTypeAdapter
+    private CountryCodeType country;
+    
+    // ... setters
+}
+```
+
+### @Up2EnableJPA
+
+Automatic detection for `Enumerated` and `Convert` JPA annotations on segments annotated by `Entity`.
+
+``` java
+public enum JpaEnum {
+   ONE, TWO
+}
+
+@Entity
+@Up2EnableJPA
+public Up2Segment implements Segment {
+
+    @Position(0)
+    @Enumerated(EnumType.STRING) // conversion based on enum constant name
+    private JpaEnum string;
+
+    @Position(1)
+    @Enumerated(EnumType.ORDINAL) // conversion based on enum constant ordinal
+    private JpaEnum ordinal;
+
+    @Position(2)
+    @Convert(converter = CurrencyConverter.class) // CurrencyConverter implements AttributeConverter<CurrencyCodeType, String> {...}
+    private CurrencyCodeType currency;
+    
+     // ... setters
+}
+```
+
 # Validation and Error API
 
 ## @Error
@@ -390,12 +492,18 @@ public TestSegment implements Segment {
 
 ## Input API
 
-See the package [persistence](./src/main/java/io/github/up2jakarta/csv/persistence)
+### The specifications are described in [io.github.up2jakarta.csv.input](./src/main/java/io/github/up2jakarta/csv/input)
 
 - InputError
 - InputRepository
 - InputRow
 - InputType
+
+### Sample implementations in [io.github.up2jakarta.csv.test.input](./src/test/java/io/github/up2jakarta/csv/test/input)
+
+- InputRowEntity implements InputRow
+- InputErrorEntity implements InputError<InputRowEntity, InputErrorEntity.PKey>
+- SimpleErrorEntity implements InputError<InputRowEntity, SimpleErrorEntity>, InputError.Key<InputRowEntity>
 
 # Use of Up2CSV
 

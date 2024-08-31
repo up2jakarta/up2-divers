@@ -3,8 +3,6 @@ package io.github.up2jakarta.csv.misc;
 import io.github.up2jakarta.csv.annotation.Error.Payload;
 import io.github.up2jakarta.csv.extension.SeverityType;
 
-import static io.github.up2jakarta.csv.extension.SeverityType.*;
-
 /**
  * Simple JSR-303 {@link jakarta.validation.Payload} interface marker annotated by {@link Error}.
  *
@@ -35,6 +33,11 @@ public final class Errors {
      */
     public static final String ERROR_CODE_LIST = "UP2-P004";
 
+    /**
+     * Default error code for {@link jakarta.xml.bind.annotation.XmlEnum}
+     */
+    public static final String ERROR_XML_ENUM = "UP2-P005";
+
     private Errors() {
     }
 
@@ -42,21 +45,21 @@ public final class Errors {
      * JSR-303 base marker interface for {@link SeverityType#WARNING}
      */
 
-    @io.github.up2jakarta.csv.annotation.Error(value = ERROR_VALIDATOR, severity = ERROR)
+    @io.github.up2jakarta.csv.annotation.Error(value = ERROR_VALIDATOR, severity = SeverityType.ERROR)
     public interface Error extends Payload {
     }
 
     /**
      * JSR-303 base marker interface for {@link SeverityType#WARNING}
      */
-    @io.github.up2jakarta.csv.annotation.Error(value = ERROR_VALIDATOR, severity = WARNING)
+    @io.github.up2jakarta.csv.annotation.Error(value = ERROR_VALIDATOR, severity = SeverityType.WARNING)
     public interface Warning extends Payload {
     }
 
     /**
      * JSR-303 base marker interface for {@link SeverityType#FATAL}
      */
-    @io.github.up2jakarta.csv.annotation.Error(value = ERROR_VALIDATOR, severity = FATAL)
+    @io.github.up2jakarta.csv.annotation.Error(value = ERROR_VALIDATOR, severity = SeverityType.FATAL)
     public interface Fatal extends Payload {
     }
 }

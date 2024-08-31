@@ -16,10 +16,23 @@ import java.util.stream.Stream;
  */
 public abstract class CodeListConverter<E extends Enum<E> & CodeList<E>> extends TypeConverter<E> {
 
-    protected CodeListConverter(Class<E> type, SeverityType severityType, String code) {
-        super(type, severityType, code);
+    /**
+     * Constructor with all arguments.
+     *
+     * @param type     the code-list type
+     * @param severity the error severity
+     * @param code     the error code
+     */
+    protected CodeListConverter(Class<E> type, SeverityType severity, String code) {
+        super(type, severity, code);
     }
 
+    /**
+     * Constructor without error severity, default {@link SeverityType#ERROR}.
+     *
+     * @param type the code-list type
+     * @param code the error code
+     */
     protected CodeListConverter(Class<E> type, String code) {
         this(type, SeverityType.ERROR, code);
     }
@@ -28,8 +41,9 @@ public abstract class CodeListConverter<E extends Enum<E> & CodeList<E>> extends
      * Find the corresponding CodeList constant from the given value.
      *
      * @param value  the CodeList code
-     * @param type   the type of CodeList
+     * @param clType the type of CodeList implementation
      * @param values the stream values
+     * @param type   the error severity
      * @param code   the error code
      * @param <C>    the type of CodeList
      * @return the found Documented constant

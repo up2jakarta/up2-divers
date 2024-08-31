@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.annotation.Up2CodeList;
 import io.github.up2jakarta.csv.test.codelist.Test2CodeList;
-import io.github.up2jakarta.csv.test.persistence.ParsedEntity;
+import io.github.up2jakarta.csv.test.input.ParsedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -18,7 +18,8 @@ public class CodeList2Entity extends ParsedEntity<Test2CodeList> {
 
     @Position(0)
     @Column(name = "TU_KEY", length = 8)
-    @Up2CodeList(@Error(value = ISO_3166, severity = FATAL))
+    @Error(value = ISO_3166, severity = FATAL)
+    @Up2CodeList
     private Test2CodeList key;
 
     public Test2CodeList getKey() {

@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.annotation.*;
 import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.csv.test.codelist.*;
-import io.github.up2jakarta.csv.test.persistence.ParsedEntity;
+import io.github.up2jakarta.csv.test.input.ParsedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -74,7 +74,8 @@ public class SupportEntity extends ParsedEntity<Integer> {
 
     @Position(9)
     @Column(name = "TU_SHIP_COUNTRY")
-    @Up2CodeList(@Error(value = ISO_3166, severity = FATAL))
+    @Error(value = ISO_3166, severity = FATAL)
+    @Up2CodeList
     private CountryCodeType shippingCountry;
 
     public Integer getKey() {

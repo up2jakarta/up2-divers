@@ -5,12 +5,15 @@
     <parent>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2-divers</artifactId>
-        <version>1.2.3</version>
+        <version>1.3.0</version>
     </parent>
 
     <artifactId>up2csv-core</artifactId>
     <name>Up2CSV :: Core</name>
-    <description>Up2CSV :: Core</description>
+    <description>
+        Modern and fault-tolerant framework for mapping and validating flat-data to JavaBeans based on annotations.
+        It is fully compatible with Jakarta Enterprise Edition (JEE) and Spring with zero dependencies.
+    </description>
     <url>https://github.com/up2jakarta/up2-divers/tree/master/up2csv-core</url>
 
     <developers>

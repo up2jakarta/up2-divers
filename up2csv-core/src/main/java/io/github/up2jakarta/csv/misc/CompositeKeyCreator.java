@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.misc;
 
 import io.github.up2jakarta.csv.core.EventCreator;
-import io.github.up2jakarta.csv.persistence.InputError;
-import io.github.up2jakarta.csv.persistence.InputRow;
+import io.github.up2jakarta.csv.input.InputError;
+import io.github.up2jakarta.csv.input.InputRow;
 
 import java.util.function.Supplier;
 
@@ -18,6 +18,12 @@ public final class CompositeKeyCreator<R extends InputRow, K extends InputError.
     private final Supplier<E> errorCreator;
     private final Supplier<K> keyCreator;
 
+    /**
+     * Constructor with error and its key creators.
+     *
+     * @param errorCreator the error creator
+     * @param keyCreator   the error key creator
+     */
     public CompositeKeyCreator(Supplier<E> errorCreator, Supplier<K> keyCreator) {
         this.errorCreator = errorCreator;
         this.keyCreator = keyCreator;

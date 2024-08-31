@@ -5,8 +5,8 @@ import io.github.up2jakarta.csv.annotation.Truncated;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.Parsed;
 import io.github.up2jakarta.csv.extension.Segment;
-import io.github.up2jakarta.csv.persistence.InputError;
-import io.github.up2jakarta.csv.persistence.InputRow;
+import io.github.up2jakarta.csv.input.InputError;
+import io.github.up2jakarta.csv.input.InputRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public abstract class Mapper<S extends Segment> {
      * Map without validation input data to java bean depending on annotations like {@link Position}.
      * and collect errors in the given collector after full-filling the error properties.
      *
-     * @param handler the error collector, must be not null
+     * @param handler the error collector, must not be null
      * @param columns the input data
      * @param <R>     the row type
      * @param <V>     the error type
@@ -67,7 +67,7 @@ public abstract class Mapper<S extends Segment> {
      * and collect errors in the given collector after full-filling the error properties.
      *
      * @param row     the input data
-     * @param handler the error collector, must be not null
+     * @param handler the error collector, must not be null
      * @param <R>     the row type
      * @param <V>     the error type
      * @return the parsed segment

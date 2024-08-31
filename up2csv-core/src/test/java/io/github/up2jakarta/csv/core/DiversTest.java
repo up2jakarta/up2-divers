@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.CSV;
-import io.github.up2jakarta.csv.test.persistence.InputErrorEntity;
-import io.github.up2jakarta.csv.test.persistence.InputRowEntity;
-import io.github.up2jakarta.csv.test.persistence.SimpleErrorEntity;
+import io.github.up2jakarta.csv.test.input.InputErrorEntity;
+import io.github.up2jakarta.csv.test.input.InputRowEntity;
+import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;

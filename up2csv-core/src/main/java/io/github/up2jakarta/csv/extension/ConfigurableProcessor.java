@@ -9,8 +9,7 @@ import java.lang.annotation.Annotation;
  *
  * @param <A> the annotation type
  */
-@FunctionalInterface
-public interface ConfigurableProcessor<A extends Annotation> {
+public abstract class ConfigurableProcessor<A extends Annotation> {
 
     /**
      * Processes {@link String} to the proper value of the destination field.
@@ -20,6 +19,6 @@ public interface ConfigurableProcessor<A extends Annotation> {
      * @return the processed {@link String} for the destination field
      * @throws RuntimeException If any error during the processing
      */
-    String process(String value, A config) throws RuntimeException;
+    public abstract String process(String value, A config) throws RuntimeException;
 
 }

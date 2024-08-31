@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.test.bean.processor;
 
 import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.extension.Segment;
-import io.github.up2jakarta.csv.test.extension.Dummy4;
+import io.github.up2jakarta.csv.test.ext.Dummy4;
 
 @SuppressWarnings("unused")
 public class Test5Processor implements Segment {

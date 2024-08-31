@@ -5,9 +5,9 @@ import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.BeanContext;
 import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.input.InputError;
+import io.github.up2jakarta.csv.input.InputRow;
 import io.github.up2jakarta.csv.misc.Listable;
-import io.github.up2jakarta.csv.persistence.InputError;
-import io.github.up2jakarta.csv.persistence.InputRow;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -61,7 +61,6 @@ public final class MapperFactory {
      * @throws BeanException for any missing or wrong bean configuration
      */
     public <S extends Segment> Mapper<S> build(final Class<S> type) throws BeanException {
-        BeanSupport.checkBean(type);
         return new DefaultMapper<>(type, context, validator);
     }
 
@@ -79,8 +78,10 @@ public final class MapperFactory {
         private DefaultMapper(Class<S> type, BeanContext context, Validator validator) throws BeanException {
             super(type);
             this.validator = validator;
+            TechnicalChecker.checkSegment(type);
+            final MapperContext mapperContext = new MapperContext(context, type);
+            this.properties = BeanSupport.getProperties(type, mapperContext);
             this.constructor = Beans.getDefaultConstructor(type);
-            this.properties = BeanSupport.getProperties(type, new BeanStack(context));
         }
 
         @Override

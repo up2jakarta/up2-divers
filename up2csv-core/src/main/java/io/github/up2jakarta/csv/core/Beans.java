@@ -72,6 +72,10 @@ public final class Beans {
         return result;
     }
 
+    private static String capitalize(String fieldName) {
+        return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+    }
+
     static Type[] getTypeArguments(Class<?> beanType, Class<?> finalType) throws BeanException {
         if (finalType.getTypeParameters().length == 0 || beanType == Object.class) {
             return NO_TYPES;
@@ -93,7 +97,19 @@ public final class Beans {
         return NO_TYPES;
     }
 
-    public static <T> T getBean(BeanContext context, Class<T> beanType) throws BeanException {
+    static Method getMethod(Class<?> type, String mName, String attr, String desc, Class<?>... pTypes) throws BeanException {
+        try {
+            final Method getter = type.getDeclaredMethod(mName, pTypes);
+            if (!Modifier.isPublic(getter.getModifiers())) {
+                throw new BeanException(type, attr, desc + " must be public");
+            }
+            return getter;
+        } catch (Throwable ex) {
+            throw new BeanException(type, attr, desc + " not found");
+        }
+    }
+
+    static <T> T getBean(BeanContext context, Class<T> beanType) throws BeanException {
         try {
             return context.getBean(beanType);
         } catch (Throwable e) {
@@ -101,29 +117,16 @@ public final class Beans {
         }
     }
 
-    public static String capitalize(String fieldName) {
-        return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+    static Method getAccessibleSetter(Field field) throws BeanException {
+        final String pName = capitalize(field.getName());
+        return getMethod(field.getDeclaringClass(), "set" + pName, pName, "setter", field.getType());
     }
 
-    public static Method getAccessibleSetter(Field field) throws BeanException {
-        final String propertyName = capitalize(field.getName());
-        final Class<?> originType = field.getDeclaringClass();
-        try {
-            final Method getter = originType.getDeclaredMethod("set" + propertyName, field.getType());
-            if (!Modifier.isPublic(getter.getModifiers())) {
-                throw new BeanException(originType, field, "setter should be public");
-            }
-            return getter;
-        } catch (Throwable ex) {
-            throw new BeanException(originType, field, "setter not found");
-        }
-    }
-
-    public static <T> Constructor<T> getDefaultConstructor(Class<T> type) throws BeanException {
+    static <T> Constructor<T> getDefaultConstructor(Class<T> type) throws BeanException {
         try {
             final Constructor<T> constructor = type.getDeclaredConstructor();
             if (!Modifier.isPublic(constructor.getModifiers())) {
-                throw new BeanException(type, "default constructor should be public");
+                throw new BeanException(type, "default constructor must be public");
             }
             return constructor;
         } catch (Throwable e) {
@@ -131,7 +134,7 @@ public final class Beans {
         }
     }
 
-    public static <T> T newInstance(Constructor<T> constructor) throws BeanException {
+    static <T> T newInstance(Constructor<T> constructor) throws BeanException {
         try {
             return constructor.newInstance();
         } catch (Throwable ex) {
@@ -139,7 +142,7 @@ public final class Beans {
         }
     }
 
-    public static <V> void setValue(Object bean, V value, Method setter) throws BeanException {
+    static <V> void setValue(Object bean, V value, Method setter) throws BeanException {
         try {
             setter.invoke(bean, value);
         } catch (Throwable ex) {

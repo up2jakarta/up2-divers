@@ -7,9 +7,9 @@ import io.github.up2jakarta.csv.core.EventHandler.SimpleHandler;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.csv.input.InputRepository;
 import io.github.up2jakarta.csv.misc.Listable;
 import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
-import io.github.up2jakarta.csv.persistence.InputRepository;
 import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.mapper.*;
 import io.github.up2jakarta.csv.test.bean.mapper.oneshot.AddressSegment;
@@ -18,9 +18,9 @@ import io.github.up2jakarta.csv.test.bean.mapper.oneshot.ComplexAddress;
 import io.github.up2jakarta.csv.test.bean.mapper.oneshot.SimpleAddress;
 import io.github.up2jakarta.csv.test.bean.processor.ProcessorBean;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
-import io.github.up2jakarta.csv.test.persistence.InputRowEntity;
-import io.github.up2jakarta.csv.test.persistence.SegmentType;
-import io.github.up2jakarta.csv.test.persistence.SimpleErrorEntity;
+import io.github.up2jakarta.csv.test.input.InputRowEntity;
+import io.github.up2jakarta.csv.test.input.SegmentType;
+import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -444,7 +444,7 @@ class MapperTest {
         // THEN
         assertEquals(Test2Segment.class, thrown.getBeanType());
         assertEquals("p", thrown.getAttribute());
-        assertEquals("Test2Segment[p] - @Fragment[value] should be positive", thrown.getMessage());
+        assertEquals("Test2Segment[p] - @Fragment[value] must be positive", thrown.getMessage());
     }
 
     @Test
@@ -454,7 +454,7 @@ class MapperTest {
         // THEN
         assertEquals(Test3Segment.class, thrown.getBeanType());
         assertEquals("p", thrown.getAttribute());
-        assertEquals("Test3Segment[p] - @Position[value] should be positive", thrown.getMessage());
+        assertEquals("Test3Segment[p] - @Position[value] must be positive", thrown.getMessage());
     }
 
     @Test

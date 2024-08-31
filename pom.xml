@@ -4,11 +4,11 @@
 
     <groupId>io.github.up2jakarta</groupId>
     <artifactId>up2-divers</artifactId>
-    <version>1.2.3</version>
+    <version>1.3.0</version>
     <packaging>pom</packaging>
 
     <name>Up2Jakarta :: Divers</name>
-    <description>Divers :: Parent POM Dependencies</description>
+    <description>Up2Jakarta POM Dependencies</description>
     <url>https://github.com/up2jakarta/up2-divers</url>
 
     <developers>
@@ -111,20 +111,14 @@
                             <sourceFileExcludes>
                                 <exclude>**/io/github/up2jakarta/csv/exception/*.java</exclude>
                                 <exclude>**/io/github/up2jakarta/csv/resolver/*.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/misc/*.java</exclude>
                                 <!-- Core -->
-                                <exclude>**/io/github/up2jakarta/csv/core/Beans.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/BeanStack.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/BeanSupport.java</exclude>
                                 <exclude>**/io/github/up2jakarta/csv/core/CodeListResolver.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/ConvertedProperty.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/LazyCounter.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/LazyList.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/PositionProperty.java</exclude>
                                 <exclude>**/io/github/up2jakarta/csv/core/ProcessorWrapper.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/Property.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/StringProperty.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/ValidationContext.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/Bean*.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/Lazy*.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/*Property.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/*Context.java</exclude>
+                                <exclude>**/io/github/up2jakarta/csv/core/*Extension.java</exclude>
                             </sourceFileExcludes>
                         </configuration>
                     </plugin>

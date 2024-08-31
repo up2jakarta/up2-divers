@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.persistence.InputError;
-import io.github.up2jakarta.csv.persistence.InputRow;
+import io.github.up2jakarta.csv.input.InputError;
+import io.github.up2jakarta.csv.input.InputRow;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

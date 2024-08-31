@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.extension;
 
-import io.github.up2jakarta.csv.persistence.InputRow;
+import io.github.up2jakarta.csv.input.InputRow;
 
 /**
  * Contract marker (target of parsing) for parsed beans managed by Up2CSV engine.

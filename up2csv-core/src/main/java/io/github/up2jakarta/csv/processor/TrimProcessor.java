@@ -11,7 +11,7 @@ import jakarta.inject.Singleton;
  */
 @Named
 @Singleton
-public final class TrimProcessor implements ConfigurableProcessor<Up2Trim> {
+public final class TrimProcessor extends ConfigurableProcessor<Up2Trim> {
 
     /**
      * Trim given input value according to the given values looks like <code>null</code>.

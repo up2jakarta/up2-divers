@@ -17,10 +17,10 @@ import io.github.up2jakarta.csv.test.bean.mapper.ValidBean;
 import io.github.up2jakarta.csv.test.bean.processor.Test3Processor;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
 import io.github.up2jakarta.csv.test.codelist.MeasurementUnitConverter;
-import io.github.up2jakarta.csv.test.extension.Dummy1Processor;
-import io.github.up2jakarta.csv.test.extension.DummyConverter;
-import io.github.up2jakarta.csv.test.persistence.InputRowEntity;
-import io.github.up2jakarta.csv.test.persistence.SegmentType;
+import io.github.up2jakarta.csv.test.ext.Dummy1Processor;
+import io.github.up2jakarta.csv.test.ext.DummyConverter;
+import io.github.up2jakarta.csv.test.input.InputRowEntity;
+import io.github.up2jakarta.csv.test.input.SegmentType;
 import io.github.up2jakarta.csv.test.validation.Up2Warn;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -258,7 +258,7 @@ public class HandlerSupportTest {
             assertEquals(ERROR_PROCESSOR, error.getErrorCode());
             assertEquals(ERROR, error.getSeverityType());
             assertInstanceOf(PropertyException.class, error.getCause());
-            assertEquals("io.github.up2jakarta.csv.test.extension.DummyException: dummy", error.getCause().getMessage());
+            assertEquals("io.github.up2jakarta.csv.test.ext.DummyException: dummy", error.getCause().getMessage());
             assertNotNull(error.getCause().getCause());
         }
     }

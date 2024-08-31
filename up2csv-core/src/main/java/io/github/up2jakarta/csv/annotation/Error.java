@@ -6,8 +6,8 @@ import java.lang.annotation.*;
 
 /**
  * Up2 Annotation that supports
- * {@link io.github.up2jakarta.csv.persistence.InputError#setSeverity(SeverityType)}
- * and {@link io.github.up2jakarta.csv.persistence.InputError#setCode(String)}.
+ * {@link io.github.up2jakarta.csv.input.InputError#setSeverity(SeverityType)}
+ * and {@link io.github.up2jakarta.csv.input.InputError#setCode(String)}.
  *
  * @see io.github.up2jakarta.csv.core.EventCreator
  */

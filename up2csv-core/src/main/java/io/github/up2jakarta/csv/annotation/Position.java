@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.annotation;
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports the index of data in {@link io.github.up2jakarta.csv.persistence.InputRow#getColumns()}.
+ * Up2 Annotation that supports the index of data in {@link io.github.up2jakarta.csv.input.InputRow#getColumns()}.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

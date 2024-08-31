@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.misc;
 
 import io.github.up2jakarta.csv.core.EventCreator;
-import io.github.up2jakarta.csv.persistence.InputError;
-import io.github.up2jakarta.csv.persistence.InputRow;
+import io.github.up2jakarta.csv.input.InputError;
+import io.github.up2jakarta.csv.input.InputRow;
 
 import java.util.function.Supplier;
 
@@ -16,6 +16,11 @@ public final class SimpleKeyCreator<R extends InputRow, E extends InputError.Key
 
     private final Supplier<E> errorCreator;
 
+    /**
+     * Constructor with error creator since key is encapsulated by error.
+     *
+     * @param errorCreator the error creator
+     */
     public SimpleKeyCreator(Supplier<E> errorCreator) {
         this.errorCreator = errorCreator;
     }

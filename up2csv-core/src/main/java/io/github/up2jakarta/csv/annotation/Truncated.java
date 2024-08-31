@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.annotation;
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports {@link io.github.up2jakarta.csv.persistence.InputError#setOffset(Integer)}
+ * Up2 Annotation that supports {@link io.github.up2jakarta.csv.input.InputError#setOffset(Integer)}
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 public @interface Truncated {
 
     /**
-     * The first column offset in the {@link io.github.up2jakarta.csv.persistence.InputRow#getColumns()}
+     * The first column offset in the {@link io.github.up2jakarta.csv.input.InputRow#getColumns()}
      * that is being mapped automatically.
      *
      * @return the first column offset

@@ -7,7 +7,7 @@ import io.github.up2jakarta.csv.test.bean.TestConverter;
 import io.github.up2jakarta.csv.test.bean.converter.SupportEntity;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
-import io.github.up2jakarta.csv.test.persistence.InputRowEntity;
+import io.github.up2jakarta.csv.test.input.InputRowEntity;
 import jakarta.persistence.AttributeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;

@@ -5,7 +5,7 @@ import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
-import io.github.up2jakarta.csv.test.extension.DummyConverter;
+import io.github.up2jakarta.csv.test.ext.DummyConverter;
 
 @SuppressWarnings("unused")
 public class Test1Converter implements Segment {

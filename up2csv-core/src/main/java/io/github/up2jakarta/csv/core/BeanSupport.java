@@ -7,15 +7,13 @@ import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.*;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
+import java.lang.annotation.Repeatable;
+import java.lang.reflect.*;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.core.Beans.getBean;
-import static io.github.up2jakarta.csv.core.MapperFactory.LOGGER;
 import static java.util.Arrays.asList;
 
 final class BeanSupport {
@@ -39,7 +37,7 @@ final class BeanSupport {
     private static Fragment getAndCheckFragment(Field field) throws BeanException {
         final Fragment csv = field.getAnnotation(Fragment.class);
         if (csv != null && csv.value() < 0) {
-            throw new BeanException(field, "@Fragment[value] should be positive");
+            throw new BeanException(field, "@Fragment[value] must be positive");
         }
         if (csv != null && !Segment.class.isAssignableFrom(field.getType())) {
             throw new BeanException(field, "type must implements Segment");
@@ -50,30 +48,9 @@ final class BeanSupport {
     private static Position getAndCheckPosition(Field field) throws BeanException {
         final Position csv = field.getAnnotation(Position.class);
         if (csv != null && csv.value() < 0) {
-            throw new BeanException(field, "@Position[value] should be positive");
+            throw new BeanException(field, "@Position[value] must be positive");
         }
         return csv;
-    }
-
-    private static void checkField(Class<? extends Segment> beanType, Field field) throws BeanException {
-        if (Character.isUpperCase(field.getName().charAt(0))) {
-            LOGGER.warn("{}[{}] : should starts with an lowercase character", beanType.getSimpleName(), field.getName());
-        }
-        if (Modifier.isPublic(field.getModifiers())) {
-            throw new BeanException(beanType, field, "must not be public");
-        }
-        if (Modifier.isFinal(field.getModifiers())) {
-            throw new BeanException(beanType, field, "must not be final");
-        }
-        if (Modifier.isStatic(field.getModifiers())) {
-            throw new BeanException(beanType, field, "must not be static");
-        }
-    }
-
-    private static void checkInner(Class<? extends Segment> beanType) throws BeanException {
-        if (beanType.getEnclosingClass() != null && !Modifier.isStatic(beanType.getModifiers())) {
-            throw new BeanException(beanType, "inner class is not allowed");
-        }
     }
 
     private static void checkDefault(Field field, Conversion<?> conversion) throws BeanException {
@@ -87,23 +64,38 @@ final class BeanSupport {
         }
     }
 
-    static void checkBean(Class<? extends Segment> beanType) throws BeanException {
-        if (beanType.isLocalClass()) {
-            throw new BeanException(beanType, "local class is not allowed");
+    private static Method getRepeatableValue(Class<? extends Annotation> annotationType) throws BeanException {
+        final Repeatable repeatable = annotationType.getDeclaredAnnotation(Repeatable.class);
+        if (repeatable != null) {
+            return Beans.getMethod(repeatable.value(), "value", "class", "value()");
         }
-        if (beanType.isInterface()) {
-            throw new BeanException(beanType, "interface is not allowed");
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    static <A extends Annotation> List<A> getAnnotationsByType(Class<A> annotationType, AnnotatedElement element) throws BeanException {
+        final Method repeatValue = getRepeatableValue(annotationType);
+        final List<A> result = new LinkedList<>();
+        for (final Annotation annotation : element.getAnnotations()) {
+            final Class<? extends Annotation> aType = annotation.annotationType();
+            // direct
+            if (annotationType.equals(aType)) {
+                result.add((A) annotation);
+            }
+            // indirect
+            if (repeatValue != null && repeatValue.getDeclaringClass().equals(aType)) {
+                try {
+                    final A[] indirectArray = (A[]) repeatValue.invoke(annotation);
+                    result.addAll(Arrays.asList(indirectArray));
+                } catch (Throwable t) {
+                    throw new BeanException(repeatValue.getDeclaringClass(), t.getMessage());
+                }
+            }
+            // shortcuts
+            final A[] shortcutArray = aType.getAnnotationsByType(annotationType);
+            result.addAll(Arrays.asList(shortcutArray));
         }
-        if (Modifier.isAbstract(beanType.getModifiers())) {
-            throw new BeanException(beanType, "abstract class is not allowed");
-        }
-        if (beanType.getTypeParameters().length != 0) {
-            throw new BeanException(beanType, "generic class is not allowed");
-        }
-        if (beanType.isRecord()) {
-            throw new BeanException(beanType, "record class is not allowed");
-        }
-        checkInner(beanType);
+        return result;
     }
 
     static ProcessorWrapper<?>[] getProcessors(BeanContext context, Field field) throws BeanException {
@@ -123,16 +115,16 @@ final class BeanSupport {
                 result.add(new ProcessorWrapper(delegate, processor.skip(), annotation));
             }
         }
-        return result.toArray(new ProcessorWrapper[0]);
+        return result.toArray(ProcessorWrapper[]::new);
     }
 
-    static Conversion<?> getConversion(BeanContext context, Field field) throws BeanException {
+    static Conversion<?> getConversion(MapperContext context, Field field) throws BeanException {
         final Converter converter = field.getAnnotation(Converter.class);
         final Error error = field.getAnnotation(Error.class);
         if (converter != null) {
-            final TypeConverter<?> tConverter = Beans.getBean(context, converter.value());
+            final TypeConverter<?> tConverter = getBean(context.getContext(), converter.value());
             if (!tConverter.getSupportedType().isAssignableFrom(field.getType())) {
-                throw new BeanException(field, "@Converter[value] does support " + field.getType().getSimpleName());
+                throw new BeanException(field, "@Converter[value] does not support " + field.getType().getSimpleName());
             }
             if (error == null) {
                 return Conversion.of(tConverter::parse, tConverter.getErrorSeverity(), tConverter.getErrorCode());
@@ -143,16 +135,16 @@ final class BeanSupport {
             final Resolver resolver = annotation.annotationType().getAnnotation(Resolver.class);
             if (resolver != null) {
                 //noinspection unchecked
-                var conversionResolver = (ConversionResolver<Annotation>) Beans.getBean(context, resolver.value());
+                var conversionResolver = (ConversionResolver<Annotation>) getBean(context.getContext(), resolver.value());
                 final Conversion<?> conversion = conversionResolver.resolve(annotation, field);
                 return Conversion.of(conversion, error);
             }
         }
-        throw new BeanException(field, "must be annotated with @Converter or one of its shortcuts");
+        return context.getConversion(field);
     }
 
-    static Property<?>[] getProperties(Class<? extends Segment> beanType, final BeanStack stack) throws BeanException {
-        if (stack.push(beanType)) {
+    static Property<?>[] getProperties(Class<? extends Segment> beanType, MapperContext context) throws BeanException {
+        if (context.push(beanType)) {
             throw new BeanException(beanType, "cyclic fragment is not allowed");
         }
         final List<Property<?>> properties = new LinkedList<>();
@@ -160,37 +152,37 @@ final class BeanSupport {
         if (Segment.class.isAssignableFrom(superClass)) {
             final Type[] arguments = Beans.getTypeArguments(beanType);
             //noinspection unchecked
-            final Class<? extends Segment> fragmentType = (Class<? extends Segment>) superClass;
-            final Property<?>[] superProperties = getProperties(fragmentType, stack.with(arguments));
+            final Class<? extends Segment> superType = (Class<? extends Segment>) superClass;
+            final Property<?>[] superProperties = getProperties(superType, context.with(arguments));
             properties.addAll(asList(superProperties));
         }
         final Field[] fields = beanType.getDeclaredFields();
-        final int offset = stack.getOffset();
+        final int offset = context.getOffset();
         for (final Field field : fields) {
-            final Class<?> fieldType = getFieldType(field, stack.getArguments());
+            final Class<?> fieldType = getFieldType(field, context.getArguments());
             final Position position = getAndCheckPosition(field);
             final Fragment fragment = getAndCheckFragment(field);
             if (position != null) {
-                checkField(beanType, field);
-                final ProcessorWrapper<?>[] processors = getProcessors(stack.getContext(), field);
+                final int index = offset + position.value();
+                TechnicalChecker.checkPositionProperty(field);
+                final ProcessorWrapper<?>[] processors = getProcessors(context.getContext(), field);
                 if (CharSequence.class == fieldType || fieldType == String.class) {
-                    properties.add(new StringProperty(field, offset + position.value(), processors));
+                    properties.add(new StringProperty(field, index, processors));
                 } else {
-                    final Conversion<?> conversion = getConversion(stack.getContext(), field);
+                    final Conversion<?> conversion = getConversion(context, field);
                     checkDefault(field, conversion);
-                    properties.add(new ConvertedProperty<>(field, offset + position.value(), processors, conversion));
+                    properties.add(new ConvertedProperty<>(field, index, processors, conversion));
                 }
             } else if (fragment != null) {
-                checkField(beanType, field);
                 //noinspection unchecked
                 final Class<? extends Segment> fragmentType = (Class<? extends Segment>) fieldType;
-                checkInner(fragmentType);
                 final int fragmentOffset = offset + fragment.value();
-                final Property<?>[] fragmentProperties = getProperties(fragmentType, stack.with(fragmentOffset));
+                TechnicalChecker.checkFragmentProperty(field, fragmentType);
+                final Property<?>[] fragmentProperties = getProperties(fragmentType, context.with(fragmentOffset));
                 properties.add(new FragmentProperty<>(fragmentType, field, fragmentOffset, fragmentProperties));
             }
         }
-        return properties.toArray(new Property[0]);
+        return properties.toArray(Property[]::new);
     }
 
 }

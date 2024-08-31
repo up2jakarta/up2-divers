@@ -13,7 +13,7 @@ import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.processor.Test1Processor;
 import io.github.up2jakarta.csv.test.bean.processor.Test2Processor;
 import io.github.up2jakarta.csv.test.bean.processor.Test5Processor;
-import io.github.up2jakarta.csv.test.extension.Dummy4;
+import io.github.up2jakarta.csv.test.ext.Dummy4;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

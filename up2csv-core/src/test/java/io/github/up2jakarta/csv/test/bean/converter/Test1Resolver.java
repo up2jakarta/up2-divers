@@ -21,7 +21,8 @@ public class Test1Resolver implements Segment {
     private CurrencyCodeType currency;
 
     @Position(1)
-    @Up2CodeList(@Error(value = EDI_R_20, severity = FATAL))
+    @Error(value = EDI_R_20, severity = FATAL)
+    @Up2CodeList
     private MeasurementUnitCode unit;
 
     @Position(2)

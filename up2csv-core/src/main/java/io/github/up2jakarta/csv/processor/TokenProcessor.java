@@ -13,7 +13,7 @@ import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
  */
 @Named
 @Singleton
-public final class TokenProcessor implements ConfigurableProcessor<Up2Token> {
+public final class TokenProcessor extends ConfigurableProcessor<Up2Token> {
 
     private final CollapsedStringAdapter tokenAdapter;
 

@@ -11,7 +11,7 @@ import jakarta.inject.Singleton;
  */
 @Named
 @Singleton
-public final class DefaultProcessor implements ConfigurableProcessor<Up2Default> {
+public final class DefaultProcessor extends ConfigurableProcessor<Up2Default> {
 
     @Override
     public String process(String value, Up2Default config) {

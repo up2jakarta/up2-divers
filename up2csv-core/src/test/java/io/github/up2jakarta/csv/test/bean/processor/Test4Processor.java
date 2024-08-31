@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.extension.SeverityType;
-import io.github.up2jakarta.csv.test.extension.Dummy3;
+import io.github.up2jakarta.csv.test.ext.Dummy3;
 
 @SuppressWarnings("unused")
 public class Test4Processor implements Segment {

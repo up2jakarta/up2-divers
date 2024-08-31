@@ -5,11 +5,11 @@ import io.github.up2jakarta.csv.exception.CodeListException;
 import io.github.up2jakarta.csv.exception.MapperException;
 import io.github.up2jakarta.csv.exception.PropertyException;
 import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.csv.input.InputError;
+import io.github.up2jakarta.csv.input.InputRepository;
+import io.github.up2jakarta.csv.input.InputRow;
 import io.github.up2jakarta.csv.misc.Listable;
 import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
-import io.github.up2jakarta.csv.persistence.InputError;
-import io.github.up2jakarta.csv.persistence.InputRepository;
-import io.github.up2jakarta.csv.persistence.InputRow;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
@@ -187,11 +187,11 @@ public abstract class EventHandler<A extends InputRow, B extends InputError.Key<
 
         private static final List<String> CLASS_NAMES = List.of(
                 ConvertedProperty.class.getName(),
+                PositionProperty.class.getName(),
+                StringProperty.class.getName(),
                 EventHandler.class.getName(),
                 MapperFactory.FragmentProperty.class.getName(),
                 MapperFactory.class.getName() + "$DefaultMapper",
-                PositionProperty.class.getName(),
-                StringProperty.class.getName(),
                 ProcessorWrapper.class.getName()
         );
 
