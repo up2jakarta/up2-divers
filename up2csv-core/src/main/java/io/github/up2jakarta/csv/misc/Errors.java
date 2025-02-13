@@ -19,7 +19,7 @@ public final class Errors {
     public static final String ERROR_VALIDATOR = "UP2-V001";
 
     /**
-     * Default error code for {@link io.github.up2jakarta.csv.annotation.Converter}
+     * Default error code for {@link io.github.up2jakarta.csv.annotation.Up2Converter}
      */
     public static final String ERROR_CONVERTER = "UP2-C002";
 

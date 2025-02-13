@@ -48,7 +48,7 @@ public class SupportEntity extends ParsedEntity<Integer> {
 
     @Position(4)
     @Column(name = "TU_CURRENCY")
-    @Converter(CurrencyConverter.class)
+    @Up2Converter(CurrencyConverter.class)
     @Error(value = CurrencyConverter.ISO_4217, severity = FATAL)
     private CurrencyCodeType currency;
 
@@ -59,7 +59,7 @@ public class SupportEntity extends ParsedEntity<Integer> {
 
     @Position(6)
     @Column(name = "TU_CURRENCY")
-    @Converter(MeasurementUnitConverter.class)
+    @Up2Converter(MeasurementUnitConverter.class)
     private MeasurementUnitCode unit;
 
     @Position(7)

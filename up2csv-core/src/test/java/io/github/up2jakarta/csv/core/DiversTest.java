@@ -43,7 +43,7 @@ class DiversTest {
         final LazyList<InputRowEntity, SimpleErrorEntity> lazyList = new LazyList<>(() -> 3);
         final SimpleErrorEntity error = new SimpleErrorEntity();
         // WHEN
-        lazyList.addWithOrder(0,null, false);
+        lazyList.addWithOrder(0, null, false);
         assertEquals(0, lazyList.toList().size());
         // WHEN
         lazyList.addWithOrder(0, error, false);
@@ -71,7 +71,7 @@ class DiversTest {
         final LazyList<InputRowEntity, InputErrorEntity> lazyList = new LazyList<>(() -> 3);
         final InputErrorEntity error = new InputErrorEntity();
         // WHEN null
-        lazyList.addWithOrder(0,null, false);
+        lazyList.addWithOrder(0, null, false);
         assertEquals(0, lazyList.toList().size());
         // WHEN Key null
         lazyList.addWithOrder(0, error, false);

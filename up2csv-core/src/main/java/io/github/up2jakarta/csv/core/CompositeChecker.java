@@ -25,6 +25,9 @@ final class CompositeChecker implements CheckerContext {
     }
 
     static CompositeChecker of(Class<? extends Segment> type, BeanContext context) throws BeanException {
+        if (type.getTypeParameters().length != 0) {
+            throw new BeanException(type, "generic class is not allowed");
+        }
         final Checker[] checkers = getAnnotationsByType(Checker.class, type).toArray(Checker[]::new);
         final List<SegmentListener> result = new LinkedList<>();
         result.add(TechnicalChecker.INSTANCE);

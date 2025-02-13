@@ -53,7 +53,7 @@ public enum SeverityType implements CodeList<SeverityType> {
      * @return the corresponding constant, else {@link #ERROR}
      */
     public static SeverityType of(String name) {
-        if(name == null) {
+        if (name == null) {
             return ERROR;
         }
         name = name.toUpperCase();

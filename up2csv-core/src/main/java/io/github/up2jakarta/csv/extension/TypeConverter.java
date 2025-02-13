@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * Up2 configurable {@link io.github.up2jakarta.csv.annotation.Converter}
+ * Up2 configurable {@link io.github.up2jakarta.csv.annotation.Up2Converter}
  * that converts the input data {@link String} to the target property type {@link T}.
  *
  * @param <T> property type

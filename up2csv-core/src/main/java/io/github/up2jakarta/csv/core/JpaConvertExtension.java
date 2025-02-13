@@ -12,7 +12,6 @@ import jakarta.inject.Singleton;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.validation.constraints.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -39,30 +38,55 @@ public final class JpaConvertExtension extends ConversionExtension<Entity, Conve
         this.context = context;
     }
 
-    @Override
-    public Optional<Convert> get(Class<? extends Segment> segmentType, Field property) throws BeanException {
-        final Convert jpa = property.getAnnotation(Convert.class);
-        if (jpa != null) {
-            if (segmentType.getAnnotation(Entity.class) == null) {
-                throw new BeanException(segmentType, "must be annotated with @Entity");
+    private void check(Field property, Class<?> type, Convert jpa) throws BeanException {
+        if (!AttributeConverter.class.isAssignableFrom(jpa.converter())) {
+            throw new BeanException(property, "@Convert[converter] must extends AttributeConverter");
+        }
+        final Class<? extends AttributeConverter<?, String>> converterType = jpa.converter();
+        final Type[] arguments = getTypeArguments(converterType, AttributeConverter.class);
+        if (!type.equals(arguments[0]) || !String.class.equals(arguments[1])) {
+            final String fName = type.getSimpleName();
+            throw new BeanException(property, "@Convert[converter] must extends AttributeConverter<" + fName + ", String>");
+        }
+    }
+
+    private Optional<Convert> from(Class<? extends Segment> segmentType, Field property, Class<?> type) throws BeanException {
+        for (final Convert jpa : segmentType.getAnnotationsByType(Convert.class)) {
+            if (jpa.attributeName().equals(property.getName())) {
+                this.check(property, type, jpa);
+                return Optional.of(jpa);
             }
-            final Class<?> fieldType = property.getType();
-            if (!AttributeConverter.class.isAssignableFrom(jpa.converter())) {
-                throw new BeanException(property, "@Convert[converter] must extends AttributeConverter");
-            }
-            final Class<? extends AttributeConverter<?, String>> converterType = jpa.converter();
-            final Type[] arguments = getTypeArguments(converterType, AttributeConverter.class);
-            if (!fieldType.equals(arguments[0]) || !String.class.equals(arguments[1])) {
-                final String fName = fieldType.getSimpleName();
-                throw new BeanException(property, "@Convert[converter] must extends AttributeConverter<" + fName + ", String>");
-            }
-            return Optional.of(jpa);
+        }
+        segmentType = (Class<? extends Segment>) segmentType.getSuperclass();
+        if (Segment.class.isAssignableFrom(segmentType)) {
+            return from(segmentType, property, type);
         }
         return Optional.empty();
     }
 
     @Override
-    public Conversion<?> resolve(@NotNull Field property, @NotNull Convert config) throws BeanException {
+    public Optional<Convert> get(Class<? extends Segment> segmentType, Field property, Class<?> type, Field... path) throws BeanException {
+        final Convert jpa = property.getAnnotation(Convert.class);
+        if (jpa != null) {
+            if (jpa.attributeName().isBlank() || jpa.attributeName().equals(property.getName())) {
+                this.check(property, type, jpa);
+                return Optional.of(jpa);
+            }
+        }
+        var fieldPath = property.getName();
+        for (var i = path.length - 1; i >= 0; i--) {
+            final Convert override = path[i].getAnnotation(Convert.class);
+            if (override != null && override.attributeName().equals(fieldPath)) {
+                this.check(property, type, override);
+                return Optional.of(override);
+            }
+            fieldPath = path[i].getName() + '.' + fieldPath;
+        }
+        return from(segmentType, property, type);
+    }
+
+    @Override
+    public Conversion<?> resolve(Field property, Class<?> type, Convert config) throws BeanException {
         final Class<? extends AttributeConverter<?, String>> converterType = config.converter();
         final Optional<Error> error = CodeListResolver.getError(property);
         final AttributeConverter<?, String> converter = getBean(context, converterType);

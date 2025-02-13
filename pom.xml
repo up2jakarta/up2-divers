@@ -4,7 +4,7 @@
 
     <groupId>io.github.up2jakarta</groupId>
     <artifactId>up2-divers</artifactId>
-    <version>1.3.1</version>
+    <version>1.3.2</version>
     <packaging>pom</packaging>
 
     <name>Up2Jakarta :: Divers</name>
@@ -136,7 +136,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <!-- mvn decrypt:decrypt -Prelease  -->
+                            <!-- mvn decrypt:decrypt -Prelease (target/pass.txt) -->
                             <!-- gpg-connect-agent -v -->
                             <keyname>${gpg.key.name}</keyname>
                         </configuration>

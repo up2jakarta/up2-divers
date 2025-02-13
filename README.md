@@ -2,7 +2,7 @@
 
 Diverse Frameworks & APIs for Jakarta EE
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.bytebuddy/byte-buddy/badge.svg?style=for-the-badge&version=1.4.0)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2-divers)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2-divers?style=for-the-badge&color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2-divers)
 
 ## Requirements
 

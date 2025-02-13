@@ -12,29 +12,20 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.util.Stack;
 
 import static io.github.up2jakarta.csv.core.JpaTableChecker.checkName;
 
 final class JpaColumnContext implements CheckerContext {
 
-    @SuppressWarnings("ALL")
-    private final Stack<AnnotatedElement> stack = new Stack<>(); // TODO ? field + segmentClass
-    @SuppressWarnings("ALL")
-    private final Stack<String> path = new Stack<>();
     private final String prefix;
 
     JpaColumnContext(Class<? extends Segment> entityType, String prefix) throws BeanException {
-        //this.entityType = entityType;
         this.prefix = prefix;
-        stack.push(entityType);
         final PrimaryKeyJoinColumn column = entityType.getAnnotation(PrimaryKeyJoinColumn.class);
         if (column != null) {
             checkName(entityType, column.name(), prefix, "@PrimaryKeyJoinColumn[name]");
         }
-        // TODO @TableGenerator SequenceGenerator, UniqueConstraint
     }
 
     private void checkNumber(Field field, Column column, int precision) throws BeanException {
@@ -135,7 +126,6 @@ final class JpaColumnContext implements CheckerContext {
 
     @Override
     public void beforeSuperSegment(Class<? extends Segment> superType) throws BeanException {
-        // TODO SecondaryTable
         if (superType.getAnnotation(Entity.class) != null) {
             final Inheritance inheritance = superType.getAnnotation(Inheritance.class);
             if (inheritance == null) {
@@ -148,22 +138,13 @@ final class JpaColumnContext implements CheckerContext {
         } else if (superType.getAnnotation(MappedSuperclass.class) == null) {
             throw new BeanException(superType, "must be annotated by @MappedSuperclass");
         }
-        stack.push(superType);
-    }
-
-    @Override
-    public void afterSuperSegment(Class<? extends Segment> superType) {
-        stack.pop();
     }
 
     @Override
     public void beforePositionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
-        // TODO Column Override (AttributeOverride & AssociationOverride)
         final Column column = property.getAnnotation(Column.class);
         if (column != null) {
             checkColumn(property, propertyType, column);
-        } else if (property.getAnnotation(Transient.class) == null) {
-            throw new BeanException(property, "must be annotated by @Transient");
         }
     }
 
@@ -192,11 +173,9 @@ final class JpaColumnContext implements CheckerContext {
                     throw new BeanException(field, "must be annotated by only one @JoinColumn(s)");
                 }
                 checkName(field, join.name(), prefix, "@JoinColumn[name]");
-                // TODO Check FK
             } else if (joins == null) {
                 throw new BeanException(fieldType, "must be annotated by @JoinColumn(s)");
             } else {
-                // TODO Check FK
                 for (final JoinColumn jc : joins.value()) {
                     checkName(field, jc.name(), prefix, "@JoinColumn[name]");
                     if (!jc.foreignKey().name().isBlank()) {
@@ -207,12 +186,6 @@ final class JpaColumnContext implements CheckerContext {
         } else if (field.getAnnotation(Transient.class) != null) {
             throw new BeanException(field, "must be annotated by @Transient");
         }
-        path.push(field.getName());
-        stack.push(fieldType);
     }
 
-    @Override
-    public void afterFragmentProperty(Field fragment, Class<? extends Segment> fragmentType) {
-        stack.pop();
-    }
 }

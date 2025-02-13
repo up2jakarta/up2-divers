@@ -44,9 +44,6 @@ final class TechnicalChecker implements SegmentListener, CheckerContext {
         if (Modifier.isAbstract(segmentType.getModifiers())) {
             throw new BeanException(segmentType, "abstract class is not allowed");
         }
-        if (segmentType.getTypeParameters().length != 0) {
-            throw new BeanException(segmentType, "generic class is not allowed");
-        }
         if (segmentType.isRecord()) {
             throw new BeanException(segmentType, "record class is not allowed");
         }

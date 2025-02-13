@@ -38,26 +38,25 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
         this.context = context;
     }
 
-    private static XmlJavaTypeAdapter getAdapter(Field field) {
+    private static XmlJavaTypeAdapter getAdapter(Field field, Class<?> type) {
         final XmlJavaTypeAdapter xml = field.getAnnotation(XmlJavaTypeAdapter.class);
         if (xml == null) {
-            return field.getType().getAnnotation(XmlJavaTypeAdapter.class);
+            return type.getAnnotation(XmlJavaTypeAdapter.class);
         }
         return xml;
     }
 
     @Override
-    public Optional<XmlJavaTypeAdapter> get(Class<? extends Segment> segmentType, Field property) throws BeanException {
-        final Class<?> fieldType = property.getType();
-        final XmlJavaTypeAdapter xml = getAdapter(property);
+    public Optional<XmlJavaTypeAdapter> get(Class<? extends Segment> segmentType, Field property, Class<?> type, Field... path) throws BeanException {
+        final XmlJavaTypeAdapter xml = getAdapter(property, type);
         if (xml != null) {
             if (segmentType.getAnnotation(XmlType.class) == null) {
                 throw new BeanException(segmentType, "must be annotated with @XmlType");
             }
             final Class<? extends XmlAdapter<String, ?>> adapterType = (Class<? extends XmlAdapter<String, ?>>) xml.value();
             final Type[] arguments = getTypeArguments(adapterType, XmlAdapter.class);
-            if (!String.class.equals(arguments[0]) || !fieldType.equals(arguments[1])) {
-                final String typeName = fieldType.getSimpleName();
+            if (!String.class.equals(arguments[0]) || !type.equals(arguments[1])) {
+                final String typeName = type.getSimpleName();
                 throw new BeanException(property, "adapter must extends XmlAdapter<String, " + typeName + ">");
             }
             return Optional.of(xml);
@@ -66,7 +65,7 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
     }
 
     @Override
-    public Conversion<?> resolve(Field property, XmlJavaTypeAdapter config) throws BeanException {
+    public Conversion<?> resolve(Field property, Class<?> type, XmlJavaTypeAdapter config) throws BeanException {
         final Class<? extends XmlAdapter<String, ?>> adapterType = (Class<? extends XmlAdapter<String, ?>>) config.value();
         final Optional<Error> error = CodeListResolver.getError(property);
         final XmlAdapter<String, ?> adapter = getBean(context, adapterType);

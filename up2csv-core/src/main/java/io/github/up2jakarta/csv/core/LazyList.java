@@ -31,7 +31,7 @@ final class LazyList<R extends InputRow, E extends InputError<R, ?>> {
                     error.getKey().setOrder(order);
                 }
                 errors.add(error);
-                if(unique) {
+                if (unique) {
                     offsets.add(offset);
                 }
             }

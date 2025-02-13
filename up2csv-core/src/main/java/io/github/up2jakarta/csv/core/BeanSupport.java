@@ -8,30 +8,21 @@ import io.github.up2jakarta.csv.extension.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
-import java.lang.reflect.*;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.core.Beans.getBean;
+import static io.github.up2jakarta.csv.core.Beans.getFieldType;
 import static java.util.Arrays.asList;
 
 final class BeanSupport {
 
     private BeanSupport() {
-    }
-
-    private static Class<?> getFieldType(Field field, Type[] typeArguments) {
-        final Type fieldType = field.getGenericType();
-        if (fieldType instanceof TypeVariable<?>) {
-            final Type[] typeParameters = field.getDeclaringClass().getTypeParameters();
-            for (var i = 0; i < typeParameters.length; i++) {
-                if (typeParameters[i] == fieldType) {
-                    return (Class<?>) typeArguments[i];
-                }
-            }
-        }
-        return field.getType();
     }
 
     private static Fragment getAndCheckFragment(Field field) throws BeanException {
@@ -118,8 +109,8 @@ final class BeanSupport {
         return result.toArray(ProcessorWrapper[]::new);
     }
 
-    static Conversion<?> getConversion(MapperContext context, Field field) throws BeanException {
-        final Converter converter = field.getAnnotation(Converter.class);
+    static Conversion<?> getConversion(MapperContext context, Field field, Class<?> type) throws BeanException {
+        final Up2Converter converter = field.getAnnotation(Up2Converter.class);
         final Error error = field.getAnnotation(Error.class);
         if (converter != null) {
             final TypeConverter<?> tConverter = getBean(context.getContext(), converter.value());
@@ -140,7 +131,7 @@ final class BeanSupport {
                 return Conversion.of(conversion, error);
             }
         }
-        return context.getConversion(field);
+        return context.getConversion(field, type);
     }
 
     static Property<?>[] getProperties(Class<? extends Segment> beanType, MapperContext context) throws BeanException {
@@ -150,7 +141,7 @@ final class BeanSupport {
         final List<Property<?>> properties = new LinkedList<>();
         final Class<?> superClass = beanType.getSuperclass();
         if (Segment.class.isAssignableFrom(superClass)) {
-            final Type[] arguments = Beans.getTypeArguments(beanType);
+            final Type[] arguments = Beans.getTypeArguments(beanType.getGenericSuperclass());
             //noinspection unchecked
             final Class<? extends Segment> superType = (Class<? extends Segment>) superClass;
             context.getChecker().beforeSuperSegment(superType);
@@ -171,7 +162,7 @@ final class BeanSupport {
                 if (CharSequence.class == fieldType || fieldType == String.class) {
                     properties.add(new StringProperty(field, index, processors));
                 } else {
-                    final Conversion<?> conversion = getConversion(context, field);
+                    final Conversion<?> conversion = getConversion(context, field, fieldType);
                     checkDefault(field, conversion);
                     properties.add(new ConvertedProperty<>(field, index, processors, conversion));
                 }
@@ -181,7 +172,7 @@ final class BeanSupport {
                 final Class<? extends Segment> fragmentType = (Class<? extends Segment>) fieldType;
                 final int fragmentOffset = offset + fragment.value();
                 context.getChecker().beforeFragmentProperty(field, fragmentType);
-                final Property<?>[] fragmentProperties = getProperties(fragmentType, context.with(fragmentOffset));
+                final Property<?>[] fragmentProperties = getProperties(fragmentType, context.with(field, fragmentOffset));
                 context.getChecker().afterFragmentProperty(field, fragmentType);
                 properties.add(new FragmentProperty<>(fragmentType, field, fragmentOffset, fragmentProperties));
             } else {

@@ -7,6 +7,7 @@ import java.lang.reflect.*;
 
 import static java.util.Arrays.stream;
 
+@SuppressWarnings("unused")
 public final class Beans {
 
     public static final Type[] NO_TYPES = {};
@@ -72,11 +73,24 @@ public final class Beans {
         return result;
     }
 
-    private static String capitalize(String fieldName) {
+    public static String capitalize(String fieldName) {
         return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
     }
 
-    static Type[] getTypeArguments(Class<?> beanType, Class<?> finalType) throws BeanException {
+    public static Class<?> getFieldType(Field field, Type[] typeArguments) {
+        final Type fieldType = field.getGenericType();
+        if (fieldType instanceof TypeVariable<?>) {
+            final Type[] typeParameters = field.getDeclaringClass().getTypeParameters();
+            for (var i = 0; i < typeParameters.length; i++) {
+                if (typeParameters[i] == fieldType) {
+                    return (Class<?>) typeArguments[i];
+                }
+            }
+        }
+        return field.getType();
+    }
+
+    public static Type[] getTypeArguments(Class<?> beanType, Class<?> finalType) throws BeanException {
         if (finalType.getTypeParameters().length == 0 || beanType == Object.class) {
             return NO_TYPES;
         }
@@ -89,17 +103,16 @@ public final class Beans {
         return getClassArguments(beanType, finalType);
     }
 
-    static Type[] getTypeArguments(Class<?> beanType) {
-        final Type genericType = beanType.getGenericSuperclass();
-        if (genericType instanceof ParameterizedType pType) {
+    public static Type[] getTypeArguments(Type beanType) {
+        if (beanType instanceof ParameterizedType pType) {
             return pType.getActualTypeArguments();
         }
         return NO_TYPES;
     }
 
-    static Method getMethod(Class<?> type, String mName, String attr, String desc, Class<?>... pTypes) throws BeanException {
+    public static Method getMethod(Class<?> type, String mName, String attr, String desc, Class<?>... pTypes) throws BeanException {
         try {
-            final Method getter = type.getDeclaredMethod(mName, pTypes);
+            final Method getter = type.getMethod(mName, pTypes);
             if (!Modifier.isPublic(getter.getModifiers())) {
                 throw new BeanException(type, attr, desc + " must be public");
             }
@@ -109,7 +122,7 @@ public final class Beans {
         }
     }
 
-    static <T> T getBean(BeanContext context, Class<T> beanType) throws BeanException {
+    public static <T> T getBean(BeanContext context, Class<T> beanType) throws BeanException {
         try {
             return context.getBean(beanType);
         } catch (Throwable e) {
@@ -117,12 +130,24 @@ public final class Beans {
         }
     }
 
-    static Method getAccessibleSetter(Field field) throws BeanException {
+    public static Method getAccessibleSetter(Field field) throws BeanException {
         final String pName = capitalize(field.getName());
         return getMethod(field.getDeclaringClass(), "set" + pName, pName, "setter", field.getType());
     }
 
-    static <T> Constructor<T> getDefaultConstructor(Class<T> type) throws BeanException {
+    public static Method getAccessibleGetter(Field field) throws BeanException {
+        return getAccessibleGetter(field.getDeclaringClass(), field);
+    }
+
+    public static Method getAccessibleGetter(Class<?> type, Field field) throws BeanException {
+        String pName = capitalize(field.getName());
+        if (type == Boolean.class || type == boolean.class) {
+            return getMethod(type, "is" + pName, pName, "getter");
+        }
+        return getMethod(type, "get" + pName, pName, "getter");
+    }
+
+    public static <T> Constructor<T> getDefaultConstructor(Class<T> type) throws BeanException {
         try {
             final Constructor<T> constructor = type.getDeclaredConstructor();
             if (!Modifier.isPublic(constructor.getModifiers())) {
@@ -134,7 +159,7 @@ public final class Beans {
         }
     }
 
-    static <T> T newInstance(Constructor<T> constructor) throws BeanException {
+    public static <T> T newInstance(Constructor<T> constructor) throws BeanException {
         try {
             return constructor.newInstance();
         } catch (Throwable ex) {
@@ -142,11 +167,19 @@ public final class Beans {
         }
     }
 
-    static <V> void setValue(Object bean, V value, Method setter) throws BeanException {
+    public static <V> void setValue(Object bean, V value, Method setter) throws BeanException {
         try {
             setter.invoke(bean, value);
         } catch (Throwable ex) {
             throw new BeanException(bean.getClass(), setter, ex.getMessage());
+        }
+    }
+
+    public static Object getValue(Object bean, Method getter) throws BeanException {
+        try {
+            return getter.invoke(bean);
+        } catch (Throwable ex) {
+            throw new BeanException(bean.getClass(), getter, ex.getMessage());
         }
     }
 

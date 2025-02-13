@@ -64,15 +64,14 @@ public final class XmlEnumExtension extends ConversionExtension<XmlType, XmlEnum
     }
 
     @Override
-    public Optional<XmlEnum> get(Class<? extends Segment> segmentType, Field property) throws BeanException {
-        final Class<?> fieldType = property.getType();
-        if (!fieldType.isEnum()) {
+    public Optional<XmlEnum> get(Class<? extends Segment> segmentType, Field property, Class<?> type, Field... path) throws BeanException {
+        if (!type.isEnum()) {
             return Optional.empty();
         }
-        final XmlEnum xml = fieldType.getAnnotation(XmlEnum.class);
+        final XmlEnum xml = type.getAnnotation(XmlEnum.class);
         if (xml != null) {
-            if (fieldType.getAnnotation(XmlType.class) == null) {
-                throw new BeanException(fieldType, "must be annotated with @XmlType");
+            if (type.getAnnotation(XmlType.class) == null) {
+                throw new BeanException(type, "must be annotated with @XmlType");
             }
             return Optional.of(xml);
         }
@@ -80,8 +79,7 @@ public final class XmlEnumExtension extends ConversionExtension<XmlType, XmlEnum
     }
 
     @Override
-    public Conversion<?> resolve(Field property, XmlEnum config) throws BeanException {
-        final Class<?> enumType = property.getType();
+    public Conversion<?> resolve(Field property, Class<?> enumType, XmlEnum config) throws BeanException {
         final Map<String, Object> mapping = getConstants(enumType, property);
         final Optional<Error> error = CodeListResolver.getError(property);
         final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);

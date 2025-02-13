@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.EventHandler.SimpleHandler;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.input.InputRepository;
@@ -61,7 +60,7 @@ public class XmlExtensionTest {
         final Mapper<Test1Bean> mapper = factory.build(Test1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "11", "2", "33", "ILS", "ANY");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = EventHandler.of(row, creator, repository);
+        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Test1Bean bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -116,7 +115,7 @@ public class XmlExtensionTest {
         final Mapper<Test2Bean> mapper = factory.build(Test2Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "11", "22", "ILS", "ANY");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = EventHandler.of(row, creator, repository);
+        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Test2Bean bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -173,7 +172,7 @@ public class XmlExtensionTest {
         // THEN
         assertEquals(Test3Bean.class, thrown.getSource());
         assertEquals("enum1", thrown.getLocator());
-        assertEquals("Test3Bean[enum1] - must be annotated with @Converter or one of its shortcuts", thrown.getMessage());
+        assertEquals("Test3Bean[enum1] - must be annotated with @Up2Converter or one of its shortcuts", thrown.getMessage());
     }
 
 }

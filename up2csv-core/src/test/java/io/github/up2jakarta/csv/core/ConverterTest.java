@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.EventHandler.SimpleHandler;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.input.InputRepository;
 import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
@@ -64,7 +63,7 @@ class ConverterTest {
         final String[] data = {"100", "Test\t 100", "2024-07-25", "57.000001", "TND", "4.06250001", "C62", "Y", "P1W", "TN"};
         final Mapper<SupportEntity> parser = factory.build(SupportEntity.class);
         final InputRowEntity row = create(SegmentType.S00, data);
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = EventHandler.of(row, creator, repository);
+        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         // WHEN
         final SupportEntity entity = parser.map(row, handler);
         assertNotNull(entity);
@@ -88,7 +87,7 @@ class ConverterTest {
         final String[] data = {"100", "8888_8888", "2024-07-25", "57.000001", "EUR", "4.06250001", "KGM", "Y", "P1W", "FR"};
         final Mapper<SupportEntity> parser = factory.build(SupportEntity.class);
         final InputRowEntity row = create(SegmentType.S00, data);
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = EventHandler.of(row, creator, repository);
+        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         // WHEN
         final SupportEntity entity = parser.map(row, handler);
         assertNotNull(entity);
@@ -122,7 +121,7 @@ class ConverterTest {
         final String[] data = {"100", "99998888", "2024-07-25", "57.000001", "ILS", "4.06250001", "KGM", "Y", "P1W", "IL"};
         final Mapper<SupportEntity> parser = factory.build(SupportEntity.class);
         final InputRowEntity row = create(SegmentType.S00, data);
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = EventHandler.of(row, creator, repository);
+        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         // WHEN
         final SupportEntity entity = parser.map(row, handler);
         assertNotNull(entity);

@@ -30,6 +30,7 @@ import java.util.*;
 )
 @Validated
 @Up2EnableJPA
+@SuppressWarnings("unused")
 public class InvoiceEntity extends ParsedEntity<Long> {
 
     @Id

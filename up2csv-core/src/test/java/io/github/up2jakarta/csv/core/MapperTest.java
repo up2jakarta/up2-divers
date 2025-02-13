@@ -3,7 +3,6 @@ package io.github.up2jakarta.csv.core;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.EventHandler.SimpleHandler;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.extension.SeverityType;
@@ -12,7 +11,7 @@ import io.github.up2jakarta.csv.misc.Listable;
 import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
 import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.mapper.*;
-import io.github.up2jakarta.csv.test.bean.mapper.oneshot.AddressSegment;
+import io.github.up2jakarta.csv.test.bean.mapper.oneshot.AbstractAddress;
 import io.github.up2jakarta.csv.test.bean.mapper.oneshot.ClientSegment;
 import io.github.up2jakarta.csv.test.bean.mapper.oneshot.ComplexAddress;
 import io.github.up2jakarta.csv.test.bean.mapper.oneshot.SimpleAddress;
@@ -65,8 +64,8 @@ class MapperTest {
         final String[] data = null;
         final Mapper<ValidBean> mapper = factory.build(ValidBean.class);
         final InputRowEntity row3 = Tests.create(SegmentType.S00, data);
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler2 = EventHandler.of(null, creator, repository);
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler3 = EventHandler.of(row3, creator, repository);
+        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler2 = new SimpleHandler<>(null, creator, repository);
+        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler3 = new SimpleHandler<>(row3, creator, repository);
         // When
         final ValidBean bean1 = mapper.map(data);
         final ValidBean bean2 = mapper.map(null, handler2);
@@ -252,7 +251,7 @@ class MapperTest {
         final Mapper<Validator2Bean> mapper = factory.build(Validator2Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "\n\t");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = EventHandler.of(row, creator, repository);
+        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Validator2Bean bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -285,7 +284,7 @@ class MapperTest {
         final Mapper<ValidatedGroupsBean> mapper = factory.build(ValidatedGroupsBean.class);
         final InputRowEntity row = Tests.create(SegmentType.S99, "\t\n");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = EventHandler.of(row, creator, repository);
+        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final ValidatedGroupsBean bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -307,7 +306,7 @@ class MapperTest {
         final Mapper<Validator1Bean> mapper = factory.build(Validator1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "eTND");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = EventHandler.of(row, creator, repository);
+        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Validator1Bean bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -340,11 +339,11 @@ class MapperTest {
     @Test
     void testAbstractClass() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(AddressSegment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(AbstractAddress.class));
         // THEN
-        assertEquals(AddressSegment.class, thrown.getSource());
+        assertEquals(AbstractAddress.class, thrown.getSource());
         assertEquals("class", thrown.getLocator());
-        assertEquals("AddressSegment[class] - abstract class is not allowed", thrown.getMessage());
+        assertEquals("AbstractAddress[class] - abstract class is not allowed", thrown.getMessage());
     }
 
     @Test
@@ -424,7 +423,7 @@ class MapperTest {
         // THEN
         assertEquals(BeanWithInteger.class, thrown.getSource());
         assertEquals("id", thrown.getLocator());
-        assertEquals("BeanWithInteger[id] - must be annotated with @Converter or one of its shortcuts", thrown.getMessage());
+        assertEquals("BeanWithInteger[id] - must be annotated with @Up2Converter or one of its shortcuts", thrown.getMessage());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package io.github.up2jakarta.csv.misc;
 
 import io.github.up2jakarta.csv.TUConfiguration;
+import io.github.up2jakarta.csv.core.DefaultHandler;
 import io.github.up2jakarta.csv.core.EventHandler;
 import io.github.up2jakarta.csv.core.Mapper;
 import io.github.up2jakarta.csv.core.MapperFactory;
@@ -45,7 +46,7 @@ class CompositeKeyCreatorTest {
         final Mapper<Validator1Bean> mapper = factory.build(Validator1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "eTND");
         // When
-        final EventHandler<InputRowEntity, PKey, InputErrorEntity> handler = EventHandler.of(row, creator, repository);
+        final EventHandler<InputRowEntity, PKey, InputErrorEntity> handler = new DefaultHandler<>(row, creator, repository);
         final Validator1Bean bean = mapper.map(row, handler);
         final List<InputErrorEntity> errors = handler.toList();
         // Then

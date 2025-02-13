@@ -119,16 +119,6 @@ class JpaBaseCheckerTest {
     }
 
     @Test
-    void testMissingColumnEntity() {
-        // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test9Entity.class));
-        // THEN
-        assertEquals(Test9Entity.class, error.getSource());
-        assertEquals("key", error.getLocator());
-        assertEquals("Test9Entity[key] - must be annotated by @Transient", error.getMessage());
-    }
-
-    @Test
     void testMissingColumnNameEntity() {
         // GIVEN
         final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test10Entity.class));

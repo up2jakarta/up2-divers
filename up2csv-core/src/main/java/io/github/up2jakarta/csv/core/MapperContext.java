@@ -10,18 +10,16 @@ import io.github.up2jakarta.csv.extension.Segment;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Stack;
+import java.util.*;
 
 import static io.github.up2jakarta.csv.core.BeanSupport.getAnnotationsByType;
 import static io.github.up2jakarta.csv.core.Beans.getBean;
 
 final class MapperContext {
 
+    private final Stack<Class<? extends Segment>> stack = new Stack<>();
     private final ConversionExtension<?, Annotation>[] extensions;
-    private final Stack<Class<? extends Segment>> stack;
+    private final LinkedList<Field> path = new LinkedList<>();
     private final Class<? extends Segment> type;
     private final CompositeChecker checker;
     private final BeanContext context;
@@ -32,7 +30,6 @@ final class MapperContext {
         this.checker = CompositeChecker.of(type, context);
         this.extensions = getExtensions(type, context);
         this.arguments = Beans.NO_TYPES;
-        this.stack = new Stack<>();
         this.context = context;
         this.type = type;
         this.offset = 0;
@@ -42,10 +39,11 @@ final class MapperContext {
         this.extensions = origin.extensions;
         this.checker = origin.checker;
         this.type = origin.type;
-        this.stack = origin.newStack();
         this.context = origin.context;
         this.offset = offset;
         this.arguments = arguments;
+        origin.stack.forEach(this.stack::push);
+        origin.path.forEach(this.path::addLast);
     }
 
     @SuppressWarnings("unchecked")
@@ -61,10 +59,47 @@ final class MapperContext {
         return (ConversionExtension<?, Annotation>[]) result.toArray(ConversionExtension<?, ?>[]::new);
     }
 
-    private Stack<Class<? extends Segment>> newStack() {
-        final Stack<Class<? extends Segment>> copy = new Stack<>();
-        copy.addAll(this.stack);
-        return copy;
+    boolean push(Class<? extends Segment> beanType) {
+        if (stack.contains(beanType)) {
+            return true;
+        }
+        this.stack.push(beanType);
+        return false;
+    }
+
+    MapperContext with(Field field, int offset) {
+        final Type[] arguments = Beans.getTypeArguments(field.getGenericType());
+        final MapperContext result = new MapperContext(this, offset, arguments);
+        result.path.addLast(field);
+        return result;
+    }
+
+    MapperContext with(Type... arguments) {
+        return new MapperContext(this, this.offset, arguments);
+    }
+
+    Conversion<?> getConversion(Field field, Class<?> type) throws BeanException {
+        final Field[] fieldPath = path.toArray(Field[]::new);
+        for (final ConversionExtension<?, Annotation> extension : extensions) {
+            final Iterator<Class<? extends Segment>> it = stack.iterator();
+            Class<? extends Segment> segmentType = stack.peek();
+            while (it.hasNext()) {
+                final Class<? extends Segment> superType = it.next();
+                if (segmentType.isAssignableFrom(superType)) {
+                    segmentType = superType;
+                    break;
+                }
+            }
+            final Optional<Annotation> config = extension.get(segmentType, field, type, fieldPath);
+            if (config.isPresent()) {
+                return extension.resolve(field, type, config.get());
+            }
+        }
+        throw new BeanException(field, "must be annotated with @Up2Converter or one of its shortcuts");
+    }
+
+    CompositeChecker getChecker() {
+        return checker;
     }
 
     BeanContext getContext() {
@@ -77,36 +112,6 @@ final class MapperContext {
 
     Type[] getArguments() {
         return arguments;
-    }
-
-    boolean push(Class<? extends Segment> beanType) {
-        if (stack.contains(beanType)) {
-            return true;
-        }
-        this.stack.push(beanType);
-        return false;
-    }
-
-    MapperContext with(int offset) {
-        return new MapperContext(this, offset, this.arguments);
-    }
-
-    MapperContext with(Type... arguments) {
-        return new MapperContext(this, this.offset, arguments);
-    }
-
-    Conversion<?> getConversion(Field field) throws BeanException {
-        for (final ConversionExtension<?, Annotation> extension : extensions) {
-            final Optional<Annotation> config = extension.get(type, field);
-            if (config.isPresent()) {
-                return extension.resolve(field, config.get());
-            }
-        }
-        throw new BeanException(field, "must be annotated with @Converter or one of its shortcuts");
-    }
-
-    public CompositeChecker getChecker() {
-        return checker;
     }
 
 }

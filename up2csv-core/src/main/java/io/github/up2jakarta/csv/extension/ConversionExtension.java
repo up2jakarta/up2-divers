@@ -42,19 +42,22 @@ public abstract class ConversionExtension<A extends Annotation, C extends Annota
      *
      * @param segmentType the segment type
      * @param property    the property that is being converted automatically
+     * @param type        the type of the property
+     * @param path        the path of the property from the root segment
      * @return the configuration annotation if found
      * @throws BeanException for any missing or wrong bean configuration
      */
-    public abstract Optional<C> get(Class<? extends Segment> segmentType, Field property) throws BeanException;
+    public abstract Optional<C> get(Class<? extends Segment> segmentType, Field property, Class<?> type, Field... path) throws BeanException;
 
     /**
      * Configures and returns the Conversion {@link java.util.function.Function}.
      *
      * @param property the property that is being converted automatically
+     * @param type     the type of the property
      * @param config   the annotation configuration
      * @return the right conversion
      * @throws BeanException for any missing or wrong bean configuration
      */
-    public abstract Conversion<?> resolve(@NotNull Field property, @NotNull C config) throws BeanException;
+    public abstract Conversion<?> resolve(@NotNull Field property, Class<?> type, @NotNull C config) throws BeanException;
 
 }

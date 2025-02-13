@@ -14,7 +14,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -49,13 +48,13 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
     }
 
     @Override
-    public Optional<Enumerated> get(Class<? extends Segment> segmentType, Field property) throws BeanException {
+    public Optional<Enumerated> get(Class<? extends Segment> segmentType, Field property, Class<?> type, Field... path) throws BeanException {
         final Enumerated jpa = property.getAnnotation(Enumerated.class);
         if (jpa != null) {
             if (segmentType.getAnnotation(Entity.class) == null) {
                 throw new BeanException(segmentType, "must be annotated with @Entity");
             }
-            final Class<? extends Enum> enumType = (Class<Enum>) property.getType();
+            final Class<? extends Enum> enumType = (Class<Enum>) type;
             if (!enumType.isEnum()) {
                 throw new BeanException(property, "must not be annotated with @Enumerated");
             }
@@ -65,8 +64,8 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
     }
 
     @Override
-    public Conversion<?> resolve(@NotNull Field property, @NotNull Enumerated config) throws BeanException {
-        final Class<? extends Enum> enumType = (Class<Enum>) property.getType();
+    public Conversion<?> resolve(Field property, Class<?> pType, Enumerated config) throws BeanException {
+        final Class<? extends Enum> enumType = (Class<Enum>) pType;
         check(property, enumType, Enum::name);
         final Optional<Error> error = CodeListResolver.getError(property);
         final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);

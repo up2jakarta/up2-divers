@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
-public @interface Converter {
+public @interface Up2Converter {
 
     /**
      * The processor must be managed by {@link io.github.up2jakarta.csv.extension.BeanContext}
