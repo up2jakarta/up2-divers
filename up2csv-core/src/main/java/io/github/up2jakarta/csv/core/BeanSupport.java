@@ -63,7 +63,6 @@ final class BeanSupport {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     static <A extends Annotation> List<A> getAnnotationsByType(Class<A> annotationType, AnnotatedElement element) throws BeanException {
         final Method repeatValue = getRepeatableValue(annotationType);
         final List<A> result = new LinkedList<>();
@@ -71,11 +70,13 @@ final class BeanSupport {
             final Class<? extends Annotation> aType = annotation.annotationType();
             // direct
             if (annotationType.equals(aType)) {
+                //noinspection unchecked
                 result.add((A) annotation);
             }
             // indirect
             if (repeatValue != null && repeatValue.getDeclaringClass().equals(aType)) {
                 try {
+                    //noinspection unchecked
                     final A[] indirectArray = (A[]) repeatValue.invoke(annotation);
                     result.addAll(Arrays.asList(indirectArray));
                 } catch (Throwable t) {

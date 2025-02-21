@@ -1,8 +1,8 @@
-package io.github.up2jakarta.csv.entities.invoincing;
+package io.github.up2jakarta.csv.test.bean.jpa;
 
 import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.extension.CodeList;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.extension.Nullable;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 
@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 @Embeddable
 @SuppressWarnings("unused")
-public class Identifier<C extends CodeList<C>> implements Segment, Serializable {
+public class NoteId<C extends CodeList<C>> implements Nullable, Serializable {
 
     @Position(0)
     private String value;
@@ -19,7 +19,12 @@ public class Identifier<C extends CodeList<C>> implements Segment, Serializable 
     @NotNull
     private C schemeId;
 
-    public Identifier() {
+    public NoteId(String value, C schemeId) {
+        this.value = value;
+        this.schemeId = schemeId;
+    }
+
+    public NoteId() {
     }
 
     public String getValue() {
@@ -36,6 +41,11 @@ public class Identifier<C extends CodeList<C>> implements Segment, Serializable 
 
     public void setSchemeId(C schemeId) {
         this.schemeId = schemeId;
+    }
+
+    @Override
+    public boolean isNotNull() {
+        return value != null;
     }
 
 }

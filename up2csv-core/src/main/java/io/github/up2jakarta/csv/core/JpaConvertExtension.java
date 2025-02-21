@@ -27,7 +27,6 @@ import static io.github.up2jakarta.csv.core.Beans.getTypeArguments;
  */
 @Named
 @Singleton
-@SuppressWarnings("unchecked")
 public final class JpaConvertExtension extends ConversionExtension<Entity, Convert> {
 
     private final BeanContext context;
@@ -42,6 +41,7 @@ public final class JpaConvertExtension extends ConversionExtension<Entity, Conve
         if (!AttributeConverter.class.isAssignableFrom(jpa.converter())) {
             throw new BeanException(property, "@Convert[converter] must extends AttributeConverter");
         }
+        //noinspection unchecked
         final Class<? extends AttributeConverter<?, String>> converterType = jpa.converter();
         final Type[] arguments = getTypeArguments(converterType, AttributeConverter.class);
         if (!type.equals(arguments[0]) || !String.class.equals(arguments[1])) {
@@ -57,6 +57,7 @@ public final class JpaConvertExtension extends ConversionExtension<Entity, Conve
                 return Optional.of(jpa);
             }
         }
+        //noinspection unchecked
         segmentType = (Class<? extends Segment>) segmentType.getSuperclass();
         if (Segment.class.isAssignableFrom(segmentType)) {
             return from(segmentType, property, type);
@@ -87,6 +88,7 @@ public final class JpaConvertExtension extends ConversionExtension<Entity, Conve
 
     @Override
     public Conversion<?> resolve(Field property, Class<?> type, Convert config) throws BeanException {
+        //noinspection unchecked
         final Class<? extends AttributeConverter<?, String>> converterType = config.converter();
         final Optional<Error> error = CodeListResolver.getError(property);
         final AttributeConverter<?, String> converter = getBean(context, converterType);

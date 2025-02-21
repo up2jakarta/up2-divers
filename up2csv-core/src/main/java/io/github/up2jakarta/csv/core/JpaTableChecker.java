@@ -12,6 +12,9 @@ import jakarta.persistence.*;
 import java.lang.reflect.*;
 import java.util.*;
 
+/**
+ * JPA {@link jakarta.persistence.Table} checker implementation.
+ */
 @Named
 @Singleton
 public final class JpaTableChecker implements SegmentListener {

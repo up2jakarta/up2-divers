@@ -11,16 +11,9 @@ import java.lang.annotation.*;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.FIELD})
 @Valid
 public @interface Validated {
-
-    /**
-     * Enable the automatic validation (JSR-303).
-     *
-     * @return <code>true</code> if the validation is enabled;
-     */
-    boolean enable() default true;
 
     /**
      * Set the validation groups (JSR-303).

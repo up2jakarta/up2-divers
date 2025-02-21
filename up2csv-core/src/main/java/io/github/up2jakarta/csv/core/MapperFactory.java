@@ -4,6 +4,7 @@ import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.BeanContext;
+import io.github.up2jakarta.csv.extension.Nullable;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputRow;
@@ -69,40 +70,22 @@ public final class MapperFactory {
      *
      * @param <S> the segment type
      */
-    private static final class DefaultMapper<S extends Segment> extends Mapper<S> implements Listable<Property<?>> {
+    private static final class DefaultMapper<S extends Segment> extends Mapper<S> {
 
         private final Constructor<S> constructor;
-        private final Property<?>[] properties;
         private final Validator validator;
 
         private DefaultMapper(Class<S> type, BeanContext context, Validator validator) throws BeanException {
-            super(type);
+            super(type, context);
             this.validator = validator;
-            final MapperContext mapperContext = new MapperContext(context, type);
-            this.properties = BeanSupport.getProperties(type, mapperContext);
-            mapperContext.getChecker().afterSegment();
             this.constructor = Beans.getDefaultConstructor(type);
         }
 
-        @Override
-        <R extends InputRow, V extends InputError<R, ?>> void validate(Object bean, Class<?>[] g, EventHandler<R, ?, V> h) {
-            final Set<ConstraintViolation<Object>> violations = validator.validate(bean, g);
-            for (final ConstraintViolation<?> v : violations) {
-                final Property<?> p = findProperty(v);
-                if (p != null) {
-                    final Error config = p.field.getAnnotation(Error.class);
-                    h.handleEvent(p.offset + this.offset, v, config);
-                } else {
-                    LOGGER.warn("Unknown {}.{} has error: {}", v.getRootBeanClass(), v.getPropertyPath(), v.getMessage());
-                }
-            }
-        }
-
-        private Property<?> findProperty(final ConstraintViolation<?> violation) {
+        private static Property<?> findProperty(final ConstraintViolation<?> violation, Property<?>[] origin) {
             final String path = violation.getPropertyPath().toString();
             final String[] fieldNames = path.split("\\.");
             Property<?> property = null;
-            Property<?>[] properties = this.properties;
+            Property<?>[] properties = origin;
             for (String fieldName : fieldNames) {
                 property = stream(properties).filter(p -> fieldName.equals(p.field.getName())).findFirst().orElse(null);
                 if (property instanceof MapperFactory.FragmentProperty<?> fp) {
@@ -114,12 +97,31 @@ public final class MapperFactory {
             return property;
         }
 
+        @Override
+        <R extends InputRow, V extends InputError<R, ?>> void validate(Object bean, Property<?>[] ps, Class<?>[] g, EventHandler<R, ?, V> h) {
+            final Set<ConstraintViolation<Object>> violations = validator.validate(bean, g);
+            for (final ConstraintViolation<?> v : violations) {
+                final Property<?> p = findProperty(v, ps);
+                if (p != null) {
+                    final Error config = p.field.getAnnotation(Error.class);
+                    h.handleEvent(p.offset + this.offset, v, config);
+                } else {
+                    LOGGER.warn("Unknown {}.{} has error: {}", v.getRootBeanClass(), v.getPropertyPath(), v.getMessage());
+                }
+            }
+        }
+
         private <T extends Segment> T map(Constructor<T> constructor, Property<?>[] properties, EventHandler<?, ?, ?> collector, String... columns) throws BeanException {
             final T bean = Beans.newInstance(constructor);
             for (final Property<?> p : properties) {
                 if (p instanceof FragmentProperty<?> fp) {
                     final Segment fragment = map(fp.constructor, fp.properties, collector, columns);
-                    fp.setValue(bean, fragment, offset, collector);
+                    if (!(fragment instanceof Nullable nv) || nv.isNotNull()) {
+                        fp.setValue(bean, fragment, offset, collector);
+                        if (fp.validation.isEnabled()) {
+                            this.validate(fragment, fp.properties, fp.validation.getGroups(), collector);
+                        }
+                    }
                 } else {
                     final int index = p.offset;
                     final String value = (index < columns.length) ? columns[index] : null;
@@ -139,11 +141,6 @@ public final class MapperFactory {
             return map(this.constructor, this.properties, handler, columns);
         }
 
-        @Override
-        public List<Property<?>> toList() {
-            return List.of(properties);
-        }
-
     }
 
     /**
@@ -153,13 +150,15 @@ public final class MapperFactory {
      */
     final static class FragmentProperty<T extends Segment> extends Property<Segment> implements Listable<Property<?>> {
 
-        final Constructor<T> constructor;
+        private final Constructor<T> constructor;
         private final Property<?>[] properties;
+        private final ValidationContext validation;
 
         FragmentProperty(Class<T> type, Field field, int offset, Property<?>[] properties) throws BeanException {
             super(field, offset);
             this.constructor = Beans.getDefaultConstructor(type);
             this.properties = properties;
+            this.validation = ValidationContext.of(field);
         }
 
         @Override

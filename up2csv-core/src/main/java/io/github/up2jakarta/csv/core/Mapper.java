@@ -3,14 +3,17 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.annotation.Truncated;
 import io.github.up2jakarta.csv.exception.BeanException;
+import io.github.up2jakarta.csv.extension.BeanContext;
 import io.github.up2jakarta.csv.extension.Parsed;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputRow;
+import io.github.up2jakarta.csv.misc.Listable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 import static io.github.up2jakarta.csv.core.Beans.getTypeArguments;
 import static io.github.up2jakarta.csv.core.EventHandler.failFast;
@@ -21,19 +24,24 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <S> the segment type
  */
-public abstract class Mapper<S extends Segment> {
+@SuppressWarnings("ClassEscapesDefinedScope")
+public abstract class Mapper<S extends Segment> implements Listable<Property<?>> {
 
     final static Logger LOGGER = LoggerFactory.getLogger(Mapper.class);
 
     protected final int offset;
     protected final Class<S> type;
+    protected final Property<?>[] properties;
     private final ValidationContext validation;
 
-    Mapper(Class<S> type) throws BeanException {
+    Mapper(Class<S> type, BeanContext context) throws BeanException {
         final Truncated truncated = type.getAnnotation(Truncated.class);
         this.offset = (truncated != null) ? truncated.value() : 0;
         this.type = type;
         this.validation = ValidationContext.of(type);
+        final MapperContext mapperContext = new MapperContext(context, type);
+        this.properties = BeanSupport.getProperties(type, mapperContext);
+        mapperContext.getChecker().afterSegment();
     }
 
     /**
@@ -50,19 +58,6 @@ public abstract class Mapper<S extends Segment> {
     }
 
     /**
-     * Map without validation input data to java bean depending on annotations like {@link Position}.
-     * and collect errors in the given collector after full-filling the error properties.
-     *
-     * @param handler the error collector, must not be null
-     * @param columns the input data
-     * @param <R>     the row type
-     * @param <V>     the error type
-     * @return the parsed segment
-     * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
-     */
-    public abstract <R extends InputRow, V extends InputError<R, ?>> S map(EventHandler<R, ?, V> handler, String... columns) throws BeanException;
-
-    /**
      * Map and validate input data to java bean depending on annotations like {@link Position}.
      * and collect errors in the given collector after full-filling the error properties.
      *
@@ -73,7 +68,6 @@ public abstract class Mapper<S extends Segment> {
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
      */
-    @SuppressWarnings("unchecked")
     public final <R extends InputRow, V extends InputError<R, ?>> S map(R row, EventHandler<R, ?, V> handler) throws BeanException {
         if (row == null || row.getColumns() == null) {
             return null;
@@ -94,10 +88,23 @@ public abstract class Mapper<S extends Segment> {
             ((Parsed<R>) parsed).setRow(row);
         }
         if (validation.isEnabled()) {
-            this.validate(segment, validation.getGroups(), handler);
+            this.validate(segment, this.properties, validation.getGroups(), handler);
         }
         return segment;
     }
+
+    /**
+     * Map without validation input data to java bean depending on annotations like {@link Position}.
+     * and collect errors in the given collector after full-filling the error properties.
+     *
+     * @param handler the error collector, must not be null
+     * @param columns the input data
+     * @param <R>     the row type
+     * @param <V>     the error type
+     * @return the parsed segment
+     * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
+     */
+    public abstract <R extends InputRow, V extends InputError<R, ?>> S map(EventHandler<R, ?, V> handler, String... columns) throws BeanException;
 
     /**
      * Validates the given bean with the given JSR-303 validation groups and gathering
@@ -109,6 +116,11 @@ public abstract class Mapper<S extends Segment> {
      * @param <R>       the input row type
      * @param <V>       the input error type
      */
-    abstract <R extends InputRow, V extends InputError<R, ?>> void validate(Object bean, Class<?>[] groups, EventHandler<R, ?, V> collector);
+    abstract <R extends InputRow, V extends InputError<R, ?>> void validate(Object bean, Property<?>[] properties, Class<?>[] groups, EventHandler<R, ?, V> collector);
+
+    @Override
+    public final List<Property<?>> toList() {
+        return List.of(this.properties);
+    }
 
 }

@@ -27,7 +27,6 @@ import static io.github.up2jakarta.csv.core.Beans.getTypeArguments;
  */
 @Named
 @Singleton
-@SuppressWarnings("unchecked")
 public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJavaTypeAdapter> {
 
     private final BeanContext context;
@@ -53,6 +52,7 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
             if (segmentType.getAnnotation(XmlType.class) == null) {
                 throw new BeanException(segmentType, "must be annotated with @XmlType");
             }
+            //noinspection unchecked
             final Class<? extends XmlAdapter<String, ?>> adapterType = (Class<? extends XmlAdapter<String, ?>>) xml.value();
             final Type[] arguments = getTypeArguments(adapterType, XmlAdapter.class);
             if (!String.class.equals(arguments[0]) || !type.equals(arguments[1])) {
@@ -66,6 +66,7 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
 
     @Override
     public Conversion<?> resolve(Field property, Class<?> type, XmlJavaTypeAdapter config) throws BeanException {
+        //noinspection unchecked
         final Class<? extends XmlAdapter<String, ?>> adapterType = (Class<? extends XmlAdapter<String, ?>>) config.value();
         final Optional<Error> error = CodeListResolver.getError(property);
         final XmlAdapter<String, ?> adapter = getBean(context, adapterType);

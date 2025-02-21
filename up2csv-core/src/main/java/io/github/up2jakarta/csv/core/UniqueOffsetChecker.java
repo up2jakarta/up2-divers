@@ -11,6 +11,9 @@ import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * UP2 {@link io.github.up2jakarta.csv.annotation.Position} checker implementation, useful for persist-able output result.
+ */
 @Named
 @Singleton
 public final class UniqueOffsetChecker implements SegmentListener {

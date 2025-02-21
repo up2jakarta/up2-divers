@@ -4,6 +4,8 @@ import io.github.up2jakarta.csv.annotation.Validated;
 import io.github.up2jakarta.csv.exception.BeanException;
 import jakarta.validation.Valid;
 
+import java.lang.reflect.Field;
+
 /**
  * Context representation for JSR-303 validation.
  */
@@ -20,6 +22,18 @@ public class ValidationContext {
         this.groups = groups;
     }
 
+    private static void checkGroups(Validated validated, Class<?> source, String name) throws BeanException {
+        final Valid valid = source.getAnnotation(Valid.class);
+        if (valid != null) {
+            throw new BeanException(source, name, "must not be annotated by @Valid");
+        }
+        for (final Class<?> group : validated.groups()) {
+            if (!group.isInterface()) {
+                throw new BeanException(source, name, "@Validated[value = " + group.getName() + ".class must be an interface]");
+            }
+        }
+    }
+
     /**
      * Factory method that create context from the given bean type.
      *
@@ -30,22 +44,27 @@ public class ValidationContext {
     public static ValidationContext of(Class<?> type) throws BeanException {
         final Validated validated = type.getAnnotation(Validated.class);
         if (validated != null) {
-            if (!validated.enable()) {
-                return DISABLED;
-            }
             if (validated.groups().length == 0) {
                 return DEFAULT;
             }
-            for (final Class<?> group : validated.groups()) {
-                if (!group.isInterface()) {
-                    throw new BeanException(type, "@Profile[value = " + group.getName() + ".class must be an interface]");
-                }
-            }
+            checkGroups(validated, type, "class");
             return new ValidationContext(true, validated.groups());
         }
         final Valid valid = type.getAnnotation(Valid.class);
         if (valid != null) {
             return DEFAULT;
+        }
+        return DISABLED;
+    }
+
+    public static ValidationContext of(Field field) throws BeanException {
+        final Validated validated = field.getAnnotation(Validated.class);
+        if (validated != null) {
+            if (validated.groups().length == 0) {
+                throw new BeanException(field, "@Validated must be replaced by @Valid");
+            }
+            checkGroups(validated, field.getDeclaringClass(), field.getName());
+            return new ValidationContext(true, validated.groups());
         }
         return DISABLED;
     }

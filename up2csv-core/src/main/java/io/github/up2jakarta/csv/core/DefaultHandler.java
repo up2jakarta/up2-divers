@@ -34,6 +34,13 @@ public class DefaultHandler<R extends InputRow, K extends InputError.Key<R>, E e
     private final LazyList<R, E> collector;
     private final EventCreator<R, K, E> creator;
 
+    /**
+     * Public constructor fo instance creation.
+     *
+     * @param row        the input segment
+     * @param creator    the error creator
+     * @param repository the input repository
+     */
     public DefaultHandler(R row, EventCreator<R, K, E> creator, InputRepository<R> repository) {
         this.row = row;
         this.creator = creator;
@@ -82,16 +89,29 @@ public class DefaultHandler<R extends InputRow, K extends InputError.Key<R>, E e
         return row;
     }
 
+    /**
+     * @return the list of collected errors.
+     */
     @Override
     public List<E> toList() {
         return collector.toList();
     }
 
+    /**
+     * Pushes the given <code>error</code> to list of collected errors.
+     *
+     * @param error the new error.
+     */
     @SuppressWarnings("unused")
     public void add(E error) {
         collector.addWithOrder(null, error, false);
     }
 
+    /**
+     * Pushes the list of collected errors to the given <code>target</code> collection.
+     *
+     * @param target the collection of errors
+     */
     @SuppressWarnings("unused")
     public void addTo(Collection<E> target) {
         collector.addTo(target);

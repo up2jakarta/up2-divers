@@ -8,6 +8,9 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.persistence.Entity;
 
+/**
+ * JPA {@link jakarta.persistence.Column} checker implementation.
+ */
 @Named
 @Singleton
 public final class JpaColumnChecker implements SegmentListener {

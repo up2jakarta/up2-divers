@@ -46,7 +46,6 @@ final class MapperContext {
         origin.path.forEach(this.path::addLast);
     }
 
-    @SuppressWarnings("unchecked")
     private static ConversionExtension<?, Annotation>[] getExtensions(Class<? extends Segment> type, BeanContext context) throws BeanException {
         final Extension[] extensions = getAnnotationsByType(Extension.class, type).toArray(Extension[]::new);
         final List<ConversionExtension<?, ? extends Annotation>> result = new LinkedList<>();
@@ -56,6 +55,7 @@ final class MapperContext {
                 result.add(bean);
             }
         }
+        //noinspection unchecked
         return (ConversionExtension<?, Annotation>[]) result.toArray(ConversionExtension<?, ?>[]::new);
     }
 

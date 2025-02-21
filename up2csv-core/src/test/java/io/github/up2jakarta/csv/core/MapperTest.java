@@ -10,12 +10,14 @@ import io.github.up2jakarta.csv.input.InputRepository;
 import io.github.up2jakarta.csv.misc.Listable;
 import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
 import io.github.up2jakarta.csv.test.Tests;
+import io.github.up2jakarta.csv.test.bean.jpa.NoteEntity;
 import io.github.up2jakarta.csv.test.bean.mapper.*;
 import io.github.up2jakarta.csv.test.bean.mapper.oneshot.AbstractAddress;
 import io.github.up2jakarta.csv.test.bean.mapper.oneshot.ClientSegment;
 import io.github.up2jakarta.csv.test.bean.mapper.oneshot.ComplexAddress;
 import io.github.up2jakarta.csv.test.bean.mapper.oneshot.SimpleAddress;
 import io.github.up2jakarta.csv.test.bean.processor.ProcessorBean;
+import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
 import io.github.up2jakarta.csv.test.input.InputRowEntity;
 import io.github.up2jakarta.csv.test.input.SegmentType;
@@ -540,7 +542,6 @@ class MapperTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testMappingBean() throws BeanException, IllegalAccessException {
         // GIVEN
         final String id = "V";
@@ -566,7 +567,6 @@ class MapperTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testMappingNoOrderBean() throws BeanException, IllegalAccessException {
         // GIVEN
         final String id = "V";
@@ -592,7 +592,6 @@ class MapperTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testMappingNoPositionBean() throws BeanException, IllegalAccessException {
         // GIVEN
         final String id = "V";
@@ -615,6 +614,23 @@ class MapperTest {
             // Then
             assertEquals("Test", f.field.get(bean));
         }
+    }
+
+    @Test
+    void testNullable() throws BeanException {
+        // Given
+        final Mapper<NoteEntity> mapper = factory.build(NoteEntity.class);
+        final String[] data = new String[]{"ZZZ", "Content", null, "FR", "XXX", "EUR"};
+        // When
+        final NoteEntity segment = mapper.map(data);
+        // Then
+        assertNotNull(segment);
+        assertEquals("ZZZ", segment.getSubjectCode());
+        assertEquals("Content", segment.getContent());
+        assertNull(segment.getTest1());
+        assertNotNull(segment.getTest2());
+        assertEquals("XXX", segment.getTest2().getValue());
+        assertEquals(CurrencyCodeType.EUR, segment.getTest2().getSchemeId());
     }
 
 }

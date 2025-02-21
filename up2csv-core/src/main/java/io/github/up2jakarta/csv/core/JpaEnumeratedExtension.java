@@ -26,7 +26,6 @@ import static java.util.Arrays.stream;
  */
 @Named
 @Singleton
-@SuppressWarnings({"unchecked", "rawtypes"})
 public final class JpaEnumeratedExtension extends ConversionExtension<Entity, Enumerated> {
 
     public static final String FORMAT = "Unknown value [%s] for @Enumerated[%s]";
@@ -54,7 +53,8 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
             if (segmentType.getAnnotation(Entity.class) == null) {
                 throw new BeanException(segmentType, "must be annotated with @Entity");
             }
-            final Class<? extends Enum> enumType = (Class<Enum>) type;
+            //noinspection unchecked
+            final Class<? extends Enum<?>> enumType = (Class<Enum<?>>) type;
             if (!enumType.isEnum()) {
                 throw new BeanException(property, "must not be annotated with @Enumerated");
             }
@@ -65,6 +65,7 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
 
     @Override
     public Conversion<?> resolve(Field property, Class<?> pType, Enumerated config) throws BeanException {
+        //noinspection unchecked,rawtypes
         final Class<? extends Enum> enumType = (Class<Enum>) pType;
         check(property, enumType, Enum::name);
         final Optional<Error> error = CodeListResolver.getError(property);
@@ -73,6 +74,7 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
         if (EnumType.STRING == config.value()) {
             return v -> {
                 try {
+                    //noinspection unchecked
                     return Enum.valueOf(enumType, v);
                 } catch (IllegalArgumentException exception) {
                     final String msg = String.format(FORMAT, v, enumType.getSimpleName());
