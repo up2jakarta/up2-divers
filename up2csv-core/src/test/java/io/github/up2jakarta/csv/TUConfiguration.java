@@ -8,7 +8,9 @@ import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
 import io.github.up2jakarta.csv.processor.TokenProcessor;
 import io.github.up2jakarta.csv.resolver.DecimalResolver;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
+import io.github.up2jakarta.csv.test.ext.DataIdResolver;
 import io.github.up2jakarta.csv.test.ext.DummyConverter;
+import io.github.up2jakarta.csv.test.input.DataId;
 import io.github.up2jakarta.csv.test.input.InputErrorEntity;
 import io.github.up2jakarta.csv.test.input.InputRowEntity;
 import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
@@ -54,6 +56,13 @@ public class TUConfiguration {
         return r -> 0;
     }
 
+    @Bean
+    @Scope(value = SCOPE_SINGLETON)
+    @Deprecated(forRemoval = true)
+    DataIdResolver resolver() {
+        return DataIdResolver.INSTANCE;
+    }
+
     /**
      * Choose one {@link io.github.up2jakarta.csv.core.EventCreator} depends on your implementation:
      *
@@ -62,7 +71,7 @@ public class TUConfiguration {
     @Bean
     @Scope(value = SCOPE_SINGLETON)
     @Deprecated(forRemoval = true)
-    public SimpleKeyCreator<InputRowEntity, SimpleErrorEntity> simpleKeyCreator() {
+    public SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> simpleKeyCreator() {
         return new SimpleKeyCreator<>(SimpleErrorEntity::new);
     }
 
@@ -74,7 +83,7 @@ public class TUConfiguration {
     @Bean
     @Scope(value = SCOPE_SINGLETON)
     @Deprecated(forRemoval = true)
-    public CompositeKeyCreator<InputRowEntity, InputErrorEntity.PKey, InputErrorEntity> compositeKeyCreator() {
+    public CompositeKeyCreator<InputRowEntity, InputErrorEntity.PKey, DataId, InputErrorEntity> compositeKeyCreator() {
         return new CompositeKeyCreator<>(InputErrorEntity::new, InputErrorEntity.PKey::new);
     }
 

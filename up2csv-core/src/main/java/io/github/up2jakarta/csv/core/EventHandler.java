@@ -4,9 +4,10 @@ import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.exception.CodeListException;
 import io.github.up2jakarta.csv.exception.MapperException;
 import io.github.up2jakarta.csv.exception.PropertyException;
+import io.github.up2jakarta.csv.extension.DataType;
 import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.input.InputError;
-import io.github.up2jakarta.csv.input.InputRow;
+import io.github.up2jakarta.csv.input.InputSegment;
 import io.github.up2jakarta.csv.misc.Listable;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.metadata.ConstraintDescriptor;
@@ -27,9 +28,10 @@ import static java.util.Optional.ofNullable;
  *
  * @param <A> the input row type
  * @param <B> the error key type
+ * @param <D> the business data type
  * @param <C> the error type
  */
-public abstract class EventHandler<A extends InputRow, B extends InputError.Key<A>, C extends InputError<A, B>> implements Listable<C> {
+public abstract class EventHandler<A extends InputSegment, B extends InputError.Key<A>, D extends DataType<D>, C extends InputError<A, B, ?>> implements Listable<C> {
 
     private static Optional<Error> getError(ConstraintViolation<?> violation) {
         final ConstraintDescriptor<?> descriptor = violation.getConstraintDescriptor();
@@ -80,10 +82,14 @@ public abstract class EventHandler<A extends InputRow, B extends InputError.Key<
     }
 
     /**
+     * @param <R> the input record-segment
+     * @param <D> the business data-type
+     * @param <V> the error type
      * @return an instance that fails at the first throw error.
      */
-    public static EventHandler<?, ?, ?> failFast() {
-        return FastHandler.INSTANCE;
+    public static <R extends InputSegment, D extends DataType<D>, V extends InputError<R, ?, D>> EventHandler<R, ?, D, V> failFast() {
+        //noinspection unchecked
+        return (EventHandler<R, ?, D, V>) FastHandler.INSTANCE;
     }
 
     /**
@@ -94,54 +100,56 @@ public abstract class EventHandler<A extends InputRow, B extends InputError.Key<
     /**
      * Handle the JSR-303 constraint violation caused by the input at the given offset.
      *
+     * @param type      the data type
      * @param offset    the input index
      * @param violation the JSR-303 constraint violation
      * @param config    the error annotation defined at property level
      */
-    public abstract void handleEvent(int offset, ConstraintViolation<?> violation, Error config);
+    public abstract void handleEvent(D type, int offset, ConstraintViolation<?> violation, Error config);
 
     /**
      * Handle any exception caused by the input at the given offset.
      *
+     * @param type      the data type
      * @param offset    the input index
      * @param exception thr thrown exception
      * @param config    the error annotation defined at property level
      * @param trace     forces the stack trace
      */
-    public abstract void handleEvent(int offset, Throwable exception, Error config, boolean trace);
+    public abstract void handleEvent(D type, int offset, Throwable exception, Error config, boolean trace);
 
     /**
      * Fail-fast implementation.
      */
-    private static class FastHandler extends EventHandler<InputRow, InputError.Key<InputRow>, InputError<InputRow, InputError.Key<InputRow>>> {
+    private static class FastHandler<D extends DataType<D>> extends EventHandler<InputSegment, InputError.Key<InputSegment>, D, InputError<InputSegment, InputError.Key<InputSegment>, ?>> {
 
-        private static final EventHandler<?, ?, ?> INSTANCE = new FastHandler();
+        private static final EventHandler<?, ?, ?, ?> INSTANCE = new FastHandler<>();
 
         private FastHandler() {
         }
 
         @Override
-        InputRow getSource() {
+        InputSegment getSource() {
             return null;
         }
 
         @Override
-        public List<InputError<InputRow, InputError.Key<InputRow>>> toList() {
+        public List<InputError<InputSegment, InputError.Key<InputSegment>, ?>> toList() {
             return emptyList();
         }
 
         @Override
-        public void handleEvent(int offset, ConstraintViolation<?> violation, Error config) {
+        public void handleEvent(D data, int offset, ConstraintViolation<?> violation, Error config) {
             final SeverityType type = getSeverity(violation, config);
             final String code = getErrorCode(violation, config);
-            throw new MapperException(offset, type, code, new PropertyException(type, code, violation.getMessage()));
+            throw new MapperException(data, offset, type, code, new PropertyException(type, code, violation.getMessage()));
         }
 
         @Override
-        public void handleEvent(int offset, Throwable exception, Error config, boolean trace) {
+        public void handleEvent(D data, int offset, Throwable exception, Error config, boolean trace) {
             final SeverityType type = getSeverity(exception, config);
             final String code = getErrorCode(exception, config);
-            throw new MapperException(offset, type, code, PropertyException.of(type, code, exception));
+            throw new MapperException(data, offset, type, code, PropertyException.of(type, code, exception));
         }
 
     }

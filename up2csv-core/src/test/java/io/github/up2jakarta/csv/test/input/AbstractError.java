@@ -2,8 +2,6 @@ package io.github.up2jakarta.csv.test.input;
 
 import io.github.up2jakarta.csv.extension.SeverityType;
 import jakarta.persistence.*;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.type.descriptor.jdbc.LongVarcharJdbcType;
 
 @MappedSuperclass
 @SuppressWarnings("unused")
@@ -23,7 +21,7 @@ abstract class AbstractError {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @JdbcType(LongVarcharJdbcType.class)
+    //@JdbcType(LongVarcharJdbcType.class)
     @Column(name = "ERR_TRACE", nullable = false)
     private String trace;
 

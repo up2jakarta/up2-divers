@@ -9,10 +9,13 @@ import java.util.Objects;
 @Entity
 @Table(name = "TB_INPUT2_ERRORS")
 @SuppressWarnings("unused")
-public class InputErrorEntity extends AbstractError implements InputError<InputRowEntity, InputErrorEntity.PKey> {
+public class InputErrorEntity extends AbstractError implements InputError<InputRowEntity, InputErrorEntity.PKey, DataId> {
 
     @EmbeddedId
     private PKey key;
+
+    @Transient
+    private DataId type;
 
     @Override
     public PKey getKey() {
@@ -22,6 +25,15 @@ public class InputErrorEntity extends AbstractError implements InputError<InputR
     @Override
     public void setKey(PKey key) {
         this.key = key;
+    }
+
+    public DataId getType() {
+        return type;
+    }
+
+    @Override
+    public void setType(DataId type) {
+        this.type = type;
     }
 
     @Embeddable
@@ -45,7 +57,7 @@ public class InputErrorEntity extends AbstractError implements InputError<InputR
         }
 
         @Override
-        public void setRow(InputRowEntity row) {
+        public void setRecord(InputRowEntity row) {
             this.row = row;
         }
 

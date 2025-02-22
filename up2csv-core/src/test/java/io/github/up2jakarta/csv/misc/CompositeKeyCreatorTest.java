@@ -11,11 +11,8 @@ import io.github.up2jakarta.csv.input.InputRepository;
 import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.mapper.Validator1Bean;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
-import io.github.up2jakarta.csv.test.input.InputErrorEntity;
+import io.github.up2jakarta.csv.test.input.*;
 import io.github.up2jakarta.csv.test.input.InputErrorEntity.PKey;
-import io.github.up2jakarta.csv.test.input.InputRowEntity;
-import io.github.up2jakarta.csv.test.input.SegmentType;
-import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +28,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class CompositeKeyCreatorTest {
 
     private final InputRepository<InputRowEntity> repository = (r -> 0);
-    private final CompositeKeyCreator<InputRowEntity, PKey, InputErrorEntity> creator;
-    private final MapperFactory factory;
+    private final CompositeKeyCreator<InputRowEntity, PKey, DataId, InputErrorEntity> creator;
+    private final MapperFactory<DataId> factory;
 
     @Autowired
-    CompositeKeyCreatorTest(MapperFactory factory, CompositeKeyCreator<InputRowEntity, PKey, InputErrorEntity> creator) {
+    CompositeKeyCreatorTest(MapperFactory<DataId> factory, CompositeKeyCreator<InputRowEntity, PKey, DataId, InputErrorEntity> creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -43,10 +40,10 @@ class CompositeKeyCreatorTest {
     @Test
     void testOneShot() throws BeanException {
         // Given
-        final Mapper<Validator1Bean> mapper = factory.build(Validator1Bean.class);
+        final Mapper<Validator1Bean, DataId> mapper = factory.build(Validator1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "eTND");
         // When
-        final EventHandler<InputRowEntity, PKey, InputErrorEntity> handler = new DefaultHandler<>(row, creator, repository);
+        final EventHandler<InputRowEntity, PKey, DataId, InputErrorEntity> handler = new DefaultHandler<>(row, creator, repository);
         final Validator1Bean bean = mapper.map(row, handler);
         final List<InputErrorEntity> errors = handler.toList();
         // Then
@@ -65,7 +62,7 @@ class CompositeKeyCreatorTest {
     @Test
     void hackCreator() {
         // Given
-        final CompositeKeyCreator<?, ?, SimpleErrorEntity> creator = new CompositeKeyCreator<>(SimpleErrorEntity::new, null);
+        final CompositeKeyCreator<?, ?, DataId, SimpleErrorEntity> creator = new CompositeKeyCreator<>(SimpleErrorEntity::new, null);
         final SimpleErrorEntity error = creator.newInstance();
         // When
         final IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> error.setKey(error));

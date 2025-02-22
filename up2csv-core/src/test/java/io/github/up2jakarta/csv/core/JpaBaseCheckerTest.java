@@ -3,6 +3,7 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.test.bean.jpa.checker.base.*;
+import io.github.up2jakarta.csv.test.input.DataId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,17 +16,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 class JpaBaseCheckerTest {
 
-    private final MapperFactory factory;
+    private final MapperFactory<DataId> factory;
 
     @Autowired
-    JpaBaseCheckerTest(MapperFactory factory) {
+    JpaBaseCheckerTest(MapperFactory<DataId> factory) {
         this.factory = factory;
     }
 
     @Test
     void testActivation() throws BeanException {
         // WHEN
-        final Mapper<Test1Entity> mapper = factory.build(Test1Entity.class);
+        final Mapper<Test1Entity, DataId> mapper = factory.build(Test1Entity.class);
         // THEN
         assertNotNull(mapper);
     }
@@ -33,7 +34,7 @@ class JpaBaseCheckerTest {
     @Test
     void testColumnNullable1() throws BeanException {
         // WHEN
-        final Mapper<Test17Entity> mapper = factory.build(Test17Entity.class);
+        final Mapper<Test17Entity, DataId> mapper = factory.build(Test17Entity.class);
         // THEN
         assertNotNull(mapper);
     }
@@ -41,7 +42,7 @@ class JpaBaseCheckerTest {
     @Test
     void testColumnNullable2() throws BeanException {
         // WHEN
-        final Mapper<Test18Entity> mapper = factory.build(Test18Entity.class);
+        final Mapper<Test18Entity, DataId> mapper = factory.build(Test18Entity.class);
         // THEN
         assertNotNull(mapper);
     }
@@ -95,7 +96,7 @@ class JpaBaseCheckerTest {
         // THEN
         assertEquals(Test6Entity.class, error.getSource());
         assertEquals("class", error.getLocator());
-        assertEquals("Test6Entity[class] - @Table[name] must contain only letters or underscore (_)", error.getMessage());
+        assertEquals("Test6Entity[class] - @Table[name] must starts with alphabetic", error.getMessage());
     }
 
     @Test
@@ -155,7 +156,7 @@ class JpaBaseCheckerTest {
         // THEN
         assertEquals(Test13Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
-        assertEquals("Test13Entity[key] - @Column[name] must contain only letters or underscore (_)", error.getMessage());
+        assertEquals("Test13Entity[key] - @Column[name] must contains only alphanumeric or underscore", error.getMessage());
     }
 
     @Test

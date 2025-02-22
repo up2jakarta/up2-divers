@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.extension;
 
-import io.github.up2jakarta.csv.input.InputRow;
+import io.github.up2jakarta.csv.input.InputSegment;
 
 /**
  * Contract marker (target of parsing) for parsed beans managed by Up2CSV engine.
@@ -8,12 +8,12 @@ import io.github.up2jakarta.csv.input.InputRow;
  *
  * @param <T> the input row type
  */
-public interface Parsed<T extends InputRow> extends Segment {
+public interface Parsed<T extends InputSegment> extends Segment {
 
     /**
      * Sets the source row, useful to keep tracking of sources.
      *
-     * @param row the input row source
+     * @param record the input source
      */
-    void setRow(T row);
+    void setRecord(T record);
 }

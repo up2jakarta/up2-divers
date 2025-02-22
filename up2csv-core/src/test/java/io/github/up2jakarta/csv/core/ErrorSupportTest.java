@@ -13,6 +13,7 @@ import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
 import io.github.up2jakarta.csv.test.codelist.MeasurementUnitConverter;
 import io.github.up2jakarta.csv.test.ext.Dummy1Processor;
 import io.github.up2jakarta.csv.test.ext.DummyConverter;
+import io.github.up2jakarta.csv.test.input.DataId;
 import io.github.up2jakarta.csv.test.input.InputRowEntity;
 import io.github.up2jakarta.csv.test.input.SegmentType;
 import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
@@ -35,11 +36,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ErrorSupportTest {
 
     private final InputRepository<InputRowEntity> repository = (r -> 0);
-    private final SimpleKeyCreator<InputRowEntity, SimpleErrorEntity> creator;
-    private final MapperFactory factory;
+    private final SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> creator;
+    private final MapperFactory<DataId> factory;
 
     @Autowired
-    ErrorSupportTest(MapperFactory factory, SimpleKeyCreator<InputRowEntity, SimpleErrorEntity> creator) {
+    ErrorSupportTest(MapperFactory<DataId> factory, SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -47,10 +48,10 @@ public class ErrorSupportTest {
     @Test
     void testProcessorWithoutError() throws BeanException {
         // Given
-        final Mapper<Test3Processor> mapper = factory.build(Test3Processor.class);
+        final Mapper<Test3Processor, DataId> mapper = factory.build(Test3Processor.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "property", "dummy");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Test3Processor bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -82,10 +83,10 @@ public class ErrorSupportTest {
     @Test
     void testProcessorWithinError() throws BeanException {
         // Given
-        final Mapper<Test4Processor> mapper = factory.build(Test4Processor.class);
+        final Mapper<Test4Processor, DataId> mapper = factory.build(Test4Processor.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "property", "dummy");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Test4Processor bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -117,10 +118,10 @@ public class ErrorSupportTest {
     @Test
     void testConverterWithoutError() throws BeanException {
         // Given
-        final Mapper<Test1Converter> mapper = factory.build(Test1Converter.class);
+        final Mapper<Test1Converter, DataId> mapper = factory.build(Test1Converter.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "ILS", "int");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Test1Converter bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -152,10 +153,10 @@ public class ErrorSupportTest {
     @Test
     void testConverterWithinError() throws BeanException {
         // Given
-        final Mapper<Test2Converter> mapper = factory.build(Test2Converter.class);
+        final Mapper<Test2Converter, DataId> mapper = factory.build(Test2Converter.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "ILS", "int");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Test2Converter bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -187,10 +188,10 @@ public class ErrorSupportTest {
     @Test
     void testResolverWithoutError() throws BeanException {
         // Given
-        final Mapper<Test1Resolver> mapper = factory.build(Test1Resolver.class);
+        final Mapper<Test1Resolver, DataId> mapper = factory.build(Test1Resolver.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "ISL", "XGM", "XPT24H");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Test1Resolver bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -232,10 +233,10 @@ public class ErrorSupportTest {
     @Test
     void testResolverWithinError() throws BeanException {
         // Given
-        final Mapper<Test2Resolver> mapper = factory.build(Test2Resolver.class);
+        final Mapper<Test2Resolver, DataId> mapper = factory.build(Test2Resolver.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "date", "duration");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Test2Resolver bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -267,10 +268,10 @@ public class ErrorSupportTest {
     @Test
     void testValidatorWithoutError() throws BeanException {
         // Given
-        final Mapper<Test1Validator> mapper = factory.build(Test1Validator.class);
+        final Mapper<Test1Validator, DataId> mapper = factory.build(Test1Validator.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "+1", "101", "", null, "-1");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Test1Validator bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -353,10 +354,10 @@ public class ErrorSupportTest {
     @Test
     void testValidatorWithinError() throws BeanException {
         // Given
-        final Mapper<Test2Validator> mapper = factory.build(Test2Validator.class);
+        final Mapper<Test2Validator, DataId> mapper = factory.build(Test2Validator.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "", null);
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Test2Validator bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then

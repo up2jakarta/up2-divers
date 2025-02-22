@@ -6,7 +6,7 @@ package io.github.up2jakarta.csv.input;
  *
  * @param <R> the input row type
  */
-public interface InputRepository<R extends InputRow> {
+public interface InputRepository<R extends InputSegment> {
 
     /**
      * Get and return the max key-order of existing errors related to the given input row.

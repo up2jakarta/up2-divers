@@ -16,9 +16,11 @@ import jakarta.persistence.Entity;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static io.github.up2jakarta.csv.core.Beans.getBean;
 import static io.github.up2jakarta.csv.core.Beans.getTypeArguments;
+import static java.util.Arrays.stream;
 
 /**
  * {@link Entity} extension that supports {@link Convert}.
@@ -50,40 +52,53 @@ public final class JpaConvertExtension extends ConversionExtension<Entity, Conve
         }
     }
 
-    private Optional<Convert> from(Class<? extends Segment> segmentType, Field property, Class<?> type) throws BeanException {
-        for (final Convert jpa : segmentType.getAnnotationsByType(Convert.class)) {
-            if (jpa.attributeName().equals(property.getName())) {
-                this.check(property, type, jpa);
-                return Optional.of(jpa);
-            }
+    private Optional<Convert> from(Class<? extends Segment> segmentType, Field field, Class<?> fieldType) throws BeanException {
+        final Convert result = this.from(segmentType, field.getName());
+        if (result != null) {
+            this.check(field, fieldType, result);
+            return Optional.of(result);
         }
         //noinspection unchecked
         segmentType = (Class<? extends Segment>) segmentType.getSuperclass();
         if (Segment.class.isAssignableFrom(segmentType)) {
-            return from(segmentType, property, type);
+            return this.from(segmentType, field, fieldType);
         }
         return Optional.empty();
     }
 
+    private Convert from(Class<?> type, String path) {
+        final Convert[] jpa = type.getAnnotationsByType(Convert.class);
+        return stream(jpa)
+                .filter(c -> path.equals(c.attributeName()))
+                .findAny()
+                .orElse(null);
+    }
+
+    private Convert from(Field property, String path, Supplier<Convert> retry) {
+        return stream(property.getAnnotationsByType(Convert.class))
+                .filter(c -> path.equals(c.attributeName()))
+                .findAny()
+                .orElseGet(retry);
+    }
+
     @Override
-    public Optional<Convert> get(Class<? extends Segment> segmentType, Field property, Class<?> type, Field... path) throws BeanException {
-        final Convert jpa = property.getAnnotation(Convert.class);
-        if (jpa != null) {
-            if (jpa.attributeName().isBlank() || jpa.attributeName().equals(property.getName())) {
-                this.check(property, type, jpa);
-                return Optional.of(jpa);
+    public Optional<Convert> get(Class<? extends Segment> segmentType, Field last, Class<?> type, Field... paths) throws BeanException {
+        Convert result = this.from(last, "", () -> null);
+        var path = last.getName();
+        for (var i = paths.length - 1; i >= 0; i--) {
+            final Field current = paths[i];
+            final String next = current.getName() + '.' + path;
+            final Convert override = this.from(current, path, () -> this.from(current.getDeclaringClass(), next));
+            if (override != null) {
+                result = override;
             }
+            path = next;
         }
-        var fieldPath = property.getName();
-        for (var i = path.length - 1; i >= 0; i--) {
-            final Convert override = path[i].getAnnotation(Convert.class);
-            if (override != null && override.attributeName().equals(fieldPath)) {
-                this.check(property, type, override);
-                return Optional.of(override);
-            }
-            fieldPath = path[i].getName() + '.' + fieldPath;
+        if (result == null) {
+            return this.from(segmentType, last, type);
         }
-        return from(segmentType, property, type);
+        this.check(last, type, result);
+        return Optional.of(result);
     }
 
     @Override

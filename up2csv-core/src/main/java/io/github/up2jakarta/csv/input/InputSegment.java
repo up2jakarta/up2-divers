@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.input;
 
 /**
- * Contact interface for an input row.
+ * Contact interface for an input record.
  */
-public interface InputRow {
+public interface InputSegment {
 
     /**
      * @return the input type

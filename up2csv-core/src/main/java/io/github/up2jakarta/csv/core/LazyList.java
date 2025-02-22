@@ -1,12 +1,12 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.input.InputError;
-import io.github.up2jakarta.csv.input.InputRow;
+import io.github.up2jakarta.csv.input.InputSegment;
 
 import java.util.*;
 import java.util.function.IntSupplier;
 
-final class LazyList<R extends InputRow, E extends InputError<R, ?>> {
+final class LazyList<R extends InputSegment, E extends InputError<R, ?, ?>> {
 
     private final Set<E> errors;
     private final Set<Integer> offsets;

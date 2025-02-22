@@ -17,11 +17,11 @@ public class NoteId<C extends CodeList<C>> implements Nullable, Serializable {
 
     @Position(1)
     @NotNull
-    private C schemeId;
+    private C code;
 
-    public NoteId(String value, C schemeId) {
+    public NoteId(String value, C code) {
         this.value = value;
-        this.schemeId = schemeId;
+        this.code = code;
     }
 
     public NoteId() {
@@ -35,12 +35,12 @@ public class NoteId<C extends CodeList<C>> implements Nullable, Serializable {
         this.value = value;
     }
 
-    public C getSchemeId() {
-        return schemeId;
+    public C getCode() {
+        return code;
     }
 
-    public void setSchemeId(C schemeId) {
-        this.schemeId = schemeId;
+    public void setCode(C code) {
+        this.code = code;
     }
 
     @Override

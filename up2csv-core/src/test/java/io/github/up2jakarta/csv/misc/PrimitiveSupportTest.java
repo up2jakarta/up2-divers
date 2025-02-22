@@ -6,6 +6,7 @@ import io.github.up2jakarta.csv.core.Mapper;
 import io.github.up2jakarta.csv.core.MapperFactory;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.test.input.DataId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +18,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
 public class PrimitiveSupportTest {
-    private final MapperFactory factory;
+    private final MapperFactory<DataId> factory;
 
     @Autowired
-    PrimitiveSupportTest(MapperFactory f) {
+    PrimitiveSupportTest(MapperFactory<DataId> f) {
         this.factory = f;
     }
 
     @Test
     void testDefaultValues() throws BeanException {
         // Given
-        final Mapper<Test2Primitive> mapper = factory.build(Test2Primitive.class);
+        final Mapper<Test2Primitive, DataId> mapper = factory.build(Test2Primitive.class);
         // When
         final Test2Primitive bean = mapper.map();
         // Then
@@ -45,7 +46,7 @@ public class PrimitiveSupportTest {
     @Test
     void testDefaultAnnotation() throws BeanException {
         // Given
-        final Mapper<Test1Primitive> mapper = factory.build(Test1Primitive.class);
+        final Mapper<Test1Primitive, DataId> mapper = factory.build(Test1Primitive.class);
         // When
         final Test1Primitive bean = mapper.map();
         // Then

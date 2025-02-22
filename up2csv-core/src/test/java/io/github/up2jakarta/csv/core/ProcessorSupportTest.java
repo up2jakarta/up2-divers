@@ -14,6 +14,7 @@ import io.github.up2jakarta.csv.test.bean.processor.Test1Processor;
 import io.github.up2jakarta.csv.test.bean.processor.Test2Processor;
 import io.github.up2jakarta.csv.test.bean.processor.Test5Processor;
 import io.github.up2jakarta.csv.test.ext.Dummy4;
+import io.github.up2jakarta.csv.test.input.DataId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +35,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ProcessorSupportTest {
 
     private final BeanContext context;
-    private final MapperFactory factory;
+    private final MapperFactory<DataId> factory;
 
     @Autowired
-    ProcessorSupportTest(BeanContext context, MapperFactory factory) {
+    ProcessorSupportTest(BeanContext context, MapperFactory<DataId> factory) {
         this.context = context;
         this.factory = factory;
     }
@@ -51,9 +52,9 @@ public class ProcessorSupportTest {
         }
         final Field field = TestProcessor.class.getDeclaredField("attribute");
         // When
-        final ProcessorWrapper<?>[] processors = getProcessors(context, field);
-        assertEquals(1, processors.length);
-        final ProcessorWrapper<?> processor = processors[0];
+        final List<ProcessorWrapper<?, DataId>> processors = getProcessors(context, field);
+        assertEquals(1, processors.size());
+        final ProcessorWrapper<?, ?> processor = processors.get(0);
         // Then
         assertNull(processor.process(null));
         assertNull(processor.process(""));
@@ -70,9 +71,9 @@ public class ProcessorSupportTest {
         }
         final Field field = TestProcessor.class.getDeclaredField("attribute");
         // When
-        final ProcessorWrapper<?>[] processors = getProcessors(context, field);
-        assertEquals(1, processors.length);
-        final ProcessorWrapper<?> processor = processors[0];
+        final List<ProcessorWrapper<?, DataId>> processors = getProcessors(context, field);
+        assertEquals(1, processors.size());
+        final ProcessorWrapper<?, DataId> processor = processors.get(0);
         // Then
         assertNull(processor.process(null));
         assertNull(processor.process(""));
@@ -91,8 +92,8 @@ public class ProcessorSupportTest {
         }
         final Field field = TestProcessor.class.getDeclaredField("p");
         // When
-        final ProcessorWrapper<?>[] processors = getProcessors(context, field);
-        assertEquals(3, processors.length);
+        final List<ProcessorWrapper<?, DataId>> processors = getProcessors(context, field);
+        assertEquals(3, processors.size());
         // Then
         var value = "\t\nundefined\t\n";
         for (var processor : processors) {
@@ -104,7 +105,7 @@ public class ProcessorSupportTest {
     @Test
     void testSkipDummyException() throws BeanException {
         // Given
-        final Mapper<Test1Processor> mapper = factory.build(Test1Processor.class);
+        final Mapper<Test1Processor, ?> mapper = factory.build(Test1Processor.class);
         {
             // When
             final Test1Processor bean = mapper.map("dummy");
@@ -136,7 +137,7 @@ public class ProcessorSupportTest {
     @Test
     void testSkipAndLog() throws Throwable {
         // Given
-        final Mapper<Test1Processor> mapper = factory.build(Test1Processor.class);
+        final Mapper<Test1Processor, ?> mapper = factory.build(Test1Processor.class);
         // When
         final List<ILoggingEvent> logs = Tests.hack(LOGGER, () -> mapper.map("dummy"));
         // Then
@@ -152,7 +153,7 @@ public class ProcessorSupportTest {
     @Test
     void testSkipAnyRuntimeException() throws BeanException {
         // Given
-        final Mapper<Test2Processor> mapper = factory.build(Test2Processor.class);
+        final Mapper<Test2Processor, ?> mapper = factory.build(Test2Processor.class);
         {
             // When
             final Test2Processor bean = mapper.map("dummy");

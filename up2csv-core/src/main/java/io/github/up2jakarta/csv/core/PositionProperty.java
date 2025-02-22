@@ -1,27 +1,29 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.exception.BeanException;
+import io.github.up2jakarta.csv.extension.DataType;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * Internal representation for {@link String} property of beans.
  */
-abstract class PositionProperty<T> extends Property<T> {
+abstract class PositionProperty<T, D extends DataType<D>> extends Property<T, D> {
 
-    private final ProcessorWrapper<?>[] processors;
+    private final List<ProcessorWrapper<?, D>> processors;
 
-    PositionProperty(Field field, int offset, ProcessorWrapper<?>[] processors) throws BeanException {
-        super(field, offset);
+    PositionProperty(Field field, D type, int offset, List<ProcessorWrapper<?, D>> processors) throws BeanException {
+        super(field, type, offset);
         this.processors = processors;
     }
 
-    final String process(String value, int offset, EventHandler<?, ?, ?> handler) {
-        for (final ProcessorWrapper<?> processor : processors) {
+    final String process(String value, int offset, EventHandler<?, ?, D, ?> handler) {
+        for (final ProcessorWrapper<?, D> processor : processors) {
             try {
                 value = processor.process(value);
             } catch (RuntimeException ex) {
-                processor.handle(field, offset + super.offset, ex, handler);
+                processor.handle(field, type, offset + super.offset, ex, handler);
             }
         }
         return value;

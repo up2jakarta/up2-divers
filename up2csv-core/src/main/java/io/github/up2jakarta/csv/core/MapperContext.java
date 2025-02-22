@@ -2,46 +2,50 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.annotation.Extension;
 import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.extension.BeanContext;
-import io.github.up2jakarta.csv.extension.Conversion;
-import io.github.up2jakarta.csv.extension.ConversionExtension;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.extension.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Stack;
 
 import static io.github.up2jakarta.csv.core.BeanSupport.getAnnotationsByType;
 import static io.github.up2jakarta.csv.core.Beans.getBean;
+import static io.github.up2jakarta.csv.core.Beans.getSegmentType;
 
-final class MapperContext {
+final class MapperContext<D extends DataType<D>> {
 
     private final Stack<Class<? extends Segment>> stack = new Stack<>();
     private final ConversionExtension<?, Annotation>[] extensions;
     private final LinkedList<Field> path = new LinkedList<>();
     private final Class<? extends Segment> type;
+    private final DataTypeResolver<D> resolver;
     private final CompositeChecker checker;
     private final BeanContext context;
     private final Type[] arguments;
     private final int offset;
 
-    public MapperContext(BeanContext context, Class<? extends Segment> type) throws BeanException {
+    public MapperContext(BeanContext context, Class<? extends Segment> type, DataTypeResolver<D> resolver) throws BeanException {
         this.checker = CompositeChecker.of(type, context);
         this.extensions = getExtensions(type, context);
         this.arguments = Beans.NO_TYPES;
+        this.resolver = resolver;
         this.context = context;
         this.type = type;
         this.offset = 0;
     }
 
-    private MapperContext(MapperContext origin, int offset, Type... arguments) {
+    private MapperContext(MapperContext<D> origin, int offset, Type... arguments) {
         this.extensions = origin.extensions;
+        this.resolver = origin.resolver;
         this.checker = origin.checker;
-        this.type = origin.type;
         this.context = origin.context;
-        this.offset = offset;
         this.arguments = arguments;
+        this.type = origin.type;
+        this.offset = offset;
         origin.stack.forEach(this.stack::push);
         origin.path.forEach(this.path::addLast);
     }
@@ -67,35 +71,40 @@ final class MapperContext {
         return false;
     }
 
-    MapperContext with(Field field, int offset) {
+    MapperContext<D> with(Field field, int offset) {
         final Type[] arguments = Beans.getTypeArguments(field.getGenericType());
-        final MapperContext result = new MapperContext(this, offset, arguments);
+        final MapperContext<D> result = new MapperContext<>(this, offset, arguments);
         result.path.addLast(field);
         return result;
     }
 
-    MapperContext with(Type... arguments) {
-        return new MapperContext(this, this.offset, arguments);
+    MapperContext<D> with(Type... arguments) {
+        return new MapperContext<>(this, this.offset, arguments);
     }
 
     Conversion<?> getConversion(Field field, Class<?> type) throws BeanException {
         final Field[] fieldPath = path.toArray(Field[]::new);
         for (final ConversionExtension<?, Annotation> extension : extensions) {
-            final Iterator<Class<? extends Segment>> it = stack.iterator();
-            Class<? extends Segment> segmentType = stack.peek();
-            while (it.hasNext()) {
-                final Class<? extends Segment> superType = it.next();
-                if (segmentType.isAssignableFrom(superType)) {
-                    segmentType = superType;
-                    break;
-                }
-            }
+            final Class<? extends Segment> segmentType = getSegmentType(stack);
             final Optional<Annotation> config = extension.get(segmentType, field, type, fieldPath);
             if (config.isPresent()) {
                 return extension.resolve(field, type, config.get());
             }
         }
         throw new BeanException(field, "must be annotated with @Up2Converter or one of its shortcuts");
+    }
+
+    D getDataType(Field field) throws BeanException {
+        if (resolver != null) {
+            final Field[] fieldPath = path.toArray(Field[]::new);
+            final Class<? extends Segment> segmentType = getSegmentType(stack);
+            final D value = resolver.get(segmentType, field, fieldPath).orElse(null);
+            if (value != null) {
+                resolver.check(value);
+            }
+            return value;
+        }
+        return null;
     }
 
     CompositeChecker getChecker() {

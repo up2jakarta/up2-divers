@@ -2,8 +2,10 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.BeanContext;
+import io.github.up2jakarta.csv.extension.Segment;
 
 import java.lang.reflect.*;
+import java.util.Stack;
 
 import static java.util.Arrays.stream;
 
@@ -71,6 +73,17 @@ public final class Beans {
             }
         }
         return result;
+    }
+
+    static Class<? extends Segment> getSegmentType(Stack<Class<? extends Segment>> stack) {
+        Class<? extends Segment> segmentType = stack.peek();
+        for (Class<? extends Segment> superType : stack) {
+            if (segmentType.isAssignableFrom(superType)) {
+                segmentType = superType;
+                break;
+            }
+        }
+        return segmentType;
     }
 
     public static String capitalize(String fieldName) {

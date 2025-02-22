@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 public @interface Truncated {
 
     /**
-     * The first column offset in the {@link io.github.up2jakarta.csv.input.InputRow#getColumns()}
+     * The first column offset in the {@link io.github.up2jakarta.csv.input.InputSegment#getColumns()}
      * that is being mapped automatically.
      *
      * @return the first column offset

@@ -16,7 +16,10 @@ public final class DecimalResolver extends ConversionResolver<Up2Decimal> {
 
     public static BigDecimal parseDecimal(String value, Up2Decimal decimal) {
         final BigDecimal result = new BigDecimal(value);
-        return result.setScale(decimal.value(), decimal.roundingMode());
+        if (result.scale() > decimal.value()) {
+            return result.setScale(decimal.value(), decimal.roundingMode());
+        }
+        return result;
     }
 
     @Override

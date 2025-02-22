@@ -1,5 +1,6 @@
 package io.github.up2jakarta.csv.input;
 
+import io.github.up2jakarta.csv.extension.DataType;
 import io.github.up2jakarta.csv.extension.SeverityType;
 
 /**
@@ -8,7 +9,7 @@ import io.github.up2jakarta.csv.extension.SeverityType;
  * @param <R> the input row type
  * @param <K> the identifier type of input error
  */
-public interface InputError<R extends InputRow, K extends InputError.Key<R>> {
+public interface InputError<R extends InputSegment, K extends InputError.Key<R>, D extends DataType<D>> {
 
     /**
      * @return the identifier
@@ -38,6 +39,11 @@ public interface InputError<R extends InputRow, K extends InputError.Key<R>> {
     void setCode(String code);
 
     /**
+     * @param type the source of data
+     */
+    void setType(D type);
+
+    /**
      * @param message the error message
      */
     void setMessage(String message);
@@ -52,7 +58,7 @@ public interface InputError<R extends InputRow, K extends InputError.Key<R>> {
      *
      * @param <R> the input row type
      */
-    interface Key<R extends InputRow> {
+    interface Key<R extends InputSegment> {
 
         /**
          * @param order the error order in the list of errors related th the row
@@ -60,9 +66,9 @@ public interface InputError<R extends InputRow, K extends InputError.Key<R>> {
         void setOrder(Integer order);
 
         /**
-         * @param row the related input row
+         * @param record the related input record
          */
-        void setRow(R row);
+        void setRecord(R record);
 
     }
 

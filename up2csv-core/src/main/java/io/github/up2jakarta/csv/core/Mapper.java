@@ -3,11 +3,9 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.annotation.Truncated;
 import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.extension.BeanContext;
-import io.github.up2jakarta.csv.extension.Parsed;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.extension.*;
 import io.github.up2jakarta.csv.input.InputError;
-import io.github.up2jakarta.csv.input.InputRow;
+import io.github.up2jakarta.csv.input.InputSegment;
 import io.github.up2jakarta.csv.misc.Listable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,22 +23,22 @@ import static java.util.Objects.requireNonNull;
  * @param <S> the segment type
  */
 @SuppressWarnings("ClassEscapesDefinedScope")
-public abstract class Mapper<S extends Segment> implements Listable<Property<?>> {
+public abstract class Mapper<S extends Segment, D extends DataType<D>> implements Listable<Property<?, D>> {
 
     final static Logger LOGGER = LoggerFactory.getLogger(Mapper.class);
 
     protected final int offset;
     protected final Class<S> type;
-    protected final Property<?>[] properties;
+    protected final List<Property<?, D>> properties;
     private final ValidationContext validation;
 
-    Mapper(Class<S> type, BeanContext context) throws BeanException {
+    Mapper(Class<S> type, BeanContext context, DataTypeResolver<D> resolver) throws BeanException {
         final Truncated truncated = type.getAnnotation(Truncated.class);
         this.offset = (truncated != null) ? truncated.value() : 0;
         this.type = type;
         this.validation = ValidationContext.of(type);
-        final MapperContext mapperContext = new MapperContext(context, type);
-        this.properties = BeanSupport.getProperties(type, mapperContext);
+        final MapperContext<D> mapperContext = new MapperContext<>(context, type, resolver);
+        this.properties = new BeanSupport<>(mapperContext).build(type);
         mapperContext.getChecker().afterSegment();
     }
 
@@ -50,7 +48,7 @@ public abstract class Mapper<S extends Segment> implements Listable<Property<?>>
      * @param columns the input data
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
-     * @see #map(InputRow, EventHandler)
+     * @see #map(InputSegment, EventHandler)
      * @see EventHandler#failFast()
      */
     public final S map(final String... columns) throws BeanException {
@@ -68,7 +66,7 @@ public abstract class Mapper<S extends Segment> implements Listable<Property<?>>
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
      */
-    public final <R extends InputRow, V extends InputError<R, ?>> S map(R row, EventHandler<R, ?, V> handler) throws BeanException {
+    public final <R extends InputSegment, V extends InputError<R, ?, D>> S map(R row, EventHandler<R, ?, D, V> handler) throws BeanException {
         if (row == null || row.getColumns() == null) {
             return null;
         }
@@ -85,7 +83,7 @@ public abstract class Mapper<S extends Segment> implements Listable<Property<?>>
                 throw new BeanException(segment.getClass(), "must implements Parsed<" + row.getClass().getSimpleName() + ">");
             }
             //noinspection unchecked
-            ((Parsed<R>) parsed).setRow(row);
+            ((Parsed<R>) parsed).setRecord(row);
         }
         if (validation.isEnabled()) {
             this.validate(segment, this.properties, validation.getGroups(), handler);
@@ -104,7 +102,7 @@ public abstract class Mapper<S extends Segment> implements Listable<Property<?>>
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
      */
-    public abstract <R extends InputRow, V extends InputError<R, ?>> S map(EventHandler<R, ?, V> handler, String... columns) throws BeanException;
+    public abstract <R extends InputSegment, V extends InputError<R, ?, D>> S map(EventHandler<R, ?, D, V> handler, String... columns) throws BeanException;
 
     /**
      * Validates the given bean with the given JSR-303 validation groups and gathering
@@ -116,11 +114,11 @@ public abstract class Mapper<S extends Segment> implements Listable<Property<?>>
      * @param <R>       the input row type
      * @param <V>       the input error type
      */
-    abstract <R extends InputRow, V extends InputError<R, ?>> void validate(Object bean, Property<?>[] properties, Class<?>[] groups, EventHandler<R, ?, V> collector);
+    abstract <R extends InputSegment, V extends InputError<R, ?, D>> void validate(Object bean, List<Property<?, D>> properties, Class<?>[] groups, EventHandler<R, ?, D, V> collector);
 
     @Override
-    public final List<Property<?>> toList() {
-        return List.of(this.properties);
+    public final List<Property<?, D>> toList() {
+        return this.properties;
     }
 
 }

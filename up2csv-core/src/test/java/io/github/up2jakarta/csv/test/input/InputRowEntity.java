@@ -1,8 +1,7 @@
 package io.github.up2jakarta.csv.test.input;
 
-import io.github.up2jakarta.csv.input.InputRow;
+import io.github.up2jakarta.csv.input.InputSegment;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Array;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,7 +9,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "TB_INPUT_ROWS")
 @SuppressWarnings("unused")
-public class InputRowEntity implements InputRow {
+public class InputRowEntity implements InputSegment {
 
     @EmbeddedId
     private InputRowEntity.PKey key;
@@ -21,7 +20,7 @@ public class InputRowEntity implements InputRow {
     @Column(name = "ROW_TYPE", length = 2, nullable = false)
     private SegmentType type;
 
-    @Array(length = 16)
+    //@Array(length = 16)
     @Column(name = "ROW_COLUMNS", length = 1024, nullable = false)
     private String[] columns;
 

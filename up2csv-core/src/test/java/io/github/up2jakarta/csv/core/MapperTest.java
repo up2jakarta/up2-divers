@@ -19,6 +19,7 @@ import io.github.up2jakarta.csv.test.bean.mapper.oneshot.SimpleAddress;
 import io.github.up2jakarta.csv.test.bean.processor.ProcessorBean;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
+import io.github.up2jakarta.csv.test.input.DataId;
 import io.github.up2jakarta.csv.test.input.InputRowEntity;
 import io.github.up2jakarta.csv.test.input.SegmentType;
 import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
@@ -35,16 +36,17 @@ import static io.github.up2jakarta.csv.core.MapperFactory.LOGGER;
 import static io.github.up2jakarta.csv.misc.Errors.ERROR_VALIDATOR;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
 class MapperTest {
 
     private final InputRepository<InputRowEntity> repository = (r -> 0);
-    private final SimpleKeyCreator<InputRowEntity, SimpleErrorEntity> creator;
-    private final MapperFactory factory;
+    private final SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> creator;
+    private final MapperFactory<DataId> factory;
 
     @Autowired
-    MapperTest(MapperFactory factory, SimpleKeyCreator<InputRowEntity, SimpleErrorEntity> creator) {
+    MapperTest(MapperFactory<DataId> factory, SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -52,9 +54,9 @@ class MapperTest {
     @Test
     void testCache() throws BeanException {
         // Given
-        final Mapper<ValidBean> mapper1 = factory.build(ValidBean.class);
+        final Mapper<ValidBean, DataId> mapper1 = factory.build(ValidBean.class);
         // When
-        final Mapper<ValidBean> mapper2 = factory.build(ValidBean.class);
+        final Mapper<ValidBean, DataId> mapper2 = factory.build(ValidBean.class);
         // Then
         assertNotSame(mapper1, mapper2);
     }
@@ -64,10 +66,10 @@ class MapperTest {
     void testNull() throws BeanException {
         // Given
         final String[] data = null;
-        final Mapper<ValidBean> mapper = factory.build(ValidBean.class);
+        final Mapper<ValidBean, DataId> mapper = factory.build(ValidBean.class);
         final InputRowEntity row3 = Tests.create(SegmentType.S00, data);
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler2 = new SimpleHandler<>(null, creator, repository);
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler3 = new SimpleHandler<>(row3, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler2 = new SimpleHandler<>(null, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler3 = new SimpleHandler<>(row3, creator, repository);
         // When
         final ValidBean bean1 = mapper.map(data);
         final ValidBean bean2 = mapper.map(null, handler2);
@@ -83,7 +85,7 @@ class MapperTest {
     @Test
     void testOneShot() throws BeanException {
         // Given
-        final Mapper<ClientSegment> mapper = factory.build(ClientSegment.class);
+        final Mapper<ClientSegment, DataId> mapper = factory.build(ClientSegment.class);
         // When
         final ClientSegment bean = mapper.map(
                 "AAB", "UP2", "CSV", "TN-0000-1111-9999", "TND",
@@ -119,7 +121,7 @@ class MapperTest {
     @Test
     void validBean() throws BeanException {
         // Given
-        final Mapper<SimpleSegment> mapper = factory.build(SimpleSegment.class);
+        final Mapper<SimpleSegment, DataId> mapper = factory.build(SimpleSegment.class);
         // When
         final SimpleSegment bean = mapper.map("AAB", "ABBESSI", "Software engineer");
         // Then
@@ -132,7 +134,7 @@ class MapperTest {
     @Test
     void testInnerStaticClass() throws BeanException {
         // Given
-        final Mapper<InnerStaticSegment> mapper = factory.build(InnerStaticSegment.class);
+        final Mapper<InnerStaticSegment, DataId> mapper = factory.build(InnerStaticSegment.class);
         // When
         final InnerStaticSegment bean = mapper.map("AAB", "ABBESSI");
         // Then
@@ -145,7 +147,7 @@ class MapperTest {
     @Test
     void validBeanMoreColumns() throws BeanException {
         // Given
-        final Mapper<SimpleSegment> mapper = factory.build(SimpleSegment.class);
+        final Mapper<SimpleSegment, DataId> mapper = factory.build(SimpleSegment.class);
         // When
         final SimpleSegment bean = mapper.map("AAB", "ABBESSI", "Software engineer", "MORE");
         // Then
@@ -158,7 +160,7 @@ class MapperTest {
     @Test
     void validBeanLessColumns() throws BeanException {
         // Given
-        final Mapper<SimpleSegment> mapper = factory.build(SimpleSegment.class);
+        final Mapper<SimpleSegment, DataId> mapper = factory.build(SimpleSegment.class);
         // When
         final SimpleSegment bean = mapper.map("AAB", "ABBESSI");
         // Then
@@ -171,7 +173,7 @@ class MapperTest {
     @Test
     void validBeanNullColumn() throws BeanException {
         // Given
-        final Mapper<SimpleSegment> mapper = factory.build(SimpleSegment.class);
+        final Mapper<SimpleSegment, DataId> mapper = factory.build(SimpleSegment.class);
         // When
         final SimpleSegment bean = mapper.map("AAB", "ABBESSI", null);
         // Then
@@ -184,7 +186,7 @@ class MapperTest {
     @Test
     void validBeanEmptyColumn() throws BeanException {
         // Given
-        final Mapper<SimpleSegment> mapper = factory.build(SimpleSegment.class);
+        final Mapper<SimpleSegment, DataId> mapper = factory.build(SimpleSegment.class);
         // When
         final SimpleSegment bean = mapper.map("AAB", "ABBESSI", "");
         // Then
@@ -197,7 +199,7 @@ class MapperTest {
     @Test
     void validComplexBean() throws BeanException {
         // Given
-        final Mapper<ComplexSegment> mapper = factory.build(ComplexSegment.class);
+        final Mapper<ComplexSegment, DataId> mapper = factory.build(ComplexSegment.class);
         // When
         final ComplexSegment bean = mapper.map("AAB", "TN", "Tunisia");
         // Then
@@ -211,7 +213,7 @@ class MapperTest {
     @Test
     void validExtendedBean() throws BeanException {
         // Given
-        final Mapper<ExtendedCountryBean> mapper = factory.build(ExtendedCountryBean.class);
+        final Mapper<ExtendedCountryBean, DataId> mapper = factory.build(ExtendedCountryBean.class);
         // When
         final ExtendedCountryBean bean = mapper.map("TND", "TN", "Tunisia");
         // Then
@@ -224,7 +226,7 @@ class MapperTest {
     @Test
     void validGenericBean() throws BeanException {
         // Given
-        final Mapper<GenericCountryBean> mapper = factory.build(GenericCountryBean.class);
+        final Mapper<GenericCountryBean, DataId> mapper = factory.build(GenericCountryBean.class);
         // When
         final GenericCountryBean bean = mapper.map("TND", "TN", "Tunisia");
         // Then
@@ -237,7 +239,7 @@ class MapperTest {
     @Test
     void testProcessors() throws BeanException {
         // Given
-        final Mapper<ProcessorBean> mapper = factory.build(ProcessorBean.class);
+        final Mapper<ProcessorBean, DataId> mapper = factory.build(ProcessorBean.class);
         // When
         final ProcessorBean bean = mapper.map("TND\t\n(Dinar)", "TN\t\n(Tunisia)", "\n\t Tunisian\tDinar \n\t");
         // Then
@@ -250,10 +252,10 @@ class MapperTest {
     @Test
     void testValidatedAnnotation() throws BeanException {
         // Given
-        final Mapper<Validator2Bean> mapper = factory.build(Validator2Bean.class);
+        final Mapper<Validator2Bean, DataId> mapper = factory.build(Validator2Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "\n\t");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Validator2Bean bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -283,10 +285,10 @@ class MapperTest {
     @Test
     void testValidationGroupsAnnotation() throws BeanException {
         // Given
-        final Mapper<ValidatedGroupsBean> mapper = factory.build(ValidatedGroupsBean.class);
+        final Mapper<ValidatedGroupsBean, DataId> mapper = factory.build(ValidatedGroupsBean.class);
         final InputRowEntity row = Tests.create(SegmentType.S99, "\t\n");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final ValidatedGroupsBean bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -305,10 +307,10 @@ class MapperTest {
     @Test
     void testValidAnnotation() throws BeanException {
         // Given
-        final Mapper<Validator1Bean> mapper = factory.build(Validator1Bean.class);
+        final Mapper<Validator1Bean, DataId> mapper = factory.build(Validator1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "eTND");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Validator1Bean bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -507,34 +509,34 @@ class MapperTest {
     @SuppressWarnings("unchecked")
     void testValidRecursive() throws BeanException {
         // When
-        final Mapper<TestRecursive6Segment> mapper = factory.build(TestRecursive6Segment.class);
-        final List<Property<?>> fields = ((Listable<Property<?>>) mapper).toList();
+        final Mapper<TestRecursive6Segment, DataId> mapper = factory.build(TestRecursive6Segment.class);
+        final List<Property<?, DataId>> fields = ((Listable<Property<?, DataId>>) mapper).toList();
         // THEN
         assertEquals(3, fields.size());
         {
-            final Property<?> property = fields.get(0);
+            final Property<?, DataId> property = fields.get(0);
             assertEquals("id", property.field.getName());
             assertEquals(0, property.offset);
         }
         {
-            final Property<?> property = fields.get(1);
+            final Property<?, DataId> property = fields.get(1);
             assertEquals("any", property.field.getName());
             assertEquals(1, property.offset);
         }
         {
-            final Property<?> fragment = fields.get(2);
+            final Property<?, DataId> fragment = fields.get(2);
             assertEquals("fragment", fragment.field.getName());
             assertEquals(2, fragment.offset);
             assertInstanceOf(Listable.class, fragment);
-            final List<Property<?>> fProperties = ((Listable<Property<?>>) fragment).toList();
+            final List<Property<?, DataId>> fProperties = ((Listable<Property<?, DataId>>) fragment).toList();
             assertEquals(2, fProperties.size());
             {
-                final Property<?> property = fProperties.get(0);
+                final Property<?, DataId> property = fProperties.get(0);
                 assertEquals("id", property.field.getName());
                 assertEquals(2, property.offset);
             }
             {
-                final Property<?> property = fProperties.get(1);
+                final Property<?, DataId> property = fProperties.get(1);
                 assertEquals("name", property.field.getName());
                 assertEquals(2 + 1, property.offset);
             }
@@ -546,17 +548,17 @@ class MapperTest {
         // GIVEN
         final String id = "V";
         final String name = "V";
-        final Mapper<ValidBean> mapper = factory.build(ValidBean.class);
+        final Mapper<ValidBean, DataId> mapper = factory.build(ValidBean.class);
         // WHEN
         final ValidBean bean = mapper.map(id, name);
-        final List<Property<?>> fields = ((Listable<Property<?>>) mapper).toList();
+        final List<Property<?, DataId>> fields = ((Listable<Property<?, DataId>>) mapper).toList();
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.get(0).field.getName());
         assertEquals("name", fields.get(1).field.getName());
-        for (final Property<?> p : fields) {
+        for (final Property<?, DataId> p : fields) {
             assertInstanceOf(StringProperty.class, p);
-            final StringProperty f = (StringProperty) p;
+            final StringProperty<DataId> f = (StringProperty<DataId>) p;
             f.field.setAccessible(true);
             assertEquals("V", f.field.get(bean));
             // When
@@ -571,17 +573,17 @@ class MapperTest {
         // GIVEN
         final String id = "V";
         final String name = "V";
-        final Mapper<NoOrderBean> mapper = factory.build(NoOrderBean.class);
+        final Mapper<NoOrderBean, DataId> mapper = factory.build(NoOrderBean.class);
         // WHEN
         final NoOrderBean bean = mapper.map(id, name);
-        final List<Property<?>> fields = ((Listable<Property<?>>) mapper).toList();
+        final List<Property<?, DataId>> fields = ((Listable<Property<?, DataId>>) mapper).toList();
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.get(0).field.getName());
         assertEquals("name", fields.get(1).field.getName());
-        for (final Property<?> p : fields) {
+        for (final Property<?, DataId> p : fields) {
             assertInstanceOf(StringProperty.class, p);
-            final StringProperty f = (StringProperty) p;
+            final StringProperty<DataId> f = (StringProperty<DataId>) p;
             f.field.setAccessible(true);
             assertEquals("V", f.field.get(bean));
             // When
@@ -596,17 +598,17 @@ class MapperTest {
         // GIVEN
         final String id = "V";
         final String name = "V";
-        final Mapper<NoPositionBean> mapper = factory.build(NoPositionBean.class);
+        final Mapper<NoPositionBean, DataId> mapper = factory.build(NoPositionBean.class);
         // WHEN
         final NoPositionBean bean = mapper.map(id, name);
-        final List<Property<?>> fields = ((Listable<Property<?>>) mapper).toList();
+        final List<Property<?, DataId>> fields = ((Listable<Property<?, DataId>>) mapper).toList();
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.get(0).field.getName());
         assertEquals("name", fields.get(1).field.getName());
-        for (final Property<?> p : fields) {
+        for (final Property<?, DataId> p : fields) {
             assertInstanceOf(StringProperty.class, p);
-            final StringProperty f = (StringProperty) p;
+            final StringProperty<DataId> f = (StringProperty<DataId>) p;
             f.field.setAccessible(true);
             assertEquals("V", f.field.get(bean));
             // When
@@ -619,7 +621,7 @@ class MapperTest {
     @Test
     void testNullable() throws BeanException {
         // Given
-        final Mapper<NoteEntity> mapper = factory.build(NoteEntity.class);
+        final Mapper<NoteEntity, DataId> mapper = factory.build(NoteEntity.class);
         final String[] data = new String[]{"ZZZ", "Content", null, "FR", "XXX", "EUR"};
         // When
         final NoteEntity segment = mapper.map(data);
@@ -630,7 +632,7 @@ class MapperTest {
         assertNull(segment.getTest1());
         assertNotNull(segment.getTest2());
         assertEquals("XXX", segment.getTest2().getValue());
-        assertEquals(CurrencyCodeType.EUR, segment.getTest2().getSchemeId());
+        assertEquals(CurrencyCodeType.EUR, segment.getTest2().getCode());
     }
 
 }

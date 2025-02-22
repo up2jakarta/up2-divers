@@ -23,7 +23,7 @@ public abstract class ParsedEntity<K extends Serializable> implements Parsed<Inp
     }
 
     @Override
-    public final void setRow(InputRowEntity row) {
+    public final void setRecord(InputRowEntity row) {
         this.row = row;
     }
 

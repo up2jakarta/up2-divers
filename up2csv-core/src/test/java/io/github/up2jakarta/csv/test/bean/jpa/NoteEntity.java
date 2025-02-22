@@ -16,6 +16,12 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "TU_NOTES")
+@AttributeOverride(name = "test1.value", column = @Column(name = "NOTE_TEST_1_ID", length = 100))
+@AttributeOverride(name = "test1.code", column = @Column(name = "NOTE_TEST_1_CODE", length = 2))
+@Convert(attributeName = "test1.code", converter = CountryConverter.class)
+@AttributeOverride(name = "test2.value", column = @Column(name = "NOTE_TEST_2_ID", length = 200))
+@AttributeOverride(name = "test2.code", column = @Column(name = "NOTE_TEST_2_CODE", length = 3))
+@Convert(attributeName = "test2.code", converter = CurrencyConverter.class)
 @Validated
 @Up2EnableJPA
 @SuppressWarnings("unused")
@@ -37,19 +43,13 @@ public class NoteEntity implements Segment {
     private String content;
 
     @Fragment(2)
-    @AttributeOverride(name = "value", column = @Column(name = "NOTE_TEST_1_ID", length = 100))
-    @AttributeOverride(name = "schemeId", column = @Column(name = "NOTE_TEST_1_CODE", length = 2))
     @Embedded
     @Valid
-    @Convert(attributeName = "schemeId", converter = CountryConverter.class)
     private NoteId<CountryCodeType> test1;
 
     @Fragment(4)
-    @AttributeOverride(name = "value", column = @Column(name = "NOTE_TEST_2_ID", length = 100))
-    @AttributeOverride(name = "schemeId", column = @Column(name = "NOTE_TEST_2_CODE", length = 3))
     @Valid
     @Embedded
-    @Convert(attributeName = "schemeId", converter = CurrencyConverter.class)
     private NoteId<CurrencyCodeType> test2;
 
     public long getKey() {

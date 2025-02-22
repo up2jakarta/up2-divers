@@ -10,6 +10,7 @@ import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.jpa.*;
 import io.github.up2jakarta.csv.test.codelist.TestCodeList;
 import io.github.up2jakarta.csv.test.codelist.TestCodeListConverter;
+import io.github.up2jakarta.csv.test.input.DataId;
 import io.github.up2jakarta.csv.test.input.InputRowEntity;
 import io.github.up2jakarta.csv.test.input.SegmentType;
 import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
@@ -28,11 +29,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class JpaExtensionTest {
 
     private final InputRepository<InputRowEntity> repository = (r -> 0);
-    private final SimpleKeyCreator<InputRowEntity, SimpleErrorEntity> creator;
-    private final MapperFactory factory;
+    private final SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> creator;
+    private final MapperFactory<DataId> factory;
 
     @Autowired
-    JpaExtensionTest(MapperFactory factory, SimpleKeyCreator<InputRowEntity, SimpleErrorEntity> creator) {
+    JpaExtensionTest(MapperFactory<DataId> factory, SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -40,7 +41,7 @@ public class JpaExtensionTest {
     @Test
     void testValidBean() throws BeanException {
         // Given
-        final Mapper<Test1Bean> mapper = factory.build(Test1Bean.class);
+        final Mapper<Test1Bean, DataId> mapper = factory.build(Test1Bean.class);
         // When
         final Test1Bean bean = mapper.map("ONE", "TWO", "0", "0", "*");
         // Then
@@ -55,10 +56,10 @@ public class JpaExtensionTest {
     @Test
     void testDefaultErrors() throws BeanException {
         // Given
-        final Mapper<Test1Bean> mapper = factory.build(Test1Bean.class);
+        final Mapper<Test1Bean, DataId> mapper = factory.build(Test1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "11", "22", "33", "44", "ANY");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Test1Bean bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -121,10 +122,10 @@ public class JpaExtensionTest {
     @Test
     void testOverrideErrors() throws BeanException {
         // Given
-        final Mapper<Test2Bean> mapper = factory.build(Test2Bean.class);
+        final Mapper<Test2Bean, DataId> mapper = factory.build(Test2Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "11", "22", "ANY");
         // When
-        final SimpleHandler<InputRowEntity, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
         final Test2Bean bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then

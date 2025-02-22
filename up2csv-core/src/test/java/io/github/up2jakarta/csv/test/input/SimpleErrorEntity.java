@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "TB_INPUT1_ERRORS")
 @SuppressWarnings("unused")
-public class SimpleErrorEntity extends AbstractError implements InputError<InputRowEntity, SimpleErrorEntity>, InputError.Key<InputRowEntity> {
+public class SimpleErrorEntity extends AbstractError implements InputError<InputRowEntity, SimpleErrorEntity, DataId>, InputError.Key<InputRowEntity> {
 
     @Id
     @ManyToOne(optional = false)
@@ -23,6 +23,9 @@ public class SimpleErrorEntity extends AbstractError implements InputError<Input
     @Column(name = "ERR_ORDER", nullable = false)
     private Integer order;
 
+    @Transient
+    private DataId type;
+
     @Override
     public SimpleErrorEntity getKey() {
         return this;
@@ -33,7 +36,7 @@ public class SimpleErrorEntity extends AbstractError implements InputError<Input
     }
 
     @Override
-    public void setRow(InputRowEntity row) {
+    public void setRecord(InputRowEntity row) {
         this.row = row;
     }
 
@@ -44,6 +47,15 @@ public class SimpleErrorEntity extends AbstractError implements InputError<Input
     @Override
     public void setOrder(Integer order) {
         this.order = order;
+    }
+
+    public DataId getType() {
+        return type;
+    }
+
+    @Override
+    public void setType(DataId type) {
+        this.type = type;
     }
 
 }

@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Up2EnableJPA
-@Table(name = "TU_1_TESTS")
+@Table(name = "1_TESTS")
 public class Test6Entity extends ParsedEntity<Integer> {
 
     @Position(0)

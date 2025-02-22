@@ -3,20 +3,24 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.Conversion;
+import io.github.up2jakarta.csv.extension.DataType;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
-final class ConvertedProperty<T> extends PositionProperty<String> {
+final class ConvertedProperty<T, D extends DataType<D>> extends PositionProperty<String, D> {
 
+    private final Error config;
     private final Conversion<T> parser;
 
-    ConvertedProperty(Field field, int offset, ProcessorWrapper<?>[] processors, Conversion<T> parser) throws BeanException {
-        super(field, offset, processors);
+    ConvertedProperty(Field field, D type, int offset, List<ProcessorWrapper<?, D>> processors, Conversion<T> parser) throws BeanException {
+        super(field, type, offset, processors);
         this.parser = parser;
+        this.config = field.getAnnotation(Error.class);
     }
 
     @Override
-    void setValue(Object bean, String value, int offset, EventHandler<?, ?, ?> handler) throws BeanException {
+    void setValue(Object bean, String value, int offset, EventHandler<?, ?, D, ?> handler) throws BeanException {
         value = process(value, offset, handler);
         if (value != null) {
             try {
@@ -25,8 +29,7 @@ final class ConvertedProperty<T> extends PositionProperty<String> {
             } catch (BeanException beanException) {
                 throw beanException;
             } catch (Throwable error) {
-                final Error config = field.getAnnotation(Error.class);
-                handler.handleEvent(offset + super.offset, error, config, false);
+                handler.handleEvent(type, offset + super.offset, error, config, false);
             }
         }
     }

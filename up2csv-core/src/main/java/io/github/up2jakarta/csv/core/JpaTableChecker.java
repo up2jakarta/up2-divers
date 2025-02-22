@@ -76,8 +76,11 @@ public final class JpaTableChecker implements SegmentListener {
         if (!name.equals(name.toUpperCase())) {
             throwBeanException(source, desc + " must be uppercase");
         }
-        if (!name.matches("[A-Z_]+")) {
-            throwBeanException(source, desc + " must contain only letters or underscore (_)");
+        if (!Character.isAlphabetic(name.charAt(0))) {
+            throwBeanException(source, desc + " must starts with alphabetic");
+        }
+        if (!name.matches("^[A-Z0-9_]+$")) {
+            throwBeanException(source, desc + " must contains only alphanumeric or underscore");
         }
         if (!name.startsWith(prefix)) {
             throwBeanException(source, desc + " must starts with \"" + prefix + "\"");

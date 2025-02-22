@@ -18,11 +18,14 @@ import java.util.List;
 
 import static io.github.up2jakarta.csv.core.Beans.getBean;
 import static io.github.up2jakarta.csv.core.Beans.getFieldType;
-import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 
-final class BeanSupport {
+final class BeanSupport<D extends DataType<D>> {
 
-    private BeanSupport() {
+    private final MapperContext<D> context;
+
+    BeanSupport(MapperContext<D> context) {
+        this.context = context;
     }
 
     private static Fragment getAndCheckFragment(Field field) throws BeanException {
@@ -90,8 +93,8 @@ final class BeanSupport {
         return result;
     }
 
-    static ProcessorWrapper<?>[] getProcessors(BeanContext context, Field field) throws BeanException {
-        final List<ProcessorWrapper<?>> result = new LinkedList<>();
+    static <D extends DataType<D>> List<ProcessorWrapper<?, D>> getProcessors(BeanContext context, Field field) throws BeanException {
+        final List<ProcessorWrapper<?, D>> result = new LinkedList<>();
         for (final Annotation annotation : field.getAnnotations()) {
             final Class<? extends Annotation> aType = annotation.annotationType();
             final Processor processor = aType.getAnnotation(Processor.class);
@@ -107,10 +110,10 @@ final class BeanSupport {
                 result.add(new ProcessorWrapper(delegate, processor.skip(), annotation));
             }
         }
-        return result.toArray(ProcessorWrapper[]::new);
+        return unmodifiableList(result);
     }
 
-    static Conversion<?> getConversion(MapperContext context, Field field, Class<?> type) throws BeanException {
+    private Conversion<?> getConversion(MapperContext<D> context, Field field, Class<?> type) throws BeanException {
         final Up2Converter converter = field.getAnnotation(Up2Converter.class);
         final Error error = field.getAnnotation(Error.class);
         if (converter != null) {
@@ -135,20 +138,20 @@ final class BeanSupport {
         return context.getConversion(field, type);
     }
 
-    static Property<?>[] getProperties(Class<? extends Segment> beanType, MapperContext context) throws BeanException {
+    private List<Property<?, D>> getProperties(Class<? extends Segment> beanType, MapperContext<D> context) throws BeanException {
         if (context.push(beanType)) {
             throw new BeanException(beanType, "cyclic fragment is not allowed");
         }
-        final List<Property<?>> properties = new LinkedList<>();
+        final List<Property<?, D>> result = new LinkedList<>();
         final Class<?> superClass = beanType.getSuperclass();
         if (Segment.class.isAssignableFrom(superClass)) {
             final Type[] arguments = Beans.getTypeArguments(beanType.getGenericSuperclass());
             //noinspection unchecked
             final Class<? extends Segment> superType = (Class<? extends Segment>) superClass;
             context.getChecker().beforeSuperSegment(superType);
-            final Property<?>[] superProperties = getProperties(superType, context.with(arguments));
+            final List<Property<?, D>> superProperties = getProperties(superType, context.with(arguments));
             context.getChecker().afterSuperSegment(superType);
-            properties.addAll(asList(superProperties));
+            result.addAll(superProperties);
         }
         final Field[] fields = beanType.getDeclaredFields();
         final int offset = context.getOffset();
@@ -157,30 +160,36 @@ final class BeanSupport {
             final Position position = getAndCheckPosition(field);
             final Fragment fragment = getAndCheckFragment(field);
             if (position != null) {
+                final D dataType = context.getDataType(field);
                 final int index = offset + position.value();
                 context.getChecker().beforePositionProperty(field, fieldType, index);
-                final ProcessorWrapper<?>[] processors = getProcessors(context.getContext(), field);
+                final List<ProcessorWrapper<?, D>> processors = getProcessors(context.getContext(), field);
                 if (CharSequence.class == fieldType || fieldType == String.class) {
-                    properties.add(new StringProperty(field, index, processors));
+                    result.add(new StringProperty<>(field, dataType, index, processors));
                 } else {
                     final Conversion<?> conversion = getConversion(context, field, fieldType);
                     checkDefault(field, conversion);
-                    properties.add(new ConvertedProperty<>(field, index, processors, conversion));
+                    result.add(new ConvertedProperty<>(field, dataType, index, processors, conversion));
                 }
                 context.getChecker().afterPositionProperty(field, fieldType, index);
             } else if (fragment != null) {
+                final D dataType = context.getDataType(field);
                 //noinspection unchecked
                 final Class<? extends Segment> fragmentType = (Class<? extends Segment>) fieldType;
                 final int fragmentOffset = offset + fragment.value();
                 context.getChecker().beforeFragmentProperty(field, fragmentType);
-                final Property<?>[] fragmentProperties = getProperties(fragmentType, context.with(field, fragmentOffset));
+                final List<Property<?, D>> fProps = getProperties(fragmentType, context.with(field, fragmentOffset));
                 context.getChecker().afterFragmentProperty(field, fragmentType);
-                properties.add(new FragmentProperty<>(fragmentType, field, fragmentOffset, fragmentProperties));
+                result.add(new FragmentProperty<>(fragmentType, dataType, field, fragmentOffset, fProps));
             } else {
                 context.getChecker().unknownProperty(field, fieldType);
             }
         }
-        return properties.toArray(Property[]::new);
+        return unmodifiableList(result);
+    }
+
+    List<Property<?, D>> build(Class<? extends Segment> beanType) throws BeanException {
+        return getProperties(beanType, context);
     }
 
 }
