@@ -19,7 +19,8 @@ mvn clean install
 
 ## Maven Modules
 
-1. [Up2CSV Core](./up2csv-core/README.md) modern API for mapping, validating and parsing flat-data to JavaBeans.
+1. [Up2CSV Core](./up2csv-core/README.md) Framework for mapping, validating and parsing flat-data to JavaBeans.
+2. [Up2CII Format](./up2cii-format/README.md) Framework for validating, reading and writing CII e-invoices.
 
 ## License
 

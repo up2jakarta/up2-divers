@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jaxb https://jakarta.ee/xml/ns/jaxb/bindingschema_3_0.xsd" version="3.0">
+    <bindings schemaLocation="./uncefact/data/standard/CrossIndustryInvoice_100pD16B.xsd" node="/xsd:schema">
+        <schemaBindings>
+            <package name="io.github.up2jakarta.cii.format.unmapped" />
+        </schemaBindings>
+    </bindings>
+    <bindings schemaLocation="./uncefact/data/standard/CrossIndustryInvoice_QualifiedDataType_100pD16B.xsd" node="/xsd:schema">
+        <schemaBindings>
+            <package name="io.github.up2jakarta.cii.format.unmapped.qdt" />
+        </schemaBindings>
+    </bindings>
+    <bindings schemaLocation="./uncefact/data/standard/CrossIndustryInvoice_ReusableAggregateBusinessInformationEntity_100pD16B.xsd" node="/xsd:schema">
+        <schemaBindings>
+            <package name="io.github.up2jakarta.cii.format.unmapped.ram" />
+        </schemaBindings>
+    </bindings>
+    <bindings schemaLocation="./uncefact/data/standard/CrossIndustryInvoice_UnqualifiedDataType_100pD16B.xsd" node="/xsd:schema">
+        <schemaBindings>
+            <package name="io.github.up2jakarta.cii.format.unmapped.udt" />
+        </schemaBindings>
+    </bindings>
+</bindings>

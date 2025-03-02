@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jaxb https://jakarta.ee/xml/ns/jaxb/bindingschema_3_0.xsd" version="3.0">
+    <globalBindings typesafeEnumMaxMembers="2000" typesafeEnumMemberName="generateError">
+        <xjc:javaType name="io.github.up2jakarta.cii.xml.OffsetDate" xmlType="xsd:date" adapter="io.github.up2jakarta.cii.xml.adapters.OffsetDateAdapter" />
+        <xjc:javaType name="java.time.OffsetDateTime" xmlType="xsd:dateTime" adapter="io.github.up2jakarta.cii.xml.adapters.OffsetDateTimeAdapter" />
+        <xjc:javaType name="java.time.OffsetTime" xmlType="xsd:time" adapter="io.github.up2jakarta.cii.xml.adapters.OffsetTimeAdapter" />
+    </globalBindings>
+    <bindings schemaLocation="./uncefact/data/standard/CrossIndustryInvoice_100pD16B.xsd" node="/xsd:schema">
+        <schemaBindings>
+            <package name="io.github.up2jakarta.cii.format.standard" />
+        </schemaBindings>
+    </bindings>
+    <bindings schemaLocation="./uncefact/data/standard/CrossIndustryInvoice_QualifiedDataType_100pD16B.xsd" node="/xsd:schema">
+        <schemaBindings>
+            <package name="io.github.up2jakarta.cii.format.standard.qdt" />
+        </schemaBindings>
+        <bindings node="//xsd:complexType[@name='DocumentCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.DocumentCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='CommunicationChannelCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.CommunicationChannelCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='TaxTypeCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.TaxTypeCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='TaxCategoryCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.TaxCategoryCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='CountryIDType']">
+            <class ref="io.github.up2jakarta.cii.edi.CountryIDType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='CurrencyCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.CurrencyCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='ReferenceCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.ReferenceCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='PaymentMeansCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.PaymentMeansCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='PartyRoleCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.PartyRoleCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='LineStatusCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.LineStatusCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='DocumentStatusCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.DocumentStatusCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='ContactTypeCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.ContactTypeCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='PriceTypeCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.PriceTypeCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='TimeReferenceCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.TimeReferenceCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='TransportEquipmentCategoryCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.TransportEquipmentCategoryCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='TransportEquipmentFullnessCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.TransportEquipmentFullnessCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='TransportEquipmentSizeTypeCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.TransportEquipmentSizeTypeCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='TransportMovementStageCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.TransportMovementStageCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='TransportModeCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.TransportModeCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='TransportMeansTypeCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.TransportMeansTypeCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='WeightUnitMeasureType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.qdt.WeightUnitMeasureType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='VolumeUnitMeasureType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.qdt.VolumeUnitMeasureType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='LinearUnitMeasureType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.qdt.LinearUnitMeasureType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='DimensionTypeCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.DimensionTypeCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='PackageTypeCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.PackageTypeCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='PackagingMarkingCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.PackagingMarkingCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='PaymentTermsTypeCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.PaymentTermsTypeCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='PaymentTermsIDType']">
+            <class ref="io.github.up2jakarta.cii.edi.PaymentTermsIDType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='PaymentMeansChannelCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.PaymentMeansChannelCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='PaymentGuaranteeMeansCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.PaymentGuaranteeMeansCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='PaymentTermsEventTimeReferenceCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.PaymentTermsEventTimeReferenceCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='MessageFunctionCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.MessageFunctionCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='LogisticsChargeCalculationBasisCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.LogisticsChargeCalculationBasisCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='GoodsTypeExtensionCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.GoodsTypeExtensionCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='GoodsTypeCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.GoodsTypeCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='FreightChargeTypeIDType']">
+            <class ref="io.github.up2jakarta.cii.edi.FreightChargeTypeIDType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='FreightChargeTariffClassCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.FreightChargeTariffClassCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='DeliveryTermsCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.DeliveryTermsCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='ChargePayingPartyRoleCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.ChargePayingPartyRoleCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='AutomaticDataCaptureMethodCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.AutomaticDataCaptureMethodCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='AdjustmentReasonCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.AdjustmentReasonCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='CargoOperationalCategoryCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.CargoOperationalCategoryCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='CargoCommodityCategoryCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.CargoCommodityCategoryCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='CargoCategoryCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.CargoCategoryCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='AllowanceChargeReasonCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.AllowanceChargeReasonCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='AllowanceChargeIdentificationCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.AllowanceChargeIdentificationCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='AccountingDocumentCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.AccountingDocumentCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='AccountingAmountTypeCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.AccountingAmountTypeCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='AccountingAccountTypeCodeType']">
+            <class ref="io.github.up2jakarta.cii.edi.AccountingAccountTypeCodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='FormattedDateTimeType']">
+            <bindings node=".//xsd:element [@name='DateTimeString']">
+                <class ref="io.github.up2jakarta.cii.format.standard.udt.DateStringType"/>
+            </bindings>
+        </bindings>
+    </bindings>
+    <bindings schemaLocation="./uncefact/data/standard/CrossIndustryInvoice_ReusableAggregateBusinessInformationEntity_100pD16B.xsd" node="/xsd:schema">
+        <schemaBindings>
+            <package name="io.github.up2jakarta.cii.format.standard.ram" />
+        </schemaBindings>
+        <bindings node="//xsd:complexType [@name='NoteType']">
+            <bindings node=".//xsd:element [@name='SubjectCode']">
+                <class ref="io.github.up2jakarta.cii.ppf.SubjectCodeType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='ExchangedDocumentType']">
+            <bindings node=".//xsd:element [@name='TypeCode']">
+                <class ref="io.github.up2jakarta.cii.ppf.InvoiceCodeType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='UniversalCommunicationType']">
+            <bindings node=".//xsd:element [@name='URIID']">
+                <class ref="io.github.up2jakarta.cii.format.standard.udt.UriIDType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='TradePartyType']">
+            <bindings node=".//xsd:element [@name='GlobalID']">
+                <class ref="io.github.up2jakarta.cii.format.standard.udt.PartyIDType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='TradeProductType']">
+            <bindings node=".//xsd:element [@name='GlobalID']">
+                <class ref="io.github.up2jakarta.cii.format.standard.udt.PartyIDType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='TradePartyType']">
+            <bindings node=".//xsd:element [@name='ID']">
+                <class ref="io.github.up2jakarta.cii.format.standard.udt.PartyIDType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='LegalOrganizationType']">
+            <bindings node=".//xsd:element [@name='ID']">
+                <class ref="io.github.up2jakarta.cii.format.standard.udt.PartyIDType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='TaxRegistrationType']">
+            <bindings node=".//xsd:element [@name='ID']">
+                <class ref="io.github.up2jakarta.cii.format.standard.udt.FiscalIDType"/>
+            </bindings>
+        </bindings>
+        <!-- Fix Mapping of EXT-FR-FE-01 -->
+        <bindings node="//xsd:complexType [@name='HeaderTradeAgreementType']">
+            <bindings node=".//xsd:element [@name='ContractReferencedDocument']">
+                <class ref="io.github.up2jakarta.cii.format.standard.ram.ReferencedContractType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='ReferencedDocumentType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.ram.ReferencedDocumentType"/>
+        </bindings>
+        <!-- Fix Mapping of EN-16931 BR-CL-19 & BR-CL-20 -->
+        <bindings node=".//xsd:complexType [@name='TradeAllowanceChargeType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.ram.TradeAllowanceChargeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='TradeTaxType']">
+            <bindings node=".//xsd:element [@name='ExemptionReasonCode']">
+                <class ref="io.github.up2jakarta.cii.ppf.TaxExemptionReasonCodeType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='RegisteredTaxType']">
+            <bindings node=".//xsd:element [@name='ExemptionReasonCode']">
+                <class ref="io.github.up2jakarta.cii.ppf.TaxExemptionReasonCodeType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='ProductClassificationType']">
+            <bindings node=".//xsd:element [@name='ClassCode']">
+                <class ref="io.github.up2jakarta.cii.format.standard.udt.ProductClassCodeType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='DocumentContextParameterType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.ram.DocumentContextParameterType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='ExchangedDocumentContextType']">
+            <bindings node=".//xsd:element [@name='GuidelineSpecifiedDocumentContextParameter']">
+                <class ref="io.github.up2jakarta.cii.format.standard.ram.ProfileContextParameterType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='ExchangedDocumentContextType']">
+            <bindings node=".//xsd:element [@name='BusinessProcessSpecifiedDocumentContextParameter']">
+                <class ref="io.github.up2jakarta.cii.format.standard.ram.ScopeContextParameterType"/>
+            </bindings>
+        </bindings>
+    </bindings>
+    <bindings schemaLocation="./uncefact/data/standard/CrossIndustryInvoice_UnqualifiedDataType_100pD16B.xsd" node="/xsd:schema">
+        <schemaBindings>
+            <package name="io.github.up2jakarta.cii.format.standard.udt" />
+        </schemaBindings>
+        <bindings node="//xsd:complexType[@name='IDType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.udt.IDType"/>
+        </bindings>
+        <bindings node="//xsd:complexType[@name='CodeType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.udt.CodeType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='MeasureType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.udt.MeasureType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='QuantityType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.udt.QuantityType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='BinaryObjectType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.udt.BinaryObjectType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='AmountType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.udt.AmountType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='TextType']">
+            <class ref="io.github.up2jakarta.cii.format.standard.udt.TextType"/>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='DateTimeType']">
+            <bindings node=".//xsd:element [@name='DateTimeString']">
+                <class ref="io.github.up2jakarta.cii.format.standard.udt.DateStringType"/>
+            </bindings>
+        </bindings>
+        <bindings node="//xsd:complexType [@name='DateType']">
+            <bindings node=".//xsd:element [@name='DateString']">
+                <class ref="io.github.up2jakarta.cii.format.standard.udt.DateStringType"/>
+            </bindings>
+        </bindings>
+    </bindings>
+</bindings>

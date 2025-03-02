@@ -1,0 +1,84 @@
+package io.github.up2jakarta.cii.edi;
+
+import io.github.up2jakarta.cii.TUConfiguration;
+import io.github.up2jakarta.cii.api.CodeAdapterTest;
+import io.github.up2jakarta.cii.api.IValidationError;
+import io.github.up2jakarta.cii.api.XValidationException;
+import io.github.up2jakarta.cii.format.standard.ram.HeaderTradeAgreementType;
+import io.github.up2jakarta.cii.format.standard.ram.SupplyChainTradeTransactionType;
+import io.github.up2jakarta.cii.format.standard.ram.TradePartyType;
+import io.github.up2jakarta.cii.format.standard.ram.UniversalCommunicationType;
+import io.github.up2jakarta.csv.exception.CodeListException;
+import io.github.up2jakarta.csv.extension.SeverityType;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = TUConfiguration.class)
+public class CommunicationChannelCodeTest extends CodeAdapterTest {
+
+    private static final io.github.up2jakarta.cii.format.unmapped.qdt.CommunicationChannelCodeType WRONG_CODE =
+            new io.github.up2jakarta.cii.format.unmapped.qdt.CommunicationChannelCodeType() {{
+                setValue("???");
+            }};
+
+    public CommunicationChannelCodeTest(@Autowired ApplicationContext context) throws IOException {
+        super(context, "invalid_communication_channel_code.xml", (i) -> {
+            var trade = i.getSupplyChainTradeTransaction();
+            var agreement = trade.getApplicableHeaderTradeAgreement();
+            var seller = agreement.getSellerTradeParty();
+            var communications = seller.getURIUniversalCommunication();
+            var communication = communications.get(0);
+            communication.setChannelCode(WRONG_CODE);
+        });
+    }
+
+    @Test
+    public void value() {
+        final SupplyChainTradeTransactionType trade = validInvoice.getSupplyChainTradeTransaction();
+        assertNotNull(trade);
+        final HeaderTradeAgreementType agreement = trade.getApplicableHeaderTradeAgreement();
+        assertNotNull(agreement);
+        final TradePartyType seller = agreement.getSellerTradeParty();
+        assertNotNull(seller);
+        final List<UniversalCommunicationType> communications = seller.getURIUniversalCommunication();
+        assertNotNull(communications);
+        assertEquals(1, communications.size());
+        final UniversalCommunicationType communication = communications.get(0);
+        assertNotNull(communication);
+        final CommunicationChannelCodeType code = communication.getChannelCode();
+        assertNotNull(code);
+        assertEquals(CommunicationChannelCodeType.EM, code);
+        assertNotNull(code.getName());
+    }
+
+    @Test
+    public void read() throws IOException {
+        assertThrows(XValidationException.class, () -> reader.read(invalidInvoiceFile, false));
+    }
+
+    @Test
+    public void validate() throws IOException {
+        final List<IValidationError> errors = validator.validate(invalidInvoiceFile);
+        assertNotNull(errors);
+        assertEquals(1, errors.size());
+        {
+            final IValidationError error = errors.get(0);
+            assertEquals(SeverityType.ERROR, error.getSeverity());
+            assertEquals(122, error.getLineNumber());
+            assertEquals(59, error.getColumnNumber());
+            assertEquals("ECE-3155: Unknown value [???] for CodeList[CommunicationChannelCodeType].", error.getMessage());
+            assertNotNull(error.getLinkedException());
+            assertInstanceOf(CodeListException.class, error.getLinkedException());
+        }
+    }
+}

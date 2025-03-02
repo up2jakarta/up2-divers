@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.up2jakarta</groupId>
+        <artifactId>up2-divers</artifactId>
+        <version>1.4.1</version>
+    </parent>
+
+    <artifactId>up2cii-format</artifactId>
+    <name>Up2CII :: Format</name>
+    <description>Framework for validating, reading and writing CII e-invoices</description>
+    <url>https://github.com/up2jakarta/up2-divers/tree/master/up2cii-format</url>
+
+    <developers>
+        <developer>
+            <name>A.ABBESSI</name>
+            <email>up2Abbessi[at]gmail.com</email>
+            <roles>
+                <role>Software engineer</role>
+                <role>Developer Lead</role>
+                <role>Technical Lead</role>
+                <role>Application Architect</role>
+            </roles>
+            <url>https://up2jakarta.github.io/</url>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency>
+            <groupId>io.github.up2jakarta</groupId>
+            <artifactId>up2csv-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- XML dependencies -->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+        </dependency>
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Generate CII-D16B classes From XSD -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <locale>en</locale>
+                    <noGeneratedHeaderComments>true</noGeneratedHeaderComments>
+                    <enableIntrospection>false</enableIntrospection>
+                    <addGeneratedAnnotation>false</addGeneratedAnnotation>
+                    <clearOutputDir>false</clearOutputDir>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <readOnly>false</readOnly>
+                    <quiet>true</quiet>
+                </configuration>
+                <executions>
+                    <!-- Standard Classes -->
+                    <execution>
+                        <id>standard_cii_xjc</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/generated-sources/jaxb</outputDirectory>
+                            <xjbSources>
+                                <xjbSource>src/main/resources/CII_D16B/bindings.xjb</xjbSource>
+                            </xjbSources>
+                            <sources>
+                                <source>src/main/resources/CII_D16B/uncefact/data/standard/CrossIndustryInvoice_100pD16B.xsd</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <!-- Unmapped Classes -->
+                    <execution>
+                        <id>unmapped_cii_xjc</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/generated-sources/jaxb</outputDirectory>
+                            <xjbSources>
+                                <xjbSource>src/main/resources/CII_D16B/unmapped-bindings.xjb</xjbSource>
+                            </xjbSources>
+                            <sources>
+                                <source>src/main/resources/CII_D16B/uncefact/data/standard/CrossIndustryInvoice_100pD16B.xsd</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Add Generated Test classes -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>add-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-test-sources/jaxb</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

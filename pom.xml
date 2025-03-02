@@ -4,7 +4,7 @@
 
     <groupId>io.github.up2jakarta</groupId>
     <artifactId>up2-divers</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <packaging>pom</packaging>
 
     <name>Up2Jakarta :: Divers</name>
@@ -39,6 +39,7 @@
 
     <modules>
         <module>up2csv-core</module>
+        <module>up2cii-format</module>
     </modules>
 
     <properties>
@@ -103,19 +104,11 @@
                             <detectOfflineLinks>false</detectOfflineLinks>
                             <show>public</show>
                             <quiet>true</quiet>
+                            <doclint>none</doclint>
                             <jdkToolchain>
                                 <version>${java.version}</version>
                             </jdkToolchain>
-                            <excludePackageNames>
-                            </excludePackageNames>
                             <sourceFileExcludes>
-                                <exclude>**/io/github/up2jakarta/csv/exception/*.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/resolver/*.java</exclude>
-                                <!-- Core -->
-                                <exclude>**/io/github/up2jakarta/csv/core/CodeListResolver.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/ProcessorWrapper.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/Bean*.java</exclude>
-                                <exclude>**/io/github/up2jakarta/csv/core/Lazy*.java</exclude>
                                 <exclude>**/io/github/up2jakarta/csv/core/*Property.java</exclude>
                                 <exclude>**/io/github/up2jakarta/csv/core/*Context.java</exclude>
                                 <exclude>**/io/github/up2jakarta/csv/core/*Extension.java</exclude>

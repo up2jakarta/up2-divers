@@ -20,7 +20,8 @@
     - Error API
     - Input API
     - Conversion Extension API
-    - Bean Checker API (Coming soon)
+    - Bean Checker API
+    - BusinessData Resolver API
 
 # Requirements
 
@@ -32,7 +33,7 @@
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.4.0</version>
+        <version>1.4.1</version>
     </dependency>
     <!-- Optional SLF4J Provider -->
     <!-- Optional JSR-303 Validation Provider -->
