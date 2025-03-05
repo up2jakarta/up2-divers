@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -39,10 +40,15 @@ public class InvoiceValidator<I> extends XProcessor<I> implements XValidator<I> 
 
     @Override
     public List<IValidationError> validate(File xmlFile) throws IOException {
+        return this.validate(getStreamSource(xmlFile));
+    }
+
+    @Override
+    public List<IValidationError> validate(StreamSource xmlFile) throws IOException {
         var handler = new FailSafeHandler(false);
         try {
             var unmarshaller = createUnmarshaller(handler);
-            unmarshaller.unmarshal(getStreamSource(xmlFile), type);
+            unmarshaller.unmarshal(xmlFile, type);
         } catch (JAXBException ex) {
             return getOrThrowError(ex);
         }

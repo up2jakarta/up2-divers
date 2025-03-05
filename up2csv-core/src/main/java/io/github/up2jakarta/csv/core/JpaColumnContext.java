@@ -114,7 +114,7 @@ final class JpaColumnContext implements CheckerContext {
             if (column.nullable() != (field.getAnnotation(NotNull.class) == null)) {
                 throw new BeanException(field, "@NotNull does not match with @Column[nullable]");
             }
-            if (size != null) {
+            if (size != null && !fieldType.isArray()) {
                 throw new BeanException(field, "must not be annotated with @Size");
             }
         }

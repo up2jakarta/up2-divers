@@ -41,14 +41,14 @@ public class TradePartyType {
     private LegalOrganizationType specifiedLegalOrganization;
 
     // BG-6, BG-9, EXT-FR-FE-22, EXT-FR-FE-39, EXT-FR-FE-62, EXT-FR-FE-85, EXT-FR-FE-108 and (1) specifications too.
-    private List<TradeContactType> definedTradeContact;
+    private TradeContactType definedTradeContact;
 
     // BG-5, BG-8, EXT-FR-FE-14, EXT-FR-FE-31, EXT-FR-FE-54, EXT-FR-FE-77, EXT-FR-FE-100 and (4) specifications too.
     private TradeAddressType postalTradeAddress;
 
     private UniversalCommunicationType uriUniversalCommunication;
 
-    private TaxRegistrationType specifiedTaxRegistration;
+    private List<TaxRegistrationType> specifiedTaxRegistration;
 
     @XmlElement(name = "GlobalID")
     public List<PartyIDType> getGlobalId() {
@@ -96,11 +96,11 @@ public class TradePartyType {
     }
 
     @XmlElement(name = "DefinedTradeContact")
-    public List<TradeContactType> getDefinedTradeContact() {
+    public TradeContactType getDefinedTradeContact() {
         return this.definedTradeContact;
     }
 
-    public void setDefinedTradeContact(List<TradeContactType> definedTradeContact) {
+    public void setDefinedTradeContact(TradeContactType definedTradeContact) {
         this.definedTradeContact = definedTradeContact;
     }
 
@@ -123,11 +123,11 @@ public class TradePartyType {
     }
 
     @XmlElement(name = "SpecifiedTaxRegistration")
-    public TaxRegistrationType getSpecifiedTaxRegistration() {
+    public List<TaxRegistrationType> getSpecifiedTaxRegistration() {
         return this.specifiedTaxRegistration;
     }
 
-    public void setSpecifiedTaxRegistration(TaxRegistrationType specifiedTaxRegistration) {
+    public void setSpecifiedTaxRegistration(List<TaxRegistrationType> specifiedTaxRegistration) {
         this.specifiedTaxRegistration = specifiedTaxRegistration;
     }
 

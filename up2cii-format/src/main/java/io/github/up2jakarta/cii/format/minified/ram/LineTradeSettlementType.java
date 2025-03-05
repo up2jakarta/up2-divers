@@ -23,7 +23,7 @@ import java.util.List;
 public class LineTradeSettlementType {
 
     // BG-30
-    private List<TradeTaxType> applicableTradeTax;
+    private TradeTaxType applicableTradeTax;
 
     // BG-26
     private SpecifiedPeriodType billingSpecifiedPeriod;
@@ -41,11 +41,11 @@ public class LineTradeSettlementType {
     private TradeAccountingAccountType receivableSpecifiedTradeAccountingAccount;
 
     @XmlElement(name = "ApplicableTradeTax")
-    public List<TradeTaxType> getApplicableTradeTax() {
+    public TradeTaxType getApplicableTradeTax() {
         return this.applicableTradeTax;
     }
 
-    public void setApplicableTradeTax(List<TradeTaxType> applicableTradeTax) {
+    public void setApplicableTradeTax(TradeTaxType applicableTradeTax) {
         this.applicableTradeTax = applicableTradeTax;
     }
 

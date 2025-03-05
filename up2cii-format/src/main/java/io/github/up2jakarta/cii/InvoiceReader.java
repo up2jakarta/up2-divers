@@ -6,6 +6,7 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.w3c.dom.Document;
 
+import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.IOException;
 
@@ -21,16 +22,21 @@ public class InvoiceReader<I> extends XProcessor<I> implements XReader<I> {
     }
 
     @Override
-    public I read(File xmlFile, boolean failFast, boolean lenient) throws IOException {
+    public I read(StreamSource xmlFile, boolean failFast, boolean lenient) throws IOException {
         try {
             var handler = computeHandler(failFast, lenient);
             var unmarshaller = createUnmarshaller(handler);
-            var invoice = unmarshaller.unmarshal(getStreamSource(xmlFile), type).getValue();
+            var invoice = unmarshaller.unmarshal(xmlFile, type).getValue();
             handler.throwValidationExceptionWhenError();
             return invoice;
         } catch (JAXBException ex) {
             throw createException(ex);
         }
+    }
+
+    @Override
+    public I read(File xmlFile, boolean failFast, boolean lenient) throws IOException {
+        return this.read(getStreamSource(xmlFile), failFast, lenient);
     }
 
     @Override

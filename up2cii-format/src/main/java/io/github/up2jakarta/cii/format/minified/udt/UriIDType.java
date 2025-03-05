@@ -7,7 +7,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-public class UriIDType extends IDType<EASchemeIDType> {
+public class UriIDType extends AbstractIDType<EASchemeIDType> {
 
     // BT-34-1, BT-49-1, EXT-FR-FE-13, EXT-FR-FE-30, EXT-FR-FE-53, EXT-FR-FE-76, EXT-FR-FE-99 and (1) specifications too.
     private EASchemeIDType schemeId;

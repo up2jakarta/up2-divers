@@ -19,6 +19,7 @@ public class ProcuringProjectType {
     // BT-11
     private String id;
 
+    // BT-11
     private String name;
 
     @XmlElement(name = "ID", required = true)

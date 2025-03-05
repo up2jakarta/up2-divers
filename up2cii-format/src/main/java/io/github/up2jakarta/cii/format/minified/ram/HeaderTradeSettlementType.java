@@ -1,6 +1,7 @@
 package io.github.up2jakarta.cii.format.minified.ram;
 
 import io.github.up2jakarta.cii.edi.CurrencyCodeType;
+import io.github.up2jakarta.cii.format.minified.udt.IDType;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -33,7 +34,7 @@ import java.util.List;
 public class HeaderTradeSettlementType {
 
     // BT-90
-    private String creditorReferenceId;
+    private IDType creditorReferenceId;
 
     // BT-83
     private String paymentReference;
@@ -68,22 +69,22 @@ public class HeaderTradeSettlementType {
     // BG-20, BG-21
     private List<TradeAllowanceChargeType> specifiedTradeAllowanceCharge;
 
-    private List<TradePaymentTermsType> specifiedTradePaymentTerms;
+    private TradePaymentTermsType specifiedTradePaymentTerms;
 
     // BG-22
     private TradeSettlementHeaderMonetarySummationType specifiedTradeSettlementHeaderMonetarySummation;
 
     // BG-3
-    private ReferencedDocumentType invoiceReferencedDocument;
+    private List<ReferencedDocumentType> invoiceReferencedDocument;
 
     private TradeAccountingAccountType receivableSpecifiedTradeAccountingAccount;
 
     @XmlElement(name = "CreditorReferenceID")
-    public String getCreditorReferenceId() {
+    public IDType getCreditorReferenceId() {
         return this.creditorReferenceId;
     }
 
-    public void setCreditorReferenceId(String creditorReferenceId) {
+    public void setCreditorReferenceId(IDType creditorReferenceId) {
         this.creditorReferenceId = creditorReferenceId;
     }
 
@@ -187,11 +188,11 @@ public class HeaderTradeSettlementType {
     }
 
     @XmlElement(name = "SpecifiedTradePaymentTerms")
-    public List<TradePaymentTermsType> getSpecifiedTradePaymentTerms() {
+    public TradePaymentTermsType getSpecifiedTradePaymentTerms() {
         return this.specifiedTradePaymentTerms;
     }
 
-    public void setSpecifiedTradePaymentTerms(List<TradePaymentTermsType> specifiedTradePaymentTerms) {
+    public void setSpecifiedTradePaymentTerms(TradePaymentTermsType specifiedTradePaymentTerms) {
         this.specifiedTradePaymentTerms = specifiedTradePaymentTerms;
     }
 
@@ -205,11 +206,11 @@ public class HeaderTradeSettlementType {
     }
 
     @XmlElement(name = "InvoiceReferencedDocument")
-    public ReferencedDocumentType getInvoiceReferencedDocument() {
+    public List<ReferencedDocumentType> getInvoiceReferencedDocument() {
         return this.invoiceReferencedDocument;
     }
 
-    public void setInvoiceReferencedDocument(ReferencedDocumentType invoiceReferencedDocument) {
+    public void setInvoiceReferencedDocument(List<ReferencedDocumentType> invoiceReferencedDocument) {
         this.invoiceReferencedDocument = invoiceReferencedDocument;
     }
 

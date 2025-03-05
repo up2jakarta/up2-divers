@@ -15,6 +15,7 @@ import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.SAXParseException;
 
 import javax.xml.XMLConstants;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
@@ -48,11 +49,16 @@ public class SchemaValidator extends XProcessor<CrossIndustryInvoiceType> implem
 
     @Override
     public List<IValidationError> validate(File xmlFile) throws IOException {
+        return this.validate(getStreamSource(xmlFile));
+    }
+
+    @Override
+    public List<IValidationError> validate(StreamSource xmlFile) throws IOException {
         var handler = new SchemaErrorCollector();
         var validator = createValidator();
         validator.setErrorHandler(handler);
         try {
-            validator.validate(getStreamSource(xmlFile));
+            validator.validate(xmlFile);
         } catch (SAXParseException e) {
             return Collections.singletonList(new SAXParseError(SeverityType.FATAL, e));
         } catch (SAXException e) {

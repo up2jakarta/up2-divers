@@ -25,7 +25,7 @@ public enum MimeCodeType implements CodeList<MimeCodeType> {
     RTF("application/rtf", "RTF"),
 
     @Duplicated("XLS")
-    XLC("application/vnd.ms-excel", "XLC"),
+    XLC("application/vnd.ms-excel", "XLS"),
 
     @Duplicated("PPT")
     PPS("application/vnd.ms-powerpoint", "PPS"),
@@ -43,7 +43,7 @@ public enum MimeCodeType implements CodeList<MimeCodeType> {
     TGZ("application/x-tar", "TGZ"),
     X_HTML("application/xhtml+xml", "XHTML"),
     XML("application/xml", "XML"),
-    XLM("application/xml ou text/xml", "XLM"),
+    XLM("application/xml ou text/xml", "XML"),
     ZIP("application/zip", "ZIP"),
     BMP("image/bmp", "BMP"),
     FAX("image/g3fax", "FAX"),

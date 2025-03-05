@@ -2,6 +2,7 @@ package io.github.up2jakarta.cii.api;
 
 import org.w3c.dom.Document;
 
+import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.IOException;
 
@@ -23,6 +24,17 @@ public interface XReader<X> {
     default X read(File xmlFile, boolean failFast) throws IOException {
         return read(xmlFile, failFast, failFast);
     }
+
+    /**
+     * Read the given {@param xmlFile} into {@link X}.
+     *
+     * @param xmlFile  the input to read: Must be an XML document and must not be null.
+     * @param failFast specify that the reader should fail at the first error detected or collect the maximum of errors.
+     * @param lenient  specify that the reader should ignore warnings and <code>Unexpected element</code>.
+     * @return the parsed {@link X}
+     * @throws IOException if the underlying {@link org.xml.sax.XMLReader} throws an {@link IOException}.
+     */
+    X read(StreamSource xmlFile, boolean failFast, boolean lenient) throws IOException;
 
     /**
      * Read the given {@param xmlDocument} into {@link X}.

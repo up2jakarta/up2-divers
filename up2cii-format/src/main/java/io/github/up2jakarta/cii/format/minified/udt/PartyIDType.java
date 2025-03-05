@@ -7,7 +7,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-public class PartyIDType extends IDType<SchemeCodeType> {
+public class PartyIDType extends AbstractIDType<SchemeCodeType> {
 
     // BT-29a-1, BT-29b-1, BT-29c-1, BT-29d-1, BT-30-1, BT-46a-1, BT-46b-1, BT-46c-1 and (28) specifications too.
     private SchemeCodeType schemeId;
