@@ -45,7 +45,7 @@ public class HeaderTradeAgreementType {
 
     private ReferencedDocumentType buyerOrderReferencedDocument;
 
-    private ReferencedContractType contractReferencedDocument;
+    private ReferencedDocumentType contractReferencedDocument;
 
     // BG-24
     private List<ReferencedDocumentType> additionalReferencedDocument;
@@ -119,11 +119,11 @@ public class HeaderTradeAgreementType {
     }
 
     @XmlElement(name = "ContractReferencedDocument")
-    public ReferencedContractType getContractReferencedDocument() {
+    public ReferencedDocumentType getContractReferencedDocument() {
         return this.contractReferencedDocument;
     }
 
-    public void setContractReferencedDocument(ReferencedContractType contractReferencedDocument) {
+    public void setContractReferencedDocument(ReferencedDocumentType contractReferencedDocument) {
         this.contractReferencedDocument = contractReferencedDocument;
     }
 

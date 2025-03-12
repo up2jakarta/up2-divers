@@ -10,7 +10,6 @@ import jakarta.xml.bind.annotation.XmlType;
 
 import javax.annotation.processing.Generated;
 import java.math.BigDecimal;
-import java.util.List;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
@@ -43,7 +42,7 @@ public class TradeAllowanceChargeType {
     // BT-97, BT-104, BT-139, BT-144
     private String reason;
 
-    private List<TradeTaxType> categoryTradeTax;
+    private TradeTaxType categoryTradeTax;
 
     @XmlElement(name = "ChargeIndicator")
     public IndicatorType getChargeIndicator() {
@@ -100,11 +99,11 @@ public class TradeAllowanceChargeType {
     }
 
     @XmlElement(name = "CategoryTradeTax")
-    public List<TradeTaxType> getCategoryTradeTax() {
+    public TradeTaxType getCategoryTradeTax() {
         return this.categoryTradeTax;
     }
 
-    public void setCategoryTradeTax(List<TradeTaxType> categoryTradeTax) {
+    public void setCategoryTradeTax(TradeTaxType categoryTradeTax) {
         this.categoryTradeTax = categoryTradeTax;
     }
 

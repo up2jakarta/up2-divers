@@ -6,7 +6,6 @@ import io.github.up2jakarta.cii.api.Schema;
 import io.github.up2jakarta.cii.api.SubList;
 import io.github.up2jakarta.cii.edi.adapters.ReferenceCodeAdapter;
 import io.github.up2jakarta.cii.ppf.PartySchemeIDType;
-import io.github.up2jakarta.cii.ppf.ReferenceType;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import javax.annotation.processing.Generated;
@@ -20,7 +19,7 @@ import javax.annotation.processing.Generated;
 @Documented(value = "Reference Type Code", agency = Agency.UN_ECE, version = "D22B")
 @Schema(agency = "UN/CEFACT", version = "3.11", date = "2008-08-23")
 @XmlJavaTypeAdapter(ReferenceCodeAdapter.class)
-public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType>, ReferenceType<ReferenceCodeType> {
+public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
 
     /**
      * [1018] Reference number identifying the acknowledgement of an order.

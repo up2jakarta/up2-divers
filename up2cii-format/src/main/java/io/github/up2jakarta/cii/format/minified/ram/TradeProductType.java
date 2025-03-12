@@ -42,7 +42,7 @@ public class TradeProductType {
     // BG-32
     private List<ProductCharacteristicType> applicableProductCharacteristic;
 
-    private List<ProductClassificationType> designatedProductClassification;
+    private ProductClassificationType designatedProductClassification;
 
     private TradeCountryType originTradeCountry;
 
@@ -101,11 +101,11 @@ public class TradeProductType {
     }
 
     @XmlElement(name = "DesignatedProductClassification")
-    public List<ProductClassificationType> getDesignatedProductClassification() {
+    public ProductClassificationType getDesignatedProductClassification() {
         return this.designatedProductClassification;
     }
 
-    public void setDesignatedProductClassification(List<ProductClassificationType> designatedProductClassification) {
+    public void setDesignatedProductClassification(ProductClassificationType designatedProductClassification) {
         this.designatedProductClassification = designatedProductClassification;
     }
 

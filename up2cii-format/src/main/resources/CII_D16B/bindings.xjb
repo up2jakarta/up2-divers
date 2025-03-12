@@ -211,15 +211,6 @@
                 <class ref="io.github.up2jakarta.cii.format.standard.udt.FiscalIDType"/>
             </bindings>
         </bindings>
-        <!-- Fix Mapping of EXT-FR-FE-01 -->
-        <bindings node="//xsd:complexType [@name='HeaderTradeAgreementType']">
-            <bindings node=".//xsd:element [@name='ContractReferencedDocument']">
-                <class ref="io.github.up2jakarta.cii.format.standard.ram.ReferencedContractType"/>
-            </bindings>
-        </bindings>
-        <bindings node="//xsd:complexType [@name='ReferencedDocumentType']">
-            <class ref="io.github.up2jakarta.cii.format.standard.ram.ReferencedDocumentType"/>
-        </bindings>
         <!-- Fix Mapping of EN-16931 BR-CL-19 & BR-CL-20 -->
         <bindings node=".//xsd:complexType [@name='TradeAllowanceChargeType']">
             <class ref="io.github.up2jakarta.cii.format.standard.ram.TradeAllowanceChargeType"/>
