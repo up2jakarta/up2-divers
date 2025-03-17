@@ -2,8 +2,8 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.exception.BeanException;
+import io.github.up2jakarta.csv.impl.DataId;
 import io.github.up2jakarta.csv.test.bean.jpa.checker.base.*;
-import io.github.up2jakarta.csv.test.input.DataId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

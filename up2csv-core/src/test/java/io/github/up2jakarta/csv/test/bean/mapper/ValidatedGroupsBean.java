@@ -2,13 +2,13 @@ package io.github.up2jakarta.csv.test.bean.mapper;
 
 import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.annotation.Up2Token;
-import io.github.up2jakarta.csv.annotation.Validated;
+import io.github.up2jakarta.csv.annotation.ValidOverride;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.csv.test.validation.Up2Group;
 import jakarta.validation.constraints.Size;
 
-@Validated(groups = Up2Group.class)
+@ValidOverride(groups = Up2Group.class)
 @SuppressWarnings("unused")
 public class ValidatedGroupsBean implements Segment {
 

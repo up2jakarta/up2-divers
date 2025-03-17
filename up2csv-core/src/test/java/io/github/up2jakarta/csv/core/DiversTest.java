@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.CSV;
-import io.github.up2jakarta.csv.test.input.InputErrorEntity;
-import io.github.up2jakarta.csv.test.input.InputRowEntity;
-import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
+import io.github.up2jakarta.csv.impl.InputErrorEntity;
+import io.github.up2jakarta.csv.impl.InputRowEntity;
+import io.github.up2jakarta.csv.impl.SimpleErrorEntity;
+import io.github.up2jakarta.csv.processor.TrimProcessor;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
@@ -18,7 +18,7 @@ class DiversTest {
         // GIVEN
         final String[] data = {null, "", " \t\n", "- \t\n", "\n\t - \t\n", "\n\t DATA \t\n", "DA - TA"};
         // WHEN
-        final String[] trim = CSV.trim(data, "", "-");
+        final String[] trim = TrimProcessor.trim(data, "", "-");
         // THEN
         assertEquals(data.length, trim.length);
         for (var i = 0; i < 5; i++) {
@@ -31,8 +31,10 @@ class DiversTest {
     @Test
     @SuppressWarnings("ALL")
     void testTrimNull() {
+        // GIVEN
+        final String[] data = null;
         // WHEN
-        final String[] trim = CSV.trim(null);
+        final String[] trim = TrimProcessor.trim(data);
         // THEN
         assertNull(trim);
     }

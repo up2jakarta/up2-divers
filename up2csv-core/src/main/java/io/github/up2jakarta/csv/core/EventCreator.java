@@ -12,7 +12,7 @@ import io.github.up2jakarta.csv.input.InputSegment;
  * @param <K> the error key type
  * @param <E> the error type
  */
-public abstract class EventCreator<R extends InputSegment, K extends InputError.Key<R>, D extends DataType<D>, E extends InputError<R, K, D>> {
+public abstract class EventCreator<R extends InputSegment<?>, K extends InputError.Key<R>, D extends DataType<D>, E extends InputError<R, K, D>> {
 
     protected EventCreator() {
     }

@@ -1,19 +1,14 @@
 package io.github.up2jakarta.csv;
 
 import io.github.up2jakarta.csv.core.MapperFactory;
+import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.BeanContext;
-import io.github.up2jakarta.csv.input.InputRepository;
-import io.github.up2jakarta.csv.misc.CompositeKeyCreator;
-import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
+import io.github.up2jakarta.csv.impl.*;
 import io.github.up2jakarta.csv.processor.TokenProcessor;
 import io.github.up2jakarta.csv.resolver.DecimalResolver;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
 import io.github.up2jakarta.csv.test.ext.DataIdResolver;
 import io.github.up2jakarta.csv.test.ext.DummyConverter;
-import io.github.up2jakarta.csv.test.input.DataId;
-import io.github.up2jakarta.csv.test.input.InputErrorEntity;
-import io.github.up2jakarta.csv.test.input.InputRowEntity;
-import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
 import jakarta.validation.Validator;
 import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import org.springframework.context.ApplicationContext;
@@ -28,7 +23,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Configuration
 @ComponentScan(basePackageClasses = {
         MapperFactory.class, TokenProcessor.class, DecimalResolver.class,
-        DummyConverter.class, CurrencyConverter.class // Test
+        DummyConverter.class, CurrencyConverter.class
 })
 public class TUConfiguration {
 
@@ -41,7 +36,7 @@ public class TUConfiguration {
     @Bean
     @Scope(value = SCOPE_SINGLETON)
     public Validator validator() {
-        return CSV.validator(messageInterpolator());
+        return MapperFactory.validator(messageInterpolator());
     }
 
     @Bean
@@ -52,15 +47,14 @@ public class TUConfiguration {
 
     @Bean
     @Scope(value = SCOPE_SINGLETON)
-    public InputRepository<InputRowEntity> inputRepository() {
-        return r -> 0;
+    DataIdResolver resolver() {
+        return DataIdResolver.INSTANCE;
     }
 
     @Bean
     @Scope(value = SCOPE_SINGLETON)
-    @Deprecated(forRemoval = true)
-    DataIdResolver resolver() {
-        return DataIdResolver.INSTANCE;
+    public InvoiceAggregator invoiceAggregator(MapperFactory<DataId> factory, ErrorCreator creator) throws BeanException {
+        return new InvoiceAggregator(factory, creator, SegmentType.S01);
     }
 
     /**
@@ -71,8 +65,8 @@ public class TUConfiguration {
     @Bean
     @Scope(value = SCOPE_SINGLETON)
     @Deprecated(forRemoval = true)
-    public SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> simpleKeyCreator() {
-        return new SimpleKeyCreator<>(SimpleErrorEntity::new);
+    public SimpleCreator simpleKeyCreator() {
+        return new SimpleCreator();
     }
 
     /**
@@ -83,8 +77,8 @@ public class TUConfiguration {
     @Bean
     @Scope(value = SCOPE_SINGLETON)
     @Deprecated(forRemoval = true)
-    public CompositeKeyCreator<InputRowEntity, InputErrorEntity.PKey, DataId, InputErrorEntity> compositeKeyCreator() {
-        return new CompositeKeyCreator<>(InputErrorEntity::new, InputErrorEntity.PKey::new);
+    public ErrorCreator compositeKeyCreator() {
+        return new ErrorCreator();
     }
 
 }

@@ -3,8 +3,7 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.SeverityType;
-import io.github.up2jakarta.csv.input.InputRepository;
-import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
+import io.github.up2jakarta.csv.impl.*;
 import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.converter.*;
 import io.github.up2jakarta.csv.test.bean.processor.Test3Processor;
@@ -13,10 +12,6 @@ import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
 import io.github.up2jakarta.csv.test.codelist.MeasurementUnitConverter;
 import io.github.up2jakarta.csv.test.ext.Dummy1Processor;
 import io.github.up2jakarta.csv.test.ext.DummyConverter;
-import io.github.up2jakarta.csv.test.input.DataId;
-import io.github.up2jakarta.csv.test.input.InputRowEntity;
-import io.github.up2jakarta.csv.test.input.SegmentType;
-import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
 import io.github.up2jakarta.csv.test.validation.Up2Warn;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,12 +30,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 public class ErrorSupportTest {
 
-    private final InputRepository<InputRowEntity> repository = (r -> 0);
-    private final SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> creator;
+    private final SimpleCreator creator;
     private final MapperFactory<DataId> factory;
 
     @Autowired
-    ErrorSupportTest(MapperFactory<DataId> factory, SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> creator) {
+    ErrorSupportTest(MapperFactory<DataId> factory, SimpleCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -51,7 +45,7 @@ public class ErrorSupportTest {
         final Mapper<Test3Processor, DataId> mapper = factory.build(Test3Processor.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "property", "dummy");
         // When
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test3Processor bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -86,7 +80,7 @@ public class ErrorSupportTest {
         final Mapper<Test4Processor, DataId> mapper = factory.build(Test4Processor.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "property", "dummy");
         // When
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test4Processor bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -121,7 +115,7 @@ public class ErrorSupportTest {
         final Mapper<Test1Converter, DataId> mapper = factory.build(Test1Converter.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "ILS", "int");
         // When
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test1Converter bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -156,7 +150,7 @@ public class ErrorSupportTest {
         final Mapper<Test2Converter, DataId> mapper = factory.build(Test2Converter.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "ILS", "int");
         // When
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test2Converter bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -191,7 +185,7 @@ public class ErrorSupportTest {
         final Mapper<Test1Resolver, DataId> mapper = factory.build(Test1Resolver.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "ISL", "XGM", "XPT24H");
         // When
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test1Resolver bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -236,7 +230,7 @@ public class ErrorSupportTest {
         final Mapper<Test2Resolver, DataId> mapper = factory.build(Test2Resolver.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "date", "duration");
         // When
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test2Resolver bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -271,7 +265,7 @@ public class ErrorSupportTest {
         final Mapper<Test1Validator, DataId> mapper = factory.build(Test1Validator.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "+1", "101", "", null, "-1");
         // When
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test1Validator bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -357,7 +351,7 @@ public class ErrorSupportTest {
         final Mapper<Test2Validator, DataId> mapper = factory.build(Test2Validator.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "", null);
         // When
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test2Validator bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then

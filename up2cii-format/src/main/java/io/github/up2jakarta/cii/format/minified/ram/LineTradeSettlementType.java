@@ -36,6 +36,7 @@ public class LineTradeSettlementType {
     // EXT-FR-FE-BG-06
     private ReferencedDocumentType invoiceReferencedDocument;
 
+    // BT-128
     private List<ReferencedDocumentType> additionalReferencedDocument;
 
     private TradeAccountingAccountType receivableSpecifiedTradeAccountingAccount;

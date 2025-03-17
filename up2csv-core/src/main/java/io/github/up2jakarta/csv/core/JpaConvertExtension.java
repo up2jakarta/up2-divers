@@ -18,8 +18,8 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static io.github.up2jakarta.csv.core.Beans.getBean;
-import static io.github.up2jakarta.csv.core.Beans.getTypeArguments;
+import static io.github.up2jakarta.csv.misc.Beans.getBean;
+import static io.github.up2jakarta.csv.misc.Beans.getTypeArguments;
 import static java.util.Arrays.stream;
 
 /**

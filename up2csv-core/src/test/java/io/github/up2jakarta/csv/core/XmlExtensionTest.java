@@ -3,19 +3,14 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.SeverityType;
-import io.github.up2jakarta.csv.input.InputRepository;
+import io.github.up2jakarta.csv.impl.*;
 import io.github.up2jakarta.csv.misc.Errors;
-import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
 import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.xml.*;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
 import io.github.up2jakarta.csv.test.codelist.TestCodeList;
 import io.github.up2jakarta.csv.test.codelist.TestCodeListConverter;
-import io.github.up2jakarta.csv.test.input.DataId;
-import io.github.up2jakarta.csv.test.input.InputRowEntity;
-import io.github.up2jakarta.csv.test.input.SegmentType;
-import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +25,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 public class XmlExtensionTest {
 
-    private final InputRepository<InputRowEntity> repository = (r -> 0);
-    private final SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> creator;
+    private final SimpleCreator creator;
     private final MapperFactory<DataId> factory;
 
     @Autowired
-    XmlExtensionTest(MapperFactory<DataId> factory, SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> creator) {
+    XmlExtensionTest(MapperFactory<DataId> factory, SimpleCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -61,7 +55,7 @@ public class XmlExtensionTest {
         final Mapper<Test1Bean, DataId> mapper = factory.build(Test1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "11", "2", "33", "ILS", "ANY");
         // When
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test1Bean bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then
@@ -116,7 +110,7 @@ public class XmlExtensionTest {
         final Mapper<Test2Bean, DataId> mapper = factory.build(Test2Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "11", "22", "ILS", "ANY");
         // When
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test2Bean bean = mapper.map(row, handler);
         final List<SimpleErrorEntity> errors = handler.toList();
         // Then

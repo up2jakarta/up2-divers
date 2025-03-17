@@ -17,8 +17,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
-import static io.github.up2jakarta.csv.core.Beans.getBean;
-import static io.github.up2jakarta.csv.core.Beans.getTypeArguments;
+import static io.github.up2jakarta.csv.misc.Beans.getBean;
+import static io.github.up2jakarta.csv.misc.Beans.getTypeArguments;
 
 /**
  * {@link XmlType} extension that supports {@link XmlJavaTypeAdapter}.
@@ -49,7 +49,7 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
     public Optional<XmlJavaTypeAdapter> get(Class<? extends Segment> segmentType, Field property, Class<?> type, Field... path) throws BeanException {
         final XmlJavaTypeAdapter xml = getAdapter(property, type);
         if (xml != null) {
-            if (segmentType.getAnnotation(XmlType.class) == null) {
+            if (!segmentType.isAnnotationPresent(XmlType.class)) {
                 throw new BeanException(segmentType, "must be annotated with @XmlType");
             }
             //noinspection unchecked

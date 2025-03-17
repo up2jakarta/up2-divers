@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.core.BeanSupport.getAnnotationsByType;
-import static io.github.up2jakarta.csv.core.Beans.getBean;
+import static io.github.up2jakarta.csv.misc.Beans.getBean;
 
 final class CompositeChecker implements CheckerContext {
 

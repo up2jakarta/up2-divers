@@ -6,7 +6,7 @@ import io.github.up2jakarta.csv.core.Mapper;
 import io.github.up2jakarta.csv.core.MapperFactory;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.Segment;
-import io.github.up2jakarta.csv.test.input.DataId;
+import io.github.up2jakarta.csv.impl.DataId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

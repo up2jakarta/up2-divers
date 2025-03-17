@@ -2,16 +2,11 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.input.InputRepository;
-import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
+import io.github.up2jakarta.csv.impl.*;
 import io.github.up2jakarta.csv.test.bean.converter.*;
 import io.github.up2jakarta.csv.test.codelist.CountryCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.codelist.MeasurementUnitCode;
-import io.github.up2jakarta.csv.test.input.DataId;
-import io.github.up2jakarta.csv.test.input.InputRowEntity;
-import io.github.up2jakarta.csv.test.input.SegmentType;
-import io.github.up2jakarta.csv.test.input.SimpleErrorEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +27,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 class ConverterTest {
 
-    private final InputRepository<InputRowEntity> repository = (r -> 0);
-    private final SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> creator;
+    private final SimpleCreator creator;
     private final MapperFactory<DataId> factory;
 
     @Autowired
-    ConverterTest(MapperFactory<DataId> factory, SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> creator) {
+    ConverterTest(MapperFactory<DataId> factory, SimpleCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -64,7 +58,7 @@ class ConverterTest {
         final String[] data = {"100", "Test\t 100", "2024-07-25", "57.000001", "TND", "4.06250001", "C62", "Y", "P1W", "TN"};
         final Mapper<SupportEntity, DataId> parser = factory.build(SupportEntity.class);
         final InputRowEntity row = create(SegmentType.S00, data);
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         // WHEN
         final SupportEntity entity = parser.map(row, handler);
         assertNotNull(entity);
@@ -88,7 +82,7 @@ class ConverterTest {
         final String[] data = {"100", "8888_8888", "2024-07-25", "57.000001", "EUR", "4.06250001", "KGM", "Y", "P1W", "FR"};
         final Mapper<SupportEntity, DataId> parser = factory.build(SupportEntity.class);
         final InputRowEntity row = create(SegmentType.S00, data);
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         // WHEN
         final SupportEntity entity = parser.map(row, handler);
         assertNotNull(entity);
@@ -122,7 +116,7 @@ class ConverterTest {
         final String[] data = {"100", "99998888", "2024-07-25", "57.000001", "ILS", "4.06250001", "KGM", "Y", "P1W", "IL"};
         final Mapper<SupportEntity, DataId> parser = factory.build(SupportEntity.class);
         final InputRowEntity row = create(SegmentType.S00, data);
-        final SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> handler = new SimpleHandler<>(row, creator, repository);
+        final SimpleHandler handler = new SimpleHandler(row, creator);
         // WHEN
         final SupportEntity entity = parser.map(row, handler);
         assertNotNull(entity);

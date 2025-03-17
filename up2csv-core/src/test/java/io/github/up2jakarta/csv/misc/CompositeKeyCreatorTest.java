@@ -1,18 +1,14 @@
 package io.github.up2jakarta.csv.misc;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.DefaultHandler;
-import io.github.up2jakarta.csv.core.EventHandler;
 import io.github.up2jakarta.csv.core.Mapper;
 import io.github.up2jakarta.csv.core.MapperFactory;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.SeverityType;
-import io.github.up2jakarta.csv.input.InputRepository;
+import io.github.up2jakarta.csv.impl.*;
 import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.mapper.Validator1Bean;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
-import io.github.up2jakarta.csv.test.input.*;
-import io.github.up2jakarta.csv.test.input.InputErrorEntity.PKey;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +23,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 class CompositeKeyCreatorTest {
 
-    private final InputRepository<InputRowEntity> repository = (r -> 0);
-    private final CompositeKeyCreator<InputRowEntity, PKey, DataId, InputErrorEntity> creator;
+    private final ErrorCreator creator;
     private final MapperFactory<DataId> factory;
 
     @Autowired
-    CompositeKeyCreatorTest(MapperFactory<DataId> factory, CompositeKeyCreator<InputRowEntity, PKey, DataId, InputErrorEntity> creator) {
+    CompositeKeyCreatorTest(MapperFactory<DataId> factory, ErrorCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -43,7 +38,7 @@ class CompositeKeyCreatorTest {
         final Mapper<Validator1Bean, DataId> mapper = factory.build(Validator1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "eTND");
         // When
-        final EventHandler<InputRowEntity, PKey, DataId, InputErrorEntity> handler = new DefaultHandler<>(row, creator, repository);
+        final ErrorHandler handler = new ErrorHandler(row, creator);
         final Validator1Bean bean = mapper.map(row, handler);
         final List<InputErrorEntity> errors = handler.toList();
         // Then

@@ -1,4 +1,4 @@
-package io.github.up2jakarta.csv.core;
+package io.github.up2jakarta.csv.misc;
 
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.BeanContext;
@@ -9,7 +9,6 @@ import java.util.Stack;
 
 import static java.util.Arrays.stream;
 
-@SuppressWarnings("unused")
 public final class Beans {
 
     public static final Type[] NO_TYPES = {};
@@ -75,7 +74,7 @@ public final class Beans {
         return result;
     }
 
-    static Class<? extends Segment> getSegmentType(Stack<Class<? extends Segment>> stack) {
+    public static Class<? extends Segment> getSegmentType(Stack<Class<? extends Segment>> stack) {
         Class<? extends Segment> segmentType = stack.peek();
         for (Class<? extends Segment> superType : stack) {
             if (segmentType.isAssignableFrom(superType)) {
@@ -84,6 +83,17 @@ public final class Beans {
             }
         }
         return segmentType;
+    }
+
+    public static Stack<Class<? extends Segment>> cleanStack(Stack<Class<? extends Segment>> stack) {
+        final Stack<Class<? extends Segment>> result = new Stack<>();
+        result.push(stack.get(0));
+        for (Class<? extends Segment> superType : stack) {
+            if (!superType.isAssignableFrom(result.peek())) {
+                result.push(superType);
+            }
+        }
+        return result;
     }
 
     public static String capitalize(String fieldName) {
@@ -148,6 +158,7 @@ public final class Beans {
         return getMethod(field.getDeclaringClass(), "set" + pName, pName, "setter", field.getType());
     }
 
+    @SuppressWarnings("unused")
     public static Method getAccessibleGetter(Field field) throws BeanException {
         return getAccessibleGetter(field.getDeclaringClass(), field);
     }

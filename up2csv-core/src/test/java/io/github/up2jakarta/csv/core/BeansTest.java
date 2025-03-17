@@ -2,12 +2,13 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.Parsed;
+import io.github.up2jakarta.csv.impl.InputRowEntity;
+import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.misc.CodeListConverter;
 import io.github.up2jakarta.csv.test.bean.TestConverter;
 import io.github.up2jakarta.csv.test.bean.converter.SupportEntity;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
-import io.github.up2jakarta.csv.test.input.InputRowEntity;
 import jakarta.persistence.AttributeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.Beans.getTypeArguments;
+import static io.github.up2jakarta.csv.misc.Beans.getTypeArguments;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -102,17 +103,18 @@ class BeansTest {
     @Test
     void testGetParsedArguments() throws BeanException {
         // Given
-        final Class<? extends Parsed<?>> beanType = SupportEntity.class;
+        final Class<? extends Parsed<?, ?>> beanType = SupportEntity.class;
         // When
         final Type[] arguments = getTypeArguments(beanType, Parsed.class);
         // Then
-        assertEquals(InputRowEntity.class, arguments[0]);
+        assertEquals(SegmentType.class, arguments[0]);
+        assertEquals(InputRowEntity.class, arguments[1]);
     }
 
     @Test
     void testGetObjectArguments() throws BeanException {
         // Given
-        final Class<? extends Parsed<?>> beanType = SupportEntity.class;
+        final Class<? extends Parsed<?, ?>> beanType = SupportEntity.class;
         // When
         final Type[] arguments = getTypeArguments(beanType, Object.class);
         // Then

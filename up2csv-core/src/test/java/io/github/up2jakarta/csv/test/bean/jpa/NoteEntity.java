@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.test.bean.jpa;
 import io.github.up2jakarta.csv.annotation.Fragment;
 import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.annotation.Up2EnableJPA;
-import io.github.up2jakarta.csv.annotation.Validated;
+import io.github.up2jakarta.csv.annotation.ValidOverride;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.test.codelist.CountryCodeType;
 import io.github.up2jakarta.csv.test.codelist.CountryConverter;
@@ -22,7 +22,7 @@ import jakarta.validation.constraints.Size;
 @AttributeOverride(name = "test2.value", column = @Column(name = "NOTE_TEST_2_ID", length = 200))
 @AttributeOverride(name = "test2.code", column = @Column(name = "NOTE_TEST_2_CODE", length = 3))
 @Convert(attributeName = "test2.code", converter = CurrencyConverter.class)
-@Validated
+@ValidOverride
 @Up2EnableJPA
 @SuppressWarnings("unused")
 public class NoteEntity implements Segment {

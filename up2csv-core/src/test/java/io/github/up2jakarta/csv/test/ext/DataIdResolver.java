@@ -1,11 +1,13 @@
 package io.github.up2jakarta.csv.test.ext;
 
+import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.DataTypeResolver;
 import io.github.up2jakarta.csv.extension.Segment;
-import io.github.up2jakarta.csv.test.input.DataId;
+import io.github.up2jakarta.csv.impl.DataId;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
+import java.util.Stack;
 
 public class DataIdResolver extends DataTypeResolver<DataId> {
 
@@ -16,7 +18,7 @@ public class DataIdResolver extends DataTypeResolver<DataId> {
     }
 
     @Override
-    public Optional<DataId> get(Class<? extends Segment> type, Field field, Field... path) {
+    public Optional<DataId> get(Stack<Class<? extends Segment>> stack, Field[] path, Field field) throws BeanException {
         return Optional.of(DataId.NONE);
     }
 

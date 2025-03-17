@@ -1,4 +1,4 @@
-package io.github.up2jakarta.csv.core;
+package io.github.up2jakarta.csv.misc;
 
 import java.util.function.IntSupplier;
 
@@ -9,7 +9,7 @@ public final class LazyCounter implements IntSupplier {
     private final IntSupplier supplier;
     private volatile int value = NAN;
 
-    LazyCounter(IntSupplier supplier) {
+    public LazyCounter(IntSupplier supplier) {
         this.supplier = supplier;
     }
 

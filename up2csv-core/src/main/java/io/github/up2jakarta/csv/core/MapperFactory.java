@@ -6,12 +6,12 @@ import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.*;
 import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputSegment;
+import io.github.up2jakarta.csv.misc.Beans;
 import io.github.up2jakarta.csv.misc.Listable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
+import jakarta.validation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +52,21 @@ public final class MapperFactory<D extends DataType<D>> {
         this.context = context;
         this.validator = validator;
         this.resolver = resolver;
+    }
+
+    /**
+     * Utility method for create JSR-303 validator.
+     *
+     * @param interpolator the message interpolator
+     * @return the validator provided
+     */
+    public static Validator validator(MessageInterpolator interpolator) {
+        final jakarta.validation.Configuration<?> cfg = Validation.byDefaultProvider()
+                .configure()
+                .messageInterpolator(interpolator);
+        try (final ValidatorFactory factory = cfg.buildValidatorFactory()) {
+            return factory.getValidator();
+        }
     }
 
     /**
@@ -101,7 +116,7 @@ public final class MapperFactory<D extends DataType<D>> {
         }
 
         @Override
-        <R extends InputSegment, V extends InputError<R, ?, D>> void validate(Object bean, List<Property<?, D>> ps, Class<?>[] g, EventHandler<R, ?, D, V> h) {
+        <R extends InputSegment<?>, V extends InputError<R, ?, D>> void validate(Object bean, List<Property<?, D>> ps, Class<?>[] g, EventHandler<R, ?, D, V> h) {
             final Set<ConstraintViolation<Object>> violations = validator.validate(bean, g);
             for (final ConstraintViolation<?> v : violations) {
                 final Property<?, D> p = findProperty(v, ps);
@@ -114,7 +129,7 @@ public final class MapperFactory<D extends DataType<D>> {
             }
         }
 
-        private <T extends Segment, R extends InputSegment, V extends InputError<R, ?, D>> T map(Constructor<T> constructor, List<Property<?, D>> properties, EventHandler<R, ?, D, V> collector, String... columns) throws BeanException {
+        private <T extends Segment, R extends InputSegment<?>, V extends InputError<R, ?, D>> T map(Constructor<T> constructor, List<Property<?, D>> properties, EventHandler<R, ?, D, V> collector, String... columns) throws BeanException {
             final T bean = Beans.newInstance(constructor);
             for (final Property<?, D> p : properties) {
                 if (p instanceof FragmentProperty<?, ?>) {
@@ -138,7 +153,7 @@ public final class MapperFactory<D extends DataType<D>> {
         }
 
         @Override
-        public <R extends InputSegment, V extends InputError<R, ?, D>> S map(EventHandler<R, ?, D, V> handler, String... columns) throws BeanException {
+        public <R extends InputSegment<?>, V extends InputError<R, ?, D>> S map(EventHandler<R, ?, D, V> handler, String... columns) throws BeanException {
             if (columns == null) {
                 return null;
             }
@@ -159,11 +174,11 @@ public final class MapperFactory<D extends DataType<D>> {
         private final ValidationContext validation;
         private final Constructor<T> constructor;
 
-        FragmentProperty(Class<T> sType, D dType, Field field, int offset, List<Property<?, D>> properties) throws BeanException {
+        FragmentProperty(Class<T> sType, D dType, Field field, int offset, ValidationContext v, List<Property<?, D>> ps) throws BeanException {
             super(field, dType, offset);
             this.constructor = Beans.getDefaultConstructor(sType);
-            this.properties = properties;
-            this.validation = ValidationContext.of(field);
+            this.properties = ps;
+            this.validation = v;
         }
 
         @Override

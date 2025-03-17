@@ -14,6 +14,24 @@ import jakarta.inject.Singleton;
 public final class TrimProcessor extends ConfigurableProcessor<Up2Trim> {
 
     /**
+     * Trim all the given values with {@link TrimProcessor#trim(String, String...)}.
+     *
+     * @param values     input data
+     * @param nullValues values looks like <code>null</code>
+     * @return data that has been trimmed
+     */
+    public static String[] trim(String[] values, String... nullValues) {
+        if (values == null || values.length == 0) {
+            return values;
+        }
+        final String[] result = new String[values.length];
+        for (var i = 0; i < values.length; i++) {
+            result[i] = trim(values[i], nullValues);
+        }
+        return result;
+    }
+
+    /**
      * Trim given input value according to the given values looks like <code>null</code>.
      *
      * @param value      input data

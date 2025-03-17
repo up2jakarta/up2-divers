@@ -1,10 +1,14 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.Validated;
+import io.github.up2jakarta.csv.annotation.ValidOverride;
 import io.github.up2jakarta.csv.exception.BeanException;
 import jakarta.validation.Valid;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+
+import static io.github.up2jakarta.csv.exception.BeanException.of;
+import static io.github.up2jakarta.csv.misc.Path.getOverride;
 
 /**
  * Context representation for JSR-303 validation.
@@ -22,14 +26,13 @@ public class ValidationContext {
         this.groups = groups;
     }
 
-    private static void checkGroups(Validated validated, Class<?> source, String name) throws BeanException {
-        final Valid valid = source.getAnnotation(Valid.class);
-        if (valid != null) {
-            throw new BeanException(source, name, "must not be annotated by @Valid");
+    private static void checkGroups(ValidOverride valid, AnnotatedElement source) throws BeanException {
+        if (source.isAnnotationPresent(Valid.class)) {
+            throw of(source, "must not be annotated by @Valid");
         }
-        for (final Class<?> group : validated.groups()) {
+        for (final Class<?> group : valid.groups()) {
             if (!group.isInterface()) {
-                throw new BeanException(source, name, "@Validated[value = " + group.getName() + ".class must be an interface]");
+                throw of(source, "@ValidOverride[value = " + group.getName() + ".class must be an interface]");
             }
         }
     }
@@ -41,30 +44,28 @@ public class ValidationContext {
      * @return the validation context
      * @throws BeanException if wrong configuration
      */
-    public static ValidationContext of(Class<?> type) throws BeanException {
-        final Validated validated = type.getAnnotation(Validated.class);
-        if (validated != null) {
-            if (validated.groups().length == 0) {
+    public static ValidationContext from(Class<?> type) throws BeanException {
+        final ValidOverride override = getOverride(ValidOverride.class, type, ValidOverride::path);
+        if (override != null) {
+            if (override.disable()) {
+                return DISABLED;
+            }
+            if (override.groups().length == 0) {
                 return DEFAULT;
             }
-            checkGroups(validated, type, "class");
-            return new ValidationContext(true, validated.groups());
+            checkGroups(override, type);
+            return new ValidationContext(true, override.groups());
         }
-        final Valid valid = type.getAnnotation(Valid.class);
-        if (valid != null) {
+        if (type.isAnnotationPresent(Valid.class)) {
             return DEFAULT;
         }
         return DISABLED;
     }
 
-    public static ValidationContext of(Field field) throws BeanException {
-        final Validated validated = field.getAnnotation(Validated.class);
-        if (validated != null) {
-            if (validated.groups().length == 0) {
-                throw new BeanException(field, "@Validated must be replaced by @Valid");
-            }
-            checkGroups(validated, field.getDeclaringClass(), field.getName());
-            return new ValidationContext(true, validated.groups());
+    public ValidationContext build(Field field, ValidOverride override) throws BeanException {
+        if (enabled && override != null && !override.disable()) {
+            checkGroups(override, field);
+            return new ValidationContext(true, override.groups());
         }
         return DISABLED;
     }
@@ -82,4 +83,5 @@ public class ValidationContext {
     public Class<?>[] getGroups() {
         return groups;
     }
+
 }

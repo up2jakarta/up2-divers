@@ -1,4 +1,4 @@
-package io.github.up2jakarta.csv.test.input;
+package io.github.up2jakarta.csv.impl;
 
 import io.github.up2jakarta.csv.input.InputError;
 import jakarta.persistence.*;

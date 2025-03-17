@@ -89,6 +89,9 @@ public final class JpaTableChecker implements SegmentListener {
 
     static Class<?> checkEntity(Class<?> entityType) throws BeanException {
         final Table table = entityType.getAnnotation(Table.class);
+        if (table == null && entityType.isAnnotationPresent(DiscriminatorValue.class)) {
+            return checkEntity(entityType.getSuperclass());
+        }
         if (table == null) {
             throw new BeanException(entityType, "must be annotated with @Table");
         }
@@ -99,7 +102,7 @@ public final class JpaTableChecker implements SegmentListener {
 
     @Override
     public boolean isActivated(Class<? extends Segment> segmentType) {
-        return segmentType.getAnnotation(Entity.class) != null && segmentType.getPackage().getAnnotation(Prefix.class) != null;
+        return segmentType.isAnnotationPresent(Entity.class) && segmentType.getPackage().isAnnotationPresent(Prefix.class);
     }
 
     @Override

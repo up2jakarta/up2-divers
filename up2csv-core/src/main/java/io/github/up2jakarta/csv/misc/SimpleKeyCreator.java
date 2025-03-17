@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  * @param <R> the input row
  * @param <E> the simple error
  */
-public class SimpleKeyCreator<R extends InputSegment, D extends DataType<D>, E extends InputError.Key<R> & InputError<R, E, D>> extends EventCreator<R, E, D, E> {
+public class SimpleKeyCreator<R extends InputSegment<?>, D extends DataType<D>, E extends InputError.Key<R> & InputError<R, E, D>> extends EventCreator<R, E, D, E> {
 
     private final Supplier<E> errorCreator;
 

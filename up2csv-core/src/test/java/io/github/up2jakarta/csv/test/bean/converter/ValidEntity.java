@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.test.bean.converter;
 
-import io.github.up2jakarta.csv.test.input.ParsedEntity;
+import io.github.up2jakarta.csv.impl.ParsedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

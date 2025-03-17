@@ -14,7 +14,7 @@ import java.util.function.Supplier;
  * @param <K> the error key type
  * @param <E> the error type
  */
-public class CompositeKeyCreator<R extends InputSegment, K extends InputError.Key<R>, D extends DataType<D>, E extends InputError<R, K, D>> extends EventCreator<R, K, D, E> {
+public class CompositeKeyCreator<R extends InputSegment<?>, K extends InputError.Key<R>, D extends DataType<D>, E extends InputError<R, K, D>> extends EventCreator<R, K, D, E> {
 
     private final Supplier<E> errorCreator;
     private final Supplier<K> keyCreator;

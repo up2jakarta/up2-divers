@@ -35,13 +35,13 @@ final class JpaColumnContext implements CheckerContext {
         if (column.scale() != 0) {
             throw new BeanException(field, "@Column[scale] must not be specified");
         }
-        if (field.getAnnotation(Up2Decimal.class) != null) {
+        if (field.isAnnotationPresent(Up2Decimal.class)) {
             throw new BeanException(field, "must not be annotated with @Up2Decimal, use @Up2Number instead");
         }
     }
 
     private void checkNumberColumn(Field field, Class<?> fieldType, Column column) throws BeanException {
-        if (field.getAnnotation(Digits.class) != null) {
+        if (field.isAnnotationPresent(Digits.class)) {
             throw new BeanException(field, "must not be annotated with @Digits");
         }
         if (column.scale() < 0) {
@@ -62,7 +62,7 @@ final class JpaColumnContext implements CheckerContext {
         if (fieldType == Byte.class || fieldType == byte.class) {
             checkNumber(field, column, 3);
         }
-        if (column.scale() == 0 && field.getAnnotation(Up2Number.class) == null) {
+        if (column.scale() == 0 && !field.isAnnotationPresent(Up2Number.class)) {
             throw new BeanException(field, "must be annotated with @Up2Number");
         }
         if (column.scale() != 0) {
@@ -70,7 +70,7 @@ final class JpaColumnContext implements CheckerContext {
             if (decimal != null && column.scale() < decimal.value()) {
                 throw new BeanException(field, "@Up2Decimal[value] must be be less than or equals to @Column[scale]");
             }
-            if (field.getAnnotation(Up2Number.class) != null) {
+            if (field.isAnnotationPresent(Up2Number.class)) {
                 throw new BeanException(field, "must not be annotated with @Up2Number, use @Up2Decimal instead");
             }
         }
@@ -89,7 +89,7 @@ final class JpaColumnContext implements CheckerContext {
         if (column.nullable() && size.min() > 0) {
             throw new BeanException(field, "@Size[min] does not match with @Column[nullable]");
         }
-        if (size.min() == 0 && column.nullable() != (field.getAnnotation(NotBlank.class) == null)) {
+        if (size.min() == 0 && column.nullable() == field.isAnnotationPresent(NotBlank.class)) {
             final Up2Default def = field.getAnnotation(Up2Default.class);
             if (def != null) {
                 if (def.value().trim().isEmpty()) {
@@ -111,7 +111,7 @@ final class JpaColumnContext implements CheckerContext {
         if (String.class.equals(fieldType)) {
             checkStringColumn(field, column, size);
         } else {
-            if (column.nullable() != (field.getAnnotation(NotNull.class) == null)) {
+            if (column.nullable() == field.isAnnotationPresent(NotNull.class)) {
                 throw new BeanException(field, "@NotNull does not match with @Column[nullable]");
             }
             if (size != null && !fieldType.isArray()) {

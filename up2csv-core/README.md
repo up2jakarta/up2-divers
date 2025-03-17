@@ -14,6 +14,7 @@
 - Support of IoC container like CDI (Contexts and Dependency Injection) provider or Spring or whatever
 - Configuration based on @Annotation
 - Support of Java OOP (Object-Oriented Programming)
+- Business Aggregator
 - Extensions
     - Processor API
     - Conversion Resolver API
@@ -56,6 +57,10 @@ public Up2Fragment implements Segment {
 }
 ```
 
+## @PositionOverride
+
+Overrides `@Position` of an embeddable property or a super-property defined in super class.
+
 ## @Fragment
 
 Reuse of java beans in order to avoid code duplication
@@ -81,6 +86,10 @@ public Up2Segment implements Segment {
     private String other;
 }
 ```
+
+## @FragmentOverride
+
+Overrides `@Fragment` of an embeddable fragment or a super-fragment defined in super class.
 
 ## @Processor API
 
@@ -459,12 +468,12 @@ public TestSegment implements Segment {
 }
 ```
 
-## @Validated
+## @ValidOverride
 
-Enables JSR-303 validation within specific groups
+Enables JSR-303 validation within specific groups.
 
 ``` java
-@Validated(groups =  CustomGroup.class)
+@ValidOverride(groups = CustomGroup.class)
 public TestSegment implements Segment {
 
     @Position(0)
@@ -495,20 +504,16 @@ public TestSegment implements Segment {
 
 ### The specifications are described in [io.github.up2jakarta.csv.input](./src/main/java/io/github/up2jakarta/csv/input)
 
-- InputError
-- InputRepository
-- InputRow
-- InputType
+- `InputError`: Input error presentation (model)
+- `InputRepository`: input error repository (helpful for error id generation)
+- `InputSegment`: Input record presentation (model)
+- `InputType`: Segment discriminator type
 
-### Sample implementations in [io.github.up2jakarta.csv.test.input](./src/test/java/io/github/up2jakarta/csv/test/input)
-
-- InputRowEntity implements InputRow
-- InputErrorEntity implements InputError<InputRowEntity, InputErrorEntity.PKey>
-- SimpleErrorEntity implements InputError<InputRowEntity, SimpleErrorEntity>, InputError.Key<InputRowEntity>
+See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/impl)
 
 # Use of Up2CSV
 
-- Without Validation
+- Without error collecting (fail-fast)
 
 ``` java
 @Inject
@@ -524,7 +529,7 @@ private MapperFactory factory;
 }
 ```
 
-- Within Validation
+- Within error collecting
 
 ``` java
 @Inject
@@ -534,14 +539,14 @@ private MapperFactory factory;
 private InputRepository<InputRowImpl> repository;
 
 @Inject
-private EventCreator<InputRowImpl, InputErrorKeyImpl, InputErrorImpl> creator;
+private EventCreator<InputRowImpl, ?, ?, InputErrorImpl> creator;
 
 {
     // GIVEN Singletons
     final Mapper<Up2Segment> mapper = factory.build(Up2Segment.class);
     // GIVEN Prototypes
-    final InputRowImpl row ; // ... retrive it from repository or create new one
-    final EventHandler<InputRowImpl, InputErrorKeyImpl, InputErrorImpl> handler = new EventHandler<>(row, creator, repository) ;
+    final InputRowImpl row ; // ... retrive it from repository or CSV file
+    final EventHandler<InputRowImpl, ?, ?, InputErrorImpl> handler = new EventHandlerImpl<>(row, creator, repository) ;
     // WHEN
     final Up2Segment bean = mapper.map(row, handler);
     final List<InputErrorImpl> errors = handler.toList();
@@ -552,50 +557,35 @@ private EventCreator<InputRowImpl, InputErrorKeyImpl, InputErrorImpl> creator;
 }
 ```
 
-# Configuration
+# Business Aggregation
 
-``` java
-@Configuration
-@ComponentScan(basePackageClasses = {MapperFactory.class, TokenProcessor.class, DecimalResolver.class}) // mandatory scans
-public class TUConfiguration {
+- The final goal of Up2CSV-Core is to parse a `business-object` when data is spread over several segments (CSV records).
 
-    @Bean
-    @Scope(value = SCOPE_SINGLETON)
-    public CollapsedStringAdapter tokenAdapter() {
-        return new CollapsedStringAdapter(); // for @Up2Token
-    }
+## Sample Business Case
 
-    @Bean
-    @Scope(value = SCOPE_SINGLETON)
-    public Validator validator() {
-        return CSV.validator(messageInterpolator());
-    }
+It's impossible to present an invoice in standard CSV format because invoice should contain several items and each item:
 
-    @Bean
-    @Scope(value = SCOPE_SINGLETON)
-    public BeanContext beanContext(final ApplicationContext context) {
-        return context::getBean;
-    }
+- Should reference a product and this product may have several attributes
+- Should have several charges or allowances
+- Should have several notes
+- and more
 
-    @Bean
-    @Scope(value = SCOPE_SINGLETON)
-    public InputRepository<InputRowEntity> inputRepository() {
-        return r -> 0; // Simplified
-    }
+## Problem
 
-    @Bean
-    @Scope(value = SCOPE_SINGLETON)
-    public CompositeKeyCreator<InputRowImpl, InputErrorKeyImpl, InputErrorImpl> compositeKeyCreator() {
-        return new CompositeKeyCreator<>(InputErrorImpl::new, InputErrorKeyImpl::new);
-    }
+It's impossible to present a `business-property` within `0..n` cardinality
 
-    // ... Define custom processors
-}
-```
+## Solution
+
+- Put any multiple `business-property` (within `0..n` cardinality) in a separate `segment` and `BusinessAggregator` do
+  the work.
+- Also, it's possible put any optional `business-property` (within `0..1` cardinality) in a separate `segment` to
+  simplify the validation.
+- And more depending on the `business-logic`
+
+See [BusinessAggregatorTest.java](src/test/java/io/github/up2jakarta/csv/BusinessAggregatorTest.java) for more details.
 
 # Best practices
 
-- Define your mapper as singleton to avoid scanning javaBeans always
-- If the javaBeans are manipulated by Bytecode-Enhancement you must provide jakarta.persistence.Cache and sync
-  operations.
+- Define your mapper as singleton to avoid scanning javaBeans every time.
+- If the javaBeans are manipulated by Bytecode-Enhancement you must provide Cache API and sync operations.
 - Use of `CodeList` because it is compatible with both JPA `AttributeConverter` and `XmlAdapter`

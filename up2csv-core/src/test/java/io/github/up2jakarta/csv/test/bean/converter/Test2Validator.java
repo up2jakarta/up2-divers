@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.test.bean.converter;
 
 import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.Validated;
+import io.github.up2jakarta.csv.annotation.ValidOverride;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.test.validation.Up2NotEmpty;
 import io.github.up2jakarta.csv.test.validation.Up2Warn;
@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
 
 import static io.github.up2jakarta.csv.extension.SeverityType.*;
 
-@Validated
+@ValidOverride
 @SuppressWarnings("unused")
 public class Test2Validator implements Segment {
 

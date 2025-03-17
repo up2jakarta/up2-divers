@@ -9,7 +9,7 @@ import io.github.up2jakarta.csv.extension.SeverityType;
  * @param <R> the input row type
  * @param <K> the identifier type of input error
  */
-public interface InputError<R extends InputSegment, K extends InputError.Key<R>, D extends DataType<D>> {
+public interface InputError<R extends InputSegment<?>, K extends InputError.Key<R>, D extends DataType<D>> {
 
     /**
      * @return the identifier
@@ -58,7 +58,7 @@ public interface InputError<R extends InputSegment, K extends InputError.Key<R>,
      *
      * @param <R> the input row type
      */
-    interface Key<R extends InputSegment> {
+    interface Key<R extends InputSegment<?>> {
 
         /**
          * @param order the error order in the list of errors related th the row

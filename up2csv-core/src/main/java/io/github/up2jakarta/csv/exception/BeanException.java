@@ -50,6 +50,22 @@ public class BeanException extends Exception implements MessageFormatter {
         this(source, "package-info", source.getName(), message);
     }
 
+    public static BeanException of(AnnotatedElement source, String message) {
+        if (source instanceof Field f) {
+            return new BeanException(f, message);
+        }
+        if (source instanceof Method m) {
+            return new BeanException(m, message);
+        }
+        if (source instanceof Package p) {
+            return new BeanException(p, message);
+        }
+        if (source instanceof Class<?> c) {
+            return new BeanException(c, message);
+        }
+        throw new IllegalArgumentException(source.getClass().getName());
+    }
+
     /**
      * @return the bean class
      */

@@ -7,6 +7,7 @@ import io.github.up2jakarta.csv.extension.CodeList;
 import io.github.up2jakarta.csv.extension.Conversion;
 import io.github.up2jakarta.csv.extension.ConversionResolver;
 import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.csv.misc.Beans;
 import io.github.up2jakarta.csv.misc.Errors;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;

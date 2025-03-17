@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Default implementation.
  */
-public class DefaultHandler<R extends InputSegment, K extends InputError.Key<R>, D extends DataType<D>, E extends InputError<R, K, D>> extends EventHandler<R, K, D, E> {
+public class DefaultHandler<R extends InputSegment<?>, K extends InputError.Key<R>, D extends DataType<D>, E extends InputError<R, K, D>> extends EventHandler<R, K, D, E> {
 
     private static final List<String> CLASS_NAMES = List.of(
             ConvertedProperty.class.getName(),

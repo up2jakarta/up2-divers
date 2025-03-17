@@ -50,7 +50,7 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
     public Optional<Enumerated> get(Class<? extends Segment> segmentType, Field property, Class<?> type, Field... path) throws BeanException {
         final Enumerated jpa = property.getAnnotation(Enumerated.class);
         if (jpa != null) {
-            if (segmentType.getAnnotation(Entity.class) == null) {
+            if (!segmentType.isAnnotationPresent(Entity.class)) {
                 throw new BeanException(segmentType, "must be annotated with @Entity");
             }
             //noinspection unchecked

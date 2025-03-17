@@ -5,6 +5,8 @@ import io.github.up2jakarta.csv.annotation.*;
 import io.github.up2jakarta.csv.core.MapperFactory.FragmentProperty;
 import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.*;
+import io.github.up2jakarta.csv.misc.Beans;
+import jakarta.validation.Valid;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
@@ -16,8 +18,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.Beans.getBean;
-import static io.github.up2jakarta.csv.core.Beans.getFieldType;
+import static io.github.up2jakarta.csv.misc.Beans.getBean;
+import static io.github.up2jakarta.csv.misc.Beans.getFieldType;
 import static java.util.Collections.unmodifiableList;
 
 final class BeanSupport<D extends DataType<D>> {
@@ -28,21 +30,35 @@ final class BeanSupport<D extends DataType<D>> {
         this.context = context;
     }
 
-    private static Fragment getAndCheckFragment(Field field) throws BeanException {
-        final Fragment csv = field.getAnnotation(Fragment.class);
-        if (csv != null && csv.value() < 0) {
-            throw new BeanException(field, "@Fragment[value] must be positive");
-        }
-        if (csv != null && !Segment.class.isAssignableFrom(field.getType())) {
-            throw new BeanException(field, "type must implements Segment");
+    private static Fragment checkFragment(Field field, Fragment csv) throws BeanException {
+        if (csv != null) {
+            if (csv.value() < 0) {
+                throw new BeanException(field, "@Fragment[value] must be positive");
+            }
+            if (!Segment.class.isAssignableFrom(field.getType())) {
+                throw new BeanException(field, "type must implements Segment");
+            }
         }
         return csv;
     }
 
-    private static Position getAndCheckPosition(Field field) throws BeanException {
-        final Position csv = field.getAnnotation(Position.class);
-        if (csv != null && csv.value() < 0) {
-            throw new BeanException(field, "@Position[value] must be positive");
+    private static Position checkProperty(Field field, Position csv) throws BeanException {
+        if (csv != null) {
+            if (csv.value() < 0) {
+                throw new BeanException(field, "@Position[value] must be positive");
+            }
+            if (field.isAnnotationPresent(Valid.class)) {
+                throw new BeanException(field, "must not be annotated with @Valid");
+            }
+            if (field.getAnnotationsByType(ValidOverride.class).length != 0) {
+                throw new BeanException(field, "must not be annotated with @ValidOverride");
+            }
+            if (field.getAnnotationsByType(PositionOverride.class).length != 0) {
+                throw new BeanException(field, "must not be annotated with @PositionOverride");
+            }
+            if (field.getAnnotationsByType(FragmentOverride.class).length != 0) {
+                throw new BeanException(field, "must not be annotated with @FragmentOverride");
+            }
         }
         return csv;
     }
@@ -149,7 +165,7 @@ final class BeanSupport<D extends DataType<D>> {
             //noinspection unchecked
             final Class<? extends Segment> superType = (Class<? extends Segment>) superClass;
             context.getChecker().beforeSuperSegment(superType);
-            final List<Property<?, D>> superProperties = getProperties(superType, context.with(arguments));
+            final List<Property<?, D>> superProperties = getProperties(superType, context.with(superType, arguments));
             context.getChecker().afterSuperSegment(superType);
             result.addAll(superProperties);
         }
@@ -157,9 +173,19 @@ final class BeanSupport<D extends DataType<D>> {
         final int offset = context.getOffset();
         for (final Field field : fields) {
             final Class<?> fieldType = getFieldType(field, context.getArguments());
-            final Position position = getAndCheckPosition(field);
-            final Fragment fragment = getAndCheckFragment(field);
-            if (position != null) {
+            final Fragment fragment = checkFragment(field, context.getFragment(field));
+            final Position position = checkProperty(field, context.getPosition(field));
+            if (fragment != null) {
+                final D dataType = context.getDataType(field);
+                //noinspection unchecked
+                final Class<? extends Segment> fType = (Class<? extends Segment>) fieldType;
+                final int fOffset = offset + fragment.value();
+                context.getChecker().beforeFragmentProperty(field, fType);
+                final List<Property<?, D>> fProps = getProperties(fType, context.with(field, fOffset, fType));
+                context.getChecker().afterFragmentProperty(field, fType);
+                final ValidationContext fContext = context.getValidation(field);
+                result.add(new FragmentProperty<>(fType, dataType, field, fOffset, fContext, fProps));
+            } else if (position != null) {
                 final D dataType = context.getDataType(field);
                 final int index = offset + position.value();
                 context.getChecker().beforePositionProperty(field, fieldType, index);
@@ -172,15 +198,6 @@ final class BeanSupport<D extends DataType<D>> {
                     result.add(new ConvertedProperty<>(field, dataType, index, processors, conversion));
                 }
                 context.getChecker().afterPositionProperty(field, fieldType, index);
-            } else if (fragment != null) {
-                final D dataType = context.getDataType(field);
-                //noinspection unchecked
-                final Class<? extends Segment> fragmentType = (Class<? extends Segment>) fieldType;
-                final int fragmentOffset = offset + fragment.value();
-                context.getChecker().beforeFragmentProperty(field, fragmentType);
-                final List<Property<?, D>> fProps = getProperties(fragmentType, context.with(field, fragmentOffset));
-                context.getChecker().afterFragmentProperty(field, fragmentType);
-                result.add(new FragmentProperty<>(fragmentType, dataType, field, fragmentOffset, fProps));
             } else {
                 context.getChecker().unknownProperty(field, fieldType);
             }

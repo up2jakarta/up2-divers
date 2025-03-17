@@ -1,4 +1,4 @@
-package io.github.up2jakarta.csv.test.input;
+package io.github.up2jakarta.csv.impl;
 
 import io.github.up2jakarta.csv.extension.Parsed;
 import jakarta.persistence.FetchType;
@@ -8,8 +8,7 @@ import jakarta.persistence.MappedSuperclass;
 import java.io.Serializable;
 
 @MappedSuperclass
-@SuppressWarnings("unused")
-public abstract class ParsedEntity<K extends Serializable> implements Parsed<InputRowEntity> {
+public abstract class ParsedEntity<K extends Serializable> implements Parsed<SegmentType, InputRowEntity> {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private InputRowEntity row;
@@ -18,7 +17,8 @@ public abstract class ParsedEntity<K extends Serializable> implements Parsed<Inp
 
     public abstract void setKey(K key);
 
-    public final InputRowEntity getRow() {
+    @Override
+    public final InputRowEntity getRecord() {
         return row;
     }
 

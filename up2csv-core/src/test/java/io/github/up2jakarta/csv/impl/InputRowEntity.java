@@ -1,4 +1,4 @@
-package io.github.up2jakarta.csv.test.input;
+package io.github.up2jakarta.csv.impl;
 
 import io.github.up2jakarta.csv.input.InputSegment;
 import jakarta.persistence.*;
@@ -9,7 +9,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "TB_INPUT_ROWS")
 @SuppressWarnings("unused")
-public class InputRowEntity implements InputSegment {
+public class InputRowEntity implements InputSegment<SegmentType> {
 
     @EmbeddedId
     private InputRowEntity.PKey key;
@@ -20,7 +20,6 @@ public class InputRowEntity implements InputSegment {
     @Column(name = "ROW_TYPE", length = 2, nullable = false)
     private SegmentType type;
 
-    //@Array(length = 16)
     @Column(name = "ROW_COLUMNS", length = 1024, nullable = false)
     private String[] columns;
 

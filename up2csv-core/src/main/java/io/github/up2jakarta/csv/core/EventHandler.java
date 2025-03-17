@@ -31,7 +31,7 @@ import static java.util.Optional.ofNullable;
  * @param <D> the business data type
  * @param <C> the error type
  */
-public abstract class EventHandler<A extends InputSegment, B extends InputError.Key<A>, D extends DataType<D>, C extends InputError<A, B, ?>> implements Listable<C> {
+public abstract class EventHandler<A extends InputSegment<?>, B extends InputError.Key<A>, D extends DataType<D>, C extends InputError<A, B, ?>> implements Listable<C> {
 
     private static Optional<Error> getError(ConstraintViolation<?> violation) {
         final ConstraintDescriptor<?> descriptor = violation.getConstraintDescriptor();
@@ -87,7 +87,7 @@ public abstract class EventHandler<A extends InputSegment, B extends InputError.
      * @param <V> the error type
      * @return an instance that fails at the first throw error.
      */
-    public static <R extends InputSegment, D extends DataType<D>, V extends InputError<R, ?, D>> EventHandler<R, ?, D, V> failFast() {
+    public static <R extends InputSegment<?>, D extends DataType<D>, V extends InputError<R, ?, D>> EventHandler<R, ?, D, V> failFast() {
         //noinspection unchecked
         return (EventHandler<R, ?, D, V>) FastHandler.INSTANCE;
     }
@@ -121,7 +121,7 @@ public abstract class EventHandler<A extends InputSegment, B extends InputError.
     /**
      * Fail-fast implementation.
      */
-    private static class FastHandler<D extends DataType<D>> extends EventHandler<InputSegment, InputError.Key<InputSegment>, D, InputError<InputSegment, InputError.Key<InputSegment>, ?>> {
+    private static class FastHandler<D extends DataType<D>> extends EventHandler<InputSegment<?>, InputError.Key<InputSegment<?>>, D, InputError<InputSegment<?>, InputError.Key<InputSegment<?>>, ?>> {
 
         private static final EventHandler<?, ?, ?, ?> INSTANCE = new FastHandler<>();
 
@@ -129,12 +129,12 @@ public abstract class EventHandler<A extends InputSegment, B extends InputError.
         }
 
         @Override
-        InputSegment getSource() {
+        InputSegment<?> getSource() {
             return null;
         }
 
         @Override
-        public List<InputError<InputSegment, InputError.Key<InputSegment>, ?>> toList() {
+        public List<InputError<InputSegment<?>, InputError.Key<InputSegment<?>>, ?>> toList() {
             return emptyList();
         }
 
