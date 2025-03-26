@@ -1,8 +1,9 @@
 package io.github.up2jakarta.cii.format.minified;
 
-import io.github.up2jakarta.cii.api.XMultipleException;
-import io.github.up2jakarta.cii.api.XReader;
-import io.github.up2jakarta.cii.api.XValidationException;
+
+import io.github.up2jakarta.xml.api.XMultipleException;
+import io.github.up2jakarta.xml.api.XReader;
+import io.github.up2jakarta.xml.api.XValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,20 +1,19 @@
 package io.github.up2jakarta.cii;
 
-import io.github.up2jakarta.cii.xml.InvoicePrefixMapper;
-import io.github.up2jakarta.cii.xml.XContext;
+import io.github.up2jakarta.cii.core.InvoicePrefixMapper;
+import io.github.up2jakarta.xml.XContext;
 import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 import javax.xml.namespace.QName;
 import javax.xml.validation.Schema;
 import java.net.URL;
 
 /**
- * CII Utility.
+ * Cross Industry Invoice UtilityClass.
  */
 public interface CII {
 
-    NamespacePrefixMapper NS_PREFIX_MAPPER = new InvoicePrefixMapper();
+    InvoicePrefixMapper NS_PREFIX_MAPPER = new InvoicePrefixMapper();
     CollapsedStringAdapter TOKEN_ADAPTER = new CollapsedStringAdapter();
     ClassLoader CLASS_LOADER = Thread.currentThread().getContextClassLoader();
     // XML Schemas path

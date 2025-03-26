@@ -2,15 +2,15 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.exception.PropertyException;
 import io.github.up2jakarta.csv.extension.ConfigurableProcessor;
+import io.github.up2jakarta.xml.codelist.PropertyException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 import static io.github.up2jakarta.csv.core.Mapper.LOGGER;
-import static io.github.up2jakarta.csv.extension.SeverityType.ERROR;
 import static io.github.up2jakarta.csv.misc.Errors.ERROR_PROCESSOR;
+import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 
 /**
  * Wrapper for {@link ConfigurableProcessor}.

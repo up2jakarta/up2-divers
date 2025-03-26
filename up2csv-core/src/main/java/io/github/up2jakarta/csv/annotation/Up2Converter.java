@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.annotation;
 
-import io.github.up2jakarta.csv.extension.TypeConverter;
+import io.github.up2jakarta.xml.codelist.TypeConverter;
 
 import java.lang.annotation.*;
 

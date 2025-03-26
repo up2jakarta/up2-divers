@@ -1,11 +1,11 @@
 package io.github.up2jakarta.cii.edi;
 
-import io.github.up2jakarta.cii.api.Agency;
-import io.github.up2jakarta.cii.api.Documented;
-import io.github.up2jakarta.cii.api.Schema;
-import io.github.up2jakarta.cii.api.SubList;
 import io.github.up2jakarta.cii.edi.adapters.ReferenceCodeAdapter;
 import io.github.up2jakarta.cii.ppf.PartySchemeIDType;
+import io.github.up2jakarta.xml.codelist.Agency;
+import io.github.up2jakarta.xml.codelist.Documented;
+import io.github.up2jakarta.xml.codelist.Schema;
+import io.github.up2jakarta.xml.codelist.SubList;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import javax.annotation.processing.Generated;

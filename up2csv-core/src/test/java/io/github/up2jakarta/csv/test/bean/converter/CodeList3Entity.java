@@ -5,11 +5,11 @@ import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.annotation.Up2CodeList;
 import io.github.up2jakarta.csv.impl.ParsedEntity;
 import io.github.up2jakarta.csv.test.codelist.Test3CodeList;
+import io.github.up2jakarta.xml.api.SeverityType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-import static io.github.up2jakarta.csv.extension.SeverityType.FATAL;
 import static io.github.up2jakarta.csv.test.codelist.CountryConverter.ISO_3166;
 
 @Entity
@@ -18,7 +18,7 @@ public class CodeList3Entity extends ParsedEntity<Test3CodeList> {
 
     @Position(0)
     @Column(name = "TU_KEY", length = 8)
-    @Error(value = ISO_3166, severity = FATAL)
+    @Error(value = ISO_3166, severity = SeverityType.FATAL)
     @Up2CodeList
     private Test3CodeList key;
 

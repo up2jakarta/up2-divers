@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.test.codelist;
 
-import io.github.up2jakarta.csv.misc.CodeListConverter;
+import io.github.up2jakarta.xml.codelist.CodeListConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.springframework.stereotype.Component;
 

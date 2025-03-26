@@ -6,11 +6,11 @@ import io.github.up2jakarta.csv.core.MapperFactory;
 import io.github.up2jakarta.csv.data.BusinessCreator;
 import io.github.up2jakarta.csv.data.BusinessEntry;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.Parsed;
 import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputSegment;
 import io.github.up2jakarta.csv.input.InputType;
+import io.github.up2jakarta.csv.misc.BeanException;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 
 import static io.github.up2jakarta.csv.data.DataType.buildMessage;
 import static io.github.up2jakarta.csv.data.DataType.isValid;
-import static io.github.up2jakarta.csv.extension.SeverityType.*;
+import static io.github.up2jakarta.xml.api.SeverityType.*;
 import static java.util.Objects.requireNonNull;
 
 public abstract class BusinessAggregator<O extends Parsed<T, R>, B extends DataType<B>, T extends Enum<T> & InputType<T>, R extends InputSegment<T>, E extends InputError<R, ?, B>> {

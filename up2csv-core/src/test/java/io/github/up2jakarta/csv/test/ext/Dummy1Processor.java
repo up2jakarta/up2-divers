@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.test.ext;
 
-import io.github.up2jakarta.csv.exception.PropertyException;
 import io.github.up2jakarta.csv.extension.ConfigurableProcessor;
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.codelist.PropertyException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 

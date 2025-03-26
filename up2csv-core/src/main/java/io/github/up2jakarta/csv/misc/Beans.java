@@ -1,6 +1,5 @@
 package io.github.up2jakarta.csv.misc;
 
-import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.BeanContext;
 import io.github.up2jakarta.csv.extension.Segment;
 
@@ -9,6 +8,7 @@ import java.util.Stack;
 
 import static java.util.Arrays.stream;
 
+@SuppressWarnings("unused")
 public final class Beans {
 
     public static final Type[] NO_TYPES = {};

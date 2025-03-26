@@ -1,12 +1,11 @@
 package io.github.up2jakarta.cii.format.unmapped;
 
 import io.github.up2jakarta.cii.InvoiceWriter;
-import io.github.up2jakarta.cii.api.XValidationException;
-import io.github.up2jakarta.cii.api.XWriter;
 import io.github.up2jakarta.cii.format.unmapped.ram.ExchangedDocumentContextType;
 import io.github.up2jakarta.cii.format.unmapped.ram.ExchangedDocumentType;
 import io.github.up2jakarta.cii.format.unmapped.ram.SupplyChainTradeTransactionType;
 import io.github.up2jakarta.cii.format.unmapped.ram.ValuationBreakdownStatementType;
+import io.github.up2jakarta.xml.api.XValidationException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class InvoiceWriterTest {
 
-    public static final XWriter<CrossIndustryInvoiceType> WRITER;
+    public static final InvoiceWriter<CrossIndustryInvoiceType> WRITER;
 
     static {
         WRITER = new InvoiceWriter<>(CrossIndustryInvoiceType.class, new XmlAdapter[0]);

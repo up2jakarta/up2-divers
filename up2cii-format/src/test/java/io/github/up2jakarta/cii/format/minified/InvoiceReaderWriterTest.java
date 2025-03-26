@@ -1,6 +1,11 @@
 package io.github.up2jakarta.cii.format.minified;
 
-import io.github.up2jakarta.cii.api.*;
+import io.github.up2jakarta.cii.InvoiceWriter;
+import io.github.up2jakarta.cii.api.TestUtil;
+import io.github.up2jakarta.xml.api.IValidationError;
+import io.github.up2jakarta.xml.api.XMultipleException;
+import io.github.up2jakarta.xml.api.XReader;
+import io.github.up2jakarta.xml.api.XValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +29,7 @@ public class InvoiceReaderWriterTest {
     @Autowired
     private XValidator<CrossIndustryInvoiceType> validator;
     @Autowired
-    private XWriter<CrossIndustryInvoiceType> writer;
+    private InvoiceWriter<CrossIndustryInvoiceType> writer;
     @Autowired
     private XReader<CrossIndustryInvoiceType> reader;
 
@@ -41,14 +46,14 @@ public class InvoiceReaderWriterTest {
     @Test
     public void testDOMInvalid() throws Exception {
         final File file = loadResource("xml/invalid2-formatCII.xml");
-        assertThrows(SAXParseException.class, () -> util.parseDocument(file));
+        assertThrows(SAXParseException.class, () -> writer.newDocument(file));
     }
 
     @Test
     public void testDOMValid() throws Exception {
         final File file = loadResource("xml/ppf/UC1-01-Facture-formatCII.xml");
         // Read
-        final Document document = util.parseDocument(file);
+        final Document document = writer.newDocument(file);
         assertNotNull(document);
     }
 

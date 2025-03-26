@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.test.validation;
 
 import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.test.Tests;
+import io.github.up2jakarta.xml.api.SeverityType;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 

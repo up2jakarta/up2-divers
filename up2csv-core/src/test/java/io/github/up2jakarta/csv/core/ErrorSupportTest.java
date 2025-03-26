@@ -1,9 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.impl.*;
+import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.converter.*;
 import io.github.up2jakarta.csv.test.bean.processor.Test3Processor;
@@ -13,6 +12,7 @@ import io.github.up2jakarta.csv.test.codelist.MeasurementUnitConverter;
 import io.github.up2jakarta.csv.test.ext.Dummy1Processor;
 import io.github.up2jakarta.csv.test.ext.DummyConverter;
 import io.github.up2jakarta.csv.test.validation.Up2Warn;
+import io.github.up2jakarta.xml.api.SeverityType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Comparator;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.extension.SeverityType.ERROR;
 import static io.github.up2jakarta.csv.misc.Errors.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -384,7 +383,7 @@ public class ErrorSupportTest {
             assertSame(row, error.getRow());
             assertNotNull(error.getOrder());
             assertEquals(2, error.getOffset());
-            assertEquals(ERROR, error.getSeverity());
+            assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(Test2Validator.TU_P_021, error.getCode());
             assertEquals("must not be empty", error.getMessage());
             assertNull(error.getTrace());

@@ -2,15 +2,15 @@ package io.github.up2jakarta.cii.edi;
 
 import io.github.up2jakarta.cii.TUConfiguration;
 import io.github.up2jakarta.cii.api.CodeAdapterTest;
-import io.github.up2jakarta.cii.api.IValidationError;
-import io.github.up2jakarta.cii.api.XValidationException;
+import io.github.up2jakarta.cii.core.Duration;
+import io.github.up2jakarta.cii.core.DurationFormatter;
+import io.github.up2jakarta.cii.core.TemporalFormatter;
 import io.github.up2jakarta.cii.format.standard.udt.DateStringType;
 import io.github.up2jakarta.cii.format.standard.udt.DateTimeType;
-import io.github.up2jakarta.cii.xml.Duration;
-import io.github.up2jakarta.cii.xml.DurationFormatter;
-import io.github.up2jakarta.cii.xml.TemporalFormatter;
-import io.github.up2jakarta.csv.exception.CodeListException;
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.xml.api.IValidationError;
+import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.api.XValidationException;
+import io.github.up2jakarta.xml.codelist.CodeListException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -220,7 +220,7 @@ public class TimePointFormatCodeTest extends CodeAdapterTest {
         var startTime = LocalTime.of(15, 30, 5);
         var endTime = LocalTime.of(17, 40, 10);
         var testString = "153005-174010";
-        var testTemporal = Duration.of(startTime, endTime);
+        var testTemporal = io.github.up2jakarta.cii.core.Duration.of(startTime, endTime);
         //Then
         var codeFormatter = code.getFormatter();
         assertNotNull(codeFormatter);

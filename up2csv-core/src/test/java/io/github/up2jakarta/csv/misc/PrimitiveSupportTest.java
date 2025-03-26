@@ -4,7 +4,6 @@ import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.annotation.*;
 import io.github.up2jakarta.csv.core.Mapper;
 import io.github.up2jakarta.csv.core.MapperFactory;
-import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.impl.DataId;
 import org.junit.jupiter.api.Test;

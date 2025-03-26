@@ -1,26 +1,23 @@
 package io.github.up2jakarta.cii;
 
-import io.github.up2jakarta.cii.api.XConfigurationException;
-import io.github.up2jakarta.cii.api.XWriter;
-import io.github.up2jakarta.cii.xml.XBuilder;
+import io.github.up2jakarta.cii.core.ErrorEnhancer;
+import io.github.up2jakarta.xml.XBuilder;
+import io.github.up2jakarta.xml.api.XConfigurationException;
+import io.github.up2jakarta.xml.api.XWriter;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.Writer;
 
-import static io.github.up2jakarta.cii.CII.CII_QNAME;
-import static io.github.up2jakarta.cii.CII.CII_SCHEMA;
+import static io.github.up2jakarta.cii.CII.*;
 
 /**
  * Thread-safe processor that write CII-D16B invoices.
  */
 public class InvoiceWriter<I> extends XBuilder<I> implements XWriter<I> {
-
-    static final NamespacePrefixMapper NS_PREFIX_MAPPER = CII.NS_PREFIX_MAPPER;
 
     public InvoiceWriter(Class<I> type, final XmlAdapter<?, ?>[] adapters) {
         super(CII_QNAME, type, false, CII_SCHEMA, adapters);
@@ -30,7 +27,7 @@ public class InvoiceWriter<I> extends XBuilder<I> implements XWriter<I> {
     public Document write(I invoice, boolean failFast) {
         try {
             var document = newDocument();
-            var handler = newHandler(failFast, false);
+            var handler = newHandler(ErrorEnhancer::enhance, failFast, false);
             var marshaller = newMarshaller(handler, NS_PREFIX_MAPPER);
             var root = newElement(invoice);
             marshaller.marshal(root, document);
@@ -46,7 +43,7 @@ public class InvoiceWriter<I> extends XBuilder<I> implements XWriter<I> {
     @Override
     public void write(I invoice, File xmlfile, boolean failFast) {
         try {
-            var handler = newHandler(failFast, false);
+            var handler = newHandler(ErrorEnhancer::enhance, failFast, false);
             var marshaller = newMarshaller(handler, NS_PREFIX_MAPPER);
             var root = newElement(invoice);
             marshaller.marshal(root, xmlfile);
@@ -59,7 +56,7 @@ public class InvoiceWriter<I> extends XBuilder<I> implements XWriter<I> {
     @Override
     public void write(I invoice, Writer writer, boolean failFast) {
         try {
-            var handler = newHandler(failFast, false);
+            var handler = newHandler(ErrorEnhancer::enhance, failFast, false);
             var marshaller = newMarshaller(handler, NS_PREFIX_MAPPER);
             var root = newElement(invoice);
             marshaller.marshal(root, writer);

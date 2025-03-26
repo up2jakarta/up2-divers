@@ -1,14 +1,14 @@
 package io.github.up2jakarta.csv;
 
-import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.impl.InputErrorEntity;
 import io.github.up2jakarta.csv.impl.InputRowEntity;
 import io.github.up2jakarta.csv.impl.InvoiceAggregator;
+import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.test.agg.Attribute;
 import io.github.up2jakarta.csv.test.agg.Invoice;
 import io.github.up2jakarta.csv.test.agg.Item;
 import io.github.up2jakarta.csv.test.agg.Party;
+import io.github.up2jakarta.xml.api.SeverityType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

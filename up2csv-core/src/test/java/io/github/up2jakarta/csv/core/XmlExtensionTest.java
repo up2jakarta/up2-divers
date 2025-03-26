@@ -1,9 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.impl.*;
+import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.xml.*;
@@ -11,6 +10,7 @@ import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
 import io.github.up2jakarta.csv.test.codelist.TestCodeList;
 import io.github.up2jakarta.csv.test.codelist.TestCodeListConverter;
+import io.github.up2jakarta.xml.api.SeverityType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

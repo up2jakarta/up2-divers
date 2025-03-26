@@ -2,13 +2,13 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.annotation.Up2CodeList;
-import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.extension.CodeList;
 import io.github.up2jakarta.csv.extension.Conversion;
 import io.github.up2jakarta.csv.extension.ConversionResolver;
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Beans;
 import io.github.up2jakarta.csv.misc.Errors;
+import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.codelist.CodeList;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
@@ -17,7 +17,7 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static io.github.up2jakarta.csv.misc.CodeListConverter.parse;
+import static io.github.up2jakarta.xml.codelist.CodeListConverter.parse;
 
 /**
  * Up2 {@link Conversion} resolver that supports {@link CodeList} types.

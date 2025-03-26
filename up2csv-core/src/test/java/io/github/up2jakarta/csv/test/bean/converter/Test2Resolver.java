@@ -6,11 +6,9 @@ import io.github.up2jakarta.csv.annotation.Up2CodeList;
 import io.github.up2jakarta.csv.annotation.Up2TemporalAmount;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.test.codelist.MeasurementUnitCode;
+import io.github.up2jakarta.xml.api.SeverityType;
 
 import java.time.Duration;
-
-import static io.github.up2jakarta.csv.extension.SeverityType.FATAL;
-import static io.github.up2jakarta.csv.extension.SeverityType.WARNING;
 
 @SuppressWarnings("unused")
 public class Test2Resolver implements Segment {
@@ -19,12 +17,12 @@ public class Test2Resolver implements Segment {
     public static final String TU_P_008 = "TU-P008";
 
     @Position(0)
-    @Error(value = TU_P_007, severity = FATAL)
+    @Error(value = TU_P_007, severity = SeverityType.FATAL)
     @Up2CodeList
     private MeasurementUnitCode unit;
 
     @Position(1)
-    @Error(value = TU_P_008, severity = WARNING)
+    @Error(value = TU_P_008, severity = SeverityType.WARNING)
     @Up2TemporalAmount
     private Duration duration;
 

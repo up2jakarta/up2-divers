@@ -4,10 +4,10 @@ import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.annotation.Up2EnableXML;
 import io.github.up2jakarta.csv.extension.Segment;
-import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.codelist.TestCodeList;
 import io.github.up2jakarta.csv.test.codelist.TestCodeListConverter;
+import io.github.up2jakarta.xml.api.SeverityType;
 import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 

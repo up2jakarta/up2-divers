@@ -431,8 +431,8 @@ Up2 comes with three predefined payloads to override the error severity.
 You can define your own payload of course:
 
 ``` java
-@Error(value = "UP2-000100", severity = SeverityType.ERROR)
-public interface CustomPayload extends Error.Payload {
+@Error(value = "UP2-100100", severity = SeverityType.ERROR) // Here the magic
+public interface Up2Payload extends Error.Payload {
 }
 ```
 
@@ -444,12 +444,11 @@ Also, Up2 supports @Error on JSR-303 constraint annotations:
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = {CustomValidator.class})
-@Error(value = "UP2-000100", severity = SeverityType.FATAL)
-@SuppressWarnings("unused")
-public @interface CustomConstraint {
+@Constraint(validatedBy = {Up2NotEmptyValidator.class})
+@Error(value = "UP2-900999", severity = SeverityType.FATAL) // Here the magic
+public @interface Up2NotEmpty {
 
-    String message() default "{jakarta.validation.constraints.CustomConstraint.message}";
+    String message() default "{jakarta.validation.constraints.NotEmpty.message}";
 
     Class<?>[] groups() default {};
 
@@ -477,11 +476,11 @@ public TestSegment implements Segment {
 Enables JSR-303 validation within specific groups.
 
 ``` java
-@ValidOverride(groups = CustomGroup.class)
+@ValidOverride(groups = Up2Group.class)
 public TestSegment implements Segment {
 
     @Position(0)
-    @Size(min = 1, max = 3, payload = Errors.Fatal.class, groups = CustomGroup.class)
+    @Size(min = 1, max = 3, payload = Errors.Fatal.class, groups = Up2Group.class)
     @Size(min = 1, max = 2, payload = Errors.Error.class) // Default
     private String code;
 
@@ -563,7 +562,7 @@ private EventCreator<InputRowImpl, ?, ?, InputErrorImpl> creator;
 
 # Business Aggregation
 
-The final goal of Up2CSV-Core is to parse a `business-object` in case of data is spread over several segments.
+The final goal of `Up2CSV` is to parse a `business-object` in case of data is spread over several segments.
 
 ## Sample Business Case
 

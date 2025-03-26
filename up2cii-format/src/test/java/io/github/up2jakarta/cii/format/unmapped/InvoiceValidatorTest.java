@@ -1,9 +1,9 @@
 package io.github.up2jakarta.cii.format.unmapped;
 
 import io.github.up2jakarta.cii.InvoiceValidator;
-import io.github.up2jakarta.cii.api.IValidationError;
-import io.github.up2jakarta.cii.api.XValidator;
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.xml.api.IValidationError;
+import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.api.XValidator;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
 

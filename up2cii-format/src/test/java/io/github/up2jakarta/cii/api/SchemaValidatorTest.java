@@ -2,7 +2,8 @@ package io.github.up2jakarta.cii.api;
 
 import io.github.up2jakarta.cii.SchemaValidator;
 import io.github.up2jakarta.cii.TUConfiguration;
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.xml.api.IValidationError;
+import io.github.up2jakarta.xml.api.SeverityType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

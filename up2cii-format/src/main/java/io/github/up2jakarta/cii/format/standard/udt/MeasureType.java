@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.format.standard.udt;
 
+import io.github.up2jakarta.cii.core.AbstractUnitMeasureType;
 import io.github.up2jakarta.cii.ppf.MeasurementUnitCode;
-import io.github.up2jakarta.cii.xml.AbstractUnitMeasureType;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;

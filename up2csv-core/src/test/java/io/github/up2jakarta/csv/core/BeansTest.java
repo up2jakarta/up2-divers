@@ -1,14 +1,14 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.Parsed;
 import io.github.up2jakarta.csv.impl.InputRowEntity;
 import io.github.up2jakarta.csv.impl.SegmentType;
-import io.github.up2jakarta.csv.misc.CodeListConverter;
+import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.test.bean.TestConverter;
 import io.github.up2jakarta.csv.test.bean.converter.SupportEntity;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
+import io.github.up2jakarta.xml.codelist.CodeListConverter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;

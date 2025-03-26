@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.test.ext;
 
-import io.github.up2jakarta.csv.extension.SeverityType;
-import io.github.up2jakarta.csv.extension.TypeConverter;
+import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.codelist.TypeConverter;
 import org.springframework.stereotype.Component;
 
 @Component

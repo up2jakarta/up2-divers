@@ -38,6 +38,7 @@
     </scm>
 
     <modules>
+        <module>up2xml-core</module>
         <module>up2csv-core</module>
         <module>up2cii-format</module>
     </modules>

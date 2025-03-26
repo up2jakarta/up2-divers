@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.test.bean.jpa;
 
 import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.extension.CodeList;
 import io.github.up2jakarta.csv.extension.Nullable;
+import io.github.up2jakarta.xml.codelist.CodeList;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 

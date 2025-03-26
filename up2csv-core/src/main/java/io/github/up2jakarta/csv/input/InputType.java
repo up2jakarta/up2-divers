@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.input;
 
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.extension.CodeList;
 import io.github.up2jakarta.csv.extension.Parsed;
+import io.github.up2jakarta.xml.codelist.CodeList;
 
 /**
  * Contact marker for the type of input-type.

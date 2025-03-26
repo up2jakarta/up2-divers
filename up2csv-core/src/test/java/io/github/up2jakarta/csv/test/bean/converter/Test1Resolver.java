@@ -7,10 +7,10 @@ import io.github.up2jakarta.csv.annotation.Up2TemporalAmount;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.codelist.MeasurementUnitCode;
+import io.github.up2jakarta.xml.api.SeverityType;
 
 import java.time.Duration;
 
-import static io.github.up2jakarta.csv.extension.SeverityType.FATAL;
 import static io.github.up2jakarta.csv.test.codelist.MeasurementUnitConverter.EDI_R_20;
 
 @SuppressWarnings("unused")
@@ -21,7 +21,7 @@ public class Test1Resolver implements Segment {
     private CurrencyCodeType currency;
 
     @Position(1)
-    @Error(value = EDI_R_20, severity = FATAL)
+    @Error(value = EDI_R_20, severity = SeverityType.FATAL)
     @Up2CodeList
     private MeasurementUnitCode unit;
 

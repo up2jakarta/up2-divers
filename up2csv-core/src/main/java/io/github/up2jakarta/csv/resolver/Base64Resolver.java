@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.resolver;
 
 import io.github.up2jakarta.csv.annotation.Up2Base64;
-import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.Conversion;
 import io.github.up2jakarta.csv.extension.ConversionResolver;
+import io.github.up2jakarta.csv.misc.BeanException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 

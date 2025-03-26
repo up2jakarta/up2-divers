@@ -1,7 +1,8 @@
 package io.github.up2jakarta.cii;
 
-import io.github.up2jakarta.cii.api.XReader;
-import io.github.up2jakarta.cii.xml.XProcessor;
+import io.github.up2jakarta.cii.core.ErrorEnhancer;
+import io.github.up2jakarta.xml.XProcessor;
+import io.github.up2jakarta.xml.api.XReader;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.w3c.dom.Document;
@@ -24,7 +25,7 @@ public class InvoiceReader<I> extends XProcessor<I> implements XReader<I> {
     @Override
     public I read(StreamSource xmlFile, boolean failFast, boolean lenient) throws IOException {
         try {
-            var handler = newHandler(failFast, lenient);
+            var handler = newHandler(ErrorEnhancer::enhance, failFast, lenient);
             var unmarshaller = newUnmarshaller(handler);
             var invoice = unmarshaller.unmarshal(xmlFile, type).getValue();
             handler.throwValidationExceptionWhenError();
@@ -42,7 +43,7 @@ public class InvoiceReader<I> extends XProcessor<I> implements XReader<I> {
     @Override
     public I read(Document xmlDocument, boolean failFast, boolean lenient) {
         try {
-            var handler = newHandler(failFast, lenient);
+            var handler = newHandler(ErrorEnhancer::enhance, failFast, lenient);
             var unmarshaller = newUnmarshaller(handler);
             var invoice = unmarshaller.unmarshal(xmlDocument, type).getValue();
             handler.throwValidationExceptionWhenError();

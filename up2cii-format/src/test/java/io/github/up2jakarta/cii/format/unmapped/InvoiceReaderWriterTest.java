@@ -1,8 +1,8 @@
 package io.github.up2jakarta.cii.format.unmapped;
 
 import io.github.up2jakarta.cii.TUConfiguration;
-import io.github.up2jakarta.cii.api.IValidationError;
 import io.github.up2jakarta.cii.api.TestUtil;
+import io.github.up2jakarta.xml.api.IValidationError;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +35,14 @@ public class InvoiceReaderWriterTest {
     @Test
     public void testDOMInvalid() throws Exception {
         final File file = loadResource("xml/invalid2-formatCII.xml");
-        assertThrows(SAXParseException.class, () -> util.parseDocument(file));
+        assertThrows(SAXParseException.class, () -> WRITER.newDocument(file));
     }
 
     @Test
     public void testDOMValid() throws Exception {
         final File file = loadResource("xml/ppf/UC1-01-Facture-formatCII.xml");
         // Read
-        final Document document = util.parseDocument(file);
+        final Document document = WRITER.newDocument(file);
         assertNotNull(document);
     }
 

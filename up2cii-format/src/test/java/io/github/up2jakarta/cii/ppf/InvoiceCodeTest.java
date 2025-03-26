@@ -2,12 +2,12 @@ package io.github.up2jakarta.cii.ppf;
 
 import io.github.up2jakarta.cii.TUConfiguration;
 import io.github.up2jakarta.cii.api.CodeAdapterTest;
-import io.github.up2jakarta.cii.api.IValidationError;
-import io.github.up2jakarta.cii.api.XValidationException;
 import io.github.up2jakarta.cii.format.standard.ram.ExchangedDocumentType;
 import io.github.up2jakarta.cii.format.unmapped.qdt.DocumentCodeType;
-import io.github.up2jakarta.csv.exception.CodeListException;
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.xml.api.IValidationError;
+import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.api.XValidationException;
+import io.github.up2jakarta.xml.codelist.CodeListException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

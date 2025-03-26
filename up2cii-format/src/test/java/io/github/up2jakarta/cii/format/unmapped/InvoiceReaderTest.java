@@ -1,8 +1,8 @@
 package io.github.up2jakarta.cii.format.unmapped;
 
 import io.github.up2jakarta.cii.InvoiceReader;
-import io.github.up2jakarta.cii.api.XReader;
-import io.github.up2jakarta.cii.api.XValidationException;
+import io.github.up2jakarta.xml.api.XReader;
+import io.github.up2jakarta.xml.api.XValidationException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
 

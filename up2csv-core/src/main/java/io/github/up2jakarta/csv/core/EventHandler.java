@@ -2,13 +2,13 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.exception.CodeListException;
-import io.github.up2jakarta.csv.exception.MapperException;
-import io.github.up2jakarta.csv.exception.PropertyException;
-import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputSegment;
 import io.github.up2jakarta.csv.misc.Listable;
+import io.github.up2jakarta.csv.misc.MapperException;
+import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.codelist.CodeListException;
+import io.github.up2jakarta.xml.codelist.PropertyException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.metadata.ConstraintDescriptor;
 

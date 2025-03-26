@@ -1,13 +1,13 @@
 package io.github.up2jakarta.csv.data;
 
 import io.github.up2jakarta.csv.core.EventHandler;
-import io.github.up2jakarta.csv.exception.PropertyException;
 import io.github.up2jakarta.csv.extension.Linked;
 import io.github.up2jakarta.csv.extension.Parsed;
-import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputSegment;
 import io.github.up2jakarta.csv.input.InputType;
+import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.codelist.PropertyException;
 
 import java.util.List;
 

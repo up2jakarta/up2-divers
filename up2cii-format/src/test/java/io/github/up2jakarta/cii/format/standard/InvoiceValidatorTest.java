@@ -2,11 +2,11 @@ package io.github.up2jakarta.cii.format.standard;
 
 import io.github.up2jakarta.cii.InvoiceValidator;
 import io.github.up2jakarta.cii.TUConfiguration;
-import io.github.up2jakarta.cii.api.IValidationError;
-import io.github.up2jakarta.cii.api.XConfigurationException;
-import io.github.up2jakarta.cii.api.XValidator;
-import io.github.up2jakarta.csv.extension.CodeList;
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.xml.api.IValidationError;
+import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.api.XConfigurationException;
+import io.github.up2jakarta.xml.api.XValidator;
+import io.github.up2jakarta.xml.codelist.CodeList;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

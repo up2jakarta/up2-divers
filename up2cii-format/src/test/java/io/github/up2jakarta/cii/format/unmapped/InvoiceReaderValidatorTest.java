@@ -1,6 +1,7 @@
 package io.github.up2jakarta.cii.format.unmapped;
 
-import io.github.up2jakarta.cii.api.IValidationError;
+
+import io.github.up2jakarta.xml.api.IValidationError;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

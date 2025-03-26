@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.impl.*;
+import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.test.bean.converter.*;
 import io.github.up2jakarta.csv.test.codelist.CountryCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
@@ -18,9 +18,9 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.extension.SeverityType.FATAL;
-import static io.github.up2jakarta.csv.extension.SeverityType.WARNING;
 import static io.github.up2jakarta.csv.misc.Errors.ERROR_VALIDATOR;
+import static io.github.up2jakarta.xml.api.SeverityType.FATAL;
+import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)

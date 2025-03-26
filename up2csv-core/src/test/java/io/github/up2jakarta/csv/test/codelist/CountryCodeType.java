@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.test.codelist;
 
-import io.github.up2jakarta.csv.extension.CodeList;
+import io.github.up2jakarta.xml.codelist.CodeList;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlJavaTypeAdapter(CountryConverter.class)

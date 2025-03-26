@@ -1,8 +1,8 @@
 package io.github.up2jakarta.cii.format.minified;
 
-import io.github.up2jakarta.cii.api.IValidationError;
-import io.github.up2jakarta.cii.api.XValidator;
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.xml.api.IValidationError;
+import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.api.XValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

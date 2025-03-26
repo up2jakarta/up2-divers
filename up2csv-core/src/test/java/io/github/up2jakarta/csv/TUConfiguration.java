@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv;
 
 import io.github.up2jakarta.csv.core.MapperFactory;
-import io.github.up2jakarta.csv.exception.BeanException;
 import io.github.up2jakarta.csv.extension.BeanContext;
 import io.github.up2jakarta.csv.impl.*;
+import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.processor.TokenProcessor;
 import io.github.up2jakarta.csv.resolver.DecimalResolver;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;

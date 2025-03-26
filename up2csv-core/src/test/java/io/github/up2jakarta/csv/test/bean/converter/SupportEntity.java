@@ -5,6 +5,7 @@ import io.github.up2jakarta.csv.annotation.*;
 import io.github.up2jakarta.csv.impl.ParsedEntity;
 import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.csv.test.codelist.*;
+import io.github.up2jakarta.xml.api.SeverityType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -15,7 +16,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 
-import static io.github.up2jakarta.csv.extension.SeverityType.FATAL;
 import static io.github.up2jakarta.csv.test.codelist.CountryConverter.ISO_3166;
 
 @Valid
@@ -49,7 +49,7 @@ public class SupportEntity extends ParsedEntity<Integer> {
     @Position(4)
     @Column(name = "TU_CURRENCY")
     @Up2Converter(CurrencyConverter.class)
-    @Error(value = CurrencyConverter.ISO_4217, severity = FATAL)
+    @Error(value = CurrencyConverter.ISO_4217, severity = SeverityType.FATAL)
     private CurrencyCodeType currency;
 
     @Position(5)
@@ -74,7 +74,7 @@ public class SupportEntity extends ParsedEntity<Integer> {
 
     @Position(9)
     @Column(name = "TU_SHIP_COUNTRY")
-    @Error(value = ISO_3166, severity = FATAL)
+    @Error(value = ISO_3166, severity = SeverityType.FATAL)
     @Up2CodeList
     private CountryCodeType shippingCountry;
 

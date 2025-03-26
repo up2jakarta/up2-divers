@@ -1,13 +1,14 @@
 package io.github.up2jakarta.cii.format.standard.udt;
 
 import io.github.up2jakarta.cii.ppf.MimeCodeType;
-import io.github.up2jakarta.cii.xml.adapters.CharsetAdapter;
+import io.github.up2jakarta.xml.adapters.CharsetAdapter;
 import jakarta.xml.bind.annotation.*;
 import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import java.nio.charset.Charset;
 
+@SuppressWarnings("unused")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "BinaryObjectType", propOrder = {"value"})
 public class BinaryObjectType {

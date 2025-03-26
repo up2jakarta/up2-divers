@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.misc;
 
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.xml.api.SeverityType;
 import jakarta.xml.bind.ValidationEvent;
 import org.junit.jupiter.api.Test;
 

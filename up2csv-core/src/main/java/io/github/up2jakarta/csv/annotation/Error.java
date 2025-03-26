@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.annotation;
 
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.xml.api.SeverityType;
 
 import java.lang.annotation.*;
 

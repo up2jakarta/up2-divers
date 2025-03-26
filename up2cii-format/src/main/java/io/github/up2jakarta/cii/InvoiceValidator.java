@@ -1,13 +1,9 @@
 package io.github.up2jakarta.cii;
 
-import io.github.up2jakarta.cii.api.IValidationError;
-import io.github.up2jakarta.cii.api.XConfigurationException;
-import io.github.up2jakarta.cii.api.XValidationException;
-import io.github.up2jakarta.cii.api.XValidator;
-import io.github.up2jakarta.cii.xml.FailSafeHandler;
-import io.github.up2jakarta.cii.xml.SAXParseError;
-import io.github.up2jakarta.cii.xml.XBuilder;
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.cii.core.ErrorEnhancer;
+import io.github.up2jakarta.xml.FailSafeHandler;
+import io.github.up2jakarta.xml.XBuilder;
+import io.github.up2jakarta.xml.api.*;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.w3c.dom.Document;
@@ -19,8 +15,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static io.github.up2jakarta.cii.CII.CII_QNAME;
-import static io.github.up2jakarta.cii.CII.CII_SCHEMA;
+import static io.github.up2jakarta.cii.CII.*;
+import static io.github.up2jakarta.xml.api.SeverityType.FATAL;
 import static java.util.Collections.singletonList;
 
 /**
@@ -33,8 +29,8 @@ public class InvoiceValidator<I> extends XBuilder<I> implements XValidator<I> {
     }
 
     private static List<IValidationError> getOrThrowError(JAXBException ex) {
-        if (ex.getLinkedException() instanceof SAXParseException) {
-            return singletonList(new SAXParseError(SeverityType.FATAL, (SAXParseException) ex.getLinkedException()));
+        if (ex.getLinkedException() instanceof SAXParseException sax) {
+            return singletonList(new SAXParseError(FATAL, sax, ErrorEnhancer::enhance));
         }
         throw new XValidationException(ex);
     }
@@ -46,7 +42,7 @@ public class InvoiceValidator<I> extends XBuilder<I> implements XValidator<I> {
 
     @Override
     public List<IValidationError> validate(StreamSource xmlFile) throws IOException {
-        var handler = new FailSafeHandler(false);
+        var handler = new FailSafeHandler(ErrorEnhancer::enhance, false);
         try {
             var unmarshaller = newUnmarshaller(handler);
             unmarshaller.unmarshal(xmlFile, type);
@@ -58,7 +54,7 @@ public class InvoiceValidator<I> extends XBuilder<I> implements XValidator<I> {
 
     @Override
     public List<IValidationError> validate(Document xmlDocument) {
-        var handler = new FailSafeHandler(false);
+        var handler = new FailSafeHandler(ErrorEnhancer::enhance, false);
         try {
             var unmarshaller = newUnmarshaller(handler);
             unmarshaller.unmarshal(xmlDocument, type);
@@ -70,10 +66,10 @@ public class InvoiceValidator<I> extends XBuilder<I> implements XValidator<I> {
 
     @Override
     public List<IValidationError> validate(I invoice) {
-        var handler = new FailSafeHandler(false);
+        var handler = new FailSafeHandler(ErrorEnhancer::enhance, false);
         try {
             var document = newDocument();
-            var marshaller = newMarshaller(handler, InvoiceWriter.NS_PREFIX_MAPPER);
+            var marshaller = newMarshaller(handler, NS_PREFIX_MAPPER);
             var root = newElement(invoice);
             marshaller.marshal(root, document);
         } catch (JAXBException ex) {

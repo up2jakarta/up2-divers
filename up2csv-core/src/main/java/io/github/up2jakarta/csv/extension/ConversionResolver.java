@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.extension;
 
-import io.github.up2jakarta.csv.exception.BeanException;
+import io.github.up2jakarta.csv.misc.BeanException;
 import jakarta.validation.constraints.NotNull;
 
 import java.lang.annotation.Annotation;

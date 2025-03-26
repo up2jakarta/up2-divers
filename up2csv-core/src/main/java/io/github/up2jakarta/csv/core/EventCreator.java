@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputSegment;
+import io.github.up2jakarta.xml.api.SeverityType;
 
 /**
  * Input Event creator that is responsible for create the final Event to be collected during the mapping/parsing.

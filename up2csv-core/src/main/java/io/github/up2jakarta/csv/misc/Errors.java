@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.misc;
 
 import io.github.up2jakarta.csv.annotation.Error.Payload;
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.xml.api.SeverityType;
 
 /**
  * Simple JSR-303 {@link jakarta.validation.Payload} interface marker annotated by {@link Error}.

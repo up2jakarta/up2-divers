@@ -1,21 +1,17 @@
 package io.github.up2jakarta.cii.edi;
 
-import io.github.up2jakarta.cii.api.Agency;
-import io.github.up2jakarta.cii.api.Documented;
-import io.github.up2jakarta.cii.api.Schema;
-import io.github.up2jakarta.cii.api.SubList;
+import io.github.up2jakarta.cii.core.AbstractFormatter;
+import io.github.up2jakarta.cii.core.DurationFormatter;
+import io.github.up2jakarta.cii.core.TemporalFormatter;
 import io.github.up2jakarta.cii.edi.adapters.TimePointFormatCodeAdapter;
-import io.github.up2jakarta.cii.xml.AbstractFormatter;
-import io.github.up2jakarta.cii.xml.DurationFormatter;
-import io.github.up2jakarta.cii.xml.TemporalFormatter;
-import io.github.up2jakarta.csv.extension.CodeList;
+import io.github.up2jakarta.xml.codelist.*;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import javax.annotation.processing.Generated;
 import java.time.*;
 import java.time.temporal.Temporal;
 
-import static io.github.up2jakarta.cii.xml.Formatters.*;
+import static io.github.up2jakarta.xml.adapters.Formatters.*;
 
 /**
  * Based on UN/CEFACT 2379 : Date or time or period format code

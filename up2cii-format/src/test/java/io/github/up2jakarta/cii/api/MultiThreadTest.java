@@ -5,6 +5,7 @@ import io.github.up2jakarta.cii.InvoiceValidator;
 import io.github.up2jakarta.cii.InvoiceWriter;
 import io.github.up2jakarta.cii.TUConfiguration;
 import io.github.up2jakarta.cii.format.standard.CrossIndustryInvoiceType;
+import io.github.up2jakarta.xml.api.XValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

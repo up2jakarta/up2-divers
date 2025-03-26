@@ -3,8 +3,8 @@ package io.github.up2jakarta.csv.test.bean.processor;
 import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.extension.Segment;
-import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.test.ext.Dummy3;
+import io.github.up2jakarta.xml.api.SeverityType;
 
 @SuppressWarnings("unused")
 public class Test4Processor implements Segment {

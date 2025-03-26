@@ -1,14 +1,10 @@
 package io.github.up2jakarta.cii;
 
-import io.github.up2jakarta.cii.api.IValidationError;
-import io.github.up2jakarta.cii.api.IValidator;
-import io.github.up2jakarta.cii.api.XConfigurationException;
-import io.github.up2jakarta.cii.api.XValidationException;
+import io.github.up2jakarta.cii.core.ErrorEnhancer;
 import io.github.up2jakarta.cii.format.standard.CrossIndustryInvoiceType;
-import io.github.up2jakarta.cii.xml.SAXParseError;
-import io.github.up2jakarta.cii.xml.SchemaErrorCollector;
-import io.github.up2jakarta.cii.xml.XProcessor;
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.xml.SchemaCollector;
+import io.github.up2jakarta.xml.XProcessor;
+import io.github.up2jakarta.xml.api.*;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
@@ -54,13 +50,13 @@ public class SchemaValidator extends XProcessor<CrossIndustryInvoiceType> implem
 
     @Override
     public List<IValidationError> validate(StreamSource xmlFile) throws IOException {
-        var handler = new SchemaErrorCollector();
+        var handler = new SchemaCollector(ErrorEnhancer::enhance);
         var validator = createValidator();
         validator.setErrorHandler(handler);
         try {
             validator.validate(xmlFile);
         } catch (SAXParseException e) {
-            return Collections.singletonList(new SAXParseError(SeverityType.FATAL, e));
+            return Collections.singletonList(new SAXParseError(SeverityType.FATAL, e, ErrorEnhancer::enhance));
         } catch (SAXException e) {
             throw new XValidationException(e);
         }

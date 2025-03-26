@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.extension;
 
-import io.github.up2jakarta.csv.exception.BeanException;
+import io.github.up2jakarta.csv.misc.BeanException;
 
 /**
  * Contact interface for checker listener for annotated {@link Segment}.

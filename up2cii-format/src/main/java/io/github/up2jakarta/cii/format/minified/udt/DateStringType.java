@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.format.minified.udt;
 
 import io.github.up2jakarta.cii.edi.TimePointFormatCodeType;
-import io.github.up2jakarta.cii.xml.adapters.LocalDateAdapter;
+import io.github.up2jakarta.xml.adapters.LocalDateAdapter;
 import jakarta.xml.bind.annotation.*;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 

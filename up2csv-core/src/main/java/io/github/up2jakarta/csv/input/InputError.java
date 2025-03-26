@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.input;
 
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.extension.SeverityType;
+import io.github.up2jakarta.xml.api.SeverityType;
 
 /**
  * Contact interface for an input error.

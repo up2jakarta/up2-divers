@@ -1,13 +1,13 @@
 package io.github.up2jakarta.cii.ppf.adapters;
 
+import io.github.up2jakarta.cii.core.TokenType;
 import io.github.up2jakarta.cii.edi.AllowanceChargeIdentificationCodeType;
 import io.github.up2jakarta.cii.edi.AllowanceChargeReasonCodeType;
 import io.github.up2jakarta.cii.ppf.ChargeReasonCodeType;
 import io.github.up2jakarta.cii.ppf.SpecialServiceDescriptionCodeType;
-import io.github.up2jakarta.cii.xml.TokenType;
-import io.github.up2jakarta.csv.exception.CodeListException;
-import io.github.up2jakarta.csv.extension.TypeConverter;
-import io.github.up2jakarta.csv.misc.CodeListConverter;
+import io.github.up2jakarta.xml.codelist.CodeListConverter;
+import io.github.up2jakarta.xml.codelist.CodeListException;
+import io.github.up2jakarta.xml.codelist.TypeConverter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 import static io.github.up2jakarta.cii.edi.adapters.AllowanceChargeIdentificationCodeAdapter.ECE_5189;
 import static io.github.up2jakarta.cii.edi.adapters.AllowanceChargeReasonCodeAdapter.ECE_4465;
 import static io.github.up2jakarta.cii.ppf.adapters.SpecialServiceDescriptionCodeAdapter.ECE_7161;
-import static io.github.up2jakarta.csv.extension.SeverityType.ERROR;
+import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -71,7 +71,7 @@ public class ChargeReasonCodeAdapter extends TypeConverter<ChargeReasonCodeType<
     }
 
     @Override
-    public String format(@NotNull ChargeReasonCodeType value) {
+    public String format(@NotNull ChargeReasonCodeType<?> value) {
         return value.getCode();
     }
 

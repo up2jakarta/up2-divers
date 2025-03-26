@@ -1,13 +1,13 @@
 package io.github.up2jakarta.csv.annotation;
 
 import io.github.up2jakarta.csv.core.CodeListResolver;
-import io.github.up2jakarta.csv.misc.CodeListConverter;
+import io.github.up2jakarta.xml.codelist.CodeListConverter;
 
 import java.lang.annotation.*;
 
 /**
  * Up2 {@link io.github.up2jakarta.csv.extension.Conversion} resolver
- * that supports {@link io.github.up2jakarta.csv.extension.CodeList} types.
+ * that supports {@link io.github.up2jakarta.xml.codelist.CodeList} types.
  *
  * @see CodeListConverter
  */

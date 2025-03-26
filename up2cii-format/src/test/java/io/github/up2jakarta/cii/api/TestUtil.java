@@ -2,8 +2,8 @@ package io.github.up2jakarta.cii.api;
 
 import io.github.up2jakarta.cii.CII;
 import io.github.up2jakarta.cii.InvoiceValidator;
-import io.github.up2jakarta.csv.exception.CodeListException;
-import io.github.up2jakarta.csv.extension.CodeList;
+import io.github.up2jakarta.xml.api.*;
+import io.github.up2jakarta.xml.codelist.*;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.w3c.dom.Document;
 
-import javax.xml.parsers.DocumentBuilder;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -163,10 +162,9 @@ public class TestUtil {
     }
 
     public <T> void assertInvoice(File file, XValidator<T> validator, XReader<T> reader, XWriter<T> writer, boolean lenient) throws Exception {
-        final Document document = parseDocument(file);
+        final Document document = context.getBean(InvoiceValidator.class).newDocument(file);
         assertNotNull(document);
         // Read
-
         assertNotNull(file);
         final T invoice = reader.read(file, false, lenient);
         assertNotNull(invoice);
@@ -192,11 +190,6 @@ public class TestUtil {
         }
         // Both invoices are equals
         Assertions.assertThat(invoice).usingRecursiveComparison().isEqualTo(invoice2);
-    }
-
-    public Document parseDocument(File xmlFile) throws Exception {
-        final DocumentBuilder documentBuilder = context.getBean(InvoiceValidator.class).newDocumentBuilder();
-        return documentBuilder.parse(xmlFile);
     }
 
 }

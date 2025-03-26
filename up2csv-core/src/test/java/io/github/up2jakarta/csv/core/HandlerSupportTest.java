@@ -1,15 +1,12 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.exception.CodeListException;
-import io.github.up2jakarta.csv.exception.MapperException;
-import io.github.up2jakarta.csv.exception.PropertyException;
-import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.impl.DataId;
 import io.github.up2jakarta.csv.impl.InputErrorEntity;
 import io.github.up2jakarta.csv.impl.InputRowEntity;
 import io.github.up2jakarta.csv.impl.SegmentType;
+import io.github.up2jakarta.csv.misc.BeanException;
+import io.github.up2jakarta.csv.misc.MapperException;
 import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.converter.Test1Converter;
 import io.github.up2jakarta.csv.test.bean.converter.Test1Resolver;
@@ -21,13 +18,15 @@ import io.github.up2jakarta.csv.test.codelist.MeasurementUnitConverter;
 import io.github.up2jakarta.csv.test.ext.Dummy1Processor;
 import io.github.up2jakarta.csv.test.ext.DummyConverter;
 import io.github.up2jakarta.csv.test.validation.Up2Warn;
+import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.codelist.CodeListException;
+import io.github.up2jakarta.xml.codelist.PropertyException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static io.github.up2jakarta.csv.extension.SeverityType.ERROR;
 import static io.github.up2jakarta.csv.misc.Errors.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -166,7 +165,7 @@ public class HandlerSupportTest {
             assertEquals(0, handler.toList().size());
             // Then
             assertEquals(ERROR_CODE_LIST, error.getErrorCode());
-            assertEquals(ERROR, error.getSeverityType());
+            assertEquals(SeverityType.ERROR, error.getSeverityType());
             assertInstanceOf(CodeListException.class, error.getCause());
             assertEquals("Unknown value [ISL] for CodeList[CurrencyCodeType]", error.getCause().getMessage());
             assertNull(error.getCause().getCause());
@@ -252,7 +251,7 @@ public class HandlerSupportTest {
             assertEquals(0, handler.toList().size());
             // Then
             assertEquals(ERROR_PROCESSOR, error.getErrorCode());
-            assertEquals(ERROR, error.getSeverityType());
+            assertEquals(SeverityType.ERROR, error.getSeverityType());
             assertInstanceOf(PropertyException.class, error.getCause());
             assertEquals("io.github.up2jakarta.csv.test.ext.DummyException: dummy", error.getCause().getMessage());
             assertNotNull(error.getCause().getCause());
