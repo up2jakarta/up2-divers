@@ -1,4 +1,4 @@
-package io.github.up2jakarta.csv.misc;
+package io.github.up2jakarta.csv.data;
 
 import io.github.up2jakarta.csv.extension.Parsed;
 import io.github.up2jakarta.csv.input.InputError;

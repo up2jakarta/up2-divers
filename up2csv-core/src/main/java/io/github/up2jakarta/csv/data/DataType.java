@@ -1,4 +1,6 @@
-package io.github.up2jakarta.csv.extension;
+package io.github.up2jakarta.csv.data;
+
+import io.github.up2jakarta.csv.extension.CodeList;
 
 /**
  * Contract interface for business data types.

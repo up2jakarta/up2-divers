@@ -3,27 +3,24 @@ package io.github.up2jakarta.csv;
 import io.github.up2jakarta.csv.core.EventHandler;
 import io.github.up2jakarta.csv.core.Mapper;
 import io.github.up2jakarta.csv.core.MapperFactory;
+import io.github.up2jakarta.csv.data.BusinessCreator;
+import io.github.up2jakarta.csv.data.BusinessEntry;
+import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.exception.PropertyException;
-import io.github.up2jakarta.csv.extension.DataType;
-import io.github.up2jakarta.csv.extension.Linked;
 import io.github.up2jakarta.csv.extension.Parsed;
-import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputSegment;
 import io.github.up2jakarta.csv.input.InputType;
-import io.github.up2jakarta.csv.misc.BusinessCreator;
 
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-import static io.github.up2jakarta.csv.extension.DataType.buildMessage;
-import static io.github.up2jakarta.csv.extension.DataType.isValid;
+import static io.github.up2jakarta.csv.data.DataType.buildMessage;
+import static io.github.up2jakarta.csv.data.DataType.isValid;
 import static io.github.up2jakarta.csv.extension.SeverityType.*;
 import static java.util.Objects.requireNonNull;
 
-@SuppressWarnings("unused")
 public abstract class BusinessAggregator<O extends Parsed<T, R>, B extends DataType<B>, T extends Enum<T> & InputType<T>, R extends InputSegment<T>, E extends InputError<R, ?, B>> {
 
     private final Map<InputType<T>, Mapper<? extends Parsed<T, ?>, B>> mappers;
@@ -66,83 +63,66 @@ public abstract class BusinessAggregator<O extends Parsed<T, R>, B extends DataT
         handler.accept(root, Collections.unmodifiableSet(result));
     }
 
-    private void error(EventHandler<R, ?, B, E> handler, SeverityType severity, InputType<?> segment, String message) {
-        final PropertyException error = new PropertyException(severity, segment.getErrorCode(), message);
-        //noinspection unchecked
-        handler.handleEvent((B) segment.getGroupType(), index, error, null, false);
-    }
-
-    private boolean filter(Parsed<T, ?> parent, Parsed<T, ?> child) {
-        if (child instanceof Linked f) {
-            return f.isParent(parent);
-        }
-        return true;
-    }
-
-    private void link(Parsed<T, ?> parent, EventHandler<R, ?, B, E> handler, Map<Parsed<T, ?>, EventHandler<R, ?, B, E>> data) {
-        this.joins.get(parent.getRecord().getType()).forEach(type -> {
-            final List<Entry<Parsed<T, ?>, EventHandler<R, ?, B, E>>> segments = data.entrySet().stream()
-                    .filter(e -> type == e.getKey().getRecord().getType())
-                    .filter(e -> filter(parent, e.getKey()))
-                    .toList();
+    private void link(BusinessEntry<T, R, B, E> parent, List<BusinessEntry<T, R, B, E>> data) {
+        this.joins.get(parent.getType()).forEach(type -> {
+            final List<BusinessEntry<T, R, B, E>> segments = data.stream().filter(e -> e.filter(parent, type)).toList();
             // Validating Cardinality
             if (!isValid(type.getGroupType(), segments.size())) {
                 if (segments.isEmpty()) {
-                    error(handler, ERROR, type, "segment is required");
+                    parent.handle(ERROR, type, "segment is required", index);
                 } else {
                     final String msg = buildMessage(type.getGroupType());
-                    error(handler, ERROR, type, msg);
-                    segments.forEach(e -> error(e.getValue(), ERROR, type, msg));
+                    parent.handle(ERROR, type, msg, index);
+                    segments.forEach(e -> e.handle(ERROR, type, msg, index));
                 }
             }
             // Linking
             segments.forEach(item -> {
-                type.getLinker().link(parent, item.getKey());
-                data.entrySet().removeIf(item::equals);
+                data.remove(item);
                 if (this.joins.containsKey(type)) {
-                    link(item.getKey(), item.getValue(), data);
+                    link(item, data);
                 }
+                type.getLinker().link(parent.getSegment(), item.getSegment());
             });
         });
     }
 
-    private O link(Entry<Parsed<T, ?>, EventHandler<R, ?, B, E>> main, Map<Parsed<T, ?>, EventHandler<R, ?, B, E>> data) {
-        //noinspection unchecked
-        final O invoice = (O) main.getKey();
-        root.getLinker().link(null, invoice);
-        data.entrySet().removeIf(main::equals);
-        link(invoice, main.getValue(), data);
-        // Check detached segment
-        data.forEach((e, h) -> error(h, WARNING, e.getRecord().getType(), "segment is detached"));
-        return invoice;
+    private List<BusinessEntry<T, R, B, E>> map(R[] rows, Consumer<BusinessEntry<T, R, B, E>> main) throws BeanException {
+        final List<BusinessEntry<T, R, B, E>> entries = new ArrayList<>(rows.length);
+        for (final R row : rows) {
+            final EventHandler<R, ?, B, E> handler = newHandler(row);
+            final Parsed<T, ?> entity = mappers.get(row.getType()).map(row, handler);
+            final BusinessEntry<T, R, B, E> record = new BusinessEntry<>(entity, handler);
+            entries.add(record);
+            if (root == row.getType()) {
+                main.accept(record);
+            }
+        }
+        return entries;
     }
 
     public final <C> C parse(R[] rows, BusinessCreator<C, O, E> result) throws BeanException {
         if (rows == null || rows.length == 0) {
             return result.apply(null, List.of());
         }
-        // Mapping all segments
-        final Map<Parsed<T, ?>, EventHandler<R, ?, B, E>> data = new HashMap<>(rows.length);
-        for (final R row : rows) {
-            final EventHandler<R, ?, B, E> handler = newHandler(row);
-            final Parsed<T, ?> entity = mappers.get(row.getType()).map(row, handler);
-            data.put(entity, handler);
-        }
-        final Map<Parsed<T, ?>, EventHandler<R, ?, B, E>> all = Map.copyOf(data);
-        // Checking root segment
-        final List<Entry<Parsed<T, ?>, EventHandler<R, ?, B, E>>> roots = data.entrySet().stream()
-                .filter(e -> root == e.getKey().getRecord().getType())
-                .toList();
+        final List<BusinessEntry<T, R, B, E>> roots = new LinkedList<>();
+        final List<BusinessEntry<T, R, B, E>> entries = this.map(rows, roots::add);
+        final List<BusinessEntry<T, R, B, E>> store = List.copyOf(entries);
         final O invoice;
         if (roots.size() != 1) {
-            data.forEach((e, h) -> error(h, FATAL, root, buildMessage(root.getGroupType())));
+            entries.forEach(r -> r.handle(FATAL, root, buildMessage(root.getGroupType()), index));
             invoice = null;
         } else {
-            invoice = link(roots.get(0), data);
+            final BusinessEntry<T, R, B, E> main = roots.get(0);
+            entries.removeAll(roots);
+            link(main, entries);
+            root.getLinker().link(null, main.getSegment());
+            entries.forEach(r -> r.handle(WARNING, r.getType(), "segment is detached", index));
+            //noinspection unchecked
+            invoice = (O) main.getSegment();
         }
-        // Collecting errors
         final List<E> errors = new LinkedList<>();
-        all.forEach((e, h) -> errors.addAll(h.toList()));
+        store.forEach(r -> r.collect(errors));
         return result.apply(invoice, errors);
     }
 

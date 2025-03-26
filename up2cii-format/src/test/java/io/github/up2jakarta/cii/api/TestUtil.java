@@ -195,7 +195,7 @@ public class TestUtil {
     }
 
     public Document parseDocument(File xmlFile) throws Exception {
-        final DocumentBuilder documentBuilder = context.getBean(InvoiceValidator.class).getDocumentBuilder();
+        final DocumentBuilder documentBuilder = context.getBean(InvoiceValidator.class).newDocumentBuilder();
         return documentBuilder.parse(xmlFile);
     }
 

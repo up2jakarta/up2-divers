@@ -22,4 +22,5 @@ public interface Parsed<T extends InputType<T>, R extends InputSegment<T>> exten
      * @param record the input source
      */
     void setRecord(R record);
+
 }

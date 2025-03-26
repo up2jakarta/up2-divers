@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.extension.DataType;
+import io.github.up2jakarta.csv.data.DataType;
 
 @SuppressWarnings("unused")
 public enum DataId implements DataType<DataId> {

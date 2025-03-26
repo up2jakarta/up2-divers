@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.test.ext;
 
+import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.extension.DataTypeResolver;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.impl.DataId;
 

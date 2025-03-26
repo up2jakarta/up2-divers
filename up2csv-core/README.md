@@ -1,8 +1,12 @@
 # Up2CSV :: Core Framework
 
-`Up2CSV` is an open-source, light and modern framework that maps and validates easily flat-data to javaBeans.
-
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2csv-core?style=for-the-badge&color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2csv-core)
+
+- `Up2CSV` is an open-source, light and modern framework that maps and validates easily flat-data to javaBeans.
+- `Up2CSV` helps developers to parse `business-object` in the case of data is spread over `several` segments (`CSV` records).
+- `Up2CSV` comes with pre-build tools that support persist-able objects (`JPA`) or exportable like (`XML` or `JSON`).
+
+Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready entities` in single pass within `less-code` approach.
 
 # Features
 
@@ -559,7 +563,7 @@ private EventCreator<InputRowImpl, ?, ?, InputErrorImpl> creator;
 
 # Business Aggregation
 
-- The final goal of Up2CSV-Core is to parse a `business-object` when data is spread over several segments (CSV records).
+The final goal of Up2CSV-Core is to parse a `business-object` in case of data is spread over several segments.
 
 ## Sample Business Case
 

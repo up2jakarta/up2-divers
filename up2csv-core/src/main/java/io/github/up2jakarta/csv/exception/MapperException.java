@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.exception;
 
-import io.github.up2jakarta.csv.extension.DataType;
+import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.extension.SeverityType;
 
 public class MapperException extends PropertyException {

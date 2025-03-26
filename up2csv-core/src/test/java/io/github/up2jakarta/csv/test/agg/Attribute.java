@@ -3,6 +3,7 @@ package io.github.up2jakarta.csv.test.agg;
 import io.github.up2jakarta.csv.annotation.Position;
 import io.github.up2jakarta.csv.annotation.Up2Number;
 import io.github.up2jakarta.csv.extension.Linked;
+import io.github.up2jakarta.csv.extension.Parsed;
 import io.github.up2jakarta.csv.impl.Parsable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -49,7 +50,7 @@ public class Attribute extends Parsable implements Linked {
     }
 
     @Override
-    public boolean isParent(Object parent) {
+    public boolean isParent(Parsed<?, ?> parent) {
         return id != null && (parent instanceof Item i) && id.equals(i.getId());
     }
 

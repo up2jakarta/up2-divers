@@ -1,10 +1,12 @@
 package io.github.up2jakarta.cii;
 
 import io.github.up2jakarta.cii.xml.InvoicePrefixMapper;
+import io.github.up2jakarta.cii.xml.XContext;
 import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 import javax.xml.namespace.QName;
+import javax.xml.validation.Schema;
 import java.net.URL;
 
 /**
@@ -19,6 +21,7 @@ public interface CII {
     String XSD_ROOT = "CII_D16B";
     String XSD_PATH = XSD_ROOT + "/uncefact/data/standard/CrossIndustryInvoice_100pD16B.xsd";
     URL XSD_URL = CLASS_LOADER.getResource(CII.XSD_PATH);
+    Schema CII_SCHEMA = XContext.getSchema(XSD_URL);
 
     // URI(s) for CII-D16B
     String XML_SCHEMA_RSM_NAMESPACE_URL = "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100";

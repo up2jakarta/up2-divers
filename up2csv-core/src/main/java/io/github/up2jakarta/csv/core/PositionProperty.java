@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.core;
 
+import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.extension.DataType;
 
 import java.lang.reflect.Field;
 import java.util.List;

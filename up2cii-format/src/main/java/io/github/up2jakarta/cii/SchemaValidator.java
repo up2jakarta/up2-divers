@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import static io.github.up2jakarta.cii.CII.XSD_URL;
+import static io.github.up2jakarta.cii.CII.CII_SCHEMA;
 
 /**
  * Thread-safe processor that checks CII-D16B invoices against Schema (Syntax).
@@ -32,7 +32,7 @@ import static io.github.up2jakarta.cii.CII.XSD_URL;
 public class SchemaValidator extends XProcessor<CrossIndustryInvoiceType> implements IValidator<IValidationError> {
 
     public SchemaValidator() {
-        super(CrossIndustryInvoiceType.class, XSD_URL, null);
+        super(CrossIndustryInvoiceType.class, CII_SCHEMA, null);
     }
 
     private Validator createValidator() {
@@ -49,7 +49,7 @@ public class SchemaValidator extends XProcessor<CrossIndustryInvoiceType> implem
 
     @Override
     public List<IValidationError> validate(File xmlFile) throws IOException {
-        return this.validate(getStreamSource(xmlFile));
+        return this.validate(newStreamSource(xmlFile));
     }
 
     @Override

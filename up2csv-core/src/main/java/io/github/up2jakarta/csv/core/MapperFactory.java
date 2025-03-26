@@ -2,8 +2,12 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.annotation.Position;
+import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.exception.BeanException;
-import io.github.up2jakarta.csv.extension.*;
+import io.github.up2jakarta.csv.extension.BeanContext;
+import io.github.up2jakarta.csv.extension.Nullable;
+import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputSegment;
 import io.github.up2jakarta.csv.misc.Beans;
@@ -188,7 +192,7 @@ public final class MapperFactory<D extends DataType<D>> {
 
         @Override
         public List<Property<?, D>> toList() {
-            return properties;
+            return this.properties;
         }
 
     }

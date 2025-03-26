@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.annotation.Error;
+import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.exception.PropertyException;
 import io.github.up2jakarta.csv.extension.ConfigurableProcessor;
-import io.github.up2jakarta.csv.extension.DataType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

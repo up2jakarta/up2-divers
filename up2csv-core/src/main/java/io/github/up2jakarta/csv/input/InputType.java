@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.input;
 
+import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.extension.CodeList;
-import io.github.up2jakarta.csv.extension.DataType;
 import io.github.up2jakarta.csv.extension.Parsed;
 
 /**

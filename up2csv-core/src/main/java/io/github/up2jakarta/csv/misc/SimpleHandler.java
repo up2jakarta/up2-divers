@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.misc;
 
 import io.github.up2jakarta.csv.core.DefaultHandler;
-import io.github.up2jakarta.csv.extension.DataType;
+import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputRepository;
 import io.github.up2jakarta.csv.input.InputSegment;

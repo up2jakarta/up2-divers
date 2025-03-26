@@ -1,6 +1,7 @@
-package io.github.up2jakarta.csv.extension;
+package io.github.up2jakarta.csv.data;
 
 import io.github.up2jakarta.csv.exception.BeanException;
+import io.github.up2jakarta.csv.extension.Segment;
 
 import java.lang.reflect.Field;
 import java.util.Optional;

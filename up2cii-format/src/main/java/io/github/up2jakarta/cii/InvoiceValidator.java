@@ -6,7 +6,7 @@ import io.github.up2jakarta.cii.api.XValidationException;
 import io.github.up2jakarta.cii.api.XValidator;
 import io.github.up2jakarta.cii.xml.FailSafeHandler;
 import io.github.up2jakarta.cii.xml.SAXParseError;
-import io.github.up2jakarta.cii.xml.XProcessor;
+import io.github.up2jakarta.cii.xml.XBuilder;
 import io.github.up2jakarta.csv.extension.SeverityType;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -19,16 +19,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static io.github.up2jakarta.cii.CII.XSD_URL;
+import static io.github.up2jakarta.cii.CII.CII_QNAME;
+import static io.github.up2jakarta.cii.CII.CII_SCHEMA;
 import static java.util.Collections.singletonList;
 
 /**
  * Thread-safe processor that checks CII-D16B invoice is readable (Syntax and Data-format).
  */
-public class InvoiceValidator<I> extends XProcessor<I> implements XValidator<I> {
+public class InvoiceValidator<I> extends XBuilder<I> implements XValidator<I> {
 
     public InvoiceValidator(Class<I> type, final XmlAdapter<?, ?>[] adapters) {
-        super(type, XSD_URL, adapters);
+        super(CII_QNAME, type, false, CII_SCHEMA, adapters);
     }
 
     private static List<IValidationError> getOrThrowError(JAXBException ex) {
@@ -40,14 +41,14 @@ public class InvoiceValidator<I> extends XProcessor<I> implements XValidator<I> 
 
     @Override
     public List<IValidationError> validate(File xmlFile) throws IOException {
-        return this.validate(getStreamSource(xmlFile));
+        return this.validate(newStreamSource(xmlFile));
     }
 
     @Override
     public List<IValidationError> validate(StreamSource xmlFile) throws IOException {
         var handler = new FailSafeHandler(false);
         try {
-            var unmarshaller = createUnmarshaller(handler);
+            var unmarshaller = newUnmarshaller(handler);
             unmarshaller.unmarshal(xmlFile, type);
         } catch (JAXBException ex) {
             return getOrThrowError(ex);
@@ -59,7 +60,7 @@ public class InvoiceValidator<I> extends XProcessor<I> implements XValidator<I> 
     public List<IValidationError> validate(Document xmlDocument) {
         var handler = new FailSafeHandler(false);
         try {
-            var unmarshaller = createUnmarshaller(handler);
+            var unmarshaller = newUnmarshaller(handler);
             unmarshaller.unmarshal(xmlDocument, type);
         } catch (JAXBException ex) {
             return getOrThrowError(ex);
@@ -71,9 +72,9 @@ public class InvoiceValidator<I> extends XProcessor<I> implements XValidator<I> 
     public List<IValidationError> validate(I invoice) {
         var handler = new FailSafeHandler(false);
         try {
-            var document = createDocument();
-            var marshaller = createMarshaller(handler, InvoiceWriter.NS_PREFIX_MAPPER);
-            var root = createJAXBElement(invoice);
+            var document = newDocument();
+            var marshaller = newMarshaller(handler, InvoiceWriter.NS_PREFIX_MAPPER);
+            var root = newElement(invoice);
             marshaller.marshal(root, document);
         } catch (JAXBException ex) {
             return getOrThrowError(ex);

@@ -18,6 +18,10 @@ public enum ProfileType implements CodeList<ProfileType> {
 
     EN_16931("urn:cen.eu:en16931:2017"),
 
+    FR_F1_BASE("urn.cpro.gouv.fr:1p0:einvoicingextract#Base"),
+
+    FR_F1_FULL("urn.cpro.gouv.fr:1p0:einvoicingextract#Full"),
+
     @Deprecated(since = "2.3", forRemoval = true)
     MINIMUM("urn:factur-x.eu:1p0:minimum"),
 

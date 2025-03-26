@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.annotation.Error;
+import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.exception.PropertyException;
-import io.github.up2jakarta.csv.extension.DataType;
 import io.github.up2jakarta.csv.extension.SeverityType;
 import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputRepository;
@@ -90,30 +90,12 @@ public class DefaultHandler<R extends InputSegment<?>, K extends InputError.Key<
         return row;
     }
 
-    /**
-     * @return the list of collected errors.
-     */
     @Override
     public List<E> toList() {
         return collector.toList();
     }
 
-    /**
-     * Pushes the given <code>error</code> to list of collected errors.
-     *
-     * @param error the new error.
-     */
-    @SuppressWarnings("unused")
-    public void add(E error) {
-        collector.addWithOrder(null, error, false);
-    }
-
-    /**
-     * Pushes the list of collected errors to the given <code>target</code> collection.
-     *
-     * @param target the collection of errors
-     */
-    @SuppressWarnings("unused")
+    @Override
     public void addTo(Collection<E> target) {
         collector.addTo(target);
     }
