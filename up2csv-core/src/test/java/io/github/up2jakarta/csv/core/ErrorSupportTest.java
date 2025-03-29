@@ -53,20 +53,20 @@ public class ErrorSupportTest {
         assertEquals(2, errors.size());
         {
             final SimpleErrorEntity error = errors.get(0);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(0, error.getOffset());
-            assertEquals(SeverityType.FATAL, error.getSeverity());
+            assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Dummy1Processor.TU_P_001, error.getCode());
             assertEquals("property", error.getMessage());
             assertNotNull(error.getTrace());
         }
         {
             final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(1, error.getOrder());
             assertEquals(1, error.getOffset());
-            assertEquals(SeverityType.ERROR, error.getSeverity());
+            assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(ERROR_PROCESSOR, error.getCode());
             assertEquals("io.github.up2jakarta.csv.test.ext.DummyException: dummy", error.getMessage());
             assertNotNull(error.getTrace());
@@ -88,7 +88,7 @@ public class ErrorSupportTest {
         assertEquals(2, errors.size());
         {
             final SimpleErrorEntity error = errors.get(0);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(0, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
@@ -98,10 +98,10 @@ public class ErrorSupportTest {
         }
         {
             final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(1, error.getOrder());
             assertEquals(1, error.getOffset());
-            assertEquals(SeverityType.FATAL, error.getSeverity());
+            assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(Test4Processor.TU_P_003, error.getCode());
             assertEquals("io.github.up2jakarta.csv.test.ext.DummyException: dummy", error.getMessage());
             assertNotNull(error.getTrace());
@@ -123,7 +123,7 @@ public class ErrorSupportTest {
         assertEquals(2, errors.size());
         {
             final SimpleErrorEntity error = errors.get(0);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(0, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
@@ -133,7 +133,7 @@ public class ErrorSupportTest {
         }
         {
             final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(1, error.getOrder());
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
@@ -158,7 +158,7 @@ public class ErrorSupportTest {
         assertEquals(2, errors.size());
         {
             final SimpleErrorEntity error = errors.get(0);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(0, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
@@ -168,10 +168,10 @@ public class ErrorSupportTest {
         }
         {
             final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(1, error.getOrder());
             assertEquals(1, error.getOffset());
-            assertEquals(SeverityType.FATAL, error.getSeverity());
+            assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(Test2Converter.TU_P_006, error.getCode());
             assertEquals("java.lang.NumberFormatException: For input string: \"int\"", error.getMessage());
             assertNull(error.getTrace());
@@ -193,7 +193,7 @@ public class ErrorSupportTest {
         assertEquals(3, errors.size());
         {
             final SimpleErrorEntity error = errors.get(0);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(0, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
@@ -203,17 +203,17 @@ public class ErrorSupportTest {
         }
         {
             final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(1, error.getOrder());
             assertEquals(1, error.getOffset());
-            assertEquals(SeverityType.FATAL, error.getSeverity());
+            assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(MeasurementUnitConverter.EDI_R_20, error.getCode());
             assertEquals("Unknown value [XGM] for CodeList[MeasurementUnitCode]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
             final SimpleErrorEntity error = errors.get(2);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(2, error.getOrder());
             assertEquals(2, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
@@ -238,17 +238,17 @@ public class ErrorSupportTest {
         assertEquals(2, errors.size());
         {
             final SimpleErrorEntity error = errors.get(0);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(0, error.getOffset());
-            assertEquals(SeverityType.FATAL, error.getSeverity());
+            assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(Test2Resolver.TU_P_007, error.getCode());
             assertEquals("Unknown value [date] for CodeList[MeasurementUnitCode]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
             final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(1, error.getOrder());
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
@@ -274,7 +274,7 @@ public class ErrorSupportTest {
         assertEquals(7, errors.size());
         {
             final SimpleErrorEntity error = errors.get(0);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertNotNull(error.getOrder());
             assertEquals(0, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
@@ -284,7 +284,7 @@ public class ErrorSupportTest {
         }
         {
             final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertNotNull(error.getOrder());
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
@@ -294,27 +294,27 @@ public class ErrorSupportTest {
         }
         {
             final SimpleErrorEntity error = errors.get(2);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertNotNull(error.getOrder());
             assertEquals(2, error.getOffset());
-            assertEquals(SeverityType.ERROR, error.getSeverity());
+            assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(ERROR_VALIDATOR, error.getCode());
             assertEquals("must not be empty", error.getMessage());
             assertNull(error.getTrace());
         }
         {
             final SimpleErrorEntity error = errors.get(3);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertNotNull(error.getOrder());
             assertEquals(3, error.getOffset());
-            assertEquals(SeverityType.FATAL, error.getSeverity());
+            assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(ERROR_VALIDATOR, error.getCode());
             assertEquals("must not be null", error.getMessage());
             assertNull(error.getTrace());
         }
         {
             final SimpleErrorEntity error = errors.get(4);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertNotNull(error.getOrder());
             assertEquals(4, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
@@ -324,17 +324,17 @@ public class ErrorSupportTest {
         }
         {
             final SimpleErrorEntity error = errors.get(5);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertNotNull(error.getOrder());
             assertEquals(5, error.getOffset());
-            assertEquals(SeverityType.FATAL, error.getSeverity());
+            assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Tests.ERROR_CODE, error.getCode());
             assertEquals("must not be empty", error.getMessage());
             assertNull(error.getTrace());
         }
         {
             final SimpleErrorEntity error = errors.get(6);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertNotNull(error.getOrder());
             assertEquals(6, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
@@ -360,17 +360,17 @@ public class ErrorSupportTest {
         assertEquals(3, errors.size());
         {
             final SimpleErrorEntity error = errors.get(0);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertNotNull(error.getOrder());
             assertEquals(0, error.getOffset());
-            assertEquals(SeverityType.FATAL, error.getSeverity());
+            assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Test2Validator.TU_P_009, error.getCode());
             assertEquals("must not be empty", error.getMessage());
             assertNull(error.getTrace());
         }
         {
             final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertNotNull(error.getOrder());
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
@@ -380,10 +380,10 @@ public class ErrorSupportTest {
         }
         {
             final SimpleErrorEntity error = errors.get(2);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertNotNull(error.getOrder());
             assertEquals(2, error.getOffset());
-            assertEquals(SeverityType.ERROR, error.getSeverity());
+            assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Test2Validator.TU_P_021, error.getCode());
             assertEquals("must not be empty", error.getMessage());
             assertNull(error.getTrace());

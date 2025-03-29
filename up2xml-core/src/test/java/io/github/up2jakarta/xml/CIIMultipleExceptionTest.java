@@ -21,7 +21,7 @@ public class CIIMultipleExceptionTest {
     private static final XMultipleException EXCEPTION = new XMultipleException(CAUSE, CAUSES);
 
     private static final List<String> PRINTED_LINES = Arrays.asList(
-            "Multiple exceptions occurred:",
+            "Multiple exceptions have been occurred:",
             "1) " + XValidationException.class.getName() + ": java.lang.NullPointerException: Cause",
             "Caused by: java.lang.NullPointerException: Cause",
             "2) " + XValidationException.class.getName() + ": java.lang.Exception: Another",

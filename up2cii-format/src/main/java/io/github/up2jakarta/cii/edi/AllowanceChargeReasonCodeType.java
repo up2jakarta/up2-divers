@@ -12,11 +12,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 4465 (AllowanceChargeReasonCode) : Adjustment reason description code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred4465.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred4465.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList(value = "4465", type = AdjustmentReasonCodeType.class)
-@Documented(value = "Allowance Charge Reason Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Allowance Charge Reason Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.4", date = "2008-08-23")
 @XmlJavaTypeAdapter(AllowanceChargeReasonCodeAdapter.class)
 public enum AllowanceChargeReasonCodeType implements ChargeReasonCodeType<AllowanceChargeReasonCodeType> {
@@ -82,8 +82,8 @@ public enum AllowanceChargeReasonCodeType implements ChargeReasonCodeType<Allowa
     V_12(AdjustmentReasonCodeType.V_12),
 
     /**
-     * Buyer claims an existing (financial) obligation from seller which (partly) offsets
-     * the outstanding invoice(s).
+     * Buyer claims an existing (financial) obligation from seller which (partly) offsets the
+     * outstanding invoice(s).
      */
     V_13(AdjustmentReasonCodeType.V_13),
 
@@ -108,8 +108,8 @@ public enum AllowanceChargeReasonCodeType implements ChargeReasonCodeType<Allowa
     V_17(AdjustmentReasonCodeType.V_17),
 
     /**
-     * Buyer does not accept invoice(s) charge as it relates to goods where the ownership
-     * remains with the seller until sold.
+     * Buyer does not accept invoice(s) charge as it relates to goods where the ownership remains
+     * with the seller until sold.
      */
     V_18(AdjustmentReasonCodeType.V_18),
 
@@ -190,8 +190,8 @@ public enum AllowanceChargeReasonCodeType implements ChargeReasonCodeType<Allowa
     V_33(AdjustmentReasonCodeType.V_33),
 
     /**
-     * Factor informs the seller that a certain invoice(s) was paid by the buyer directly
-     * to the seller.
+     * Factor informs the seller that a certain invoice(s) was paid by the buyer directly to
+     * the seller.
      */
     V_34(AdjustmentReasonCodeType.V_34),
 
@@ -371,8 +371,8 @@ public enum AllowanceChargeReasonCodeType implements ChargeReasonCodeType<Allowa
     V_68(AdjustmentReasonCodeType.V_68),
 
     /**
-     * Adjustment has been made because an incorrect due date was referred to with regard
-     * to the monetary amount.
+     * Adjustment has been made because an incorrect due date was referred to with regard to
+     * the monetary amount.
      */
     V_69(AdjustmentReasonCodeType.V_69),
 
@@ -445,8 +445,8 @@ public enum AllowanceChargeReasonCodeType implements ChargeReasonCodeType<Allowa
     V_82(AdjustmentReasonCodeType.V_82),
 
     /**
-     * The adjustment was made due to the card acceptor specifying an expired expiry date
-     * within the filing document or electronic data.
+     * The adjustment was made due to the card acceptor specifying an expired expiry date within
+     * the filing document or electronic data.
      */
     V_83(AdjustmentReasonCodeType.V_83),
 
@@ -457,8 +457,8 @@ public enum AllowanceChargeReasonCodeType implements ChargeReasonCodeType<Allowa
     V_84(AdjustmentReasonCodeType.V_84),
 
     /**
-     * The adjustment was made due to the permission limit defined by card issuer or card
-     * company was exceeded without prior authorisation. Synonym: Floor limit.
+     * The adjustment was made due to the permission limit defined by card issuer or card company
+     * was exceeded without prior authorisation. Synonym: Floor limit.
      */
     V_85(AdjustmentReasonCodeType.V_85),
 

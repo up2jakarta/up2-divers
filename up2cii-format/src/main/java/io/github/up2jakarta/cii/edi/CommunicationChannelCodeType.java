@@ -8,11 +8,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 3155 (CommunicationChannelCode) : Communication means type code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred3155.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred3155.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList("3155")
-@Documented(value = "Communication Means Type Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Communication Means Type Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.4", date = "2008-08-23")
 @XmlJavaTypeAdapter(CommunicationChannelCodeAdapter.class)
 public enum CommunicationChannelCodeType implements CodeList<CommunicationChannelCodeType> {
@@ -194,8 +194,8 @@ public enum CommunicationChannelCodeType implements CodeList<CommunicationChanne
     PB("PB", "Postbox number"),
 
     /**
-     * The process of routing and transferring data by means of addressed packets so that
-     * a channel is occupied only during the transmission; upon completion of the transmission
+     * The process of routing and transferring data by means of addressed packets so that a
+     * channel is occupied only during the transmission; upon completion of the transmission
      * the channel is made available for the transfer of other packets (ISO).
      */
     PS("PS", "Packet switching"),

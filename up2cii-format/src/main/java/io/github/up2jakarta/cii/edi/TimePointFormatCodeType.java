@@ -15,12 +15,12 @@ import static io.github.up2jakarta.cii.CII.*;
 
 /**
  * Based on UN/CEFACT 2379 : Date or time or period format code
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred2379.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred2379.htm}
  */
-@Generated(value = "CII", comments = "by Abderrazek ABBESSI")
+@Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList("2379")
-@Documented(value = "TimePointFormatCode", agency = Agency.UN_ECE, version = "D22B")
-@Schema(agency = "UN/CEFACT", version = "4.5", date = "2008-08-23")
+@Documented(value = "TimePointFormatCode", agency = Agency.UN_ECE, version = "D22A")
+@Schema(agency = "UN/CEFACT", version = "4.2", date = "2008-08-23")
 @XmlJavaTypeAdapter(TimePointFormatCodeAdapter.class)
 public enum TimePointFormatCodeType implements CodeList<TimePointFormatCodeType> {
 

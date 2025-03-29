@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 1373 : Document status code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred1373.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred1373.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Document Status Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Document Status Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.9", date = "2008-08-23")
 @XmlJavaTypeAdapter(DocumentStatusCodeAdapter.class)
 public enum DocumentStatusCodeType implements CodeList<DocumentStatusCodeType> {
@@ -83,15 +83,15 @@ public enum DocumentStatusCodeType implements CodeList<DocumentStatusCodeType> {
 
     /**
      * Customs declaration to which the document is related does not complete or exhaust the
-     * allowance stated on the document . The document is not attached to the declaration
-     * but has already been lodged in the Customs station.
+     * allowance stated on the document . The document is not attached to the declaration but
+     * has already been lodged in the Customs station.
      */
     V_13("13", "Document not exhausted by declaration and attached"),
 
     /**
      * Customs declaration to which the document is related completed or exhaust the allowance
-     * stated on the document. The usage of the document is complete. The document is not
-     * attached to the declaration but has already been lodged in the Customs station.
+     * stated on the document. The usage of the document is complete. The document is not attached
+     * to the declaration but has already been lodged in the Customs station.
      */
     V_14("14", "Document exhausted by declaration and previously lodged"),
 
@@ -228,76 +228,59 @@ public enum DocumentStatusCodeType implements CodeList<DocumentStatusCodeType> {
     /**
      * The validity of the document is or has been suspended.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_40("40", "Validity suspended"),
 
     /**
      * The validity of the document is or has been revoked.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_41("41", "Validity revoked"),
 
     /**
      * The specified document is in error.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_42("42", "In error"),
 
     /**
      * The document is received.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_43("43", "Received"),
 
     /**
      * The document is accepted, but has generated warnings.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_44("44", "Accepted with warnings"),
 
     /**
      * Indicates that the document is being processed.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_45("45", "In process"),
 
     /**
      * Indicates that the document has been halted pending response to a query.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_46("46", "Under query"),
 
     /**
      * Indicates that the document has been paid.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_47("47", "Paid"),
 
     /**
      * Indicates that the document is acknowledged as understood and submitted for further
      * processing.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_48("48", "Acknowledged"),
 
     /**
      * Indicates that the document is accepted under conditions stated and proceeded accordingly
      * unless disputed.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_49("49", "Conditionally accepted"),
 
     /**
      * Indicates that the document has been rejected, and a clarification or reason is required.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_50("50", "Rejected, no further processing"),
-
-    /**
-     * Notice that a specific document or message will be sent by electronic means.
-     */
-    @Deprecated(since = "D23A", forRemoval = false)
-    V_51("51", "To arrive by electronic means"),
     ;
 
     private final String name;

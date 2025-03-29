@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 8169 : Full or empty indicator code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred8169.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred8169.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Transport Equipment Fullness Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Transport Equipment Fullness Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.1", date = "2008-08-23")
 @XmlJavaTypeAdapter(TransportEquipmentFullnessCodeAdapter.class)
 public enum TransportEquipmentFullnessCodeType implements CodeList<TransportEquipmentFullnessCodeType> {
@@ -50,8 +50,8 @@ public enum TransportEquipmentFullnessCodeType implements CodeList<TransportEqui
     V_6("6", "No volume available"),
 
     /**
-     * Indicates that the equipment is fully loaded, and includes a number LCL (Less Than
-     * Container Load) consignments.
+     * Indicates that the equipment is fully loaded, and includes a number LCL (Less Than Container
+     * Load) consignments.
      */
     V_7("7", "Full, mixed consignment"),
 

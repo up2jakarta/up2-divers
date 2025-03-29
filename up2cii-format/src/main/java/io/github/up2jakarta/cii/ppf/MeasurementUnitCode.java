@@ -2039,7 +2039,7 @@ public enum MeasurementUnitCode implements CodeList<MeasurementUnitCode> {
     XUC("XUC", "Uncaged"),
     XUN("XUN", "Unit"),
     XVA("XVA", "Vat"),
-    XVG("XVG", "Bulk, gas (at 1031 mbar and 15 °C)"),
+    XVG("XVG", "Bulk, gas (at 1031 mbar and 15°C)"),
     XVI("XVI", "Vial"),
     XVK("XVK", "Vanpack"),
     XVL("XVL", "Bulk, liquid"),

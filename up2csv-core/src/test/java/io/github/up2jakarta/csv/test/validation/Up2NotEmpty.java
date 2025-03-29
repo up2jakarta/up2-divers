@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = {Up2NotEmptyValidator.class})
-@Error(value = Tests.ERROR_CODE, severity = SeverityType.FATAL)
+@Error(value = Tests.ERROR_CODE, severity = SeverityType.WARNING)
 @SuppressWarnings("unused")
 public @interface Up2NotEmpty {
 

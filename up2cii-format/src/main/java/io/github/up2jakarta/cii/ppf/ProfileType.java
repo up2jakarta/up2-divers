@@ -11,7 +11,7 @@ import javax.annotation.processing.Generated;
 /**
  * Based on FR/PPF S1.06 : Profile Type.
  */
-@Generated(value = "PPF", comments = "by Abderrazek ABBESSI")
+@Generated(value = "PPF", comments = "by A.ABBESSI")
 @Documented(value = "Profile type", agency = Agency.EN_16931, version = "2.3")
 @XmlJavaTypeAdapter(ProfileAdapter.class)
 public enum ProfileType implements CodeList<ProfileType> {

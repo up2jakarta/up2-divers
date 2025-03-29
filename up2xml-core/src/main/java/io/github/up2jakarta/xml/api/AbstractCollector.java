@@ -32,7 +32,7 @@ public abstract class AbstractCollector implements ValidationEventHandler {
                 throw cause;
             }
             final List<XValidationException> causes = errors.stream().map(XValidationException::new).toList();
-            throw new XMultipleException(cause, causes);
+            throw new XMultipleException(cause, List.copyOf(causes));
         }
     }
 

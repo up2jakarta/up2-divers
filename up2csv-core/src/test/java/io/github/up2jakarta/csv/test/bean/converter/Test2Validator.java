@@ -19,7 +19,7 @@ public class Test2Validator implements Segment {
     public static final String TU_P_021 = "TU-P021";
 
     @Position(0)
-    @Error(value = TU_P_009, severity = SeverityType.FATAL)
+    @Error(value = TU_P_009, severity = SeverityType.WARNING)
     @NotEmpty
     private String sequence;
 
@@ -29,7 +29,7 @@ public class Test2Validator implements Segment {
     private String other;
 
     @Position(2)
-    @Error(value = TU_P_021, severity = SeverityType.ERROR)
+    @Error(value = TU_P_021, severity = SeverityType.WARNING)
     @Up2NotEmpty(payload = Up2Warn.class)
     private String andMore;
 

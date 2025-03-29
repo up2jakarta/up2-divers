@@ -11,7 +11,7 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 7065 : Package type description code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred7065.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred7065.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @Documented(value = "Package Type Code", agency = Agency.UN_ECE, version = "2006")
@@ -192,8 +192,8 @@ public enum PackageTypeCodeType implements CodeList<PackageTypeCodeType> {
     FD("FD", "Crate, framed"),
 
     /**
-     * A flexible containment tank made of plastic, typically for the transportation bulk
-     * non-hazardous cargoes using standard size shipping containers.
+     * A flexible containment tank made of plastic, typically for the transportation bulk non-hazardous
+     * cargoes using standard size shipping containers.
      */
     FE("FE", "Flexitank"),
     FI("FI", "Firkin"),
@@ -204,8 +204,8 @@ public enum PackageTypeCodeType implements CodeList<PackageTypeCodeType> {
     FT("FT", "Foodtainer"),
 
     /**
-     * Wheeled flat bedded device on which trays or other regular shaped items are packed
-     * for transportation purposes.
+     * Wheeled flat bedded device on which trays or other regular shaped items are packed for
+     * transportation purposes.
      */
     FW("FW", "Cart, flatbed"),
     FX("FX", "Bag, flexible container"),
@@ -275,8 +275,7 @@ public enum PackageTypeCodeType implements CodeList<PackageTypeCodeType> {
     KI("KI", "Kit"),
 
     /**
-     * A collection of bags, cases and/or containers which hold personal belongings for a
-     * journey.
+     * A collection of bags, cases and/or containers which hold personal belongings for a journey.
      */
     LE("LE", "Luggage"),
     LG("LG", "Log"),
@@ -316,58 +315,49 @@ public enum PackageTypeCodeType implements CodeList<PackageTypeCodeType> {
     NV("NV", "Net, tube, textile"),
 
     /**
-     * A two sided cage mounted on wheels with fixing strap. Dimensions: 900 x 770 x 1513
-     * cm (length x width x height).
+     * A two sided cage mounted on wheels with fixing strap. Dimensions: 900 x 770 x 1513 cm
+     * (length x width x height).
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     O1("O1", "Two sided cage on wheels with fixing strap"),
 
     /**
      * A low cart for the transportation and storage of groceries, milk, etc.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     O2("O2", "Trolley"),
 
     /**
      * Oneway pallet with dimensions 80 X 60 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     O3("O3", "Oneway pallet ISO 0 - 1/2 EURO Pallet"),
 
     /**
      * Oneway pallet with dimensions 80 X 120 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     O4("O4", "Oneway pallet ISO 1 - 1/1 EURO Pallet"),
 
     /**
      * Oneway pallet with dimensions 100 X 120 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     O5("O5", "Oneway pallet ISO 2 - 2/1 EURO Pallet"),
 
     /**
      * Pallet with non-standard dimensions.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     O6("O6", "Pallet with exceptional dimensions"),
 
     /**
      * Wooden pallet with dimensions 40 cm x 80 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     O7("O7", "Wooden pallet  40 cm x 80 cm"),
 
     /**
      * SRS (Svenska Retursystem) standard synthetic pallet of dimensions 60 cm x 80 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     O8("O8", "Plastic pallet SRS 60 cm x 80 cm"),
 
     /**
      * SRS (Svenska Retursystem) standard synthetic pallet of dimensions 80 cm x 120 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     O9("O9", "Plastic pallet SRS 80 cm x 120 cm"),
 
     /**
@@ -404,25 +394,21 @@ public enum PackageTypeCodeType implements CodeList<PackageTypeCodeType> {
     /**
      * Standard pallet with dimensions 80 X 60 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OG("OG", "Pallet ISO 0 - 1/2 EURO Pallet"),
 
     /**
      * Standard pallet with dimensions 80 X 120 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OH("OH", "Pallet ISO 1 - 1/1 EURO Pallet"),
 
     /**
      * Standard pallet with dimensions 100 X 120 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OI("OI", "Pallet ISO 2 - 2/1 EURO Pallet"),
 
     /**
      * Standard pallet with dimensions 60 X 40 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OJ("OJ", "1/4 EURO Pallet"),
 
     /**
@@ -433,45 +419,38 @@ public enum PackageTypeCodeType implements CodeList<PackageTypeCodeType> {
     /**
      * Standard pallet with dimensions 40 X 30 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OL("OL", "1/8 EURO Pallet"),
 
     /**
-     * A standard pallet with standard dimensions 80 x 120cm made of a synthetic material
-     * for hygienic reasons.
+     * A standard pallet with standard dimensions 80 x 120cm made of a synthetic material for
+     * hygienic reasons.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OM("OM", "Synthetic pallet ISO 1"),
 
     /**
      * A standard pallet with standard dimensions 100 x 120cm made of a synthetic material
      * for hygienic reasons.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     ON("ON", "Synthetic pallet ISO 2"),
 
     /**
      * Pallet provided by the wholesaler.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OP("OP", "Wholesaler pallet"),
 
     /**
      * Pallet with dimensions 80 X 100 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OQ("OQ", "Pallet 80 X 100 cm"),
 
     /**
      * Pallet with dimensions 60 X 100 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OR("OR", "Pallet 60 X 100 cm"),
 
     /**
      * Pallet need not be returned to the point of expedition.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OS("OS", "Oneway pallet"),
 
     /**
@@ -489,42 +468,36 @@ public enum PackageTypeCodeType implements CodeList<PackageTypeCodeType> {
     /**
      * Pallet must be returned to the point of expedition.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OV("OV", "Returnable pallet"),
 
     /**
      * A non-rigid container made of fabric, paper, plastic, etc, with an opening at the top
      * which can be closed and which is suitable for use on pallets.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OW("OW", "Large bag, pallet sized"),
 
     /**
      * A wheeled pallet with raised rim for the storing and transporting of loads. Dimensions:
      * 81 x 67 x 135 cm (length x width x height).
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OX("OX", "A wheeled pallet with raised rim (81 x 67 x 135)"),
 
     /**
      * A wheeled pallet with raised rim for the storing and transporting of loads. Dimensions:
      * 81 x 72 x 135 cm (length x width x height).
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OY("OY", "A wheeled pallet with raised rim (81 x 72 x 135)"),
 
     /**
      * A wheeled pallet with raised rim for the storing and transporting of loads. Dimensions:
      * 81 x 60 x 16 cm (length x width x height).
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     OZ("OZ", "A wheeled pallet with raised rim (81 x 60 x 16)"),
 
     /**
      * Commonwealth Handling Equipment Pool (CHEP) standard pallet of dimensions 60 centimeters
      * x 80 centimeters.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     P1("P1", "CHEP pallet 60 cm x 80 cm"),
 
     /**
@@ -535,13 +508,11 @@ public enum PackageTypeCodeType implements CodeList<PackageTypeCodeType> {
     /**
      * LPR (La Pallet Rouge) standard pallet of dimensions 60 cm x 80 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     P3("P3", "LPR pallet 60 cm x 80 cm"),
 
     /**
      * LPR (La Pallet Rouge) standard pallet of dimensions 80 cm x 120 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     P4("P4", "LPR pallet 80 cm x 120 cm"),
     PA("PA", "Packet"),
     PB("PB", "Pallet, box"),

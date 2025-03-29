@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 4461 : Payment means code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred4461.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred4461.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Payment Means Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Payment Means Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.4", date = "2008-08-23")
 @XmlJavaTypeAdapter(PaymentMeansCodeAdapter.class)
 public enum PaymentMeansCodeType implements CodeList<PaymentMeansCodeType> {
@@ -67,8 +67,8 @@ public enum PaymentMeansCodeType implements CodeList<PaymentMeansCodeType> {
     V_9("9", "National or regional clearing"),
 
     /**
-     * Payment by currency (including bills and coins) in circulation, including checking
-     * account deposits.
+     * Payment by currency (including bills and coins) in circulation, including checking account
+     * deposits.
      */
     V_10("10", "In cash"),
 
@@ -103,8 +103,8 @@ public enum PaymentMeansCodeType implements CodeList<PaymentMeansCodeType> {
     V_16("16", "Bookentry debit"),
 
     /**
-     * A credit transaction made through the ACH system to a demand deposit account using
-     * the CCD payment format.
+     * A credit transaction made through the ACH system to a demand deposit account using the
+     * CCD payment format.
      */
     V_17("17", "ACH demand cash concentration/disbursement (CCD) credit"),
 
@@ -115,14 +115,14 @@ public enum PaymentMeansCodeType implements CodeList<PaymentMeansCodeType> {
     V_18("18", "ACH demand cash concentration/disbursement (CCD) debit"),
 
     /**
-     * A credit transaction made through the ACH system to a demand deposit account using
-     * the CTP payment format.
+     * A credit transaction made through the ACH system to a demand deposit account using the
+     * CTP payment format.
      */
     V_19("19", "ACH demand corporate trade payment (CTP) credit"),
 
     /**
-     * Payment by a pre-printed form on which instructions are given to an account holder
-     * (a bank or building society) to pay a stated sum to a named recipient.
+     * Payment by a pre-printed form on which instructions are given to an account holder (a
+     * bank or building society) to pay a stated sum to a named recipient.
      */
     V_20("20", "Cheque"),
 
@@ -169,8 +169,8 @@ public enum PaymentMeansCodeType implements CodeList<PaymentMeansCodeType> {
     V_27("27", "ACH demand corporate trade payment (CTP) debit"),
 
     /**
-     * A credit transaction made through the ACH system to a demand deposit account using
-     * the CTX payment format.
+     * A credit transaction made through the ACH system to a demand deposit account using the
+     * CTX payment format.
      */
     V_28("28", "ACH demand corporate trade exchange (CTX) credit"),
 
@@ -191,8 +191,8 @@ public enum PaymentMeansCodeType implements CodeList<PaymentMeansCodeType> {
     V_31("31", "Debit transfer"),
 
     /**
-     * A credit transaction made through the ACH system to a demand deposit account using
-     * the CCD+ payment format.
+     * A credit transaction made through the ACH system to a demand deposit account using the
+     * CCD+ payment format.
      */
     V_32("32", "ACH demand cash concentration/disbursement plus (CCD+) credit"),
 
@@ -214,8 +214,8 @@ public enum PaymentMeansCodeType implements CodeList<PaymentMeansCodeType> {
     V_35("35", "ACH savings cash concentration/disbursement (CCD) credit"),
 
     /**
-     * A debit transaction made through the ACH system to a savings account using the CCD
-     * payment format.
+     * A debit transaction made through the ACH system to a savings account using the CCD payment
+     * format.
      */
     V_36("36", "ACH savings cash concentration/disbursement (CCD) debit"),
 
@@ -226,8 +226,8 @@ public enum PaymentMeansCodeType implements CodeList<PaymentMeansCodeType> {
     V_37("37", "ACH savings corporate trade payment (CTP) credit"),
 
     /**
-     * A debit transaction made through the ACH system to a savings account using the CTP
-     * payment format.
+     * A debit transaction made through the ACH system to a savings account using the CTP payment
+     * format.
      */
     V_38("38", "ACH savings corporate trade payment (CTP) debit"),
 
@@ -238,8 +238,8 @@ public enum PaymentMeansCodeType implements CodeList<PaymentMeansCodeType> {
     V_39("39", "ACH savings corporate trade exchange (CTX) credit"),
 
     /**
-     * A debit transaction made through the ACH system to a savings account using the CTX
-     * payment format.
+     * A debit transaction made through the ACH system to a savings account using the CTX payment
+     * format.
      */
     V_40("40", "ACH savings corporate trade exchange (CTX) debit"),
 
@@ -298,8 +298,8 @@ public enum PaymentMeansCodeType implements CodeList<PaymentMeansCodeType> {
 
     /**
      * A French standard procedure that allows a debtor to pay an amount due to a creditor.
-     * The creditor will forward it to its bank, which will collect the money on the bank
-     * account of the debtor.
+     * The creditor will forward it to its bank, which will collect the money on the bank account
+     * of the debtor.
      */
     V_51("51", "FR, norme 6 97-Telereglement CFONB (French Organisation for Banking Standards)  - Option A"),
 
@@ -376,23 +376,23 @@ public enum PaymentMeansCodeType implements CodeList<PaymentMeansCodeType> {
     V_63("63", "Promissory note signed by the debtor and endorsed by a third party"),
 
     /**
-     * Payment by an unconditional promise in writing made by the bank to another person,
-     * signed by the bank, engaging to pay on demand or at a fixed or determinable future
-     * time a sum certain in money, to order or to bearer.
+     * Payment by an unconditional promise in writing made by the bank to another person, signed
+     * by the bank, engaging to pay on demand or at a fixed or determinable future time a sum
+     * certain in money, to order or to bearer.
      */
     V_64("64", "Promissory note signed by a bank"),
 
     /**
-     * Payment by an unconditional promise in writing made by the bank to another person,
-     * signed by the bank and endorsed by another bank, engaging to pay on demand or at a
-     * fixed or determinable future time a sum certain in money, to order or to bearer.
+     * Payment by an unconditional promise in writing made by the bank to another person, signed
+     * by the bank and endorsed by another bank, engaging to pay on demand or at a fixed or
+     * determinable future time a sum certain in money, to order or to bearer.
      */
     V_65("65", "Promissory note signed by a bank and endorsed by another bank"),
 
     /**
      * Payment by an unconditional promise in writing made by a third party to another person,
-     * signed by the third party, engaging to pay on demand or at a fixed or determinable
-     * future time a sum certain in money, to order or to bearer.
+     * signed by the third party, engaging to pay on demand or at a fixed or determinable future
+     * time a sum certain in money, to order or to bearer.
      */
     V_66("66", "Promissory note signed by a third party"),
 
@@ -412,7 +412,6 @@ public enum PaymentMeansCodeType implements CodeList<PaymentMeansCodeType> {
      * Transfer of an amount of money in the books of the account servicer. An advice should
      * be sent back to the account owner.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_69("69", "Transfer Advice"),
 
     /**

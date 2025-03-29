@@ -1,6 +1,5 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.input.InputError;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -9,7 +8,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "TB_INPUT2_ERRORS")
 @SuppressWarnings("unused")
-public class InputErrorEntity extends AbstractError implements InputError<InputRowEntity, InputErrorEntity.PKey, DataId> {
+public class InputErrorEntity extends AbstractError<InputErrorEntity.PKey> {
 
     @EmbeddedId
     private PKey key;
@@ -27,6 +26,7 @@ public class InputErrorEntity extends AbstractError implements InputError<InputR
         this.key = key;
     }
 
+    @Override
     public DataId getType() {
         return type;
     }
@@ -47,18 +47,18 @@ public class InputErrorEntity extends AbstractError implements InputError<InputR
                 },
                 foreignKey = @ForeignKey(name = "FK_INPUT_ERROR2_ROW")
         )
-        private InputRowEntity row;
+        private InputRowEntity record;
 
         @Column(name = "ERR_ORDER", nullable = false)
         private Integer order;
 
-        public InputRowEntity getRow() {
-            return row;
+        public InputRowEntity getRecord() {
+            return record;
         }
 
         @Override
-        public void setRecord(InputRowEntity row) {
-            this.row = row;
+        public void setRecord(InputRowEntity record) {
+            this.record = record;
         }
 
         public Integer getOrder() {
@@ -79,12 +79,12 @@ public class InputErrorEntity extends AbstractError implements InputError<InputR
                 return false;
             }
             final InputErrorEntity.PKey that = (InputErrorEntity.PKey) other;
-            return Objects.equals(getRow(), that.getRow()) && Objects.equals(order, that.order);
+            return Objects.equals(record, that.record) && Objects.equals(order, that.order);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(getRow(), order);
+            return Objects.hash(record, order);
         }
 
     }

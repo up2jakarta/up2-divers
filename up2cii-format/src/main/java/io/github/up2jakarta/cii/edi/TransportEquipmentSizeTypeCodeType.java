@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 8155 : Equipment size and type description code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred8155.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred8155.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Equipment Size Type Description Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Equipment Size Type Description Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.2", date = "2008-08-23")
 @XmlJavaTypeAdapter(TransportEquipmentSizeTypeCodeAdapter.class)
 public enum TransportEquipmentSizeTypeCodeType implements CodeList<TransportEquipmentSizeTypeCodeType> {
@@ -78,8 +78,8 @@ public enum TransportEquipmentSizeTypeCodeType implements CodeList<TransportEqui
     V_16("16", "Exchangeable pallet"),
 
     /**
-     * Non self propelled vehicle without front wheels designed for the carriage of cargo
-     * and provided with a kingpin.
+     * Non self propelled vehicle without front wheels designed for the carriage of cargo and
+     * provided with a kingpin.
      */
     V_17("17", "Semi-trailer"),
 
@@ -150,8 +150,8 @@ public enum TransportEquipmentSizeTypeCodeType implements CodeList<TransportEqui
     V_29("29", "Tank container IC 40 feet"),
 
     /**
-     * A refrigerated tank owned by InterContainer, a European railway subsidiary, with a
-     * length of 20 feet.
+     * A refrigerated tank owned by InterContainer, a European railway subsidiary, with a length
+     * of 20 feet.
      */
     V_30("30", "Refrigerated tank IC 20 feet"),
 
@@ -161,8 +161,8 @@ public enum TransportEquipmentSizeTypeCodeType implements CodeList<TransportEqui
     V_31("31", "Temperature controlled container 30 ft."),
 
     /**
-     * A refrigerated tank owned by InterContainer, a European railway subsidiary, with a
-     * length of 40 feet.
+     * A refrigerated tank owned by InterContainer, a European railway subsidiary, with a length
+     * of 40 feet.
      */
     V_32("32", "Refrigerated tank IC 40 feet"),
 
@@ -235,14 +235,12 @@ public enum TransportEquipmentSizeTypeCodeType implements CodeList<TransportEqui
      * A standard pallet with standard dimensions 80*120cm made of a synthetic material for
      * hygienic reasons.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_46("46", "Synthetic pallet ISO 1"),
 
     /**
      * A standard pallet with standard dimensions 100*120cm made of a synthetic material for
      * hygienic reasons.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_47("47", "Synthetic pallet ISO 2"),
     ;
 

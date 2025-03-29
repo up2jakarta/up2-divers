@@ -11,7 +11,7 @@ import javax.annotation.processing.Generated;
  * Based on UN/CEFACT R20 (Linear) : Measurement Unit Common Code Linear.
  * {@see https://unece.org/trade/uncefact/cl-recommendations}
  */
-@Generated(value = "CII", comments = "by Abderrazek ABBESSI")
+@Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList(value = "R20", type = MeasurementUnitCode.class)
 @Documented(value = "Measurement Unit Common Code Linear", agency = Agency.UN_ECE, version = "4")
 @Schema(agency = "UN/CEFACT", version = "1.1", date = "2008-08-23")

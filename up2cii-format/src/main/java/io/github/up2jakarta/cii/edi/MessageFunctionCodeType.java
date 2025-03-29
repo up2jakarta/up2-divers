@@ -8,11 +8,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 1225 (MessageFunctionTypeCode) : Message function code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred1225.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred1225.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList("1225")
-@Documented(value = "Message Function Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Message Function Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.3", date = "2008-08-23")
 @XmlJavaTypeAdapter(MessageFunctionCodeAdapter.class)
 public enum MessageFunctionCodeType implements CodeList<MessageFunctionCodeType> {
@@ -373,28 +373,24 @@ public enum MessageFunctionCodeType implements CodeList<MessageFunctionCodeType>
     /**
      * A message related to the amendment of declaration data.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_70("70", "Amended declaration data"),
 
     /**
-     * A message related to a guarantee containing information about the refusal to start
-     * of an operation.
+     * A message related to a guarantee containing information about the refusal to start of
+     * an operation.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_71("71", "Refusal to start operation guarantee"),
 
     /**
-     * A message related to a guarantee containing information about the seals during the
-     * start of an operation.
+     * A message related to a guarantee containing information about the seals during the start
+     * of an operation.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_72("72", "Seals information (Start)"),
 
     /**
-     * A message related to a guarantee containing information about the seals during the
-     * termination of an operation.
+     * A message related to a guarantee containing information about the seals during the termination
+     * of an operation.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_73("73", "Seals information (Terminate)"),
     ;
 

@@ -19,7 +19,7 @@ import java.time.Period;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.misc.Errors.ERROR_VALIDATOR;
-import static io.github.up2jakarta.xml.api.SeverityType.FATAL;
+import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -101,7 +101,7 @@ class ConverterTest {
         assertEquals(CountryCodeType.FR, entity.getShippingCountry());
         // Error
         final SimpleErrorEntity error = errors.get(0);
-        assertEquals(row, error.getKey().getRow());
+        assertEquals(row, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
         assertEquals(WARNING, error.getSeverity());
         assertEquals(ERROR_VALIDATOR, error.getCode());
@@ -136,9 +136,9 @@ class ConverterTest {
         // Error Currency
         {
             final SimpleErrorEntity error = errors.get(0);
-            assertEquals(row, error.getKey().getRow());
+            assertEquals(row, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
-            assertEquals(FATAL, error.getSeverity());
+            assertEquals(ERROR, error.getSeverity());
             assertEquals("ISO-4217", error.getCode());
             assertEquals(1 + 4, error.getOffset());
             assertEquals("Unknown value [ILS] for CodeList[CurrencyCodeType]", error.getMessage());
@@ -147,9 +147,9 @@ class ConverterTest {
         // Error Country
         {
             final SimpleErrorEntity error = errors.get(1);
-            assertEquals(row, error.getKey().getRow());
+            assertEquals(row, error.getKey().getRecord());
             assertEquals(1, error.getKey().getOrder());
-            assertEquals(FATAL, error.getSeverity());
+            assertEquals(ERROR, error.getSeverity());
             assertEquals("ISO-3166", error.getCode());
             assertEquals(1 + 9, error.getOffset());
             assertEquals("Unknown value [IL] for CodeList[CountryCodeType]", error.getMessage());

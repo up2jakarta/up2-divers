@@ -11,9 +11,9 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 7143 : Item type identification code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred7143.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred7143.htm}
  */
-@Generated(value = "PPF", comments = "by Abderrazek ABBESSI")
+@Generated(value = "PPF", comments = "by A.ABBESSI")
 @Documented(value = "Item type identification code", agency = Agency.UN_ECE, version = "2.3")
 @Schema(agency = "UN/CEFACT", version = "3.4", date = "2008-08-23")
 @XmlJavaTypeAdapter(ItemTypeIDCodeAdapter.class)
@@ -72,8 +72,8 @@ public enum ItemTypeIDCodeType implements CodeList<ItemTypeIDCodeType> {
     AJ("AJ", "Sample number"),
 
     /**
-     * Number assigned to a pack containing a stack of items put together (e.g. cold roll
-     * sheets (steel product)).
+     * Number assigned to a pack containing a stack of items put together (e.g. cold roll sheets
+     * (steel product)).
      */
     AK("AK", "Pack number"),
 
@@ -340,8 +340,8 @@ public enum ItemTypeIDCodeType implements CodeList<ItemTypeIDCodeType> {
     EMD("EMD", "EMDN (European Medical Device Nomenclature)"),
 
     /**
-     * Number assigned to a manufacturer's product according to the International Article
-     * Numbering Association.
+     * Number assigned to a manufacturer's product according to the International Article Numbering
+     * Association.
      */
     EN("EN", "International Article Numbering Association (EAN)"),
 
@@ -514,8 +514,8 @@ public enum ItemTypeIDCodeType implements CodeList<ItemTypeIDCodeType> {
     SRU("SRU", "IFLS (Institut Francais du Libre Service) 9 digit product classification code"),
 
     /**
-     * A unique number, up to 14-digits, assigned according to the numbering structure of
-     * the GS1 system.
+     * A unique number, up to 14-digits, assigned according to the numbering structure of the
+     * GS1 system.
      */
     SRV("SRV", "GS1 Global Trade Item Number"),
 
@@ -632,8 +632,8 @@ public enum ItemTypeIDCodeType implements CodeList<ItemTypeIDCodeType> {
     SSO("SSO", "United Nations Dangerous Goods List"),
 
     /**
-     * A code established by the International Code of Botanical Nomenclature (ICBN) used
-     * to classify and identify botanical articles and commodities.
+     * A code established by the International Code of Botanical Nomenclature (ICBN) used to
+     * classify and identify botanical articles and commodities.
      */
     SSP("SSP", "International Code of Botanical Nomenclature (ICBN)"),
 
@@ -644,8 +644,8 @@ public enum ItemTypeIDCodeType implements CodeList<ItemTypeIDCodeType> {
     SSQ("SSQ", "International Code of Zoological Nomenclature (ICZN)"),
 
     /**
-     * A code established by the International Code of Nomenclature for Cultivated Plants
-     * (ICNCP) used to classify and identify animals.
+     * A code established by the International Code of Nomenclature for Cultivated Plants (ICNCP)
+     * used to classify and identify animals.
      */
     SSR("SSR", "International Code of Nomenclature for Cultivated Plants (ICNCP)"),
 
@@ -759,8 +759,8 @@ public enum ItemTypeIDCodeType implements CodeList<ItemTypeIDCodeType> {
     STL("STL", "ATC (Anatomical Therapeutic Chemical) classification system"),
 
     /**
-     * A five level classification system for medical decvices maintained by the CLADIMED
-     * organisation used in the French market.
+     * A five level classification system for medical decvices maintained by the CLADIMED organisation
+     * used in the French market.
      */
     STM("STM", "CLADIMED (Classification des Dispositifs Médicaux)"),
 
@@ -787,8 +787,8 @@ public enum ItemTypeIDCodeType implements CodeList<ItemTypeIDCodeType> {
     STQ("STQ", "ECl@ss"),
 
     /**
-     * Classification for in vitro diagnostics medical devices maintained by the European
-     * Diagnostic Manufacturers Association.
+     * Classification for in vitro diagnostics medical devices maintained by the European Diagnostic
+     * Manufacturers Association.
      */
     STR("STR", "EDMA (European Diagnostic Manufacturers Association) Products Classification"),
 
@@ -858,8 +858,8 @@ public enum ItemTypeIDCodeType implements CodeList<ItemTypeIDCodeType> {
     SUD("SUD", "UMDNS (Universal Medical Device Nomenclature System)"),
 
     /**
-     * A unique, 13-digit number assigned according to the numbering structure of the GS1
-     * system and used to identify a type of Reusable Transport Item (RTI).
+     * A unique, 13-digit number assigned according to the numbering structure of the GS1 system
+     * and used to identify a type of Reusable Transport Item (RTI).
      */
     SUE("SUE", "GS1 Global Returnable Asset Identifier, non-serialised"),
 
@@ -896,8 +896,8 @@ public enum ItemTypeIDCodeType implements CodeList<ItemTypeIDCodeType> {
     SUK("SUK", "IMDG packing group"),
 
     /**
-     * International Bulk Chemical (IBC) code defined by the International Convention for
-     * the Prevention of Pollution from Ships (MARPOL).
+     * International Bulk Chemical (IBC) code defined by the International Convention for the
+     * Prevention of Pollution from Ships (MARPOL).
      */
     SUL("SUL", "MARPOL Code IBC"),
 
@@ -913,10 +913,10 @@ public enum ItemTypeIDCodeType implements CodeList<ItemTypeIDCodeType> {
     TG("TG", "Transport group number"),
 
     /**
-     * A unique number assigned to a taxonomic entity, commonly to a species of plants or
-     * animals, providing information on their hierarchical classification, scientific name,
-     * taxonomic rank, associated synonyms and vernacular names where appropriate, data source
-     * information and data quality indicators.
+     * A unique number assigned to a taxonomic entity, commonly to a species of plants or animals,
+     * providing information on their hierarchical classification, scientific name, taxonomic
+     * rank, associated synonyms and vernacular names where appropriate, data source information
+     * and data quality indicators.
      */
     TSN("TSN", "Taxonomic Serial Number"),
 
@@ -926,8 +926,8 @@ public enum ItemTypeIDCodeType implements CodeList<ItemTypeIDCodeType> {
     TSO("TSO", "IMDG main hazard class"),
 
     /**
-     * The number is part of, or is generated in the context of the Combined Nomenclature
-     * classification, as developed and maintained by the European Union (EU).
+     * The number is part of, or is generated in the context of the Combined Nomenclature classification,
+     * as developed and maintained by the European Union (EU).
      */
     TSP("TSP", "EU Combined Nomenclature"),
 

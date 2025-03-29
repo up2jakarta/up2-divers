@@ -46,7 +46,7 @@ class CompositeKeyCreatorTest {
         assertEquals(1, errors.size());
         // Then Error
         final InputErrorEntity error = errors.get(0);
-        assertSame(row, error.getKey().getRow());
+        assertSame(row, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
         assertEquals(SeverityType.ERROR, error.getSeverity());
         assertEquals(CurrencyConverter.ISO_4217, error.getCode());

@@ -8,11 +8,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 3035 (Charge Paying) : Party function code qualifier.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred3035.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred3035.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList(value = "3035", type = PartyRoleCodeType.class)
-@Documented(value = "Party Role Code_Charge Paying", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Party Role Code_Charge Paying", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.5", date = "2008-08-23")
 @XmlJavaTypeAdapter(ChargePayingPartyRoleCodeAdapter.class)
 public enum ChargePayingPartyRoleCodeType implements CodeList<ChargePayingPartyRoleCodeType> {
@@ -103,8 +103,8 @@ public enum ChargePayingPartyRoleCodeType implements CodeList<ChargePayingPartyR
     DGB(PartyRoleCodeType.DGB),
 
     /**
-     * [3030] Party who makes, or on whose behalf the export declaration is made, and who
-     * is the owner of the goods or has similar rights of disposal over them at the time when
+     * [3030] Party who makes, or on whose behalf the export declaration is made, and who is
+     * the owner of the goods or has similar rights of disposal over them at the time when
      * the declaration is accepted.
      */
     EX(PartyRoleCodeType.EX),
@@ -121,8 +121,8 @@ public enum ChargePayingPartyRoleCodeType implements CodeList<ChargePayingPartyR
 
     /**
      * [3020] Party who makes - or on whose behalf a Customs clearing agent or other authorized
-     * person makes - an import declaration. This may include a person who has possession
-     * of the goods or to whom the goods are consigned.
+     * person makes - an import declaration. This may include a person who has possession of
+     * the goods or to whom the goods are consigned.
      */
     IM(PartyRoleCodeType.IM),
 

@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 4279 : Payment terms type code qualifier.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred4279.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred4279.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Payment Terms Type Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Payment Terms Type Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.1", date = "2008-08-23")
 @XmlJavaTypeAdapter(PaymentTermsTypeCodeAdapter.class)
 public enum PaymentTermsTypeCodeType implements CodeList<PaymentTermsTypeCodeType> {
@@ -410,8 +410,8 @@ public enum PaymentTermsTypeCodeType implements CodeList<PaymentTermsTypeCodeTyp
     V_77("77", "Promissory note"),
 
     /**
-     * Payment term requires payment being made by the factoring company according to the
-     * agreement between buyer, bank and factoring company.
+     * Payment term requires payment being made by the factoring company according to the agreement
+     * between buyer, bank and factoring company.
      */
     V_78("78", "Factoring"),
 

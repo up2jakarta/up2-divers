@@ -62,7 +62,7 @@ public class HandlerSupportTest {
     void testValidator() throws BeanException {
         // Given
         final Mapper<Test1Validator, DataId> mapper = factory.build(Test1Validator.class);
-        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast();
+        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast(false);
         {
             // When
             final InputRowEntity row = Tests.create(SegmentType.S00, "+1", "1", "1", "1", "1", "1", "1");
@@ -95,7 +95,7 @@ public class HandlerSupportTest {
             assertEquals(0, handler.toList().size());
             // Then
             assertEquals(ERROR_VALIDATOR, error.getErrorCode());
-            assertEquals(SeverityType.ERROR, error.getSeverityType());
+            assertEquals(SeverityType.WARNING, error.getSeverityType());
             assertNotNull(error.getCause());
             assertEquals("must not be empty", error.getCause().getMessage());
             assertNull(error.getCause().getCause());
@@ -107,7 +107,7 @@ public class HandlerSupportTest {
             assertEquals(0, handler.toList().size());
             // Then
             assertEquals(ERROR_VALIDATOR, error.getErrorCode());
-            assertEquals(SeverityType.FATAL, error.getSeverityType());
+            assertEquals(SeverityType.WARNING, error.getSeverityType());
             assertNotNull(error.getCause());
             assertEquals("must not be null", error.getCause().getMessage());
             assertNull(error.getCause().getCause());
@@ -131,7 +131,7 @@ public class HandlerSupportTest {
             assertEquals(0, handler.toList().size());
             // Then
             assertEquals(Tests.ERROR_CODE, error.getErrorCode());
-            assertEquals(SeverityType.FATAL, error.getSeverityType());
+            assertEquals(SeverityType.WARNING, error.getSeverityType());
             assertNotNull(error.getCause());
             assertEquals("must not be empty", error.getCause().getMessage());
             assertNull(error.getCause().getCause());
@@ -157,7 +157,7 @@ public class HandlerSupportTest {
     void testResolver() throws BeanException {
         // Given
         final Mapper<Test1Resolver, DataId> mapper = factory.build(Test1Resolver.class);
-        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast();
+        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast(false);
         {
             // When
             final InputRowEntity row = Tests.create(SegmentType.S00, "ISL", "KGM", "PT24H");
@@ -176,7 +176,7 @@ public class HandlerSupportTest {
             assertEquals(0, handler.toList().size());
             // Then
             assertEquals(MeasurementUnitConverter.EDI_R_20, error.getErrorCode());
-            assertEquals(SeverityType.FATAL, error.getSeverityType());
+            assertEquals(SeverityType.ERROR, error.getSeverityType());
             assertInstanceOf(CodeListException.class, error.getCause());
             assertEquals("Unknown value [XGM] for CodeList[MeasurementUnitCode]", error.getCause().getMessage());
             assertNull(error.getCause().getCause());
@@ -201,7 +201,7 @@ public class HandlerSupportTest {
     void testConverter() throws BeanException {
         // Given
         final Mapper<Test1Converter, DataId> mapper = factory.build(Test1Converter.class);
-        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast();
+        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast(false);
         {
             final InputRowEntity row = Tests.create(SegmentType.S00, "ILS", "1");
             final MapperException error = assertThrows(MapperException.class, () -> mapper.map(row, handler));
@@ -233,14 +233,14 @@ public class HandlerSupportTest {
     void testProcessor() throws BeanException {
         // Given
         final Mapper<Test3Processor, DataId> mapper = factory.build(Test3Processor.class);
-        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast();
+        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast(false);
         {
             final InputRowEntity row = Tests.create(SegmentType.S00, "property");
             final MapperException error = assertThrows(MapperException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toList().size());
             // Then
             assertEquals(Dummy1Processor.TU_P_001, error.getErrorCode());
-            assertEquals(SeverityType.FATAL, error.getSeverityType());
+            assertEquals(SeverityType.WARNING, error.getSeverityType());
             assertInstanceOf(PropertyException.class, error.getCause());
             assertEquals("property", error.getCause().getMessage());
             assertNull(error.getCause().getCause());
@@ -250,8 +250,8 @@ public class HandlerSupportTest {
             final MapperException error = assertThrows(MapperException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toList().size());
             // Then
-            assertEquals(ERROR_PROCESSOR, error.getErrorCode());
-            assertEquals(SeverityType.ERROR, error.getSeverityType());
+            assertEquals(Dummy1Processor.TU_P_001, error.getErrorCode());
+            assertEquals(SeverityType.WARNING, error.getSeverityType());
             assertInstanceOf(PropertyException.class, error.getCause());
             assertEquals("io.github.up2jakarta.csv.test.ext.DummyException: dummy", error.getCause().getMessage());
             assertNotNull(error.getCause().getCause());

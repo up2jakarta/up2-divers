@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 5243 : Rate or tariff class description code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred5243.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred5243.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Freight Charge Tariff Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Freight Charge Tariff Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.2", date = "2008-08-23")
 @XmlJavaTypeAdapter(FreightChargeTariffClassCodeAdapter.class)
 public enum FreightChargeTariffClassCodeType implements CodeList<FreightChargeTariffClassCodeType> {
@@ -52,14 +52,12 @@ public enum FreightChargeTariffClassCodeType implements CodeList<FreightChargeTa
     /**
      * Rate a foreign government supplies in the export process
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     G("G", "Export Subsidy Rate"),
 
     /**
      * Rate a foreign government gives its manufacturers so that they can manufacture their
      * goods for less
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     H("H", "Subsidy Rate"),
 
     /**

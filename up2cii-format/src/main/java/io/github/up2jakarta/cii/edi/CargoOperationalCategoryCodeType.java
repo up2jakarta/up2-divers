@@ -11,17 +11,17 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 7085 : Cargo type classification code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred7085.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred7085.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Cargo Operational Category Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Cargo Operational Category Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.4", date = "2008-08-23")
 @XmlJavaTypeAdapter(CargoOperationalCategoryCodeAdapter.class)
 public enum CargoOperationalCategoryCodeType implements CodeList<CargoOperationalCategoryCodeType> {
 
     /**
-     * Printed, typed or written matter including leaflets, pamphlets, certificates etc.,
-     * which are not subject to import duties and taxes, restrictions and prohibitions.
+     * Printed, typed or written matter including leaflets, pamphlets, certificates etc., which
+     * are not subject to import duties and taxes, restrictions and prohibitions.
      */
     V_1("1", "Documents"),
 
@@ -149,7 +149,6 @@ public enum CargoOperationalCategoryCodeType implements CodeList<CargoOperationa
     /**
      * Cargo of deep-frozen products.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_25("25", "Deep-frozen cargo"),
     ;
 

@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 4435 : Payment channel code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred4435.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred4435.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Payment Means Channel Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Payment Means Channel Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.1", date = "2008-08-23")
 @XmlJavaTypeAdapter(PaymentMeansChannelCodeAdapter.class)
 public enum PaymentMeansChannelCodeType implements CodeList<PaymentMeansChannelCodeType> {

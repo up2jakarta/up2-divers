@@ -8,11 +8,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 3139 (ContactTypeCode) : Contact function code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred3139.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred3139.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList("3139")
-@Documented(value = "Contact Function Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Contact Function Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.6", date = "2008-08-23")
 @XmlJavaTypeAdapter(ContactTypeCodeAdapter.class)
 public enum ContactTypeCodeType implements CodeList<ContactTypeCodeType> {
@@ -58,8 +58,8 @@ public enum ContactTypeCodeType implements CodeList<ContactTypeCodeType> {
     AH("AH", "Coordination contact"),
 
     /**
-     * Department/person to contact for matters regarding project management on behalf of
-     * the contractor.
+     * Department/person to contact for matters regarding project management on behalf of the
+     * contractor.
      */
     AI("AI", "Project management contact"),
 
@@ -227,8 +227,8 @@ public enum ContactTypeCodeType implements CodeList<ContactTypeCodeType> {
     BO("BO", "After business hours contact"),
 
     /**
-     * The round the clock contact of the Company Security Officer who is responsible for
-     * the vessel.
+     * The round the clock contact of the Company Security Officer who is responsible for the
+     * vessel.
      */
     BP("BP", "Company Security Officer’s 24-hour contact"),
 
@@ -245,14 +245,12 @@ public enum ContactTypeCodeType implements CodeList<ContactTypeCodeType> {
     /**
      * The main department/person to be contacted at the customer.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     BS("BS", "Customer contact"),
 
     /**
-     * Department/person to contact for matters regarding meter reading, including access
-     * to the meter.
+     * Department/person to contact for matters regarding meter reading, including access to
+     * the meter.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     BT("BT", "Meter access contact"),
 
     /**

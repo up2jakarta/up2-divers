@@ -13,8 +13,8 @@ public class Validator2Bean implements Segment {
 
     @Position(0)
     @Up2Token
-    @Size(min = 1, max = 3, payload = Errors.Fatal.class)
-    @Size(min = 1, max = 3, payload = Errors.Error.class)
+    @Size(min = 1, max = 3, payload = Errors.Warning.class)
+    @Size(min = 1, max = 3, payload = Errors.Warning.class)
     protected String currency;
 
     public String getCurrency() {

@@ -38,7 +38,7 @@ Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready enti
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.4.1</version>
+        <version>1.4.6</version>
     </dependency>
     <!-- Optional JSR-303 Validation Provider -->
     <!-- Optional JPA Provider -->

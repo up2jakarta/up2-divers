@@ -19,7 +19,7 @@ public class Test4Processor implements Segment {
 
     @Position(1)
     @Dummy3
-    @Error(value = TU_P_003, severity = SeverityType.FATAL)
+    @Error(value = TU_P_003, severity = SeverityType.ERROR)
     private String other;
 
     public void setTest(String test) {

@@ -22,7 +22,7 @@ public class Test2Converter implements Segment {
 
     @Position(1)
     @Up2Converter(DummyConverter.class)
-    @Error(value = TU_P_006, severity = SeverityType.FATAL)
+    @Error(value = TU_P_006, severity = SeverityType.ERROR)
     private Integer other;
 
     public void setTest(CurrencyCodeType test) {

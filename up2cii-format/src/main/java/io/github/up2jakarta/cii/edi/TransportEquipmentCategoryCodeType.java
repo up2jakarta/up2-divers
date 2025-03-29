@@ -11,11 +11,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 8053 : Equipment type code qualifier.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred8053.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred8053.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Transport Equipment Category Code", agency = Agency.UN_ECE, version = "D22B")
-@Schema(agency = "UN/CEFACT", version = "3.6", date = "2008-08-23")
+@Documented(value = "Transport Equipment Category Code", agency = Agency.UN_ECE, version = "D22A")
+@Schema(agency = "UN/CEFACT", version = "3.5", date = "2008-08-23")
 @XmlJavaTypeAdapter(TransportEquipmentCategoryCodeAdapter.class)
 public enum TransportEquipmentCategoryCodeType implements CodeList<TransportEquipmentCategoryCodeType> {
 
@@ -95,8 +95,7 @@ public enum TransportEquipmentCategoryCodeType implements CodeList<TransportEqui
     AQ("AQ", "Road/rail trailer"),
 
     /**
-     * Empty rail wagon added to the loaded wagons, when goods are longer than the loaded
-     * wagon.
+     * Empty rail wagon added to the loaded wagons, when goods are longer than the loaded wagon.
      */
     AT("AT", "Overhang wagon"),
 
@@ -158,8 +157,8 @@ public enum TransportEquipmentCategoryCodeType implements CodeList<TransportEqui
     BPU("BPU", "Flats Tray"),
 
     /**
-     * Postal item which is conveyed individually, with only the wrapping provided by the
-     * mailer for protection.
+     * Postal item which is conveyed individually, with only the wrapping provided by the mailer
+     * for protection.
      */
     BPV("BPV", "Out of bag parcel"),
 
@@ -262,7 +261,6 @@ public enum TransportEquipmentCategoryCodeType implements CodeList<TransportEqui
     /**
      * Standard pallet with dimensions 80 X 60 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DPK("DPK", "Pallet ISO 0 - 1/2 EURO Pallet"),
 
     /**
@@ -273,19 +271,16 @@ public enum TransportEquipmentCategoryCodeType implements CodeList<TransportEqui
     /**
      * Standard pallet with dimensions 80 X 120 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DPM("DPM", "Pallet ISO 1 - 1/1 EURO Pallet (GS1 Temporary Code)"),
 
     /**
      * Standard pallet with dimensions 100 X 120 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DPN("DPN", "Pallet ISO 2"),
 
     /**
      * Standard pallet with dimensions 60 X 40 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DPO("DPO", "1/4 EURO Pallet"),
 
     /**
@@ -296,119 +291,100 @@ public enum TransportEquipmentCategoryCodeType implements CodeList<TransportEqui
     /**
      * Standard pallet with dimensions 40 X 30 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EFQ("EFQ", "1/8 EURO Pallet"),
 
     /**
      * Pallet provided by the wholesaler.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EFR("EFR", "Wholesaler pallet"),
 
     /**
      * Pallet with dimensions 80 X 100 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EFS("EFS", "Pallet 80 X 100 cm"),
 
     /**
      * Pallet with dimensions 60 X 100 cm.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EFT("EFT", "Pallet 60 X 100 cm"),
 
     /**
      * Pallet need not be returned to the point of expedition.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EFU("EFU", "Oneway pallet"),
 
     /**
      * Pallet must be returned to the point of expedition.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EFV("EFV", "Returnable pallet"),
 
     /**
      * A container for the storage or movement of bottles, a.k.a. bottlerack.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EFW("EFW", "Bottlecrate"),
 
     /**
      * A non-protected cylindrical container with a narrow neck made usually of glass or plastic
      * which is especially used for liquids.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EFX("EFX", "Bottle, non-protected, cylindrical"),
 
     /**
      * A lidded package which can be made of cardboard, wood, plastic,tin,etc.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EFY("EFY", "Box"),
 
     /**
      * A box mounted on a pallet base under the control of CHEP.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EFZ("EFZ", "CHEP Eurobox"),
 
     /**
      * A package such as a box.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EGA("EGA", "Case"),
 
     /**
      * A package used for the dispaly of goods, usually during a promotion.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EGB("EGB", "Display package"),
 
     /**
      * A case used for products which require constant temperature control.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EGC("EGC", "Isothermic case"),
 
     /**
      * Collars, with the dimensions 80cms * 100cms, which when fitted onto a pallet enable
      * the pallet to be transformed into a box pallet with, if necessary, a lid.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EGD("EGD", "Pallet modular collars 80*100"),
 
     /**
      * Collars, with the dimensions 80cms * 120cms, which when fitted onto a pallet enable
      * the pallet to be transformed into a box pallet with, if necessary, a lid.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EGE("EGE", "Pallet modular collars 80*120"),
 
     /**
      * A flat receptacle with low sides for carrying or holding articles.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EGF("EGF", "Tray"),
 
     /**
      * A three sided cage mounted on wheels.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EGG("EGG", "Roll cage"),
 
     /**
      * A low cart for the transportation and storage of groceries, milk, etc.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EGH("EGH", "Trolley"),
 
     /**
      * A generator located landside at a terminal, used to provide electric power to a vessel
      * or other means of transport.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EGI("EGI", "Landside power generator"),
 
     /**
@@ -507,7 +483,7 @@ public enum TransportEquipmentCategoryCodeType implements CodeList<TransportEqui
     /**
      * A road trailer without a front axle and with wheels only at the back end.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
+    @Deprecated
     SM("SM", "Semi-trailer"),
 
     /**
@@ -527,8 +503,8 @@ public enum TransportEquipmentCategoryCodeType implements CodeList<TransportEqui
     SW("SW", "Swap body"),
 
     /**
-     * A vehicle without motive power, designed for the carriage of cargo and to be towed
-     * by a motor vehicle.
+     * A vehicle without motive power, designed for the carriage of cargo and to be towed by
+     * a motor vehicle.
      */
     TE("TE", "Trailer"),
 
@@ -536,7 +512,7 @@ public enum TransportEquipmentCategoryCodeType implements CodeList<TransportEqui
      * A tank container used for the storage, transport and stockpiling of bulk cargoes such
      * as gases or liquids.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
+    @Deprecated
     TN("TN", "Tank"),
 
     /**

@@ -13,7 +13,7 @@ import javax.annotation.processing.Generated;
  * Based on UN/CEFACT 6131 : Freight Charge Quantity Unit Basis Code.
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Freight Charge Quantity Unit Basis Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Freight Charge Quantity Unit Basis Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.2", date = "2008-08-23")
 @XmlJavaTypeAdapter(LogisticsChargeCalculationBasisCodeAdapter.class)
 public enum LogisticsChargeCalculationBasisCodeType implements CodeList<LogisticsChargeCalculationBasisCodeType> {

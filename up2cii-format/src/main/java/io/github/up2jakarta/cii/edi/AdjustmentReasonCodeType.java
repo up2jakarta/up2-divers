@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 4465 : Adjustment reason description code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred4465.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred4465.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Adjustment Reason Description Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Adjustment Reason Description Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.4", date = "2008-08-23")
 @XmlJavaTypeAdapter(AdjustmentReasonCodeAdapter.class)
 public enum AdjustmentReasonCodeType implements CodeList<AdjustmentReasonCodeType> {
@@ -80,8 +80,8 @@ public enum AdjustmentReasonCodeType implements CodeList<AdjustmentReasonCodeTyp
     V_12("12", "Agent commission"),
 
     /**
-     * Buyer claims an existing (financial) obligation from seller which (partly) offsets
-     * the outstanding invoice(s).
+     * Buyer claims an existing (financial) obligation from seller which (partly) offsets the
+     * outstanding invoice(s).
      */
     V_13("13", "Counter claim"),
 
@@ -106,8 +106,8 @@ public enum AdjustmentReasonCodeType implements CodeList<AdjustmentReasonCodeTyp
     V_17("17", "Transport damage"),
 
     /**
-     * Buyer does not accept invoice(s) charge as it relates to goods where the ownership
-     * remains with the seller until sold.
+     * Buyer does not accept invoice(s) charge as it relates to goods where the ownership remains
+     * with the seller until sold.
      */
     V_18("18", "Goods on consignment"),
 
@@ -188,8 +188,8 @@ public enum AdjustmentReasonCodeType implements CodeList<AdjustmentReasonCodeTyp
     V_33("33", "Late delivery"),
 
     /**
-     * Factor informs the seller that a certain invoice(s) was paid by the buyer directly
-     * to the seller.
+     * Factor informs the seller that a certain invoice(s) was paid by the buyer directly to
+     * the seller.
      */
     V_34("34", "Quoted as paid to you"),
 
@@ -369,8 +369,8 @@ public enum AdjustmentReasonCodeType implements CodeList<AdjustmentReasonCodeTyp
     V_68("68", "Early payment allowance adjustment"),
 
     /**
-     * Adjustment has been made because an incorrect due date was referred to with regard
-     * to the monetary amount.
+     * Adjustment has been made because an incorrect due date was referred to with regard to
+     * the monetary amount.
      */
     V_69("69", "Incorrect due date for monetary amount"),
 
@@ -443,8 +443,8 @@ public enum AdjustmentReasonCodeType implements CodeList<AdjustmentReasonCodeTyp
     V_82("82", "Card number error"),
 
     /**
-     * The adjustment was made due to the card acceptor specifying an expired expiry date
-     * within the filing document or electronic data.
+     * The adjustment was made due to the card acceptor specifying an expired expiry date within
+     * the filing document or electronic data.
      */
     V_83("83", "Card expired"),
 
@@ -455,8 +455,8 @@ public enum AdjustmentReasonCodeType implements CodeList<AdjustmentReasonCodeTyp
     V_84("84", "Test card transaction"),
 
     /**
-     * The adjustment was made due to the permission limit defined by card issuer or card
-     * company was exceeded without prior authorisation. Synonym: Floor limit.
+     * The adjustment was made due to the permission limit defined by card issuer or card company
+     * was exceeded without prior authorisation. Synonym: Floor limit.
      */
     V_85("85", "Permission limit exceeded"),
 

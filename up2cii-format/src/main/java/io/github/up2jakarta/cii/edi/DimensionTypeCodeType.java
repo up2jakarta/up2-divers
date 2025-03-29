@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 6145 : Dimension type code qualifier.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred6145.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred6145.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Dimension Type Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Dimension Type Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.3", date = "2008-08-23")
 @XmlJavaTypeAdapter(DimensionTypeCodeAdapter.class)
 public enum DimensionTypeCodeType implements CodeList<DimensionTypeCodeType> {
@@ -46,8 +46,8 @@ public enum DimensionTypeCodeType implements CodeList<DimensionTypeCodeType> {
     V_5("5", "Off-standard dimension front"),
 
     /**
-     * The dimension in the length that the cargo exceeds the standard length at the back
-     * of an equipment.
+     * The dimension in the length that the cargo exceeds the standard length at the back of
+     * an equipment.
      */
     V_6("6", "Off-standard dimension back"),
 
@@ -95,8 +95,7 @@ public enum DimensionTypeCodeType implements CodeList<DimensionTypeCodeType> {
     V_14("14", "Equipment door dimensions"),
 
     /**
-     * The dimension of the width that the cargo exceeds the standard width of a piece of
-     * equipment.
+     * The dimension of the width that the cargo exceeds the standard width of a piece of equipment.
      */
     V_15("15", "Off-standard dimension width"),
 
@@ -113,8 +112,8 @@ public enum DimensionTypeCodeType implements CodeList<DimensionTypeCodeType> {
     V_17("17", "Bundled equipment total height"),
 
     /**
-     * Actual height of equipment. To be specified for containers if actual height is not
-     * defined by a specific ISO size type code.
+     * Actual height of equipment. To be specified for containers if actual height is not defined
+     * by a specific ISO size type code.
      */
     V_18("18", "Equipment off-standard dimension height, actual"),
 
@@ -146,7 +145,6 @@ public enum DimensionTypeCodeType implements CodeList<DimensionTypeCodeType> {
     /**
      * The gross dimensions of a transport unit.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_24("24", "Transport unit gross dimensions"),
     ;
 

@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static io.github.up2jakarta.csv.misc.Errors.ERROR_CONVERTER;
 import static io.github.up2jakarta.csv.misc.Errors.ERROR_VALIDATOR;
+import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
@@ -82,12 +83,17 @@ public abstract class EventHandler<A extends InputSegment<?>, B extends InputErr
     }
 
     /**
-     * @param <R> the input record-segment
-     * @param <D> the business data-type
-     * @param <V> the error type
-     * @return an instance that fails at the first throw error.
+     * @param noWarning ignore warnings
+     * @param <R>       the input record-segment
+     * @param <D>       the business data-type
+     * @param <V>       the error type
+     * @return an instance that fails at the first throw error or warning depending on the given flag <code>noWarning</code>.
      */
-    public static <R extends InputSegment<?>, D extends DataType<D>, V extends InputError<R, ?, D>> EventHandler<R, ?, D, V> failFast() {
+    public static <R extends InputSegment<?>, D extends DataType<D>, V extends InputError<R, ?, D>> EventHandler<R, ?, D, V> failFast(boolean noWarning) {
+        if (noWarning) {
+            //noinspection unchecked
+            return (EventHandler<R, ?, D, V>) FastHandler.NO_WARNING;
+        }
         //noinspection unchecked
         return (EventHandler<R, ?, D, V>) FastHandler.INSTANCE;
     }
@@ -123,9 +129,13 @@ public abstract class EventHandler<A extends InputSegment<?>, B extends InputErr
      */
     private static class FastHandler<D extends DataType<D>> extends EventHandler<InputSegment<?>, InputError.Key<InputSegment<?>>, D, InputError<InputSegment<?>, InputError.Key<InputSegment<?>>, ?>> {
 
-        private static final EventHandler<?, ?, ?, ?> INSTANCE = new FastHandler<>();
+        private static final EventHandler<?, ?, ?, ?> INSTANCE = new FastHandler<>(true);
+        private static final EventHandler<?, ?, ?, ?> NO_WARNING = new FastHandler<>(false);
 
-        private FastHandler() {
+        private final boolean any;
+
+        private FastHandler(boolean any) {
+            this.any = any;
         }
 
         @Override
@@ -142,14 +152,18 @@ public abstract class EventHandler<A extends InputSegment<?>, B extends InputErr
         public void handleEvent(D data, int offset, ConstraintViolation<?> violation, Error config) {
             final SeverityType type = getSeverity(violation, config);
             final String code = getErrorCode(violation, config);
-            throw new MapperException(data, offset, type, code, new PropertyException(type, code, violation.getMessage()));
+            if (any || type != WARNING) {
+                throw new MapperException(data, offset, type, code, new PropertyException(type, code, violation.getMessage()));
+            }
         }
 
         @Override
         public void handleEvent(D data, int offset, Throwable exception, Error config, boolean trace) {
             final SeverityType type = getSeverity(exception, config);
             final String code = getErrorCode(exception, config);
-            throw new MapperException(data, offset, type, code, PropertyException.of(type, code, exception));
+            if (any || type != WARNING) {
+                throw new MapperException(data, offset, type, code, PropertyException.of(type, code, exception));
+            }
         }
 
     }

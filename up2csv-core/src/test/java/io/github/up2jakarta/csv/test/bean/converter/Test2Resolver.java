@@ -17,7 +17,7 @@ public class Test2Resolver implements Segment {
     public static final String TU_P_008 = "TU-P008";
 
     @Position(0)
-    @Error(value = TU_P_007, severity = SeverityType.FATAL)
+    @Error(value = TU_P_007, severity = SeverityType.ERROR)
     @Up2CodeList
     private MeasurementUnitCode unit;
 

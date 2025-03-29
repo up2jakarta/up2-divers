@@ -8,11 +8,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 7233 (PackagingMarkingCode) : Packaging related description code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred7233.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred7233.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList("7233")
-@Documented(value = "PackagingMarkingCode", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "PackagingMarkingCode", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.2", date = "2008-08-23")
 @XmlJavaTypeAdapter(PackagingMarkingCodeAdapter.class)
 public enum PackagingMarkingCodeType implements CodeList<PackagingMarkingCodeType> {
@@ -140,8 +140,7 @@ public enum PackagingMarkingCodeType implements CodeList<PackagingMarkingCodeTyp
     V_44("44", "Unloading device"),
 
     /**
-     * The information specifies the unloading equipment which must be used to handle the
-     * package.
+     * The information specifies the unloading equipment which must be used to handle the package.
      */
     V_45("45", "Unloading equipment"),
 

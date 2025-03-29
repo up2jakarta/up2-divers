@@ -8,11 +8,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 7233 (AutomaticDataCaptureMethodCode) : Packaging related description code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred7233.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred7233.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList("7233")
-@Documented(value = "AutomaticDataCaptureMethodCode", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "AutomaticDataCaptureMethodCode", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.3", date = "2008-08-23")
 @XmlJavaTypeAdapter(AutomaticDataCaptureMethodCodeAdapter.class)
 public enum AutomaticDataCaptureMethodCodeType implements CodeList<AutomaticDataCaptureMethodCodeType> {

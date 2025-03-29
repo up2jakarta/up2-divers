@@ -338,35 +338,15 @@ public enum FreightChargeTypeIDType implements CodeList<FreightChargeTypeIDType>
     V_104201("104201", "Costs for crossing the channel tunnel"),
     V_104202("104202", "Transport between terminals"),
     V_104203("104203", "Transport charges from depot"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_104204("104204", "Transport to customs"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_104205("104205", "Transport to Cargo Warehouse"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_104206("104206", "Transport to outside terminal incl. 1 gate charge"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_104207("104207", "Transport to outside terminal incl. 2 gate charges"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_104208("104208", "Transport by arrangement"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_104209("104209", "Transport of bundled flats upon request"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_104210("104210", "Additional transport charges dangerous goods"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_104211("104211", "Additional transport charges special weights"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_104212("104212", "Additional transport charges out of gauge"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_104213("104213", "Transport to Customs X-Ray Station"),
     V_105000("105000", "PRE-CARRIAGE CHARGE"),
     V_105001("105001", "Transhipment charge precarriage"),
@@ -643,32 +623,14 @@ public enum FreightChargeTypeIDType implements CodeList<FreightChargeTypeIDType>
     V_203194("203194", "Loading containers main vessel to main vessel with overheight/overwidth in overtime"),
     V_203195("203195", "Loading containers main vessel to main vessel with dangerous goods in overtime"),
     V_203196("203196", "Loading containers main vessel to main vessel with overheight/overwidth in overtime"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_203197("203197", "Loading any standard length container full to overseas-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_203198("203198", "Loading any standard length container full out of gauge to overseas-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_203199("203199", "Loading any standard length container empty to overseas-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_203200("203200", "Loading any standard length container full to feeder"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_203201("203201", "Loading any standard length container full out of gauge to feeder"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_203202("203202", "Loading any standard length container empty to feeder"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_203203("203203", "Loading any standard length container full to barge"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_203204("203204", "Loading any standard length container full out of gauge to barge"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_203205("203205", "Loading any standard length container empty to barge"),
     V_204000("204000", "DISCHARGING CHARGE"),
     V_204001("204001", "Discharging 20 feet container full DS/SS"),
@@ -878,32 +840,14 @@ public enum FreightChargeTypeIDType implements CodeList<FreightChargeTypeIDType>
     V_204208("204208", "Discharging 45 feet container full DS/SS with dangerous goods ex feeders"),
     V_204209("204209", "Discharging uncontainerized cargo"),
     V_204210("204210", "Discharging uncontainerized cargo in overtime"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_204211("204211", "Discharging any standard length container full to overseas-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_204212("204212", "Discharging any standard length container full out of gauge to overseas-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_204213("204213", "Discharging any standard length container empty to overseas-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_204214("204214", "Discharging any standard length container full to feeder"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_204215("204215", "Discharging any standard length container full out of gauge to feeder"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_204216("204216", "Discharging any standard length container empty to feeder"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_204217("204217", "Discharging any standard length container full to barge"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_204218("204218", "Discharging any standard length container full out of gauge to barge"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_204219("204219", "Discharging any standard length container empty to barge"),
     V_205000("205000", "SHIFTING CHARGES"),
     V_205001("205001", "Shifting"),
@@ -1016,50 +960,20 @@ public enum FreightChargeTypeIDType implements CodeList<FreightChargeTypeIDType>
     V_206049("206049", "Reloading 20 feet container full via quai with overheight/overwide"),
     V_206050("206050", "Reloading 40 feet container full via quai with overheight/overwide"),
     V_206051("206051", "Reloading 45 feet container full via quai with overheight/overwide"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206052("206052", "Transshipment any standard length container full from overseas-vessel to other overseas-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206053("206053", "Transshipment any standard length container full out of gauge from overseas-vessel to other overseas-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206054("206054", "Transshipment any standard length container empty from overseas-vessel to other overseas-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206055("206055", "Transshipment any standard length container full from overseas-vessel to feeder-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206056("206056", "Transshipment any standard length container full out of gauge from overseas-vessel to feeder-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206057("206057", "Transshipment any standard length container empty from overseas-vessel to feeder-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206058("206058", "Transshipment any standard length container full from feeder-vessel to overseas-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206059("206059", "Transshipment any standard length container full out of gauge from feeder-vessel to overseas-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206060("206060", "Transshipment any standard length container empty from feeder-vessel to overseas-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206061("206061", "Transshipment any standard length container full from feeder-vessel to other feeder-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206062("206062", "Transshipment any standard length container full out of gauge from feeder-vessel to other feeder-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206063("206063", "Transshipment any standard length container empty from feeder-vessel to other feeder-vessel"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206064("206064", "Reloading any standard length container full to same vessel via quay"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206065("206065", "Reloading any standard length container full out of gauge to same vessel via quay"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_206066("206066", "Reloading any standard length container empty to same vessel via quay"),
     V_207000("207000", "RECEIVING CHARGES"),
     V_207001("207001", "Receiving by rail of empty chassis"),
@@ -1120,11 +1034,7 @@ public enum FreightChargeTypeIDType implements CodeList<FreightChargeTypeIDType>
     V_207058("207058", "Received/delivered by barge not shipbound full"),
     V_207059("207059", "Received/delivered by barge not shipbound empty"),
     V_207060("207060", "Receiving more than one month at terminal"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_207061("207061", "Receiving any standard length container full out of gauge via road"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_207062("207062", "Receiving any standard length container full out of gauge via rail"),
     V_208000("208000", "DELIVERING CHARGES"),
     V_208001("208001", "Delivering by rail of empty chassis"),
@@ -1178,11 +1088,7 @@ public enum FreightChargeTypeIDType implements CodeList<FreightChargeTypeIDType>
     V_208047("208047", "Delivery 45 feet container full with overheight/overwide"),
     V_208048("208048", "Delivery 45 feet container full with overheight/overwide - additional"),
     V_208049("208049", "Delivery 45 feet container empty"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_208050("208050", "Delivering any standard length container full out of gauge via road"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_208051("208051", "Delivering any standard length container full out of gauge via rail"),
     V_209000("209000", "TERMINAL ACTIVITIES CHARGES"),
     V_209001("209001", "Attaching/detaching clip-on units"),
@@ -1207,41 +1113,17 @@ public enum FreightChargeTypeIDType implements CodeList<FreightChargeTypeIDType>
     V_209060("209060", "Terminal handling charge - origin"),
     V_209061("209061", "Remove damaged twistlocks"),
     V_209062("209062", "Set safety seals"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_209063("209063", "Crane operation truck-rail"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_209064("209064", "Crane operation rail-truck"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_209065("209065", "Crane operation truck-yard"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_209066("209066", "Crane operation rail-yard"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_209067("209067", "Crane operation yard-rail"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_209068("209068", "Crane operation yard-truck"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_209069("209069", "Status Change (Replanning, Reallocation)"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_209070("209070", "Mounting/ demounting of end walls"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_209071("209071", "Setting brackets for loading on waggons"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_209072("209072", "Small repairs"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_209073("209073", "Supervision of container"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_209074("209074", "Cargo survey ordered by ships crew"),
     V_210000("210000", "STORAGE CHARGES"),
     V_210001("210001", "Storage 20 feet containers export"),
@@ -1309,11 +1191,7 @@ public enum FreightChargeTypeIDType implements CodeList<FreightChargeTypeIDType>
     V_210058("210058", "Storage dues for 45 feet container empty"),
     V_210059("210059", "Storage full more than one month at terminal"),
     V_210060("210060", "Yard occupancy charge"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_210061("210061", "Storage of any standard length container empty"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_210062("210062", "Storage of any standard length container empty special"),
     V_211000("211000", "MAN HOURS CHARGES"),
     V_211001("211001", "Terminal labour per hour"),
@@ -1488,29 +1366,13 @@ public enum FreightChargeTypeIDType implements CodeList<FreightChargeTypeIDType>
     V_216084("216084", "Veterinarian inspection"),
     V_216085("216085", "Extra handling charges for rolling tarpaulins"),
     V_216086("216086", "Handling of automatic twistlocks"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_216087("216087", "Setting/ removing of stacking cones/ twist locks"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_216088("216088", "Supply of gangway"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_216089("216089", "Freshwater supply"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_216090("216090", "Receival from authority inspection"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_216091("216091", "Receival from authority inspection out of gauge"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_216092("216092", "Delivery to authority inspection"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_216093("216093", "Delivery to authority inspection out of gauge"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_216094("216094", "Minimum fee for every order for which dues are payable"),
     V_300000("300000", "DOCUMENTATION CHARGES"),
     V_300999("300999", "All documentation charges"),
@@ -1788,8 +1650,8 @@ public enum FreightChargeTypeIDType implements CodeList<FreightChargeTypeIDType>
     V_609018("609018", "Charges resulting from the fact of having to wait for the consignor to supply documents needed for the completion of formalities required by Customs or other authorities (cf. article 25/paragraph 3(1) of CIM)"),
 
     /**
-     * particulars which are irregular/incorrect/incomplete or not in the allotted spaces
-     * (cf. article 18 of CIM)
+     * particulars which are irregular/incorrect/incomplete or not in the allotted spaces (cf.
+     * article 18 of CIM)
      */
     V_609019("609019", "Charges resulting from the fact that the consignor has entered in the consignment note particulars which are irregular/incorrect/incomplete or not in the alloted spaces (cf. article 18 of CIM)"),
     V_609020("609020", "Cleaning of vehicle"),
@@ -1917,8 +1779,6 @@ public enum FreightChargeTypeIDType implements CodeList<FreightChargeTypeIDType>
     V_609142("609142", "Extras used in accident procedures when dangerous goods"),
     V_609143("609143", "Former transport charges"),
     V_609144("609144", "Sweeping 45 feet container"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     V_609145("609145", "Waiting time at Customs X-Ray Station"),
     ;
 

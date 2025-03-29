@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 4277 : Payment terms description identifier.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred4277.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred4277.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Payment Terms Description Identifier", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Payment Terms Description Identifier", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.1", date = "2008-08-23")
 @XmlJavaTypeAdapter(PaymentTermsIDAdapter.class)
 public enum PaymentTermsIDType implements CodeList<PaymentTermsIDType> {

@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 5153 : Duty or tax or fee type name code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred5153.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred5153.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Duty Tax Fee Type Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Duty Tax Fee Type Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.4", date = "2008-08-23")
 @XmlJavaTypeAdapter(TaxTypeCodeAdapter.class)
 public enum TaxTypeCodeType implements CodeList<TaxTypeCodeType> {
@@ -30,8 +30,8 @@ public enum TaxTypeCodeType implements CodeList<TaxTypeCodeType> {
     AAB("AAB", "Provisional countervailing duty cash"),
 
     /**
-     * Countervailing duty paid by posting a bond during an investigation period prior to
-     * a formal decision on subsidization by Customs.
+     * Countervailing duty paid by posting a bond during an investigation period prior to a
+     * formal decision on subsidization by Customs.
      */
     AAC("AAC", "Provisional countervailing duty bond"),
 
@@ -89,13 +89,11 @@ public enum TaxTypeCodeType implements CodeList<TaxTypeCodeType> {
     /**
      * A tax levied on Cannabis products
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     AAO("AAO", "Provincial Cannabis Tax"),
 
     /**
      * Fee levied due to outstanding duties to be paid
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     AAP("AAP", "Outstanding duty interest"),
 
     /**
@@ -229,8 +227,8 @@ public enum TaxTypeCodeType implements CodeList<TaxTypeCodeType> {
     MCA("MCA", "Monetary compensatory amount"),
 
     /**
-     * Duty paid and held on deposit, by Customs, during an investigation period prior to
-     * a final decision being made on any aspect related to imported goods (except valuation)
+     * Duty paid and held on deposit, by Customs, during an investigation period prior to a
+     * final decision being made on any aspect related to imported goods (except valuation)
      * by Customs.
      */
     MCD("MCD", "Miscellaneous cash deposit"),
@@ -241,8 +239,8 @@ public enum TaxTypeCodeType implements CodeList<TaxTypeCodeType> {
     OTH("OTH", "Other taxes"),
 
     /**
-     * Anti-dumping duty paid by posting a bond during an investigation period prior to a
-     * formal decision on dumping by Customs.
+     * Anti-dumping duty paid by posting a bond during an investigation period prior to a formal
+     * decision on dumping by Customs.
      */
     PDB("PDB", "Provisional duty bond"),
 
@@ -311,8 +309,8 @@ public enum TaxTypeCodeType implements CodeList<TaxTypeCodeType> {
     TTA("TTA", "Tonnage taxes"),
 
     /**
-     * Duty paid and held on deposit, by Customs, during an investigation period prior to
-     * a formal decision on valuation of the goods being made.
+     * Duty paid and held on deposit, by Customs, during an investigation period prior to a
+     * formal decision on valuation of the goods being made.
      */
     VAD("VAD", "Valuation deposit"),
 

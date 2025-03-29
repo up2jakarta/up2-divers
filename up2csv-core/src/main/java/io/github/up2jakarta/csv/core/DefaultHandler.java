@@ -5,6 +5,7 @@ import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputRepository;
 import io.github.up2jakarta.csv.input.InputSegment;
+import io.github.up2jakarta.csv.misc.MapperException;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.codelist.PropertyException;
 import jakarta.validation.ConstraintViolation;
@@ -67,6 +68,9 @@ public class DefaultHandler<R extends InputSegment<?>, K extends InputError.Key<
         if (!collector.contains(offset)) {
             final SeverityType type = EventHandler.getSeverity(violation, config);
             final String code = getErrorCode(violation, config);
+            if (type == SeverityType.FATAL) {
+                throw new MapperException(data, offset, type, code, new PropertyException(type, code, violation.getMessage()), toList());
+            }
             final E error = creator.create(type, row, offset, data, code, violation.getMessage());
             this.collector.addWithOrder(offset, error, false);
         }
@@ -76,11 +80,14 @@ public class DefaultHandler<R extends InputSegment<?>, K extends InputError.Key<
     public void handleEvent(D data, int offset, Throwable exception, Error config, boolean trace) {
         final String code = getErrorCode(exception, config);
         final SeverityType type = getSeverity(exception, config);
+        if (type == SeverityType.FATAL) {
+            throw new MapperException(data, offset, type, code, PropertyException.of(type, code, exception), toList());
+        }
         final E error = creator.create(type, row, offset, data, code, exception.getMessage());
         if (trace || !(exception instanceof PropertyException)) {
             final StringWriter writer = new StringWriter();
             stackTrace(exception, new PrintWriter(writer));
-            error.setTrace(writer.toString());
+            error.setTrace(writer.toString().trim());
         }
         this.collector.addWithOrder(offset, error, true);
     }

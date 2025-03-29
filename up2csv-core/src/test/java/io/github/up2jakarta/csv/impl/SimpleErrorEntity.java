@@ -1,12 +1,12 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.input.InputError;
+import io.github.up2jakarta.csv.input.InputError.Key;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "TB_INPUT1_ERRORS")
 @SuppressWarnings("unused")
-public class SimpleErrorEntity extends AbstractError implements InputError<InputRowEntity, SimpleErrorEntity, DataId>, InputError.Key<InputRowEntity> {
+public class SimpleErrorEntity extends AbstractError<SimpleErrorEntity> implements Key<InputRowEntity> {
 
     @Id
     @ManyToOne(optional = false)
@@ -17,7 +17,7 @@ public class SimpleErrorEntity extends AbstractError implements InputError<Input
                     @JoinColumn(name = "ERR_ROW_ORDER", referencedColumnName = "ROW_ORDER")
             }
     )
-    private InputRowEntity row;
+    private InputRowEntity record;
 
     @Id
     @Column(name = "ERR_ORDER", nullable = false)
@@ -31,13 +31,13 @@ public class SimpleErrorEntity extends AbstractError implements InputError<Input
         return this;
     }
 
-    public InputRowEntity getRow() {
-        return row;
+    public InputRowEntity getRecord() {
+        return record;
     }
 
     @Override
     public void setRecord(InputRowEntity row) {
-        this.row = row;
+        this.record = row;
     }
 
     public Integer getOrder() {
@@ -49,6 +49,7 @@ public class SimpleErrorEntity extends AbstractError implements InputError<Input
         this.order = order;
     }
 
+    @Override
     public DataId getType() {
         return type;
     }

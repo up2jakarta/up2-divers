@@ -12,11 +12,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 1153 (ReferenceTypeCode) : Reference code qualifier.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred1153.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred1153.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList("1153")
-@Documented(value = "Reference Type Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Reference Type Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.11", date = "2008-08-23")
 @XmlJavaTypeAdapter(ReferenceCodeAdapter.class)
 public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
@@ -189,8 +189,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     ABF("ABF", "Repair estimate number"),
 
     /**
-     * Reference issued by Customs pertaining to a pending tariff classification decision
-     * requested by an importer or agent.
+     * Reference issued by Customs pertaining to a pending tariff classification decision requested
+     * by an importer or agent.
      */
     ABG("ABG", "Customs decision request number"),
 
@@ -237,8 +237,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     ABO("ABO", "Originator's reference"),
 
     /**
-     * Reference to the party whose posted bond or security is being declared in order to
-     * accept responsibility for a goods declaration and the applicable duties and taxes.
+     * Reference to the party whose posted bond or security is being declared in order to accept
+     * responsibility for a goods declaration and the applicable duties and taxes.
      */
     ABP("ABP", "Declarant's Customs identity number"),
 
@@ -481,8 +481,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     ADL("ADL", "Ordering customer consignment reference number"),
 
     /**
-     * Reference number assigned by the shipowner as an authorization number to transport
-     * certain goods (such as hazardous goods, cool or reefer goods).
+     * Reference number assigned by the shipowner as an authorization number to transport certain
+     * goods (such as hazardous goods, cool or reefer goods).
      */
     ADM("ADM", "Shipowner's authorization number"),
 
@@ -586,9 +586,9 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     AEG("AEG", "Customer specification number"),
 
     /**
-     * Instructions or standards applicable for the whole message or a message line item.
-     * These instructions or standards may be published by a neutral organization or authority
-     * or another party concerned.
+     * Instructions or standards applicable for the whole message or a message line item. These
+     * instructions or standards may be published by a neutral organization or authority or
+     * another party concerned.
      */
     AEH("AEH", "Applicable instructions or standards"),
 
@@ -608,8 +608,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     AEK("AEK", "Payment order number"),
 
     /**
-     * Reference number by which a haulier/carrier will announce himself at the container
-     * terminal or depot when delivering equipment.
+     * Reference number by which a haulier/carrier will announce himself at the container terminal
+     * or depot when delivering equipment.
      */
     AEL("AEL", "Delivery number (transport)"),
 
@@ -1033,14 +1033,12 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     AHN("AHN", "Joint venture reference number"),
 
     /**
-     * The registration number by which a company/organization is known to the Chamber of
-     * Commerce.
+     * The registration number by which a company/organization is known to the Chamber of Commerce.
      */
     AHO("AHO", "Chamber of Commerce registration number"),
 
     /**
-     * The registration number by which a company/organization is identified with the tax
-     * administration.
+     * The registration number by which a company/organization is identified with the tax administration.
      */
     AHP("AHP", "Tax registration number"),
 
@@ -1113,8 +1111,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     AID("AID", "Certificate of conformity"),
 
     /**
-     * Certificate of approval for components which are subject to legal restrictions and
-     * must be approved by the government.
+     * Certificate of approval for components which are subject to legal restrictions and must
+     * be approved by the government.
      */
     AIE("AIE", "Ministerial certificate of homologation"),
 
@@ -1367,8 +1365,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     AKA("AKA", "Container disposition order reference number"),
 
     /**
-     * The first part of the unique identification of a container formed by an alpha code
-     * identifying the owner of the container.
+     * The first part of the unique identification of a container formed by an alpha code identifying
+     * the owner of the container.
      */
     AKB("AKB", "Container prefix"),
 
@@ -1467,8 +1465,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     AKT("AKT", "Forwarding order number"),
 
     /**
-     * Reference number known at the address where the transport equipment will be or has
-     * been surveyed.
+     * Reference number known at the address where the transport equipment will be or has been
+     * surveyed.
      */
     AKU("AKU", "Transport equipment survey reference number"),
 
@@ -1531,8 +1529,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     ALF("ALF", "Authorization number for exception to dangerous goods regulations"),
 
     /**
-     * Reference number allocated by an authority in order to control the dangerous goods
-     * on board of a specific means of transport for dangerous goods security purposes.
+     * Reference number allocated by an authority in order to control the dangerous goods on
+     * board of a specific means of transport for dangerous goods security purposes.
      */
     ALG("ALG", "Dangerous goods security number"),
 
@@ -1628,8 +1626,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     ALY("ALY", "Financial management reference"),
 
     /**
-     * A reference assigned by a consignor to a notification document which indicates the
-     * availability of goods for collection.
+     * A reference assigned by a consignor to a notification document which indicates the availability
+     * of goods for collection.
      */
     ALZ("ALZ", "NOTIfication for COLlection number (NOTICOL)"),
 
@@ -1712,8 +1710,7 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     AMO("AMO", "Premium rate table"),
 
     /**
-     * Financial institution through which the advising bank is to advise the documentary
-     * credit.
+     * Financial institution through which the advising bank is to advise the documentary credit.
      */
     AMP("AMP", "Advise through bank's reference"),
 
@@ -1728,8 +1725,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     AMR("AMR", "US, Food and Drug Administration establishment indicator"),
 
     /**
-     * A number known as the United States Federal Communications Commission (FCC) import
-     * condition number applying to certain types of regulated communications equipment.
+     * A number known as the United States Federal Communications Commission (FCC) import condition
+     * number applying to certain types of regulated communications equipment.
      */
     AMS("AMS", "US, Federal Communications Commission (FCC) import condition number"),
 
@@ -2146,8 +2143,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     APX("APX", "Original submitter log number"),
 
     /**
-     * A Data Maintenance Request (DMR) original submitter's reference log number for the
-     * parent DMR.
+     * A Data Maintenance Request (DMR) original submitter's reference log number for the parent
+     * DMR.
      */
     APY("APY", "Original submitter, parent Data Maintenance Request (DMR) log number"),
 
@@ -2252,8 +2249,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     AQQ("AQQ", "Activite Principale Exercee (APE) identifier"),
 
     /**
-     * Dun and Bradstreet United States' 8 digit Standard Industrial Classification (SIC)
-     * code identifying activities of the company.
+     * Dun and Bradstreet United States' 8 digit Standard Industrial Classification (SIC) code
+     * identifying activities of the company.
      */
     AQR("AQR", "Dun and Bradstreet US 8 digit Standard Industrial Classification (SIC) code"),
 
@@ -2472,8 +2469,7 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     ASH("ASH", "Formal statement reference"),
 
     /**
-     * A reference number identifying a proof of delivery which is generated by the goods
-     * recipient.
+     * A reference number identifying a proof of delivery which is generated by the goods recipient.
      */
     ASI("ASI", "Proof of delivery reference number"),
 
@@ -2651,8 +2647,7 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     ATQ("ATQ", "Kamer Van Koophandel (KVK) number"),
 
     /**
-     * An identification number assigned by the Luxembourg National Bank to a business in
-     * Luxembourg.
+     * An identification number assigned by the Luxembourg National Bank to a business in Luxembourg.
      */
     ATR("ATR", "Institut Belgo-Luxembourgeois de Codification (IBLC) number"),
 
@@ -2954,10 +2949,10 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     AVU("AVU", "Unique goods shipment identifier"),
 
     /**
-     * A reference to an agreement between one or more contracting authorities and one or
-     * more economic operators, the purpose of which is to establish the terms governing contracts
-     * to be awarded during a given period, in particular with regard to price and, where
-     * appropriate, the quantity envisaged.
+     * A reference to an agreement between one or more contracting authorities and one or more
+     * economic operators, the purpose of which is to establish the terms governing contracts
+     * to be awarded during a given period, in particular with regard to price and, where appropriate,
+     * the quantity envisaged.
      */
     AVV("AVV", "Framework Agreement Number"),
 
@@ -3151,8 +3146,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
 
     /**
      * A reference number identifying the relationship between a service provider and a service
-     * client, e.g., treatment of a patient in a hospital, usage by a member of a library
-     * facility, etc.
+     * client, e.g., treatment of a patient in a hospital, usage by a member of a library facility,
+     * etc.
      */
     AXH("AXH", "Service relation number"),
 
@@ -3187,8 +3182,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     AXN("AXN", "Pre-agreement number"),
 
     /**
-     * Number assigned by a governing body (or their agents) to a product which certifies
-     * compliance with a standard.
+     * Number assigned by a governing body (or their agents) to a product which certifies compliance
+     * with a standard.
      */
     AXO("AXO", "Product certification number"),
 
@@ -3211,7 +3206,6 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
      * The party identification number used in the European Union's Trade Control and Expert
      * System (TRACES).
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     AXS("AXS", "TRACES party identification"),
 
     /**
@@ -3270,7 +3264,6 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     /**
      * Registration number of producer of batteries and accumulators.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     BTP("BTP", "Battery and accumulator producer registration number"),
 
     /**
@@ -3521,7 +3514,6 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     /**
      * Registration number of producer of electrical and electronic equipment.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     EEP("EEP", "Electrical and electronic equipment producer registration number"),
 
     /**
@@ -3561,14 +3553,13 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     EX("EX", "Export permit identifier"),
 
     /**
-     * Tax payer's number. Number assigned to individual persons as well as to corporates
-     * by a public institution; this number is different from the VAT registration number.
+     * Tax payer's number. Number assigned to individual persons as well as to corporates by
+     * a public institution; this number is different from the VAT registration number.
      */
     FC("FC", "Fiscal number"),
 
     /**
-     * [1460] Reference number assigned by the freight forwarder to identify a particular
-     * consignment.
+     * [1460] Reference number assigned by the freight forwarder to identify a particular consignment.
      */
     FF("FF", "Consignment identifier, freight forwarder assigned"),
 
@@ -3578,8 +3569,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     FI("FI", "File line identifier"),
 
     /**
-     * Number given to a usual sender which has regular expeditions of the same goods, to
-     * the same destination, defining all general conditions of the transport.
+     * Number given to a usual sender which has regular expeditions of the same goods, to the
+     * same destination, defining all general conditions of the transport.
      */
     FLW("FLW", "Flow reference number"),
 
@@ -3626,8 +3617,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     GC("GC", "Government contract number"),
 
     /**
-     * Number to identify a specific parameter within a standardization description (e.g.
-     * M5 for screws or DIN A4 for paper).
+     * Number to identify a specific parameter within a standardization description (e.g. M5
+     * for screws or DIN A4 for paper).
      */
     GD("GD", "Standard's code number"),
 
@@ -3971,8 +3962,7 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     RE("RE", "Release number"),
 
     /**
-     * [1150] Reference number assigned to identify a consignment upon its arrival at its
-     * destination.
+     * [1150] Reference number assigned to identify a consignment upon its arrival at its destination.
      */
     REN("REN", "Consignment receipt identifier"),
 
@@ -4112,16 +4102,15 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
 
     /**
      * Number assigned by the tax authorities to a party indicating its tax exemption authorization.
-     * This number could relate to a specified business type, a specified local area or a
-     * class of products.
+     * This number could relate to a specified business type, a specified local area or a class
+     * of products.
      */
     TL("TL", "Tax exemption licence number"),
 
     /**
-     * Reference applied to a transaction between two or more parties over a defined life
-     * cycle; e.g. number applied by importer or broker to obtain release from Customs, may
-     * then used to control declaration through final accounting (synonyms: declaration, entry
-     * number).
+     * Reference applied to a transaction between two or more parties over a defined life cycle;
+     * e.g. number applied by importer or broker to obtain release from Customs, may then used
+     * to control declaration through final accounting (synonyms: declaration, entry number).
      */
     TN("TN", "Transaction reference number"),
 
@@ -4175,8 +4164,8 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     VC("VC", "Vendor contract number"),
 
     /**
-     * Reference number identifying the documentation of a transport equipment gross mass
-     * (weight) verification.
+     * Reference number identifying the documentation of a transport equipment gross mass (weight)
+     * verification.
      */
     VGR("VGR", "Transport equipment gross mass verification reference number"),
 
@@ -4269,9 +4258,9 @@ public enum ReferenceCodeType implements PartySchemeIDType<ReferenceCodeType> {
     XC("XC", "Cargo control number"),
 
     /**
-     * Where a consignment is deconsolidated and/or transferred to the control of another
-     * carrier or freight forwarder (e.g. housebill, abstract) this references the previous
-     * (e.g. master) cargo control number.
+     * Where a consignment is deconsolidated and/or transferred to the control of another carrier
+     * or freight forwarder (e.g. housebill, abstract) this references the previous (e.g. master)
+     * cargo control number.
      */
     XP("XP", "Previous cargo control number"),
 

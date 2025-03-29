@@ -11,11 +11,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 1001 : Document name code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred1001.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred1001.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Document Name Code", agency = Agency.UN_ECE, version = "D22B")
-@Schema(agency = "UN/CEFACT", version = "3.18", date = "2008-08-23")
+@Documented(value = "Document Name Code", agency = Agency.UN_ECE, version = "D22A")
+@Schema(agency = "UN/CEFACT", version = "3.17", date = "2008-08-23")
 @XmlJavaTypeAdapter(DocumentCodeAdapter.class)
 public enum DocumentCodeType implements CodeList<DocumentCodeType> {
 
@@ -60,8 +60,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_8("8", "First sample test report"),
 
     /**
-     * A document/message to enable the transmission of information regarding pricing and
-     * catalogue details for goods and services offered by a seller to a buyer.
+     * A document/message to enable the transmission of information regarding pricing and catalogue
+     * details for goods and services offered by a seller to a buyer.
      */
     V_9("9", "Price/sales catalogue"),
 
@@ -103,10 +103,9 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_16("16", "Certificate"),
 
     /**
-     * Document identifying goods in which the issuing authority expressly certifies that
-     * the goods originate in a specific country or part of, or group of countries. It also
-     * states the price and/or cost of the goods with the purpose of determining the customs
-     * origin.
+     * Document identifying goods in which the issuing authority expressly certifies that the
+     * goods originate in a specific country or part of, or group of countries. It also states
+     * the price and/or cost of the goods with the purpose of determining the customs origin.
      */
     V_17("17", "Combined certificate of value and origin"),
 
@@ -183,14 +182,14 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_31("31", "Underbond request"),
 
     /**
-     * A message/document issuing Customs approval to move cargo from one Customs control
-     * point to another.
+     * A message/document issuing Customs approval to move cargo from one Customs control point
+     * to another.
      */
     V_32("32", "Underbond approval"),
 
     /**
-     * Document / message issued by the authority in the exporting country evidencing the
-     * sealing of export meat lockers.
+     * Document / message issued by the authority in the exporting country evidencing the sealing
+     * of export meat lockers.
      */
     V_33("33", "Certificate of sealing of export meat lockers"),
 
@@ -211,8 +210,7 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
 
     /**
      * Document/message in which the competent national authorities provide a declarant with
-     * an acceptance or a rejection about a received declaration for European statistical
-     * purposes.
+     * an acceptance or a rejection about a received declaration for European statistical purposes.
      */
     V_37("37", "Response to a trade statistics message"),
 
@@ -300,8 +298,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
 
     /**
      * Document or message to supply advice on a dangerous or hazardous material to industrial
-     * customers so as to enable them to take measures to protect their employees and the
-     * environment from any potential harmful effects from these material.
+     * customers so as to enable them to take measures to protect their employees and the environment
+     * from any potential harmful effects from these material.
      */
     V_53("53", "Safety and hazard data sheet"),
 
@@ -341,8 +339,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_59("59", "Treatment - nil outturn"),
 
     /**
-     * Movement type indicator: goods are moved under customs control for warehousing due
-     * to being time-up.
+     * Movement type indicator: goods are moved under customs control for warehousing due to
+     * being time-up.
      */
     V_60("60", "Treatment - time-up underbond"),
 
@@ -471,8 +469,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_82("82", "Metered services invoice"),
 
     /**
-     * Document message for providing credit information related to financial adjustments
-     * to the relevant party, e.g., bonuses.
+     * Document message for providing credit information related to financial adjustments to
+     * the relevant party, e.g., bonuses.
      */
     V_83("83", "Credit note related to financial adjustments"),
 
@@ -496,8 +494,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_86("86", "Vessel unpack report"),
 
     /**
-     * A document code to indicate that the message being transmitted is summary manifest
-     * information for general cargo.
+     * A document code to indicate that the message being transmitted is summary manifest information
+     * for general cargo.
      */
     V_87("87", "General cargo summary manifest report"),
 
@@ -571,8 +569,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_99("99", "Cargo release notification"),
 
     /**
-     * Certificate asserting that the goods have been submitted to the excise authorities
-     * before departure from the exporting country or before delivery in case of import traffic.
+     * Certificate asserting that the goods have been submitted to the excise authorities before
+     * departure from the exporting country or before delivery in case of import traffic.
      */
     V_100("100", "Excise certificate"),
 
@@ -593,15 +591,15 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_103("103", "Transport equipment direct interchange report"),
 
     /**
-     * Advice that containers or other items of transport equipment may be expected to be
-     * delivered to a certain location.
+     * Advice that containers or other items of transport equipment may be expected to be delivered
+     * to a certain location.
      */
     V_104("104", "Transport equipment impending arrival advice"),
 
     /**
-     * Document/message issued within an enterprise to initiate the purchase of articles,
-     * materials or services required for the production or manufacture of goods to be offered
-     * for sale or otherwise supplied to customers.
+     * Document/message issued within an enterprise to initiate the purchase of articles, materials
+     * or services required for the production or manufacture of goods to be offered for sale
+     * or otherwise supplied to customers.
      */
     V_105("105", "Purchase order"),
 
@@ -652,8 +650,7 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_113("113", "Transport equipment unpacking report"),
 
     /**
-     * Request for confirmation that an item of transport equipment will be available for
-     * collection.
+     * Request for confirmation that an item of transport equipment will be available for collection.
      */
     V_114("114", "Transport equipment pick-up availability request"),
 
@@ -796,8 +793,7 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_140("140", "Packing instructions"),
 
     /**
-     * A document and/or message advising of items which have to be booked to a financial
-     * account.
+     * A document and/or message advising of items which have to be booked to a financial account.
      */
     V_141("141", "Advising items to be booked to a financial account"),
 
@@ -822,8 +818,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_145("145", "Cargo vessel discharge order"),
 
     /**
-     * Order that specified cargo, containers or groups of containers are to be loaded in
-     * or on a vessel.
+     * Order that specified cargo, containers or groups of containers are to be loaded in or
+     * on a vessel.
      */
     V_146("146", "Cargo vessel loading order"),
 
@@ -978,8 +974,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_174("174", "Drawing"),
 
     /**
-     * A report identifying the cost performance on a contract at specified levels of the
-     * work breakdown structure (format 2 - organizational categories).
+     * A report identifying the cost performance on a contract at specified levels of the work
+     * breakdown structure (format 2 - organizational categories).
      */
     V_175("175", "Cost Performance Report (CPR) format 2"),
 
@@ -996,9 +992,9 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_177("177", "Cost Performance Report (CPR) format 1"),
 
     /**
-     * A report identifying the cost performance on a contract that summarizes changes to
-     * a contract over a given reporting period with beginning and ending values (format 3
-     * - baseline).
+     * A report identifying the cost performance on a contract that summarizes changes to a
+     * contract over a given reporting period with beginning and ending values (format 3 -
+     * baseline).
      */
     V_178("178", "Cost Performance Report (CPR) format 3"),
 
@@ -1123,8 +1119,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_201("201", "Direct payment valuation request"),
 
     /**
-     * Document/message addressed, for instance, by a general contractor to the owner, in
-     * order that a direct payment be made to a subcontractor.
+     * Document/message addressed, for instance, by a general contractor to the owner, in order
+     * that a direct payment be made to a subcontractor.
      */
     V_202("202", "Direct payment valuation"),
 
@@ -1197,8 +1193,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_214("214", "Pre-authorised direct debit(s)"),
 
     /**
-     * Document/message by means of which a buyer informs a seller that the buyer intends
-     * to enter into contractual negotiations.
+     * Document/message by means of which a buyer informs a seller that the buyer intends to
+     * enter into contractual negotiations.
      */
     V_215("215", "Letter of intent"),
 
@@ -1581,8 +1577,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_288("288", "Kanban schedule"),
 
     /**
-     * A message to submit master data, a set of data that is rarely changed, to identify
-     * and describe products a supplier offers to their (potential) customer or buyer.
+     * A message to submit master data, a set of data that is rarely changed, to identify and
+     * describe products a supplier offers to their (potential) customer or buyer.
      */
     V_289("289", "Product data message"),
 
@@ -1776,8 +1772,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_324("324", "Transport emergency card"),
 
     /**
-     * Document/message serving as a preliminary invoice, containing - on the whole - the
-     * same information as the final invoice, but not actually claiming payment.
+     * Document/message serving as a preliminary invoice, containing - on the whole - the same
+     * information as the final invoice, but not actually claiming payment.
      */
     V_325("325", "Proforma invoice"),
 
@@ -1828,8 +1824,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_334("334", "Customs declaration for cargo examination, alternate"),
 
     /**
-     * Document/message issued by a supplier to a carrier requesting space to be reserved
-     * for a specified consignment, indicating desirable conveyance, despatch time, etc.
+     * Document/message issued by a supplier to a carrier requesting space to be reserved for
+     * a specified consignment, indicating desirable conveyance, despatch time, etc.
      */
     V_335("335", "Booking request"),
 
@@ -1871,8 +1867,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_342("342", "Report of transactions for information only"),
 
     /**
-     * Document/message giving instructions regarding local transport of goods, e.g. from
-     * the premises of an enterprise to those of a carrier undertaking further transport.
+     * Document/message giving instructions regarding local transport of goods, e.g. from the
+     * premises of an enterprise to those of a carrier undertaking further transport.
      */
     V_343("343", "Cartage order (local transport)"),
 
@@ -2103,8 +2099,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_385("385", "Consolidated invoice"),
 
     /**
-     * An invoice to pay amounts for goods and services in advance; these amounts will be
-     * subtracted from the final invoice.
+     * An invoice to pay amounts for goods and services in advance; these amounts will be subtracted
+     * from the final invoice.
      */
     V_386("386", "Prepayment invoice"),
 
@@ -2224,8 +2220,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
 
     /**
      * Document/message containing instructions from a customer to his bank to pay an amount
-     * in a specified currency to a nominated party in another country by a method either
-     * specified (e.g. teletransmission, air mail) or left to the discretion of the bank.
+     * in a specified currency to a nominated party in another country by a method either specified
+     * (e.g. teletransmission, air mail) or left to the discretion of the bank.
      */
     V_409("409", "Instructions for bank transfer"),
 
@@ -2242,8 +2238,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_411("411", "Utilities time series message"),
 
     /**
-     * Application by a customer to his bank to issue a banker's draft stating the amount
-     * and currency of the draft, the name of the payee and the place and country of payment.
+     * Application by a customer to his bank to issue a banker's draft stating the amount and
+     * currency of the draft, the name of the payee and the place and country of payment.
      */
     V_412("412", "Application for banker's draft"),
 
@@ -2280,8 +2276,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
 
     /**
      * Declaration, in accordance with the WCO Customs Data Model, to Customs concerning the
-     * export of cargo carried by commercial means of transport over water or through the
-     * air, e.g. vessel or aircraft.
+     * export of cargo carried by commercial means of transport over water or through the air,
+     * e.g. vessel or aircraft.
      */
     V_419("419", "WCO Cargo Report Export, Air or Maritime"),
 
@@ -2298,15 +2294,14 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
 
     /**
      * Declaration, in accordance with the WCO Customs Data Model, to Customs concerning the
-     * import of cargo carried by commercial means of transport over water or through the
-     * air, e.g. vessel or aircraft.
+     * import of cargo carried by commercial means of transport over water or through the air,
+     * e.g. vessel or aircraft.
      */
     V_422("422", "WCO Cargo Report Import, Air or Maritime"),
 
     /**
-     * Single step declaration, in accordance with the WCO Customs Data Model, to Customs
-     * by which goods are declared for a Customs export procedure based on the 1999 Kyoto
-     * Convention.
+     * Single step declaration, in accordance with the WCO Customs Data Model, to Customs by
+     * which goods are declared for a Customs export procedure based on the 1999 Kyoto Convention.
      */
     V_423("423", "WCO one-step export declaration"),
 
@@ -2450,8 +2445,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_447("447", "Collection order"),
 
     /**
-     * Document/message whereby a draft or similar instrument and/or commercial documents
-     * are presented to a bank for acceptance, discounting, negotiation, payment or collection,
+     * Document/message whereby a draft or similar instrument and/or commercial documents are
+     * presented to a bank for acceptance, discounting, negotiation, payment or collection,
      * whether or not against a documentary credit.
      */
     V_448("448", "Documents presentation form"),
@@ -2558,9 +2553,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * Document/message in which a bank states that it has issued a documentary credit under
      * which the beneficiary is to obtain payment, acceptance or negotiation on compliance
-     * with certain terms and conditions and against presentation of stipulated documents
-     * and such drafts as may be specified. The credit may or may not be confirmed by another
-     * bank.
+     * with certain terms and conditions and against presentation of stipulated documents and
+     * such drafts as may be specified. The credit may or may not be confirmed by another bank.
      */
     V_465("465", "Documentary credit"),
 
@@ -2599,7 +2593,7 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
      * collect tax on the invoice. The invoice should not contain tax details or information
      * about the party tax registrations.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
+    @Deprecated
     V_480("480", "Invoice out of scope of tax"),
 
     /**
@@ -2627,10 +2621,10 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_484("484", "Multiple direct debit request"),
 
     /**
-     * Draft drawn in favour of a third party either by one bank on another bank, or by a
-     * branch of a bank on its head office (or vice versa) or upon another branch of the same
-     * bank. In either case, the draft should comply with the specifications laid down for
-     * cheques in the country in which it is to be payable.
+     * Draft drawn in favour of a third party either by one bank on another bank, or by a branch
+     * of a bank on its head office (or vice versa) or upon another branch of the same bank.
+     * In either case, the draft should comply with the specifications laid down for cheques
+     * in the country in which it is to be payable.
      */
     V_485("485", "Banker's draft"),
 
@@ -2646,8 +2640,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_487("487", "Certificate of disembarkation permission"),
 
     /**
-     * Document certifying that the object was free of rats when inspected and that it is
-     * exempt from a deratting statement.
+     * Document certifying that the object was free of rats when inspected and that it is exempt
+     * from a deratting statement.
      */
     V_488("488", "Deratting exemption certificate"),
 
@@ -2657,18 +2651,18 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_489("489", "Reefer connection order"),
 
     /**
-     * Document/message, issued and signed in conformity with the applicable legislation,
-     * which contains an unconditional order whereby the drawer directs the drawee to pay
-     * a definite sum of money to the payee or to his order, on demand or at a definite time,
-     * against the surrender of the document itself.
+     * Document/message, issued and signed in conformity with the applicable legislation, which
+     * contains an unconditional order whereby the drawer directs the drawee to pay a definite
+     * sum of money to the payee or to his order, on demand or at a definite time, against
+     * the surrender of the document itself.
      */
     V_490("490", "Bill of exchange"),
 
     /**
-     * Document/message, issued and signed in conformity with the applicable legislation,
-     * which contains an unconditional promise whereby the maker undertakes to pay a definite
-     * sum of money to the payee or to his order, on demand or at a definite time, against
-     * the surrender of the document itself.
+     * Document/message, issued and signed in conformity with the applicable legislation, which
+     * contains an unconditional promise whereby the maker undertakes to pay a definite sum
+     * of money to the payee or to his order, on demand or at a definite time, against the
+     * surrender of the document itself.
      */
     V_491("491", "Promissory note"),
 
@@ -2691,8 +2685,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_495("495", "WCO second step of two-step export declaration"),
 
     /**
-     * Single step declaration, in accordance with the WCO Customs Data Model, to Customs
-     * by which goods are declared for Customs import procedure based on the 1999 Kyoto Convention.
+     * Single step declaration, in accordance with the WCO Customs Data Model, to Customs by
+     * which goods are declared for Customs import procedure based on the 1999 Kyoto Convention.
      */
     V_496("496", "WCO one-step import declaration"),
 
@@ -2716,46 +2710,46 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_499("499", "Previous transport document"),
 
     /**
-     * An invoice produced by the buyer (invoicee) instead of the seller, which indicates
-     * that the buyer has to pay amounts for goods and services in advance; these amounts
-     * will be subtracted from the final invoice.
+     * An invoice produced by the buyer (invoicee) instead of the seller, which indicates that
+     * the buyer has to pay amounts for goods and services in advance; these amounts will be
+     * subtracted from the final invoice.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
+    @Deprecated
     V_500("500", "Self billed prepayment invoice"),
 
     /**
      * An invoice assigned to a third party for collection, produced by the buyer (invoicee)
      * instead of the seller.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
+    @Deprecated
     V_501("501", "Self billed factored invoice"),
 
     /**
      * An invoice assigned to a third party for collection, produced by the buyer (invoicee)
      * which indicates that the buyer is claiming credit.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
+    @Deprecated
     V_502("502", "Self billed factored credit note"),
 
     /**
      * A document/message providing credit information to the relevant party which indicates
-     * that the buyer has to pay amounts for goods and services in advance; these amounts
-     * will be subtracted from the prepayment invoice.
+     * that the buyer has to pay amounts for goods and services in advance; these amounts will
+     * be subtracted from the prepayment invoice.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
+    @Deprecated
     V_503("503", "Prepayment credit note"),
 
     /**
-     * Document/message issued to the insured certifying that insurance has been effected
-     * and that a policy has been issued. Such a certificate for a particular cargo is primarily
-     * used when good are insured under the terms of a floating or an open policy; at the
-     * request of the insured it can be exchanged for a policy.
+     * Document/message issued to the insured certifying that insurance has been effected and
+     * that a policy has been issued. Such a certificate for a particular cargo is primarily
+     * used when good are insured under the terms of a floating or an open policy; at the request
+     * of the insured it can be exchanged for a policy.
      */
     V_520("520", "Insurance certificate"),
 
     /**
-     * A permit related to a transport document granting the transport of cargo under the
-     * conditions as specifically required.
+     * A permit related to a transport document granting the transport of cargo under the conditions
+     * as specifically required.
      */
     V_521("521", "Special requirements permit related to the transport of cargo"),
 
@@ -2792,8 +2786,7 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_527("527", "Self billed debit note"),
 
     /**
-     * The official document used for military personnel on travel orders, substituting a
-     * passport.
+     * The official document used for military personnel on travel orders, substituting a passport.
      */
     V_528("528", "Military Identification Card"),
 
@@ -2848,8 +2841,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_537("537", "Interim International Ship Security Certificate"),
 
     /**
-     * Certificate that guarantees quality manufacturing and processing of food products,
-     * medications, cosmetics, etc.
+     * Certificate that guarantees quality manufacturing and processing of food products, medications,
+     * cosmetics, etc.
      */
     V_538("538", "Good Manufacturing Practice (GMP) Certificate"),
 
@@ -2863,8 +2856,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
 
     /**
      * A document/message used when an insured reports to his insurer details of individual
-     * shipments which are covered by an insurance contract - an open cover or a floating
-     * policy - between the parties.
+     * shipments which are covered by an insurance contract - an open cover or a floating policy
+     * - between the parties.
      */
     V_550("550", "Insurance declaration sheet (bordereau)"),
 
@@ -2960,8 +2953,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_585("585", "EU Document for establishing the Community status of goods for certain fiscal purposes (T2LF)"),
 
     /**
-     * Form establishing the Community status of goods ("T2L" under European Legislation)
-     * in the context of trade between the EU and San Marino. ("T2LSM" under EU Legislation).
+     * Form establishing the Community status of goods ("T2L" under European Legislation) in
+     * the context of trade between the EU and San Marino. ("T2LSM" under EU Legislation).
      */
     V_586("586", "Document for establishing the Customs Status of goods for San Marino (T2LSM)"),
 
@@ -2994,8 +2987,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_621("621", "Forwarder's advice to import agent"),
 
     /**
-     * Document/message issued by a freight forwarder informing an exporter of the action
-     * taken in fulfillment of instructions received.
+     * Document/message issued by a freight forwarder informing an exporter of the action taken
+     * in fulfillment of instructions received.
      */
     V_622("622", "Forwarder's advice to exporter"),
 
@@ -3015,14 +3008,13 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * A certificate verifying the heat treatment of the product is in conformance with international
      * standards to ensure the product’s healthiness and/or shows the mode of heat treatment
-     * indicating the temperature and the amount of time the product or raw material used
-     * in the product was treated (such as milk).
+     * indicating the temperature and the amount of time the product or raw material used in
+     * the product was treated (such as milk).
      */
     V_625("625", "Heat Treatment Certificate"),
 
     /**
-     * A certificate used in the trade of endangered species in accordance with the CITES
-     * convention.
+     * A certificate used in the trade of endangered species in accordance with the CITES convention.
      */
     V_626("626", "Convention on International Trade in Endangered Species of Wild Fauna and Flora (CITES) Certificate"),
 
@@ -3095,14 +3087,14 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_636("636", "Health certificate"),
 
     /**
-     * A document that shows that the product (food additive, detergent, disinfectant and
-     * sanitizer) is suitable to be used in the food industry.
+     * A document that shows that the product (food additive, detergent, disinfectant and sanitizer)
+     * is suitable to be used in the food industry.
      */
     V_637("637", "Food grade certificate"),
 
     /**
-     * Certificate of inspection for the vessel stating its readiness and suitability for
-     * transporting grains and legumes.
+     * Certificate of inspection for the vessel stating its readiness and suitability for transporting
+     * grains and legumes.
      */
     V_638("638", "Certificate of suitability for transport of grains and legumes"),
 
@@ -3130,8 +3122,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_642("642", "Certificate of food item transport readiness"),
 
     /**
-     * A document legalized from a competent authority that shows that the food packaging
-     * product is safe to come into contact with food.
+     * A document legalized from a competent authority that shows that the food packaging product
+     * is safe to come into contact with food.
      */
     V_643("643", "Food packaging contact certificate"),
 
@@ -3197,8 +3189,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_653("653", "Previous correspondence"),
 
     /**
-     * A declaration to be presented to the competent authority when radioactive material
-     * moves cross-border.
+     * A declaration to be presented to the competent authority when radioactive material moves
+     * cross-border.
      */
     V_654("654", "Declaration for radioactive material"),
 
@@ -3234,7 +3226,7 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
      * of units of materials used and produced commonly related to manufacturing instructions,
      * purchase orders and other documents.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
+    @Deprecated
     V_660("660", "Production Report"),
 
     /**
@@ -3245,8 +3237,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * Document/message evidencing a contract of carriage covering the movement of goods by
      * any mode of transport, or combination of modes, for national as well as international
-     * transport, under any applicable international convention or national law and under
-     * the conditions of carriage of any carrier or transport operator undertaking or arranging
+     * transport, under any applicable international convention or national law and under the
+     * conditions of carriage of any carrier or transport operator undertaking or arranging
      * the transport referred to in the document.
      */
     V_701("701", "Universal (multipurpose) transport document"),
@@ -3391,9 +3383,9 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_723("723", "Escort official recognition"),
 
     /**
-     * Fictitious transport document regarding a previous transport, enabling a carrier's
-     * agent to give to another carrier's agent (in a different country) the possibility to
-     * collect charges relating to the original transport (rail environment).
+     * Fictitious transport document regarding a previous transport, enabling a carrier's agent
+     * to give to another carrier's agent (in a different country) the possibility to collect
+     * charges relating to the original transport (rail environment).
      */
     V_724("724", "Recharging document"),
 
@@ -3403,8 +3395,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_725("725", "Manufacturer raised order"),
 
     /**
-     * Document/message providing details of a consignment order which has been raised by
-     * a manufacturer.
+     * Document/message providing details of a consignment order which has been raised by a
+     * manufacturer.
      */
     V_726("726", "Manufacturer raised consignment order"),
 
@@ -3420,8 +3412,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_728("728", "Price/sales catalogue containing commercial information"),
 
     /**
-     * Document/message by means of which the buyer informs the seller about the despatch
-     * of returned goods.
+     * Document/message by means of which the buyer informs the seller about the despatch of
+     * returned goods.
      */
     V_729("729", "Returns advice"),
 
@@ -3460,8 +3452,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * A message enabling companies to exchange or report electronically, basic sales data
      * related to products or services, including the corresponding location, time period,
-     * product identification, pricing and quantity information. It enables the recipient
-     * to p.
+     * product identification, pricing and quantity information. It enables the recipient to
+     * p.
      */
     V_735("735", "Sales data report"),
 
@@ -3529,16 +3521,16 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
 
     /**
      * Document/message created by the consignor or by the departure station, joined to the
-     * transport or sent to the consignee, giving the possibility to the consignee or the
-     * arrival station to attest the delivery of the goods. The document must be returned
-     * to the consignor or to the departure station.
+     * transport or sent to the consignee, giving the possibility to the consignee or the arrival
+     * station to attest the delivery of the goods. The document must be returned to the consignor
+     * or to the departure station.
      */
     V_746("746", "Delivery notice (rail transport)"),
 
     /**
-     * A message sent by a party (usually an employer or its representative) to a service
-     * providing organisation, to detail payroll deductions paid on behalf of its employees
-     * to the service providing organisation.
+     * A message sent by a party (usually an employer or its representative) to a service providing
+     * organisation, to detail payroll deductions paid on behalf of its employees to the service
+     * providing organisation.
      */
     V_747("747", "Payroll deductions advice"),
 
@@ -3568,73 +3560,64 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_751("751", "Invoice information for accounting purposes"),
 
     /**
-     * Document/message issued by a competent body certifying the phytosanitary status of
-     * plants or plant products for international trade.
+     * Document/message issued by a competent body certifying the phytosanitary status of plants
+     * or plant products for international trade.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_752("752", "Plant Passport"),
 
     /**
      * Document/message issued by a competent body certifying sustainability.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_753("753", "Certificate of sustainability"),
 
     /**
-     * A document/message used by a buyer to define the procurement procedure and request
-     * suppliers to participate.
+     * A document/message used by a buyer to define the procurement procedure and request suppliers
+     * to participate.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_754("754", "Call for tender"),
 
     /**
-     * A document/message used by a buyer to define the procurement procedure and request
-     * specific suppliers to participate.
+     * A document/message used by a buyer to define the procurement procedure and request specific
+     * suppliers to participate.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_755("755", "Invitation to tender"),
 
     /**
      * A document/message requesting a self-declaration from the supplier, providing preliminary
      * evidence during the tendering phase.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_756("756", "European Single Procurement Document request"),
 
     /**
      * A document/message requesting information regarding pricing and catalogue details for
      * goods and/or services to be offered as part of a tender.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_757("757", "Tendering price/sales catalogue request"),
 
     /**
      * A document/message used by a supplier to bid in a procurement procedure.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_758("758", "Tender"),
 
     /**
      * A document/message containing a self-declaration by the supplier, providing preliminary
      * evidence during the tendering phase.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_759("759", "European Single Procurement Document"),
 
     /**
-     * A transport document used when more than one mode of transportation is involved in
-     * the movement of cargo. It is a contract of carriage and receipt of the cargo for a
-     * multimodal transport. It indicates the place where the responsible transport company
-     * in the move takes responsibility for the cargo, the place where the responsibility
-     * of this transport company in the move ends and the conveyances involved.
+     * A transport document used when more than one mode of transportation is involved in the
+     * movement of cargo. It is a contract of carriage and receipt of the cargo for a multimodal
+     * transport. It indicates the place where the responsible transport company in the move
+     * takes responsibility for the cargo, the place where the responsibility of this transport
+     * company in the move ends and the conveyances involved.
      */
     V_760("760", "Multimodal/combined transport document (generic)"),
 
     /**
-     * Bill of lading which evidences a contract of carriage from one place to another in
-     * separate stages of which at least one stage is a sea transit, and by which the issuing
-     * carrier accepts responsibility for the carriage as set forth in the through bill of
-     * lading.
+     * Bill of lading which evidences a contract of carriage from one place to another in separate
+     * stages of which at least one stage is a sea transit, and by which the issuing carrier
+     * accepts responsibility for the carriage as set forth in the through bill of lading.
      */
     V_761("761", "Through bill of lading"),
 
@@ -3642,15 +3625,14 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
      * A document/message providing information regarding pricing and catalogue details for
      * goods and/or services to be offered as part of a tender.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_762("762", "Tendering price/sales catalogue"),
 
     /**
      * Negotiable document/message issued by a forwarder to certify that he has taken charge
      * of a specified consignment for despatch and delivery in accordance with the consignor's
-     * instructions, as indicated in the document, and that he accepts responsibility for
-     * delivery of the goods to the holder of the document through the intermediary of a delivery
-     * agent of his choice. E.g. FIATA-FCT.
+     * instructions, as indicated in the document, and that he accepts responsibility for delivery
+     * of the goods to the holder of the document through the intermediary of a delivery agent
+     * of his choice. E.g. FIATA-FCT.
      */
     V_763("763", "Forwarder's certificate of transport"),
 
@@ -3682,50 +3664,43 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * Document/message confirming a receipt to the sending party.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_767("767", "Acknowledgment of receipt"),
 
     /**
      * Document which confirms the civil status of a person.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_768("768", "Civil status document"),
 
     /**
      * Document reporting advice.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_769("769", "Advice report"),
 
     /**
-     * Document/message issued by a carrier to confirm that space has been reserved for a
-     * consignment in means of transport.
+     * Document/message issued by a carrier to confirm that space has been reserved for a consignment
+     * in means of transport.
      */
     V_770("770", "Booking confirmation"),
 
     /**
      * Document which is a binding offer from one party to another.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_771("771", "Binding offer"),
 
     /**
-     * Document which is a binding agreement from the customer for a contract, such as an
-     * insurance contract.
+     * Document which is a binding agreement from the customer for a contract, such as an insurance
+     * contract.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_772("772", "Binding customer agreement for contract"),
 
     /**
      * Document confirming that insurance coverage is granted.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_773("773", "Coverage confirmation note"),
 
     /**
      * Document specifying general terms and conditions.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_774("774", "General terms and conditions"),
 
     /**
@@ -3736,25 +3711,21 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * Document specifying the clauses applying to a contract.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_776("776", "Contract clauses"),
 
     /**
      * Document specifying the individual conditions or clauses applying to a specific contract.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_777("777", "Specific contract conditions"),
 
     /**
      * Document stating the rules of a group insurance contract.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_778("778", "Group insurance rules"),
 
     /**
      * Document consisting of a series of questions.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_779("779", "Questionnaire"),
 
     /**
@@ -3813,9 +3784,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_787("787", "Bordereau"),
 
     /**
-     * Document/message specifying the contents of particular freight containers or other
-     * transport units, prepared by the party responsible for their loading into the container
-     * or unit.
+     * Document/message specifying the contents of particular freight containers or other transport
+     * units, prepared by the party responsible for their loading into the container or unit.
      */
     V_788("788", "Container manifest (unit packing list)"),
 
@@ -3891,8 +3861,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
 
     /**
      * Permit issued by a government authority permitting exportation of a specified commodity
-     * subject to specified conditions as quantity, country of destination, etc. Synonym:
-     * Embargo permit.
+     * subject to specified conditions as quantity, country of destination, etc. Synonym: Embargo
+     * permit.
      */
     V_811("811", "Export licence"),
 
@@ -3907,45 +3877,38 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * Declaration document to identify the final beneficiary of an asset.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_813("813", "Declaration of final beneficiary"),
 
     /**
      * Statement regarding the Foreign Account Tax Compliance Act (FATCA) of the United States
      * of America.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_814("814", "US, FATCA statement"),
 
     /**
      * Document reporting (e.g. annually) to the insured the actual details of an insurance
      * contract.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_815("815", "Insured status report"),
 
     /**
      * Information document for the group pension commitment to an individual person.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_816("816", "Group pension commitment information"),
 
     /**
      * Document notifying a claim.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_817("817", "Claim notification"),
 
     /**
      * Document reporting an assessment.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_818("818", "Assessment report"),
 
     /**
      * Document specifying the value of a loss.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_819("819", "Loss statement"),
 
     /**
@@ -3988,45 +3951,39 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
      * Document certifying the guarantee of the document issuer that he will pay for costs
      * of the addressee, e.g. the costs for repairing a vehicle.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_826("826", "Guarantee of cost acceptance"),
 
     /**
      * Document reporting the closing of a claim file.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_827("827", "Close of claim"),
 
     /**
      * Document stating the refusal of a claim.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_828("828", "Refusal of claim"),
 
     /**
      * Document reporting a valuation.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_829("829", "Valuation report"),
 
     /**
      * Document/message by which goods are declared for export Customs clearance, conforming
      * to the layout key set out at Appendix I to Annex C.1 concerning outright exportation
-     * to the Kyoto convention (CCC). Within a Customs union, "for despatch" may have the
-     * same meaning as "for exportation".
+     * to the Kyoto convention (CCC). Within a Customs union, "for despatch" may have the same
+     * meaning as "for exportation".
      */
     V_830("830", "Goods declaration for exportation"),
 
     /**
      * Document which certifies the history of claims.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_831("831", "Claim history certificate"),
 
     /**
      * Document specifying an accounting statement.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_832("832", "Accounting statement"),
 
     /**
@@ -4039,44 +3996,38 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * Document confirming the receipt of a payment.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_834("834", "Payment receipt confirmation"),
 
     /**
      * Document certifying the payment of the insurance premium.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_835("835", "Certificate of paid insurance premium"),
 
     /**
      * Report about payments done towards an insured party.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_836("836", "Insured party payment report"),
 
     /**
      * Report about payments done towards a third party.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_837("837", "Third party payment report"),
 
     /**
      * Document giving the addressee the right to debit from an account of the authorizing
      * party.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_838("838", "Direct debit authorisation"),
 
     /**
      * Report issued by a medical doctor.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_839("839", "Physician report"),
 
     /**
-     * Document/message submitted to a competent body by party requesting a Goods control
-     * certificate to be issued in accordance with national or international standards, or
-     * conforming to legislation in the importing country, or as specified in the contract.
+     * Document/message submitted to a competent body by party requesting a Goods control certificate
+     * to be issued in accordance with national or international standards, or conforming to
+     * legislation in the importing country, or as specified in the contract.
      */
     V_840("840", "Application for goods control certificate"),
 
@@ -4090,54 +4041,46 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * Document certifying a medical condition.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_842("842", "Medical certificate"),
 
     /**
      * Document containing a report of a witness.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_843("843", "Witness report"),
 
     /**
      * Document detailing a calculation, such as an invoice calculation or a costs calculation.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_844("844", "Calculation note"),
 
     /**
      * Document containing a communication from the opposite party, such as in legal action.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_845("845", "Communication from opposite party"),
 
     /**
      * Document specifying an amicable agreement.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_846("846", "Amicable agreement"),
 
     /**
      * Document which specifies an out of court settlement.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_847("847", "Out of court settlement"),
 
     /**
      * Document specifying a legal action at court.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_848("848", "Legal action"),
 
     /**
      * Document specifying a summons to court.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_849("849", "Summons"),
 
     /**
-     * Document/message submitted to a competent body by party requesting a Phytosanitary
-     * certificate to be issued.
+     * Document/message submitted to a competent body by party requesting a Phytosanitary certificate
+     * to be issued.
      */
     V_850("850", "Application for phytosanitary certificate"),
 
@@ -4165,14 +4108,12 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * Document specifying a judgment of a court.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_854("854", "Court judgment"),
 
     /**
-     * Document/message submitted to a competent body by a party requesting an Inspection
-     * certificate to be issued in accordance with national or international standards, or
-     * conforming to legislation in the country in which it is required, or as specified in
-     * the contract.
+     * Document/message submitted to a competent body by a party requesting an Inspection certificate
+     * to be issued in accordance with national or international standards, or conforming to
+     * legislation in the country in which it is required, or as specified in the contract.
      */
     V_855("855", "Application for inspection certificate"),
 
@@ -4187,25 +4128,22 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * Document which must be aboard the vehicle.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_857("857", "Vehicle aboard document"),
 
     /**
      * Document consisting of an image.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_858("858", "Image"),
 
     /**
      * Document consisting of an audio recording (e.g. a telephone conversation or alike).
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_859("859", "Audio"),
 
     /**
-     * Document/message submitted to a competent body by an interested party requesting a
-     * Certificate of origin to be issued in accordance with relevant criteria, and on the
-     * basis of evidence of the origin of the goods.
+     * Document/message submitted to a competent body by an interested party requesting a Certificate
+     * of origin to be issued in accordance with relevant criteria, and on the basis of evidence
+     * of the origin of the goods.
      */
     V_860("860", "Certificate of origin, application for"),
 
@@ -4219,9 +4157,9 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_861("861", "Certificate of origin"),
 
     /**
-     * Appropriate statement as to the origin of the goods, made in connection with their
-     * exportation by the manufacturer, producer, supplier, exporter or other competent person
-     * on the Commercial invoice or any other document relating to the goods (CCC).
+     * Appropriate statement as to the origin of the goods, made in connection with their exportation
+     * by the manufacturer, producer, supplier, exporter or other competent person on the Commercial
+     * invoice or any other document relating to the goods (CCC).
      */
     V_862("862", "Declaration of origin"),
 
@@ -4248,26 +4186,22 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * Document consisting of a video.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_866("866", "Video"),
 
     /**
      * A letter of introduction attached to, or accompanying another document such as an insurance
      * policy.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_867("867", "Introductory letter"),
 
     /**
      * Document specifying the terms of data protection regulations.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_868("868", "Data protection regulations statement"),
 
     /**
      * Document expressing the mandate of a client for a service only by the mandated broker.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_869("869", "Exclusive brokerage mandate"),
 
     /**
@@ -4278,49 +4212,41 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_870("870", "Consular invoice"),
 
     /**
-     * Document expressing the mandate of a client for an inquiry service by the mandated
-     * provider.
+     * Document expressing the mandate of a client for an inquiry service by the mandated provider.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_871("871", "Inquiry mandate"),
 
     /**
      * Document specifying the analysis of risks.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_872("872", "Risk analysis"),
 
     /**
      * A partial transport equipment movement report, containing only a selected part of the
      * movements of transport equipment for a vessel in a port.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_873("873", "Transport equipment movement report, partial"),
 
     /**
      * Declaration of the conveyance to a public authority.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_874("874", "Conveyance declaration"),
 
     /**
      * Partial invoice in the context of a specific construction project.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_875("875", "Partial construction invoice"),
 
     /**
      * Invoice concluding all previous partial construction invoices of a completed partial
      * rendered service in the context of a specific construction project.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_876("876", "Partial final construction invoice"),
 
     /**
      * Invoice concluding all previous partial invoices and partial final construction invoices
      * in the context of a specific construction project.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_877("877", "Final construction invoice"),
 
     /**
@@ -4328,15 +4254,13 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
      * and safety of the logistics chain in the flow of foreign trade operations by a national
      * AEO recognized program (e.g. AEO-Security and Safety (AEOS) - Regulation (EU) No 952/2013).
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_878("878", "AEO Certificate of Security and/or Safety"),
 
     /**
-     * Certificate issued to business that fulfils specified criteria for compliance with
-     * tax and customs obligations, as well as financial solvency by a national AEO recognized
+     * Certificate issued to business that fulfils specified criteria for compliance with tax
+     * and customs obligations, as well as financial solvency by a national AEO recognized
      * program (e.g. AEO-Customs Simplifications (AEOC) - Regulation (EU) No 952/2013).
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_879("879", "AEO Certificate of Conformity or Compliance"),
 
     /**
@@ -4353,14 +4277,12 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
      * AEO recognized program (e.g. AEO-Customs Simplifications/Security and Safety (AEOC/AEOS)
      * - Regulation(EU) No 952/2013).
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_891("891", "AEO Certificate Full"),
 
     /**
-     * Document enabling the Financing Requestor to initiate the financing process by the
-     * First Agent.
+     * Document enabling the Financing Requestor to initiate the financing process by the First
+     * Agent.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_892("892", "Purchase Order Financing Request"),
 
     /**
@@ -4368,14 +4290,12 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
      * a purchase order financing request or the status of a purchase order financing cancellation
      * request previously sent by the Financial Requestor itself.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_893("893", "Purchase Order Financing Request Status"),
 
     /**
      * Document enabling the Financing Requestor to request the First Agent to cancel a previously
      * sent purchase order financing request.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_894("894", "Purchase Order Financing Request Cancellation"),
 
     /**
@@ -4385,8 +4305,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_895("895", "Statistical document, export"),
 
     /**
-     * Document/message in which a declarant provides information about goods required by
-     * the body responsible for the collection of trade statistics.
+     * Document/message in which a declarant provides information about goods required by the
+     * body responsible for the collection of trade statistics.
      */
     V_896("896", "INTRASTAT declaration"),
 
@@ -4394,7 +4314,6 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
      * Certificate of approval for vehicles and containers used to transit goods under customs
      * seals.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_897("897", "Transit certificate of approval"),
 
     /**
@@ -4402,81 +4321,70 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
      * delivery point which will be moved across a dock in a distribution centre without further
      * handling.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_898("898", "Pre-packed cross docking consignment order"),
 
     /**
      * Document/message declaring a traceability event.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_899("899", "Traceability event declaration"),
 
     /**
      * Document/message requesting information based on defined criteria regarding sustainability.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_900("900", "Sustainability data request"),
 
     /**
-     * Document/message whereby an official authority (Customs or governmental) certifies
-     * that goods have been delivered.
+     * Document/message whereby an official authority (Customs or governmental) certifies that
+     * goods have been delivered.
      */
     V_901("901", "Delivery verification certificate"),
 
     /**
      * Document/Message returned as an answer to a question regarding sustainability.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_902("902", "Sustainability data response"),
 
     /**
      * Document/message requesting a sustainability inspection.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_903("903", "Sustainability Inspection request"),
 
     /**
      * Document/message reporting the results of a sustainability inspection.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_904("904", "Sustainability Inspection response"),
 
     /**
      * Message to provide the forecast information about ships, trains, vehicles and aircrafts
      * arrival at the destination.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_905("905", "Transport Means Forecast Information Message"),
 
     /**
      * Message to provide the actual information about ships, trains, vehicles and aircrafts
      * arrival at the destination.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_906("906", "Transport Means Actual Information Message"),
 
     /**
      * Message to provide the arrival information of transport means and goods.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_907("907", "Arrival Report Message"),
 
     /**
      * Message to provide the information of goods tallying.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_908("908", "Tally Message"),
 
     /**
      * Message to provide the information of goods loading.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_909("909", "Goods Loading Message"),
 
     /**
      * Document/message in which an interested party applies to the competent body for authorization
-     * to import either a limited quantity of articles subject to import restrictions, or
-     * an unlimited quantity of such articles during a limited period, and specifies the kind
+     * to import either a limited quantity of articles subject to import restrictions, or an
+     * unlimited quantity of such articles during a limited period, and specifies the kind
      * of articles, their origin and value, etc.
      */
     V_910("910", "Import licence, application for"),
@@ -4484,15 +4392,14 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     /**
      * Document/message issued by the competent body in accordance with import regulations
      * in force, by which authorization is granted to a named party to import either a limited
-     * quantity of designated articles or an unlimited quantity of such articles during a
-     * limited period, under conditions specified in the document.
+     * quantity of designated articles or an unlimited quantity of such articles during a limited
+     * period, under conditions specified in the document.
      */
     V_911("911", "Import licence"),
 
     /**
      * Message to provide the releasing information of transport means and goods.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_912("912", "Transport Means and Goods Release Message."),
 
     /**
@@ -4508,8 +4415,7 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_914("914", "Customs declaration with commercial and item detail"),
 
     /**
-     * CUSDEC transmission that does not include data from the item detail section of the
-     * message.
+     * CUSDEC transmission that does not include data from the item detail section of the message.
      */
     V_915("915", "Customs declaration without item detail"),
 
@@ -4524,9 +4430,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_917("917", "Receipt (Customs)"),
 
     /**
-     * Document/message whereby an importer/buyer requests the competent body to allocate
-     * an amount of foreign exchange to be transferred to an exporter/seller in payment for
-     * goods.
+     * Document/message whereby an importer/buyer requests the competent body to allocate an
+     * amount of foreign exchange to be transferred to an exporter/seller in payment for goods.
      */
     V_925("925", "Application for exchange allocation"),
 
@@ -4538,9 +4443,9 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
 
     /**
      * Document/message completed by an importer/buyer as a means for the competent body to
-     * control that a trade transaction for which foreign exchange has been allocated has
-     * been executed and that money has been transferred in accordance with the conditions
-     * of payment and the exchange control regulations in force.
+     * control that a trade transaction for which foreign exchange has been allocated has been
+     * executed and that money has been transferred in accordance with the conditions of payment
+     * and the exchange control regulations in force.
      */
     V_927("927", "Exchange control declaration (import)"),
 
@@ -4577,8 +4482,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_933("933", "Cargo declaration (arrival)"),
 
     /**
-     * Document/message in which a declarant (importer) states the invoice or other price
-     * (e.g. selling price, price of identical goods), and specifies costs for freight, insurance
+     * Document/message in which a declarant (importer) states the invoice or other price (e.g.
+     * selling price, price of identical goods), and specifies costs for freight, insurance
      * and packing, etc., terms of delivery and payment, any relationship with the trading
      * partner, etc., for the purpose of determining the Customs value of goods imported.
      */
@@ -4588,8 +4493,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
      * Document/message required by the Customs in an importing country in which an exporter
      * states the invoice or other price (e.g. selling price, price of identical goods), and
      * specifies costs for freight, insurance and packing, etc., terms of delivery and payment,
-     * for the purpose of determining the Customs value in the importing country of goods
-     * consigned to that country.
+     * for the purpose of determining the Customs value in the importing country of goods consigned
+     * to that country.
      */
     V_935("935", "Customs invoice"),
 
@@ -4601,8 +4506,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_936("936", "Customs declaration (post parcels)"),
 
     /**
-     * Document/message in which an importer states the pertinent information required by
-     * the competent body for assessment of value-added tax.
+     * Document/message in which an importer states the pertinent information required by the
+     * competent body for assessment of value-added tax.
      */
     V_937("937", "Tax declaration (value added tax)"),
 
@@ -4638,8 +4543,8 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
      * International Customs document (International Transit by Road), issued by a guaranteeing
      * association approved by the Customs authorities, under the cover of which goods are
      * carried, in most cases under Customs seal, in road vehicles and/or containers in compliance
-     * with the requirements of the Customs TIR Convention of the International Transport
-     * of Goods under cover of TIR Carnets (UN/ECE).
+     * with the requirements of the Customs TIR Convention of the International Transport of
+     * Goods under cover of TIR Carnets (UN/ECE).
      */
     V_952("952", "TIR carnet"),
 
@@ -4656,18 +4561,18 @@ public enum DocumentCodeType implements CodeList<DocumentCodeType> {
     V_954("954", "EUR 1 certificate of origin"),
 
     /**
-     * International Customs document (Admission Temporaire / Temporary Admission) which,
-     * issued under the terms of the ATA Convention (1961), incorporates an internationally
-     * valid guarantee and may be used, in lieu of national Customs documents and as security
-     * for import duties and taxes, to cover the temporary admission of goods and, where appropriate,
+     * International Customs document (Admission Temporaire / Temporary Admission) which, issued
+     * under the terms of the ATA Convention (1961), incorporates an internationally valid
+     * guarantee and may be used, in lieu of national Customs documents and as security for
+     * import duties and taxes, to cover the temporary admission of goods and, where appropriate,
      * the transit of goods. If accepted for controlling the temporary export and reimport
      * of goods, international guarantee does not apply (CCC).
      */
     V_955("955", "ATA carnet"),
 
     /**
-     * A set of documents, replacing the various (national) forms for Customs declaration
-     * within the EC, implemented on 01-01-1988.
+     * A set of documents, replacing the various (national) forms for Customs declaration within
+     * the EC, implemented on 01-01-1988.
      */
     V_960("960", "Single administrative document"),
 

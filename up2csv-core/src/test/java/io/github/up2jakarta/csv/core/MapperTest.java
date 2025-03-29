@@ -252,22 +252,13 @@ class MapperTest {
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
-        assertEquals(2, errors.size());
+        assertEquals(1, errors.size());
         // Then Error 0
         {
             final SimpleErrorEntity error = errors.get(0);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
-            assertTrue(error.getSeverity().getLevel() >= SeverityType.ERROR.getLevel());
-            assertEquals(ERROR_VALIDATOR, error.getCode());
-            assertEquals("size must be between 1 and 3", error.getMessage());
-        }
-        // Then Error 1
-        {
-            final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRow());
-            assertEquals(1, error.getOrder());
-            assertTrue(error.getSeverity().getLevel() >= SeverityType.ERROR.getLevel());
+            assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(ERROR_VALIDATOR, error.getCode());
             assertEquals("size must be between 1 and 3", error.getMessage());
         }
@@ -288,9 +279,9 @@ class MapperTest {
         assertEquals(1, errors.size());
         // Then Error
         final SimpleErrorEntity error = errors.get(0);
-        assertSame(row, error.getRow());
+        assertSame(row, error.getRecord());
         assertEquals(0, error.getOrder());
-        assertEquals(SeverityType.FATAL, error.getSeverity());
+        assertEquals(SeverityType.WARNING, error.getSeverity());
         assertEquals(ERROR_VALIDATOR, error.getCode());
         assertEquals("size must be between 1 and 3", error.getMessage());
     }
@@ -310,7 +301,7 @@ class MapperTest {
         assertEquals(1, errors.size());
         // Then Error
         final SimpleErrorEntity error = errors.get(0);
-        assertSame(row, error.getRow());
+        assertSame(row, error.getRecord());
         assertEquals(0, error.getOrder());
         assertEquals(SeverityType.ERROR, error.getSeverity());
         assertEquals(CurrencyConverter.ISO_4217, error.getCode());
@@ -548,7 +539,7 @@ class MapperTest {
             f.field.setAccessible(true);
             assertEquals("V", f.field.get(bean));
             // When
-            f.setValue(bean, "Test", 0, failFast());
+            f.setValue(bean, "Test", 0, failFast(false));
             // Then
             assertEquals("Test", f.field.get(bean));
         }
@@ -573,7 +564,7 @@ class MapperTest {
             f.field.setAccessible(true);
             assertEquals("V", f.field.get(bean));
             // When
-            f.setValue(bean, "Test", 0, failFast());
+            f.setValue(bean, "Test", 0, failFast(false));
             // Then
             assertEquals("Test", f.field.get(bean));
         }
@@ -598,7 +589,7 @@ class MapperTest {
             f.field.setAccessible(true);
             assertEquals("V", f.field.get(bean));
             // When
-            f.setValue(bean, "Test", 0, failFast());
+            f.setValue(bean, "Test", 0, failFast(false));
             // Then
             assertEquals("Test", f.field.get(bean));
         }

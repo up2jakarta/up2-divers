@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 8051 : Transport stage code qualifier.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred8051.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred8051.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Transport Movement Stage Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Transport Movement Stage Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.1", date = "2008-08-23")
 @XmlJavaTypeAdapter(TransportMovementStageCodeAdapter.class)
 public enum TransportMovementStageCodeType implements CodeList<TransportMovementStageCodeType> {
@@ -36,8 +36,8 @@ public enum TransportMovementStageCodeType implements CodeList<TransportMovement
     V_3("3", "At arrival"),
 
     /**
-     * The means of transport used to carry goods that have come under transit procedures
-     * of the customs administration to which a transit declaration is being made.
+     * The means of transport used to carry goods that have come under transit procedures of
+     * the customs administration to which a transit declaration is being made.
      */
     V_4("4", "Means of transport at transit"),
 

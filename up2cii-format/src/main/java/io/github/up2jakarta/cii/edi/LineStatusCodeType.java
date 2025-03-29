@@ -8,11 +8,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 1229 (LineStatusCode) : Action code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred1229.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred1229.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList("1229")
-@Documented(value = "Action Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Action Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.2", date = "2008-08-23")
 @XmlJavaTypeAdapter(LineStatusCodeAdapter.class)
 public enum LineStatusCodeType implements CodeList<LineStatusCodeType> {
@@ -149,8 +149,7 @@ public enum LineStatusCodeType implements CodeList<LineStatusCodeType> {
     V_26("26", "Included"),
 
     /**
-     * Upon receipt and verification of documents we shall cover you when due as per your
-     * instructions.
+     * Upon receipt and verification of documents we shall cover you when due as per your instructions.
      */
     V_27("27", "Upon receipt and verification of documents we shall cover you when due as per your instructions"),
 
@@ -615,7 +614,6 @@ public enum LineStatusCodeType implements CodeList<LineStatusCodeType> {
     /**
      * The object or item is to be or has been observed.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     V_119("119", "Observe"),
     ;
 

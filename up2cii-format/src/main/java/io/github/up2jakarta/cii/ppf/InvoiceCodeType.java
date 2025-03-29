@@ -9,16 +9,14 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 1001 (Invoice Type Code) : Document name code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred1001.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred1001.htm}
  */
-@Generated(value = "PPF", comments = "by Abderrazek ABBESSI")
+@Generated(value = "PPF", comments = "by A.ABBESSI")
 @SubList(value = "1001", type = DocumentCodeType.class)
 @Documented(value = "Invoice Type Code", agency = Agency.UN_ECE, version = "2.3")
 @Schema(agency = "UN/CEFACT", version = "2.3", date = "2023-07-31")
 @XmlJavaTypeAdapter(InvoiceCodeAdapter.class)
-@SuppressWarnings("deprecation")
 public enum InvoiceCodeType implements CodeList<InvoiceCodeType> {
-
 
     /**
      * A document which indicates that the customer is claiming credit in a self billing environment.
@@ -43,8 +41,8 @@ public enum InvoiceCodeType implements CodeList<InvoiceCodeType> {
     V_384(DocumentCodeType.V_384),
 
     /**
-     * An invoice to pay amounts for goods and services in advance; these amounts will be
-     * subtracted from the final invoice.
+     * An invoice to pay amounts for goods and services in advance; these amounts will be subtracted
+     * from the final invoice.
      */
     V_386(DocumentCodeType.V_386),
 
@@ -64,9 +62,9 @@ public enum InvoiceCodeType implements CodeList<InvoiceCodeType> {
     V_396(DocumentCodeType.V_396),
 
     /**
-     * An invoice produced by the buyer (invoicee) instead of the seller, which indicates
-     * that the buyer has to pay amounts for goods and services in advance; these amounts
-     * will be subtracted from the final invoice.
+     * An invoice produced by the buyer (invoicee) instead of the seller, which indicates that
+     * the buyer has to pay amounts for goods and services in advance; these amounts will be
+     * subtracted from the final invoice.
      */
     V_500(DocumentCodeType.V_500),
 
@@ -84,14 +82,19 @@ public enum InvoiceCodeType implements CodeList<InvoiceCodeType> {
 
     /**
      * A document/message providing credit information to the relevant party which indicates
-     * that the buyer has to pay amounts for goods and services in advance; these amounts
-     * will be subtracted from the prepayment invoice.
+     * that the buyer has to pay amounts for goods and services in advance; these amounts will
+     * be subtracted from the prepayment invoice.
      */
     V_503(DocumentCodeType.V_503),
 
-    V_918("918", "Facture rectificative auto-facturée"),
-    V_919("919", "Facture rectificative affacturée"),
-    V_920("920", "Facture rectificative auto-facturée affacturée"),
+    @Deprecated
+    V_918("918", "Self-billed corrective invoice"),
+
+    @Deprecated
+    V_919("919", "Factored corrective Invoice"),
+
+    @Deprecated
+    V_920("920", "Self-billed factored corrective invoice"),
     ;
 
     private final String name;
@@ -116,4 +119,5 @@ public enum InvoiceCodeType implements CodeList<InvoiceCodeType> {
     public String getCode() {
         return code;
     }
+
 }

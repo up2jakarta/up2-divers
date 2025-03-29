@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 3035 : Party function code qualifier.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred3035.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred3035.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Party Role Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Party Role Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.10", date = "2008-08-23")
 @XmlJavaTypeAdapter(PartyRoleCodeAdapter.class)
 public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
@@ -275,8 +275,7 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     BW("BW", "Borrower"),
 
     /**
-     * Party at the building site responsible for engineering matters for that particular
-     * site.
+     * Party at the building site responsible for engineering matters for that particular site.
      */
     BX("BX", "Building site engineer"),
 
@@ -530,8 +529,8 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     CP("CP", "Party to receive certificate of compliance"),
 
     /**
-     * [3190] Identifies the financial institution used by the issuing bank to advise the
-     * documentary credit.
+     * [3190] Identifies the financial institution used by the issuing bank to advise the documentary
+     * credit.
      */
     CPA("CPA", "Advising bank"),
 
@@ -806,8 +805,8 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     DDM("DDM", "Grid operator"),
 
     /**
-     * Identifies the financial institution that is the point of entry into the interbank
-     * transaction chain.
+     * Identifies the financial institution that is the point of entry into the interbank transaction
+     * chain.
      */
     DDN("DDN", "First financial institution in the transaction chain"),
 
@@ -973,8 +972,8 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     DEQ("DEQ", "Shipper"),
 
     /**
-     * A data pool that supports the functionality required by a data source such as data
-     * loading, publication, notification, registration, etc.
+     * A data pool that supports the functionality required by a data source such as data loading,
+     * publication, notification, registration, etc.
      */
     DER("DER", "Source data pool"),
 
@@ -1015,8 +1014,7 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     DEY("DEY", "Commercial verifier"),
 
     /**
-     * A person authorized under relevant legislation for the purpose of issuing official
-     * assurances.
+     * A person authorized under relevant legislation for the purpose of issuing official assurances.
      */
     DEZ("DEZ", "Authorized issuer"),
 
@@ -1072,8 +1070,8 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     DFI("DFI", "Crop grower"),
 
     /**
-     * The responsible party as identified and defined in the International Ship and Port
-     * Facility Security Code (ISPS).
+     * The responsible party as identified and defined in the International Ship and Port Facility
+     * Security Code (ISPS).
      */
     DFJ("DFJ", "ISPS Responsible Party"),
 
@@ -1196,21 +1194,18 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     /**
      * A party responsible for establishing the calorific value for a set of Metering points.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGF("DGF", "Calorific Value Responsible"),
 
     /**
      * A party with reserve-providing units or reserve-providing groups able to provide balancing
      * services to one or more LFC Operators.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGG("DGG", "Balancing Service Provider"),
 
     /**
      * A party responsible for keeping a register of consents for a domain. The Consent Administrator
      * makes this information available on request for entitled parties in the sector.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGH("DGH", "Consent Administrator"),
 
     /**
@@ -1218,95 +1213,80 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
      * active in the energy value chain or the physical infrastructure itself. The ESCO may
      * provide insight services as well as energy management services.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGI("DGI", "Energy Service Company (ESCO)"),
 
     /**
      * A party that aggregates resources for usage by a service provider for energy market
      * services.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGJ("DGJ", "Resource Aggregator"),
 
     /**
      * A role that manages a resource and provides production/consumption schedules for it,
      * if required.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGK("DGK", "Resource Provider"),
 
     /**
      * A party responsible for storing and distributing validated measured data.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGL("DGL", "Metered Data Administrator"),
 
     /**
      * The person who purchases goods and services for personal use.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGM("DGM", "Consumer"),
 
     /**
      * The party engaged in agriculture business, field crop growing, cattle rearing and other
      * productions (hides, milk, wool, etc).
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGN("DGN", "Farmer"),
 
     /**
      * The party who collects waste in order to produce materials that can be used again.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGO("DGO", "Recycler"),
 
     /**
      * The party who sells goods to the public in relatively small quantities for use or consumption
      * rather than for resale.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGP("DGP", "Retailer"),
 
     /**
      * The party related to another party.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGQ("DGQ", "Second Party"),
 
     /**
      * The party providing waste disposal services.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGR("DGR", "Waste Disposal Provider"),
 
     /**
      * The party who processes animals skins with tanning agents.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGS("DGS", "Tanner"),
 
     /**
      * The party who provides a service.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGT("DGT", "Service Provider"),
 
     /**
      * The party who uses a machine in order to clean cotton fibre, flax fibre etc.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGU("DGU", "Ginner"),
 
     /**
      * The party who makes thread by spinning.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGV("DGV", "Spinner"),
 
     /**
      * The party who weaves fabric.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     DGW("DGW", "Weaver"),
 
     /**
@@ -1401,8 +1381,7 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     DX("DX", "Engineer (construction)"),
 
     /**
-     * Party commissioned by the owner to advise and supervise engineering aspects of the
-     * works.
+     * Party commissioned by the owner to advise and supervise engineering aspects of the works.
      */
     DY("DY", "Engineer, resident (construction)"),
 
@@ -1529,8 +1508,8 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     EW("EW", "Subcontractor with direct payment"),
 
     /**
-     * [3030] Party who makes, or on whose behalf the export declaration is made, and who
-     * is the owner of the goods or has similar rights of disposal over them at the time when
+     * [3030] Party who makes, or on whose behalf the export declaration is made, and who is
+     * the owner of the goods or has similar rights of disposal over them at the time when
      * the declaration is accepted.
      */
     EX("EX", "Exporter"),
@@ -1669,8 +1648,8 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     FX("FX", "Current receiver"),
 
     /**
-     * Current sender of the goods in a multi-step transportation process (indirect flow)
-     * involving at least one grouping centre.
+     * Current sender of the goods in a multi-step transportation process (indirect flow) involving
+     * at least one grouping centre.
      */
     FY("FY", "Current sender"),
 
@@ -1966,8 +1945,7 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     ID("ID", "Replacing manufacturer"),
 
     /**
-     * Identifies the non-resident third party company with whom the financial account is
-     * held.
+     * Identifies the non-resident third party company with whom the financial account is held.
      */
     IE("IE", "Non-resident third party company with whom financial account is held"),
 
@@ -2005,8 +1983,8 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
 
     /**
      * [3020] Party who makes - or on whose behalf a Customs clearing agent or other authorized
-     * person makes - an import declaration. This may include a person who has possession
-     * of the goods or to whom the goods are consigned.
+     * person makes - an import declaration. This may include a person who has possession of
+     * the goods or to whom the goods are consigned.
      */
     IM("IM", "Importer"),
 
@@ -2250,8 +2228,8 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     MF("MF", "Manufacturer of goods"),
 
     /**
-     * Party designated to execute re-icing, selected in the official list of mandatories
-     * competent for this kind of operation.
+     * Party designated to execute re-icing, selected in the official list of mandatories competent
+     * for this kind of operation.
      */
     MG("MG", "Party designated to execute re-icing"),
 
@@ -2298,8 +2276,8 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     NI("NI", "Notify party"),
 
     /**
-     * Party who offers facilities for berthing of vessels, handling and storage of break
-     * bulk cargo.
+     * Party who offers facilities for berthing of vessels, handling and storage of break bulk
+     * cargo.
      */
     OA("OA", "Break bulk berth operator"),
 
@@ -2369,8 +2347,8 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     ON("ON", "Remitting bank"),
 
     /**
-     * The owner of goods under consignment which are moving under a negotiable transport
-     * document and will only be released upon receipt of the original transport document.
+     * The owner of goods under consignment which are moving under a negotiable transport document
+     * and will only be released upon receipt of the original transport document.
      */
     OO("OO", "Order of the shipper party"),
 
@@ -2461,7 +2439,6 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     /**
      * A party responsible for maintaining party information.
      */
-    @Deprecated(since = "D23A", forRemoval = false)
     PAD("PAD", "Party Administrator"),
 
     /**
@@ -2506,8 +2483,8 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     PI("PI", "Payee's company name/ID"),
 
     /**
-     * Second party designated by a first party to receive certain correspondence in lieu
-     * of it being mailed directly to this first party.
+     * Second party designated by a first party to receive certain correspondence in lieu of
+     * it being mailed directly to this first party.
      */
     PJ("PJ", "Party to receive correspondence"),
 
@@ -3206,8 +3183,7 @@ public enum PartyRoleCodeType implements CodeList<PartyRoleCodeType> {
     WM("WM", "Works manager"),
 
     /**
-     * Party designated by the registering party to receive a binding direction to supply
-     * something.
+     * Party designated by the registering party to receive a binding direction to supply something.
      */
     WN("WN", "Party to receive order to supply"),
 

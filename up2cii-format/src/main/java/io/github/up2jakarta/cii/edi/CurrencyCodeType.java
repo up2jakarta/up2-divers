@@ -14,7 +14,7 @@ import javax.annotation.processing.Generated;
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @Documented(value = "ISO 3 Alpha Currency Code", agency = Agency.ISO, version = "2012-08-31")
-@Schema(agency = "UN/CEFACT", version = "11.14", date = "2015-11-04")
+@Schema(agency = "UN/CEFACT", version = "11.13", date = "2015-11-04")
 @XmlJavaTypeAdapter(CurrencyCodeAdapter.class)
 public enum CurrencyCodeType implements CodeList<CurrencyCodeType> {
 
@@ -113,11 +113,6 @@ public enum CurrencyCodeType implements CodeList<CurrencyCodeType> {
     MMK("MMK", "Kyat"),
     MNT("MNT", "Tugrik"),
     MOP("MOP", "Pataca"),
-
-    @Deprecated(since = "D23A", forRemoval = true)
-    MRO("MRO", "Ouguiya"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     MRU("MRU", "Ouguiya"),
     MUR("MUR", "Mauritius Rupee"),
     MVR("MVR", "Rufiyaa"),
@@ -157,17 +152,14 @@ public enum CurrencyCodeType implements CodeList<CurrencyCodeType> {
     SGD("SGD", "Singapore Dollar"),
     SHP("SHP", "St. Helena Pound"),
 
-    @Deprecated(since = "D23A", forRemoval = false)
+    @Deprecated(forRemoval = true)
     SLE("SLE", "Leone"),
+
+    @Deprecated
     SLL("SLL", "Leone"),
     SOS("SOS", "Somali Shilling"),
     SRD("SRD", "Suriname Dollar"),
     SSP("SSP", "South Sudanese Pound"),
-
-    @Deprecated(since = "D23A", forRemoval = true)
-    STD("STD", "Dobra"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     STN("STN", "Dobra"),
     SVC("SVC", "El Salvador Colon"),
     SYP("SYP", "Syrian Pound"),
@@ -187,18 +179,11 @@ public enum CurrencyCodeType implements CodeList<CurrencyCodeType> {
     USN("USN", "US Dollar (Next day)"),
     UYI("UYI", "Uruguayo Peso en Unidades"),
     UYU("UYU", "Peso Uruguayo"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     UYW("UYW", "Unidad Previsional"),
     UZS("UZS", "Uzbekistan Sum"),
 
-    @Deprecated(since = "D23A", forRemoval = false)
+    @Deprecated(forRemoval = true)
     VED("VED", "Bolívar Soberano"),
-
-    @Deprecated(since = "D23A", forRemoval = true)
-    VEF("VEF", "Bolívar"),
-
-    @Deprecated(since = "D23A", forRemoval = false)
     VES("VES", "Bolívar Soberano"),
     VND("VND", "Dong"),
     VUV("VUV", "Vatu"),

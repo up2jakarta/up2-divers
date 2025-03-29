@@ -8,11 +8,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 4451 (SubjectCode) : Text subject code qualifier.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred4451.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred4451.htm}
  */
 @Generated(value = "PPF", comments = "by A.ABBESSI")
 @SubList("4451")
-@Documented(value = "Text subject code qualifier", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Text subject code qualifier", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.5", date = "2008-08-23")
 @XmlJavaTypeAdapter(SubjectCodeAdapter.class)
 public enum SubjectCodeType implements CodeList<SubjectCodeType> {
@@ -24,8 +24,7 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     AAA("AAA", "Goods item description"),
 
     /**
-     * [4276] Free form description of the conditions of payment between the parties to a
-     * transaction.
+     * [4276] Free form description of the conditions of payment between the parties to a transaction.
      */
     AAB("AAB", "Payment term"),
 
@@ -36,9 +35,8 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
 
     /**
      * [7254] Proper shipping name, supplemented as necessary with the correct technical name,
-     * by which a dangerous substance or article may be correctly identified, or which is
-     * sufficiently informative to permit identification by reference to generally available
-     * literature.
+     * by which a dangerous substance or article may be correctly identified, or which is sufficiently
+     * informative to permit identification by reference to generally available literature.
      */
     AAD("AAD", "Dangerous goods technical name"),
 
@@ -53,8 +51,7 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     AAF("AAF", "Rate additional information"),
 
     /**
-     * Indicates that the segment contains instructions to be passed on to the identified
-     * party.
+     * Indicates that the segment contains instructions to be passed on to the identified party.
      */
     AAG("AAG", "Party instructions"),
 
@@ -116,8 +113,8 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     AAS("AAS", "Bill of lading remarks"),
 
     /**
-     * Free text information on an IATA Air Waybill to indicate means by which account is
-     * to be settled.
+     * Free text information on an IATA Air Waybill to indicate means by which account is to
+     * be settled.
      */
     AAT("AAT", "Mode of settlement information"),
 
@@ -162,8 +159,8 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     ABB("ABB", "Medical history"),
 
     /**
-     * (4490) (4372) Additional information regarding terms and conditions which apply to
-     * the transaction.
+     * (4490) (4372) Additional information regarding terms and conditions which apply to the
+     * transaction.
      */
     ABC("ABC", "Conditions of sale or purchase"),
 
@@ -345,8 +342,7 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     ACM("ACM", "Statistical description"),
 
     /**
-     * The definition of a statistical object such as a value list, concept, or structure
-     * definition.
+     * The definition of a statistical object such as a value list, concept, or structure definition.
      */
     ACN("ACN", "Statistical definition"),
 
@@ -546,8 +542,7 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     ADY("ADY", "Container stripping instructions"),
 
     /**
-     * Information on the CSC (Container Safety Convention) plate that is attached to the
-     * container.
+     * Information on the CSC (Container Safety Convention) plate that is attached to the container.
      */
     ADZ("ADZ", "CSC (Container Safety Convention) plate information"),
 
@@ -1435,47 +1430,56 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     /**
      * Identifies that Special Import Measures Act applies
      */
+    @Deprecated(forRemoval = true)
     BAT("BAT", "SIMA applicable"),
 
     /**
      * Identifies information related to an appeals program.
      */
+    @Deprecated(forRemoval = true)
     BAU("BAU", "Appeals program code"),
 
     /**
      * Identifies if the goods are subject to a Special Import Measures Act measure.
      */
+    @Deprecated(forRemoval = true)
     BAV("BAV", "SIMA subject"),
 
     /**
      * Identifies that surtax applies
      */
+    @Deprecated(forRemoval = true)
     BAW("BAW", "Surtax applicable"),
 
     /**
      * Identifies that there is a security bond in hand that could theoretically be used
      * to cover Special Import Measures Act charges
      */
+    @Deprecated(forRemoval = true)
     BAX("BAX", "SIMA security bond"),
 
     /**
      * Identifies if the goods are subject to a surtax measure
      */
+    @Deprecated(forRemoval = true)
     BAY("BAY", "Surtax subject"),
 
     /**
      * Identifies safeguard applies
      */
+    @Deprecated(forRemoval = true)
     BAZ("BAZ", "Safeguard applicable"),
 
     /**
      * Identifies safeguard applies
      */
+    @Deprecated(forRemoval = true)
     BBA("BBA", "Safeguard applicable"),
 
     /**
      * Identifies if the goods are subject to a safeguard measure
      */
+    @Deprecated(forRemoval = true)
     BBB("BBB", "Safeguard subject"),
 
     /**
@@ -1562,8 +1566,8 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     BLR("BLR", "Transport contract document remark"),
 
     /**
-     * Text describing the security information as applicable at the port facility in the
-     * previous port where a ship/port interface was conducted.
+     * Text describing the security information as applicable at the port facility in the previous
+     * port where a ship/port interface was conducted.
      */
     BLS("BLS", "Previous port of call security information"),
 
@@ -1632,6 +1636,7 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     /**
      * Identifies the specific Special Import Measures Act measure related to the goods
      */
+    @Deprecated(forRemoval = true)
     BMF("BMF", "SIMA measure in force"),
 
     /**
@@ -1639,11 +1644,13 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
      * prior to implementation of Canada Border Services Agency’s Assessment and Revenue Management
      * (CARM) project
      */
+    @Deprecated(forRemoval = true)
     BMG("BMG", "Pre-CARM"),
 
     /**
      * Identification of the type of Special Import Measures Act measure
      */
+    @Deprecated(forRemoval = true)
     BMH("BMH", "SIMA measure type"),
 
     /**
@@ -1655,36 +1662,42 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     /**
      * Code which identifies a secondary form type
      */
+    @Deprecated(forRemoval = true)
     CCJ("CCJ", "Sub Type Code"),
 
     /**
      * Additional information detailing Special Import Measures Act information
      */
+    @Deprecated(forRemoval = true)
     CCK("CCK", "SIMA information"),
 
     /**
      * The date the goods exited the economy or warehouse
      */
+    @Deprecated(forRemoval = true)
     CCL("CCL", "Time limit end"),
 
     /**
      * The date the goods entered the economy or warehouse
      */
+    @Deprecated(forRemoval = true)
     CCM("CCM", "Time limit start"),
 
     /**
      * The amount of time goods may remain in the warehouse
      */
+    @Deprecated(forRemoval = true)
     CCN("CCN", "Warehouse time limit"),
 
     /**
      * Additional information detailing the basis on which the value for duty was determined
      */
+    @Deprecated(forRemoval = true)
     CCO("CCO", "Value for duty information"),
 
     /**
-     * Any coded or clear instruction agreed by customer and carrier regarding the export
-     * declaration of the goods.
+     * Any coded or clear instruction agreed by customer and carrier regarding the export declaration
+     * of the goods.
      */
     CEX("CEX", "Customs clearance instructions export"),
 
@@ -1694,8 +1707,8 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     CHG("CHG", "Change information"),
 
     /**
-     * Any coded or clear instruction agreed by customer and carrier regarding the import
-     * declaration of the goods.
+     * Any coded or clear instruction agreed by customer and carrier regarding the import declaration
+     * of the goods.
      */
     CIP("CIP", "Customs clearance instruction import"),
 
@@ -1830,14 +1843,14 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     IRP("IRP", "Information for railway purpose"),
 
     /**
-     * Information concerning the pre-carriage to the port of discharge if by other means
-     * than a vessel.
+     * Information concerning the pre-carriage to the port of discharge if by other means than
+     * a vessel.
      */
     ITR("ITR", "Inland transport details"),
 
     /**
-     * Instructions regarding the testing that is required to be carried out on the items
-     * in the transaction.
+     * Instructions regarding the testing that is required to be carried out on the items in
+     * the transaction.
      */
     ITS("ITS", "Testing instructions"),
 
@@ -1940,9 +1953,8 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
 
     /**
      * Instructions regarding quarantine, i.e. the period during which an arriving vessel,
-     * including its equipment, cargo, crew or passengers, suspected to carry or carrying
-     * a contagious disease is detained in strict isolation to prevent the spread of such
-     * a disease.
+     * including its equipment, cargo, crew or passengers, suspected to carry or carrying a
+     * contagious disease is detained in strict isolation to prevent the spread of such a disease.
      */
     QIN("QIN", "Quarantine instructions"),
 
@@ -2000,8 +2012,8 @@ public enum SubjectCodeType implements CodeList<SubjectCodeType> {
     SIN("SIN", "Special instructions"),
 
     /**
-     * Shipping line requested to be used for traffic between European continent and U.K.
-     * for Ireland.
+     * Shipping line requested to be used for traffic between European continent and U.K. for
+     * Ireland.
      */
     SLR("SLR", "Ship line requested"),
 

@@ -18,6 +18,15 @@ public class XMultipleException extends XValidationException {
         this.causes = causes;
     }
 
+    private void print(Consumer<String> println, Consumer<String> print, Consumer<XValidationException> unit) {
+        println.accept("Multiple exceptions have been occurred:");
+        var i = 0;
+        for (final XValidationException ex : causes) {
+            print.accept(++i + ") ");
+            unit.accept(ex);
+        }
+    }
+
     public List<XValidationException> getCauses() {
         return causes;
     }
@@ -30,14 +39,6 @@ public class XMultipleException extends XValidationException {
     @Override
     public final void printStackTrace(PrintWriter writer) {
         print(writer::println, writer::print, e -> e.printStackTrace(writer));
-    }
-
-    private void print(Consumer<String> println, Consumer<String> print, Consumer<XValidationException> unit) {
-        println.accept("Multiple exceptions occurred:");
-        for (var i = 0; i < causes.size(); i++) {
-            print.accept((i + 1) + ") ");
-            unit.accept(causes.get(i));
-        }
     }
 
     @Override

@@ -8,11 +8,11 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 2475 (Payment Terms Event) : Event time reference code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred2475.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred2475.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList(value = "2475", type = TimeReferenceCodeType.class)
-@Documented(value = "Event Time Reference Code Payment Terms Event", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Event Time Reference Code Payment Terms Event", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.1", date = "2008-08-23")
 @XmlJavaTypeAdapter(PaymentTermsEventTimeReferenceCodeAdapter.class)
 public enum PaymentTermsEventTimeReferenceCodeType implements CodeList<PaymentTermsEventTimeReferenceCodeType> {

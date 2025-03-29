@@ -56,8 +56,8 @@ public enum TaxExemptionReasonCodeType implements CodeList<TaxExemptionReasonCod
 
     /**
      * The supply of services by independent groups of persons, who are carrying on an activity
-     * which is exempt from VAT or in relation to which they are not taxable persons, for
-     * the purpose of rendering their members the services directly necessary for the exercise
+     * which is exempt from VAT or in relation to which they are not taxable persons, for the
+     * purpose of rendering their members the services directly necessary for the exercise
      * of that activity, where those groups merely claim from their members exact reimbursement
      * of their share of the joint expenses, provided that such exemption is not likely to
      * cause distortion of competition.
@@ -102,7 +102,7 @@ public enum TaxExemptionReasonCodeType implements CodeList<TaxExemptionReasonCod
     /**
      * The supply of services, and the supply of goods closely linked thereto, to their members
      * in their common interest in return for a subscription fixed in accordance with their
-     * rules by non-profitmaking organisations with aims of a political, trade-union, religious,
+     * rules by non-profit making organisations with aims of a political, trade-union, religious,
      * patriotic, philosophical, philanthropic or civic nature, provided that this exemption
      * is not likely to cause distortion of competition.
      */
@@ -124,14 +124,14 @@ public enum TaxExemptionReasonCodeType implements CodeList<TaxExemptionReasonCod
     /**
      * The supply of services and goods, by organisations whose activities are exempt pursuant
      * to points (b), (g), (h), (i), (l), (m) and (n), in connection with fund-raising events
-     * organised exclusively for their own benefit, provided that exemption is not likely
-     * to cause distortion of competition.
+     * organised exclusively for their own benefit, provided that exemption is not likely to
+     * cause distortion of competition.
      */
     VATEX_EU_132_1O("VATEX-EU-132-1O", "Exempt based on article 132, section 1 (o) of Council Directive 2006/112/EC"),
 
     /**
-     * The supply of transport services for sick or injured persons in vehicles specially
-     * designed for the purpose, by duly authorised bodies.
+     * The supply of transport services for sick or injured persons in vehicles specially designed
+     * for the purpose, by duly authorised bodies.
      */
     VATEX_EU_132_1P("VATEX-EU-132-1P", "Exempt based on article 132, section 1 (p) of Council Directive 2006/112/EC"),
 
@@ -159,10 +159,9 @@ public enum TaxExemptionReasonCodeType implements CodeList<TaxExemptionReasonCod
     VATEX_EU_143_1B("VATEX-EU-143-1B", "Exempt based on article 143, section 1 (b) of Council Directive 2006/112/EC"),
 
     /**
-     * The final importation of goods, in free circulation from a third territory forming
-     * part of the Community customs territory, which would be entitled to exemption under
-     * point (b) if they had been imported within the meaning of the first paragraph of Article
-     * 30
+     * The final importation of goods, in free circulation from a third territory forming part
+     * of the Community customs territory, which would be entitled to exemption under point
+     * (b) if they had been imported within the meaning of the first paragraph of Article 30
      */
     VATEX_EU_143_1C("VATEX-EU-143-1C", "Exempt based on article 143, section 1 (c) of Council Directive 2006/112/EC"),
 
@@ -175,8 +174,8 @@ public enum TaxExemptionReasonCodeType implements CodeList<TaxExemptionReasonCod
     VATEX_EU_143_1D("VATEX-EU-143-1D", "Exempt based on article 143, section 1 (d) of Council Directive 2006/112/EC"),
 
     /**
-     * The reimportation, by the person who exported them, of goods in the state in which
-     * they were exported, where those goods are exempt from customs duties.
+     * The reimportation, by the person who exported them, of goods in the state in which they
+     * were exported, where those goods are exempt from customs duties.
      */
     VATEX_EU_143_1E("VATEX-EU-143-1E", "Exempt based on article 143, section 1 (e) of Council Directive 2006/112/EC"),
 
@@ -188,19 +187,19 @@ public enum TaxExemptionReasonCodeType implements CodeList<TaxExemptionReasonCod
 
     /**
      * The importation of goods by the European Community, the European Atomic Energy Community,
-     * the European Central Bank or the European Investment Bank, or by the bodies set up
-     * by the Communities to which the Protocol of 8 April 1965 on the privileges and immunities
-     * of the European Communities applies, within the limits and under the conditions of
-     * that Protocol and the agreements for its implementation or the headquarters agreements,
-     * in so far as it does not lead to distortion of  competition;
+     * the European Central Bank or the European Investment Bank, or by the bodies set up by
+     * the Communities to which the Protocol of 8 April 1965 on the privileges and immunities
+     * of the European Communities applies, within the limits and under the conditions of that
+     * Protocol and the agreements for its implementation or the headquarters agreements, in
+     * so far as it does not lead to distortion of  competition;
      */
     VATEX_EU_143_1FA("VATEX-EU-143-1FA", "Exempt based on article 143, section 1 (fa) of Council Directive 2006/112/EC"),
 
     /**
      * The importation of goods by international bodies, other than those referred to in point
-     * (fa), recognised as such by the public authorities of the host Member State, or by
-     * members of such bodies, within the limits and under the conditions laid down by the
-     * international conventions establishing the bodies or by headquarters agreements;
+     * (fa), recognised as such by the public authorities of the host Member State, or by members
+     * of such bodies, within the limits and under the conditions laid down by the international
+     * conventions establishing the bodies or by headquarters agreements;
      */
     VATEX_EU_143_1G("VATEX-EU-143-1G", "Exempt based on article 143, section 1 (g) of Council Directive 2006/112/EC"),
 
@@ -233,9 +232,9 @@ public enum TaxExemptionReasonCodeType implements CodeList<TaxExemptionReasonCod
 
     /**
      * The importation of gas through a natural gas system or any network connected to such
-     * a system or fed in from a vessel transporting gas into a natural gas system or any
-     * upstream pipeline network, of electricity or of heat or cooling energy through heating
-     * or cooling networks.
+     * a system or fed in from a vessel transporting gas into a natural gas system or any upstream
+     * pipeline network, of electricity or of heat or cooling energy through heating or cooling
+     * networks.
      */
     VATEX_EU_143_1L("VATEX-EU-143-1L", "Exempt based on article 143, section 1 (l) of Council Directive 2006/112/EC"),
 
@@ -300,8 +299,8 @@ public enum TaxExemptionReasonCodeType implements CodeList<TaxExemptionReasonCod
     VATEX_EU_151_1AA("VATEX-EU-151-1AA", "Exempt based on article 151, section 1 (aa) of Council Directive 2006/112/EC"),
 
     /**
-     * The supply of goods or services to international bodies, other than those referred
-     * to in point (aa), recognised as such by the public authorities of the host Member States,
+     * The supply of goods or services to international bodies, other than those referred to
+     * in point (aa), recognised as such by the public authorities of the host Member States,
      * and to members of such bodies, within the limits and under the conditions laid down
      * by the international conventions establishing the bodies or by headquarters agreements.
      */
@@ -310,8 +309,8 @@ public enum TaxExemptionReasonCodeType implements CodeList<TaxExemptionReasonCod
     /**
      * The supply of goods or services within a Member State which is a party to the North
      * Atlantic Treaty, intended either for the armed forces of other States party to that
-     * Treaty for the use of those forces, or of the civilian staff accompanying them, or
-     * for supplying their messes or canteens when such forces take part in the common defence
+     * Treaty for the use of those forces, or of the civilian staff accompanying them, or for
+     * supplying their messes or canteens when such forces take part in the common defence
      * effort.
      */
     VATEX_EU_151_1C("VATEX-EU-151-1C", "Exempt based on article 151, section 1 (c) of Council Directive 2006/112/EC"),
@@ -332,6 +331,11 @@ public enum TaxExemptionReasonCodeType implements CodeList<TaxExemptionReasonCod
      * staff accompanying them, or for supplying their messes or canteens.
      */
     VATEX_EU_151_1E("VATEX-EU-151-1E", "Exempt based on article 151, section 1 (e) of Council Directive 2006/112/EC"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_EU_153("VATEX-EU-153", "Exempt based on Article 263 of the General Tax Code"),
 
     /**
      * Travel agents performed outside of EU.
@@ -421,10 +425,10 @@ public enum TaxExemptionReasonCodeType implements CodeList<TaxExemptionReasonCod
      *     </ul>
      * </ul>
      */
-    VATEX_EU_IC("VATEX-EU-IC", "Intra-Community supply"),
+    VATEX_EU_IC("VATEX-EU-IC", "Intra-community supply"),
 
     /**
-     * Collectors' items and antiques - Indication that the VAT margin scheme for collector?s
+     * Collectors' items and antiques - Indication that the VAT margin scheme for collector’s
      * items and antiques has been applied.
      * <ul>
      *     <li><u>Notes:</u></li>
@@ -449,6 +453,159 @@ public enum TaxExemptionReasonCodeType implements CodeList<TaxExemptionReasonCod
      * </ul>
      */
     VATEX_EU_O("VATEX-EU-O", "Not subject to VAT"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_298SEXDECIESA("VATEX-FR-298SEXDECIESA", "Exempt based on Article 298 sexdecies A of the General Tax Code"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261_1("VATEX-FR-CGI261-1", "Exempt based on Article 261-1 of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261_2("VATEX-FR-CGI261-2", "Exempt based on Article 261-2 of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261_3("VATEX-FR-CGI261-3", "Exempt based on Article 261-3 of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261_4("VATEX-FR-CGI261-4", "Exempt based on Article 261-4 of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261_5("VATEX-FR-CGI261-5", "Exempt based on Article 261-5 of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261_7("VATEX-FR-CGI261-7", "Exempt based on Article 261-7 of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261_8("VATEX-FR-CGI261-8", "Exempt based on Article 261-8 of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261A("VATEX-FR-CGI261A", "Exempt based on Article 261 A of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261B("VATEX-FR-CGI261B", "Exempt based on Article 261 B of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261C_1("VATEX-FR-CGI261C-1", "Exempt based on Article 261 C-1Â° a of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261C_2("VATEX-FR-CGI261C-2", "Exempt based on Article 261 C-2Â° a of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261C_3("VATEX-FR-CGI261C-3", "Exempt based on Article 261 C-3Â° a of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261D_1("VATEX-FR-CGI261D-1", "Exempt based on Article 261 D-1Â° of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261D_1BIS("VATEX-FR-CGI261D-1BIS", "Exempt based on Article 261 D-1Â° bis of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261D_2("VATEX-FR-CGI261D-2", "Exempt based on Article 261 D-2Â° of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261D_3("VATEX-FR-CGI261D-3", "Exempt based on Article 261 D-3Â° of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261D_4("VATEX-FR-CGI261D-4", "Exempt based on Article 261 D-4Â°-a, b, and c of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261E_1("VATEX-FR-CGI261E-1", "Exempt based on Article 261 E-1Â° of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI261E_2("VATEX-FR-CGI261E-2", "Exempt based on Article 261 E-2Â° of the CGI *"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI263("VATEX-FR-CGI263", "Exempt based on Article 263 of the General Tax Code"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI275("VATEX-FR-CGI275", "Exempt based on Article 275 of the General Tax Code"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI277A("VATEX-FR-CGI277A", "Exempt based on Article 277 A of the General Tax Code"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI293B("VATEX-FR-CGI293B", "Exempt based on Article 293B of the General Tax Code"),
+
+    /**
+     * The context of exemption will be defined once this code is validated and published *
+     */
+    VATEX_FR_CGI295("VATEX-FR-CGI295", "Exempt based on Article 295 of the General Tax Code"),
+
+    /**
+     * Administrative doctrine BOI TVA DECLA 30 20 20 §260 and 270 for credit notes and §280
+     * and 290 for discounts
+     * <ul>
+     *     <li><u>Notes:</u></li>
+     *     <ul>
+     *          <li>
+     *               1) For domestic Credit Notes only in France
+     *          </li>
+     *     </ul>
+     * </ul>
+     */
+    VATEX_FR_CNWVAT("VATEX-FR-CNWVAT", "France domestic Credit Notes without VAT, due to supplier forfeit of VAT for discount"),
+
+    /**
+     * Domestic VAT taxable persons which are franchised in base (article 293 B of the general
+     * tax code. In this case, they are exempt from VAT.)
+     * <ul>
+     *     <li><u>Notes:</u></li>
+     *     <ul>
+     *          <li>
+     *               1) For domestic invoicing in France
+     *          </li>
+     *     </ul>
+     * </ul>
+     */
+    VATEX_FR_FRANCHISE("VATEX-FR-FRANCHISE", "France domestic VAT franchise in base"),
     ;
 
     private final String name;

@@ -62,9 +62,9 @@ public enum TransportModeCodeType implements CodeList<TransportModeCodeType> {
      *     <ul>
      *          <li>
      *               1) This code is provided for practical reasons, despite the fact that mail is not a
-     *               genuine mode of transport. In many countries, the value of merchandise exported by
-     *               mail is considerable, but the exporter or importer concerned would be unable to state
-     *               by which mode postal items had been conveyed.
+     *               genuine mode of transport. In many countries, the value of merchandise exported by mail
+     *               is considerable, but the exporter or importer concerned would be unable to state by
+     *               which mode postal items had been conveyed.
      *          </li>
      *     </ul>
      * </ul>
@@ -80,12 +80,12 @@ public enum TransportModeCodeType implements CodeList<TransportModeCodeType> {
      *          <li>
      *               1) This code is provided for practical reasons, despite the fact that multimodal transport
      *               is not a genuine mode of transport.
-     *               It can be used when goods are carried by at least two different modes from a place
-     *               at which the goods are taken in charge
+     *               It can be used when goods are carried by at least two different modes from a place at
+     *               which the goods are taken in charge
      *               by a transport operator to a place designated for delivery, on the basis of one transport
      *               contract. (Operations of pick-up and
-     *               delivery of goods carried out in the performance of a single mode of transport, as
-     *               defined in such a contract, shall not be
+     *               delivery of goods carried out in the performance of a single mode of transport, as defined
+     *               in such a contract, shall not be
      *               considered as multimodal transport).
      *          </li>
      *     </ul>

@@ -10,7 +10,7 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 7161 : Special service description code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred7161.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred7161.htm}
  */
 @Generated(value = "PPF", comments = "by A.ABBESSI")
 @Documented(value = "Special Service Description Code", agency = Agency.UN_ECE, version = "2.3")
@@ -531,8 +531,7 @@ public enum SpecialServiceDescriptionCodeType implements ChargeReasonCodeType<Sp
     DAB("DAB", "Layout/design"),
 
     /**
-     * Allowance given when a specific part of a suppliers assortment is purchased by the
-     * buyer.
+     * Allowance given when a specific part of a suppliers assortment is purchased by the buyer.
      */
     DAC("DAC", "Assortment allowance"),
 
@@ -563,8 +562,8 @@ public enum SpecialServiceDescriptionCodeType implements ChargeReasonCodeType<Sp
     DAI("DAI", "Growth of business"),
 
     /**
-     * An allowance related to the introduction of a new product to the range of products
-     * traded by a retailer.
+     * An allowance related to the introduction of a new product to the range of products traded
+     * by a retailer.
      */
     DAJ("DAJ", "Introduction allowance"),
 

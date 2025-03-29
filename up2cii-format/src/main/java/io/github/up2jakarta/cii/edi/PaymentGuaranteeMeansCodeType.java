@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 4431 : Payment guarantee means code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred4431.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred4431.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Payment Guarantee Means Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Payment Guarantee Means Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.1", date = "2008-08-23")
 @XmlJavaTypeAdapter(PaymentGuaranteeMeansCodeAdapter.class)
 public enum PaymentGuaranteeMeansCodeType implements CodeList<PaymentGuaranteeMeansCodeType> {
@@ -63,8 +63,8 @@ public enum PaymentGuaranteeMeansCodeType implements CodeList<PaymentGuaranteeMe
     V_21("21", "Business as security"),
 
     /**
-     * The payer has provided a warrant or warehouse receipts for goods or property to be
-     * held or used as security against payment.
+     * The payer has provided a warrant or warehouse receipts for goods or property to be held
+     * or used as security against payment.
      */
     V_23("23", "Warrant or similar (warehouse receipts)"),
 

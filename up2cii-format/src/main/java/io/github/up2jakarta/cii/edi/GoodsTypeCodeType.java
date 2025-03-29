@@ -9,7 +9,7 @@ import javax.annotation.processing.Generated;
 /**
  * SubList like of UN/TDED 7357 : Goods type code.
  */
-@Generated(value = "CII", comments = "by Abderrazek ABBESSI")
+@Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList(value = "7357", type = CargoCommodityCategoryCodeType.class)
 @Documented(value = "Goods Type Code", agency = Agency.UN_ECE, version = "D22B")
 @Schema(agency = "UN/CEFACT", version = "3.1", date = "2008-08-23")

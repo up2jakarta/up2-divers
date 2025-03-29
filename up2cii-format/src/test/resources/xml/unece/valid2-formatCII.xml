@@ -243,7 +243,7 @@
                 <ram:ActualAmount>40.00</ram:ActualAmount>
                 <ram:ReasonCode>100</ram:ReasonCode>
                 <ram:Reason>Remise commerciale</ram:Reason>
-                <ram:TypeCode>33</ram:TypeCode>
+                <ram:TypeCode>105</ram:TypeCode>
                 <ram:CategoryTradeTax>
                     <ram:TypeCode>VAT</ram:TypeCode>
                     <ram:CategoryCode>S</ram:CategoryCode>

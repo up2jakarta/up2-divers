@@ -47,10 +47,10 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
      * @see #map(InputSegment, EventHandler)
-     * @see EventHandler#failFast()
+     * @see EventHandler#failFast(boolean)
      */
     public final S map(final String... columns) throws BeanException {
-        return map(failFast(), columns);
+        return map(failFast(true), columns);
     }
 
     /**

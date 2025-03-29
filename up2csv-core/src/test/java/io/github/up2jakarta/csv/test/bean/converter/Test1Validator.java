@@ -23,12 +23,12 @@ public class Test1Validator implements Segment {
     private Integer aWarning;
 
     @Position(2)
-    @NotEmpty(payload = Errors.Error.class)
+    @NotEmpty(payload = Errors.Warning.class)
     private String anError;
 
     @Position(3)
     @Up2Number
-    @NotNull(payload = Errors.Fatal.class)
+    @NotNull(payload = Errors.Warning.class)
     private Integer aFatal;
 
     @Position(4)

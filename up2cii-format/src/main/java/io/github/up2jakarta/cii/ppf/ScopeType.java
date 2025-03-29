@@ -11,7 +11,7 @@ import javax.annotation.processing.Generated;
 /**
  * Based on FR/PPF G1.02 : Scope Type.
  */
-@Generated(value = "PPF", comments = "by Abderrazek ABBESSI")
+@Generated(value = "PPF", comments = "by A.ABBESSI")
 @Documented(value = "Scope type", agency = Agency.EN_16931, version = "2.3")
 @XmlJavaTypeAdapter(ScopeAdapter.class)
 public enum ScopeType implements CodeList<ScopeType> {

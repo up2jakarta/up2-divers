@@ -24,14 +24,29 @@ public interface InputError<R extends InputSegment<?>, K extends InputError.Key<
     }
 
     /**
+     * @return the input index
+     */
+    Integer getOffset();
+
+    /**
      * @param offset the input index
      */
     void setOffset(Integer offset);
 
     /**
+     * @return the error severity
+     */
+    SeverityType getSeverity();
+
+    /**
      * @param severity the error severity
      */
     void setSeverity(SeverityType severity);
+
+    /**
+     * @return the error code for known exception
+     */
+    String getCode();
 
     /**
      * @param code the error code for known exception
@@ -44,9 +59,24 @@ public interface InputError<R extends InputSegment<?>, K extends InputError.Key<
     void setType(D type);
 
     /**
+     * @return the source of data
+     */
+    D getType();
+
+    /**
+     * @return the error message
+     */
+    String getMessage();
+
+    /**
      * @param message the error message
      */
     void setMessage(String message);
+
+    /**
+     * @return the the error stack trace
+     */
+    String getTrace();
 
     /**
      * @param trace the error stack trace

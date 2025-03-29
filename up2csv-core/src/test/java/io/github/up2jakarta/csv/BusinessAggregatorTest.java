@@ -4,6 +4,7 @@ import io.github.up2jakarta.csv.impl.InputErrorEntity;
 import io.github.up2jakarta.csv.impl.InputRowEntity;
 import io.github.up2jakarta.csv.impl.InvoiceAggregator;
 import io.github.up2jakarta.csv.misc.BeanException;
+import io.github.up2jakarta.csv.misc.MapperException;
 import io.github.up2jakarta.csv.test.agg.Attribute;
 import io.github.up2jakarta.csv.test.agg.Invoice;
 import io.github.up2jakarta.csv.test.agg.Item;
@@ -106,29 +107,23 @@ class BusinessAggregatorTest {
     }
 
     @Test
-    void testCardinality1() throws BeanException {
+    void testCardinality1() {
         // Given
         final InputRowEntity[] rows = {
                 create(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
                 create(S01, "TU2025R0088", "2025-03-12", "120", "100", "20"),
         };
-        final List<InputErrorEntity> errors = new LinkedList<>();
         // When
-        final Invoice invoice = aggregator.parse(rows, (i, r) -> {
-            errors.addAll(r);
-            return i;
-        });
+        final MapperException e = assertThrows(MapperException.class, () -> aggregator.parse(rows, (i, r) -> i));
+        assertEquals(0, e.getCauses().size());
         // Then
-        assertNull(invoice);
-        assertEquals(2, errors.size());
-        for (var e : errors) {
-            assertNull(e.getTrace());
-            assertEquals(D001, e.getType());
-            assertEquals(0, e.getOffset());
-            assertEquals(SeverityType.FATAL, e.getSeverity());
-            assertEquals(S01.getErrorCode(), e.getCode());
-            assertEquals("size must be between 1 and 1", e.getMessage());
-        }
+        assertEquals(D001, e.getDataType());
+        assertEquals(0, e.getOffset());
+        assertEquals(SeverityType.FATAL, e.getSeverityType());
+        assertEquals(S01.getErrorCode(), e.getErrorCode());
+        assertNotNull(e.getCause());
+        assertNull(e.getCause().getCause());
+        assertEquals("size must be between 1 and 1", e.getCause().getMessage());
     }
 
     @Test
@@ -268,7 +263,7 @@ class BusinessAggregatorTest {
         {
             final InputErrorEntity e = errors.get(0);
             assertNotNull(e.getKey());
-            assertEquals(detached, e.getKey().getRow());
+            assertEquals(detached, e.getKey().getRecord());
             assertNull(e.getTrace());
             assertEquals(D005, e.getType());
             assertEquals(0, e.getOffset());

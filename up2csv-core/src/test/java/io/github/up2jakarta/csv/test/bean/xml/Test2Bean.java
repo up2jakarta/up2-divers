@@ -21,7 +21,7 @@ public class Test2Bean implements Segment {
     public static final String XML_004 = "XML-004";
 
     @Position(0)
-    @Error(value = XML_001, severity = SeverityType.FATAL)
+    @Error(value = XML_001, severity = SeverityType.WARNING)
     private XML1Enum enum1;
 
     @Position(1)
@@ -29,7 +29,7 @@ public class Test2Bean implements Segment {
     private XML2Enum enum2;
 
     @Position(2)
-    @Error(value = XML_003, severity = SeverityType.FATAL)
+    @Error(value = XML_003, severity = SeverityType.WARNING)
     private CurrencyCodeType adapter1;
 
     @Position(3)

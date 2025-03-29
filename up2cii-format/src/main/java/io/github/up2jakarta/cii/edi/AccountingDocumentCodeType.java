@@ -8,19 +8,19 @@ import javax.annotation.processing.Generated;
 
 /**
  * SubList of UN/CEFACT 1001 (Accounting) : Document name code.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred1001.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred1001.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
 @SubList(value = "1001", type = DocumentCodeType.class)
-@Documented(value = "Document Name Code_Accounting", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Document Name Code_Accounting", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.6", date = "2008-08-23")
 @XmlJavaTypeAdapter(AccountingDocumentCodeAdapter.class)
 public enum AccountingDocumentCodeType implements CodeList<AccountingDocumentCodeType> {
 
     /**
-     * Document/message issued within an enterprise to initiate the purchase of articles,
-     * materials or services required for the production or manufacture of goods to be offered
-     * for sale or otherwise supplied to customers.
+     * Document/message issued within an enterprise to initiate the purchase of articles, materials
+     * or services required for the production or manufacture of goods to be offered for sale
+     * or otherwise supplied to customers.
      */
     V_105(DocumentCodeType.V_105),
 
@@ -61,8 +61,8 @@ public enum AccountingDocumentCodeType implements CodeList<AccountingDocumentCod
     V_320(DocumentCodeType.V_320),
 
     /**
-     * Document/message serving as a preliminary invoice, containing - on the whole - the
-     * same information as the final invoice, but not actually claiming payment.
+     * Document/message serving as a preliminary invoice, containing - on the whole - the same
+     * information as the final invoice, but not actually claiming payment.
      */
     V_325(DocumentCodeType.V_325),
 
@@ -150,9 +150,9 @@ public enum AccountingDocumentCodeType implements CodeList<AccountingDocumentCod
     V_731(DocumentCodeType.V_731),
 
     /**
-     * A message sent by a party (usually an employer or its representative) to a service
-     * providing organisation, to detail payroll deductions paid on behalf of its employees
-     * to the service providing organisation.
+     * A message sent by a party (usually an employer or its representative) to a service providing
+     * organisation, to detail payroll deductions paid on behalf of its employees to the service
+     * providing organisation.
      */
     V_747(DocumentCodeType.V_747),
     ;

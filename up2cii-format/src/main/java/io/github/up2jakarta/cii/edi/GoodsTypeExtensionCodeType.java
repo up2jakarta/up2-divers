@@ -11,10 +11,10 @@ import javax.annotation.processing.Generated;
 
 /**
  * Based on UN/CEFACT 7361 : Customs goods identifier.
- * {@see https://service.unece.org/trade/untdid/d16b/tred/tred7361.htm}
+ * {@see https://service.unece.org/trade/untdid/d22b/tred/tred7361.htm}
  */
 @Generated(value = "CII", comments = "by A.ABBESSI")
-@Documented(value = "Goods Type Extension Code", agency = Agency.UN_ECE, version = "D22B")
+@Documented(value = "Goods Type Extension Code", agency = Agency.UN_ECE, version = "D22A")
 @Schema(agency = "UN/CEFACT", version = "3.1", date = "2008-08-23")
 @XmlJavaTypeAdapter(GoodsTypeExtensionCodeAdapter.class)
 public enum GoodsTypeExtensionCodeType implements CodeList<GoodsTypeExtensionCodeType> {

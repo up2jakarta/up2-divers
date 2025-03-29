@@ -62,7 +62,7 @@ public class JpaExtensionTest {
         assertEquals(5, errors.size());
         {
             final SimpleErrorEntity error = errors.get(0);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(0, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
@@ -72,7 +72,7 @@ public class JpaExtensionTest {
         }
         {
             final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(1, error.getOrder());
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
@@ -83,7 +83,7 @@ public class JpaExtensionTest {
 
         {
             final SimpleErrorEntity error = errors.get(2);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(2, error.getOrder());
             assertEquals(2, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
@@ -93,7 +93,7 @@ public class JpaExtensionTest {
         }
         {
             final SimpleErrorEntity error = errors.get(3);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(3, error.getOrder());
             assertEquals(3, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
@@ -103,7 +103,7 @@ public class JpaExtensionTest {
         }
         {
             final SimpleErrorEntity error = errors.get(4);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(4, error.getOrder());
             assertEquals(4, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
@@ -128,17 +128,17 @@ public class JpaExtensionTest {
         assertEquals(3, errors.size());
         {
             final SimpleErrorEntity error = errors.get(0);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(0, error.getOffset());
-            assertEquals(SeverityType.FATAL, error.getSeverity());
+            assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Test2Bean.XML_001, error.getCode());
             assertEquals("Unknown value [11] for @Enumerated[XML1Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
             final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(1, error.getOrder());
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
@@ -148,10 +148,10 @@ public class JpaExtensionTest {
         }
         {
             final SimpleErrorEntity error = errors.get(2);
-            assertSame(row, error.getRow());
+            assertSame(row, error.getRecord());
             assertEquals(2, error.getOrder());
             assertEquals(2, error.getOffset());
-            assertEquals(SeverityType.FATAL, error.getSeverity());
+            assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Test2Bean.XML_003, error.getCode());
             assertEquals("Unknown value [ANY] for CodeList[TestCodeList]", error.getMessage());
             assertNull(error.getTrace());

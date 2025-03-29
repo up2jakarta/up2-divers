@@ -52,7 +52,7 @@ public class AllowanceChargeIdentificationCodeTest extends CodeAdapterTest {
         final TradeAllowanceChargeType charge = charges.get(0);
         assertNotNull(charge);
         final AllowanceChargeIdentificationCodeType code = charge.getTypeCode();
-        assertEquals(AllowanceChargeIdentificationCodeType.V_33, code);
+        assertEquals(AllowanceChargeIdentificationCodeType.V_105, code);
         assertNotNull(code.getName());
     }
 

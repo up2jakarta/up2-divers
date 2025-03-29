@@ -6,14 +6,7 @@
 
 # Features
 
-- CII `Cross Industry Invoice` : https://unece.org/trade/uncefact/xml-schemas-2018-2012 :
-
-| Issued | Document Title                | Download                                                                                                   |
-|--------|-------------------------------|------------------------------------------------------------------------------------------------------------|
-| 2016   | XML Schemas 16B (SCRDM - CII) | [ZIP](https://unece.org/DAM/cefact/xml_schemas/D16B_SCRDM__Subset__CII.zip)                                |
-|        | XML Schemas version 16B       | [ZIP](https://unece.org/DAM/cefact/xml_schemas/D16B.zip)                                                   |
-|        | Validation Report             | [PDF](https://unece.org/DAM/cefact/xml_schemas/160929-1-Schema_VALIDATION-REPORT-D16B_schemas_28SEP16.pdf) |
-|        | Release notes                 | [PDF](https://unece.org/DAM/cefact/xml_schemas/D16B_Schema_Production_Notes.pdf)                           |
+- CII D22B [Cross Industry Invoice](https://unece.org/trade/uncefact/xml-schemas)
 
 - France e-invoicing [Specifications B2B v3.0](https://www.impots.gouv.fr/specifications-externes-b2b)
 

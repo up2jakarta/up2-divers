@@ -14,8 +14,8 @@ public class ValidatedGroupsBean implements Segment {
 
     @Position(0)
     @Up2Token
-    @Size(min = 1, max = 3, payload = Errors.Fatal.class, groups = Up2Group.class)
-    @Size(min = 1, max = 2, payload = Errors.Error.class)
+    @Size(min = 1, max = 3, payload = Errors.Warning.class, groups = Up2Group.class)
+    @Size(min = 1, max = 2, payload = Errors.Warning.class)
     private String currency;
 
     public String getCurrency() {
