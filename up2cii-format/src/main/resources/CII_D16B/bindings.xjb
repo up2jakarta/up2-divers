@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bindings xmlns="https://jakarta.ee/xml/ns/jaxb" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jaxb https://jakarta.ee/xml/ns/jaxb/bindingschema_3_0.xsd" version="3.0">
     <globalBindings typesafeEnumMaxMembers="2000" typesafeEnumMemberName="generateError">
-        <xjc:javaType name="io.github.up2jakarta.xml.adapters.OffsetDate" xmlType="xsd:date" adapter="io.github.up2jakarta.xml.adapters.OffsetDateAdapter" />
+        <xjc:javaType name="java.time.LocalDate" xmlType="xsd:date" adapter="io.github.up2jakarta.xml.adapters.OffsetDateAdapter" />
         <xjc:javaType name="java.time.OffsetDateTime" xmlType="xsd:dateTime" adapter="io.github.up2jakarta.xml.adapters.OffsetDateTimeAdapter" />
         <xjc:javaType name="java.time.OffsetTime" xmlType="xsd:time" adapter="io.github.up2jakarta.xml.adapters.OffsetTimeAdapter" />
     </globalBindings>

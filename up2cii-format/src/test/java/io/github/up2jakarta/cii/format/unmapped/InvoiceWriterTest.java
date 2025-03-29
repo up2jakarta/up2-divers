@@ -6,7 +6,6 @@ import io.github.up2jakarta.cii.format.unmapped.ram.ExchangedDocumentType;
 import io.github.up2jakarta.cii.format.unmapped.ram.SupplyChainTradeTransactionType;
 import io.github.up2jakarta.cii.format.unmapped.ram.ValuationBreakdownStatementType;
 import io.github.up2jakarta.xml.api.XValidationException;
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -21,7 +20,7 @@ public class InvoiceWriterTest {
     public static final InvoiceWriter<CrossIndustryInvoiceType> WRITER;
 
     static {
-        WRITER = new InvoiceWriter<>(CrossIndustryInvoiceType.class, new XmlAdapter[0]);
+        WRITER = new InvoiceWriter<>(CrossIndustryInvoiceType.class);
     }
 
     // Test invoices

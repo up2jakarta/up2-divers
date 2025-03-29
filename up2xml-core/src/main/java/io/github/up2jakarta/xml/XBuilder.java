@@ -24,9 +24,9 @@ public abstract class XBuilder<X> extends XProcessor<X> {
     protected final QName name;
     protected final DocumentBuilderFactory factory;
 
-    public XBuilder(QName name, Class<X> type, boolean validating, Schema xsd, final XmlAdapter<?, ?>[] adapters) {
+    protected XBuilder(QName name, Class<X> type, DocumentBuilderFactory factory, Schema xsd, XmlAdapter<?, ?>[] adapters) {
         super(type, xsd, adapters);
-        this.factory = XContext.getDocumentBuilderFactory(xsd, validating);
+        this.factory = factory;
         this.name = name;
     }
 

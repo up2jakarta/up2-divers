@@ -20,7 +20,7 @@ import static javax.xml.XMLConstants.*;
  */
 public class XContext {
 
-    private static final String ALLOWED_PROTOCOL = "file,nested";
+    static final String ALLOWED_PROTOCOL = "file,nested";
 
     private static final Map<Class<?>, JAXBContext> CACHE_CONTEXT = new ConcurrentHashMap<>();
 

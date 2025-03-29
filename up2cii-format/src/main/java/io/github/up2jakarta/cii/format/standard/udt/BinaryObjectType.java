@@ -29,7 +29,7 @@ public class BinaryObjectType {
 
     @XmlAttribute(name = "characterSetCode")
     @XmlJavaTypeAdapter(CharsetAdapter.class)
-    protected Charset characterSetCode;
+    protected Charset charset;
 
     @XmlAttribute(name = "uri")
     @XmlSchemaType(name = "anyURI")
@@ -115,8 +115,8 @@ public class BinaryObjectType {
      *
      * @return possible object is {@link Charset }
      */
-    public Charset getCharacterSetCode() {
-        return characterSetCode;
+    public Charset getCharset() {
+        return charset;
     }
 
     /**
@@ -124,8 +124,8 @@ public class BinaryObjectType {
      *
      * @param value allowed object is {@link Charset }
      */
-    public void setCharacterSetCode(Charset value) {
-        this.characterSetCode = value;
+    public void setCharset(Charset value) {
+        this.charset = value;
     }
 
     /**

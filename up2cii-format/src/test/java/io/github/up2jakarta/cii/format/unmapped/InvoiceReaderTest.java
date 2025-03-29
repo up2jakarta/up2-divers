@@ -3,7 +3,6 @@ package io.github.up2jakarta.cii.format.unmapped;
 import io.github.up2jakarta.cii.InvoiceReader;
 import io.github.up2jakarta.xml.api.XReader;
 import io.github.up2jakarta.xml.api.XValidationException;
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -19,7 +18,7 @@ public class InvoiceReaderTest {
     public static final XReader<CrossIndustryInvoiceType> READER;
 
     static {
-        READER = new InvoiceReader<>(CrossIndustryInvoiceType.class, new XmlAdapter[0]);
+        READER = new InvoiceReader<>(CrossIndustryInvoiceType.class);
     }
 
     @Test

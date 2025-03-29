@@ -328,7 +328,7 @@ public class ErrorSupportTest {
             assertNotNull(error.getOrder());
             assertEquals(5, error.getOffset());
             assertEquals(SeverityType.FATAL, error.getSeverity());
-            assertEquals(Tests.TU_V_001, error.getCode());
+            assertEquals(Tests.ERROR_CODE, error.getCode());
             assertEquals("must not be empty", error.getMessage());
             assertNull(error.getTrace());
         }

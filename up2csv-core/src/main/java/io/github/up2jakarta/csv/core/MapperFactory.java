@@ -16,8 +16,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.validation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -34,11 +32,6 @@ import static java.util.Objects.requireNonNull;
 @Named
 @Singleton
 public final class MapperFactory<D extends DataType<D>> {
-
-    /**
-     * Mapper Factory Logger.
-     */
-    final static Logger LOGGER = LoggerFactory.getLogger(MapperFactory.class);
 
     private final BeanContext context;
     private final Validator validator;

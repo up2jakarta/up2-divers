@@ -130,7 +130,7 @@ public class HandlerSupportTest {
             final MapperException error = assertThrows(MapperException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toList().size());
             // Then
-            assertEquals(Tests.TU_V_001, error.getErrorCode());
+            assertEquals(Tests.ERROR_CODE, error.getErrorCode());
             assertEquals(SeverityType.FATAL, error.getSeverityType());
             assertNotNull(error.getCause());
             assertEquals("must not be empty", error.getCause().getMessage());

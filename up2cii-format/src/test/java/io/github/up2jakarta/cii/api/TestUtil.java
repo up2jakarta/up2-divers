@@ -1,6 +1,5 @@
 package io.github.up2jakarta.cii.api;
 
-import io.github.up2jakarta.cii.CII;
 import io.github.up2jakarta.cii.InvoiceValidator;
 import io.github.up2jakarta.xml.api.*;
 import io.github.up2jakarta.xml.codelist.*;
@@ -22,6 +21,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 
+import static io.github.up2jakarta.cii.CII.TOKEN_ADAPTER;
+import static io.github.up2jakarta.cii.CII.getClassLoader;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Named
@@ -41,8 +42,8 @@ public class TestUtil {
     private static <I extends Enum<I>> void assertNaming(I constant, String code) {
         assertNotNull(code);
         assertFalse(code.isBlank());
-        assertEquals(code, CII.TOKEN_ADAPTER.unmarshal(code));
-        assertEquals(CII.codeConstant(code), constant.name());
+        assertEquals(code, TOKEN_ADAPTER.unmarshal(code));
+        assertEquals(CodeList.constant(code), constant.name());
     }
 
     private static <I extends Enum<I>> Documented assertCodeList(Class<I> implClass) {
@@ -104,7 +105,7 @@ public class TestUtil {
     }
 
     public static File loadResource(final String resourcePath) throws FileNotFoundException {
-        var url = CII.CLASS_LOADER.getResource(resourcePath);
+        var url = getClassLoader().getResource(resourcePath);
         try {
             assert url != null;
             return new File(url.toURI());

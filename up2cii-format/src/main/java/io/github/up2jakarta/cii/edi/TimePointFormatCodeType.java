@@ -11,7 +11,7 @@ import javax.annotation.processing.Generated;
 import java.time.*;
 import java.time.temporal.Temporal;
 
-import static io.github.up2jakarta.xml.adapters.Formatters.*;
+import static io.github.up2jakarta.cii.CII.*;
 
 /**
  * Based on UN/CEFACT 2379 : Date or time or period format code
@@ -27,35 +27,35 @@ public enum TimePointFormatCodeType implements CodeList<TimePointFormatCodeType>
     /**
      * Calendar date: C = Century ; Y = Year ; M = Month ; D = Day.
      */
-    V_102("102", "CCYYMMDD", new TemporalFormatter<>(TP_LOCAL_DATE, LocalDate.class, LocalDate::from)),
+    V_102("102", "CCYYMMDD", new TemporalFormatter<>(FORMATTER_LOCAL_DATE, LocalDate.class, LocalDate::from)),
 
     /**
      * Calendar date including time with minutes: C=Century; Y=Year; M=Month; D=Day; H=Hour; M=Minutes.
      */
-    V_203("203", "CCYYMMDDHHMM", new TemporalFormatter<>(TP_LOCAL_DATE_TIME, LocalDateTime.class, LocalDateTime::from)),
+    V_203("203", "CCYYMMDDHHMM", new TemporalFormatter<>(FORMATTER_LOCAL_DATE_TIME, LocalDateTime.class, LocalDateTime::from)),
 
     /**
      * Calendar date including time and time zone expressed in hours and minutes.
      * ZHHMM = time zone given as offset from Coordinated Universal Time (UTC).
      */
-    V_205("205", "CCYYMMDDHHMMZHHMM", new TemporalFormatter<>(TP_OFFSET_DATE_TIME, OffsetDateTime.class, OffsetDateTime::from)),
+    V_205("205", "CCYYMMDDHHMMZHHMM", new TemporalFormatter<>(FORMATTER_OFFSET_DATE_TIME, OffsetDateTime.class, OffsetDateTime::from)),
 
     /**
      * A period of time specified by giving the start time followed by the end time (both expressed by hours
      * minutes and seconds). Data is to be transmitted as consecutive characters without hyphen.
      */
-    V_502("502", "HHMMSS-HHMMSS", new DurationFormatter<>(TP_LOCAL_TIME, LocalTime.class, LocalTime::from)),
+    V_502("502", "HHMMSS-HHMMSS", new DurationFormatter<>(FORMATTER_LOCAL_TIME, LocalTime.class, LocalTime::from)),
 
     /**
      * Time with seconds and with Time Zone: H = Hour; M = Minute, S = Seconds, Z = leading
      * plus/minus sign, HHMM = difference to UTC in Hours and Minutes.
      */
-    V_209("209", "HHMMSSZHHMM", new TemporalFormatter<>(TP_OFFSET_TIME, OffsetTime.class, OffsetTime::from)),
+    V_209("209", "HHMMSSZHHMM", new TemporalFormatter<>(FORMATTER_OFFSET_TIME, OffsetTime.class, OffsetTime::from)),
 
     /**
      * Calendar year including century: C = Century; Y = Year.
      */
-    V_602("602", "CCYY", new TemporalFormatter<>(TP_YEAR, Year.class, Year::from)),
+    V_602("602", "CCYY", new TemporalFormatter<>(FORMATTER_YEAR, Year.class, Year::from)),
     ;
 
     private final AbstractFormatter<? extends Temporal, ?> formatter;

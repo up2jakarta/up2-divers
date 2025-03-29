@@ -2,20 +2,25 @@ package io.github.up2jakarta.xml;
 
 import io.github.up2jakarta.xml.api.AbstractCollector;
 import io.github.up2jakarta.xml.api.MessageEnhancer;
-import io.github.up2jakarta.xml.api.XPrefixMapper;
+import io.github.up2jakarta.xml.api.XConfigurationException;
 import io.github.up2jakarta.xml.api.XValidationException;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.SAXParseException;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
+import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -30,7 +35,7 @@ public abstract class XProcessor<X> {
     private final JAXBContext context;
     private final XmlAdapter<?, ?>[] adapters;
 
-    protected XProcessor(Class<X> type, Schema xsd, final XmlAdapter<?, ?>[] adapters) {
+    protected XProcessor(Class<X> type, Schema xsd, final XmlAdapter<?, ?>... adapters) {
         this.type = type;
         this.context = XContext.getContext(type);
         this.schema = xsd;
@@ -70,21 +75,32 @@ public abstract class XProcessor<X> {
     }
 
     protected Unmarshaller newUnmarshaller(AbstractCollector handler) throws JAXBException {
-        var unmarshaller = context.createUnmarshaller();
+        final Unmarshaller unmarshaller = context.createUnmarshaller();
         unmarshaller.setSchema(schema);
         unmarshaller.setEventHandler(handler);
         Stream.of(adapters).forEach(unmarshaller::setAdapter);
         return unmarshaller;
     }
 
-    protected Marshaller newMarshaller(AbstractCollector handler, XPrefixMapper prefixMapper) throws JAXBException {
-        var marshaller = context.createMarshaller();
+    protected Marshaller newMarshaller(AbstractCollector handler, Consumer<Marshaller> customizer) throws JAXBException {
+        final Marshaller marshaller = context.createMarshaller();
         marshaller.setSchema(schema);
         marshaller.setEventHandler(handler);
-        marshaller.setProperty(prefixMapper.getProperty(), prefixMapper);
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        customizer.accept(marshaller);
         Stream.of(adapters).forEach(marshaller::setAdapter);
         return marshaller;
+    }
+
+    protected Validator newValidator() {
+        try {
+            final Validator validator = schema.newValidator();
+            validator.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            validator.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, XContext.ALLOWED_PROTOCOL);
+            validator.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, XContext.ALLOWED_PROTOCOL);
+            return validator;
+        } catch (SAXNotSupportedException | SAXNotRecognizedException e) {
+            throw new XConfigurationException("Cannot create XML validator", e);
+        }
     }
 
 }

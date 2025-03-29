@@ -1,6 +1,6 @@
 package io.github.up2jakarta.cii.format.minified.udt;
 
-import io.github.up2jakarta.xml.adapters.LocalDateAdapter;
+import io.github.up2jakarta.cii.core.LocalDateAdapter;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;

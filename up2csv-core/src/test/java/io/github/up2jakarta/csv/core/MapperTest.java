@@ -1,7 +1,5 @@
 package io.github.up2jakarta.csv.core;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.impl.*;
@@ -27,7 +25,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.core.EventHandler.failFast;
-import static io.github.up2jakarta.csv.core.MapperFactory.LOGGER;
 import static io.github.up2jakarta.csv.misc.Errors.ERROR_VALIDATOR;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -455,18 +452,13 @@ class MapperTest {
     }
 
     @Test
-    void testFieldName() throws Throwable {
-        // Given
+    void testFieldName() {
         // WHEN
-        final List<ILoggingEvent> logs = Tests.hack(LOGGER, () -> factory.build(Test4Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test4Segment.class));
         // THEN
-        assertEquals(1, logs.size());
-        final ILoggingEvent event = logs.get(0);
-        assertEquals(Level.WARN, event.getLevel());
-        assertEquals("{}[{}] : should starts with an lowercase character", event.getMessage());
-        assertEquals(2, event.getArgumentArray().length);
-        assertEquals("Test4Segment", event.getArgumentArray()[0]);
-        assertEquals("Upper", event.getArgumentArray()[1]);
+        assertEquals(Test4Segment.class, thrown.getSource());
+        assertEquals("Upper", thrown.getLocator());
+        assertEquals("Test4Segment[Upper] - must starts with an lowercase character", thrown.getMessage());
     }
 
     @Test

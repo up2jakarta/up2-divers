@@ -1,7 +1,5 @@
 package io.github.up2jakarta.csv.core;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.annotation.Up2Default;
 import io.github.up2jakarta.csv.annotation.Up2Token;
@@ -9,13 +7,14 @@ import io.github.up2jakarta.csv.annotation.Up2Trim;
 import io.github.up2jakarta.csv.extension.BeanContext;
 import io.github.up2jakarta.csv.impl.DataId;
 import io.github.up2jakarta.csv.misc.BeanException;
+import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.csv.misc.MapperException;
-import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.processor.Test1Processor;
 import io.github.up2jakarta.csv.test.bean.processor.Test2Processor;
 import io.github.up2jakarta.csv.test.bean.processor.Test5Processor;
 import io.github.up2jakarta.csv.test.ext.Dummy4;
 import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.codelist.PropertyException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.core.BeanSupport.getProcessors;
-import static io.github.up2jakarta.csv.core.Mapper.LOGGER;
 import static io.github.up2jakarta.csv.misc.Errors.ERROR_PROCESSOR;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -107,10 +105,15 @@ public class ProcessorSupportTest {
         // Given
         final Mapper<Test1Processor, ?> mapper = factory.build(Test1Processor.class);
         {
-            // When
-            final Test1Processor bean = mapper.map("dummy");
             // Then
-            assertEquals("dummy", bean.getTest());
+            final MapperException thrown = assertThrows(MapperException.class, () -> mapper.map("dummy"));
+            // THEN
+            assertNotNull(thrown.getCause());
+            assertInstanceOf(PropertyException.class, thrown.getCause());
+            assertEquals(SeverityType.WARNING, thrown.getSeverityType());
+            assertEquals(Errors.ERROR_PROCESSOR, thrown.getErrorCode());
+            assertEquals(1, thrown.getOffset());
+            assertEquals("io.github.up2jakarta.csv.test.ext.DummyException: dummy", thrown.getCause().getMessage());
         }
         {
             // When
@@ -135,43 +138,42 @@ public class ProcessorSupportTest {
     }
 
     @Test
-    void testSkipAndLog() throws Throwable {
-        // Given
-        final Mapper<Test1Processor, ?> mapper = factory.build(Test1Processor.class);
-        // When
-        final List<ILoggingEvent> logs = Tests.hack(LOGGER, () -> mapper.map("dummy"));
-        // Then
-        assertEquals(1, logs.size());
-        final ILoggingEvent event = logs.get(0);
-        assertEquals(Level.WARN, event.getLevel());
-        assertEquals("Skip @Processor[{}] error : {}", event.getMessage());
-        assertEquals(2, event.getArgumentArray().length);
-        assertEquals("Dummy1Processor", event.getArgumentArray()[0]);
-        assertEquals("dummy", event.getArgumentArray()[1]);
-    }
-
-    @Test
-    void testSkipAnyRuntimeException() throws BeanException {
+    void testSkipWarnings() throws BeanException {
         // Given
         final Mapper<Test2Processor, ?> mapper = factory.build(Test2Processor.class);
         {
             // When
-            final Test2Processor bean = mapper.map("dummy");
-            // Then
-            assertEquals("dummy", bean.getTest());
+            final MapperException thrown = assertThrows(MapperException.class, () -> mapper.map("dummy"));
+            // THEN
+            assertNotNull(thrown.getCause());
+            assertInstanceOf(PropertyException.class, thrown.getCause());
+            assertEquals(SeverityType.WARNING, thrown.getSeverityType());
+            assertEquals(Errors.ERROR_PROCESSOR, thrown.getErrorCode());
+            assertEquals(1, thrown.getOffset());
+            assertEquals("io.github.up2jakarta.csv.test.ext.DummyException: dummy", thrown.getCause().getMessage());
         }
         {
             // When
-            final Test2Processor bean = mapper.map("");
-            // Then
-            assertEquals("", bean.getTest());
+            final MapperException thrown = assertThrows(MapperException.class, () -> mapper.map(""));
+            // THEN
+            assertNotNull(thrown.getCause());
+            assertInstanceOf(PropertyException.class, thrown.getCause());
+            assertEquals(SeverityType.WARNING, thrown.getSeverityType());
+            assertEquals(Errors.ERROR_PROCESSOR, thrown.getErrorCode());
+            assertEquals(1, thrown.getOffset());
+            assertEquals("java.lang.NullPointerException: NPE", thrown.getCause().getMessage());
 
         }
         {
             // When
-            final Test2Processor bean = mapper.map("other");
-            // Then
-            assertEquals("other", bean.getTest());
+            final MapperException thrown = assertThrows(MapperException.class, () -> mapper.map("other"));
+            // THEN
+            assertNotNull(thrown.getCause());
+            assertInstanceOf(PropertyException.class, thrown.getCause());
+            assertEquals(SeverityType.WARNING, thrown.getSeverityType());
+            assertEquals(Errors.ERROR_PROCESSOR, thrown.getErrorCode());
+            assertEquals(1, thrown.getOffset());
+            assertEquals("java.lang.RuntimeException: other", thrown.getCause().getMessage());
         }
     }
 

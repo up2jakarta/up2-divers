@@ -3,14 +3,15 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.extension.ConfigurableProcessor;
+import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.codelist.PropertyException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-import static io.github.up2jakarta.csv.core.Mapper.LOGGER;
 import static io.github.up2jakarta.csv.misc.Errors.ERROR_PROCESSOR;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
 
 /**
  * Wrapper for {@link ConfigurableProcessor}.
@@ -28,17 +29,14 @@ final class ProcessorWrapper<A extends Annotation, D extends DataType<D>> {
     }
 
     void handle(Field field, D type, int offset, RuntimeException exception, EventHandler<?, ?, D, ?> handler) {
-        if (skip.isInstance(exception)) {
-            LOGGER.warn("Skip @Processor[{}] error : {}", delegate.getClass().getSimpleName(), exception.getMessage());
+        final SeverityType severity = skip.isInstance(exception) ? WARNING : ERROR;
+        final Error c = field.getAnnotation(Error.class);
+        if (c != null) {
+            handler.handleEvent(type, offset, PropertyException.of(c.severity(), c.value(), exception), c, true);
+        } else if (exception instanceof PropertyException pException) {
+            handler.handleEvent(type, offset, pException, c, true);
         } else {
-            final Error c = field.getAnnotation(Error.class);
-            if (c != null) {
-                handler.handleEvent(type, offset, PropertyException.of(c.severity(), c.value(), exception), c, true);
-            } else if (exception instanceof PropertyException pException) {
-                handler.handleEvent(type, offset, pException, c, true);
-            } else {
-                handler.handleEvent(type, offset, PropertyException.of(ERROR, ERROR_PROCESSOR, exception), c, true);
-            }
+            handler.handleEvent(type, offset, PropertyException.of(severity, ERROR_PROCESSOR, exception), c, true);
         }
     }
 

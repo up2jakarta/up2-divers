@@ -1,21 +1,16 @@
 package io.github.up2jakarta.csv.test;
 
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import io.github.up2jakarta.csv.impl.InputRowEntity;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import jakarta.validation.MessageInterpolator;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-import org.junit.jupiter.api.function.Executable;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 public final class Tests {
 
-    public static final String TU_V_001 = "TU-V001";
+    public static final String ERROR_CODE = "TU-V001";
 
     private Tests() {
     }
@@ -34,17 +29,6 @@ public final class Tests {
                 context -> Locale.ENGLISH,
                 false
         );
-    }
-
-    public static List<ILoggingEvent> hack(org.slf4j.Logger log, Executable executable) throws Throwable {
-        final ListAppender<ILoggingEvent> appender = new ListAppender<>();
-        final Logger logger = (Logger) log;
-        appender.start();
-        logger.addAppender(appender);
-        executable.execute();
-        appender.stop();
-        logger.detachAppender(appender);
-        return appender.list;
     }
 
 }

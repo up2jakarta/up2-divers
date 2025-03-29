@@ -8,8 +8,6 @@ import io.github.up2jakarta.csv.misc.BeanException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import static io.github.up2jakarta.csv.core.MapperFactory.LOGGER;
-
 final class TechnicalChecker implements SegmentListener, CheckerContext {
 
     static final TechnicalChecker INSTANCE = new TechnicalChecker();
@@ -20,7 +18,7 @@ final class TechnicalChecker implements SegmentListener, CheckerContext {
     private static void checkField(Field field) throws BeanException {
         final Class<?> type = field.getDeclaringClass();
         if (Character.isUpperCase(field.getName().charAt(0))) {
-            LOGGER.warn("{}[{}] : should starts with an lowercase character", type.getSimpleName(), field.getName());
+            throw new BeanException(type, field, "must starts with an lowercase character");
         }
         if (Modifier.isPublic(field.getModifiers())) {
             throw new BeanException(type, field, "must not be public");

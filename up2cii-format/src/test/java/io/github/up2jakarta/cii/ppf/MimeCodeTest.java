@@ -66,7 +66,7 @@ public class MimeCodeTest extends CodeAdapterTest {
             assertNotNull(code.getName());
         }
         {
-            final Charset code = attachment.getCharacterSetCode();
+            final Charset code = attachment.getCharset();
             assertEquals(StandardCharsets.UTF_8, code);
         }
         {

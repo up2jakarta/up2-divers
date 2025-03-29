@@ -11,15 +11,13 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.IOException;
 
-import static io.github.up2jakarta.cii.CII.CII_SCHEMA;
-
 /**
  * Thread-safe processor that read CII-D16B invoice.
  */
 public class InvoiceReader<I> extends XProcessor<I> implements XReader<I> {
 
-    public InvoiceReader(Class<I> type, final XmlAdapter<?, ?>[] adapters) {
-        super(type, CII_SCHEMA, adapters);
+    public InvoiceReader(Class<I> type, final XmlAdapter<?, ?>... adapters) {
+        super(type, CII.getSchema(), adapters);
     }
 
     @Override

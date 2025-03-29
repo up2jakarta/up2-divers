@@ -40,7 +40,6 @@ Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready enti
         <artifactId>up2csv-core</artifactId>
         <version>1.4.1</version>
     </dependency>
-    <!-- Optional SLF4J Provider -->
     <!-- Optional JSR-303 Validation Provider -->
     <!-- Optional JPA Provider -->
     <!-- Optional CDI Provider -->

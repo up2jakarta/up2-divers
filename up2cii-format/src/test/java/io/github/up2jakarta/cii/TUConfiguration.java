@@ -1,10 +1,10 @@
 package io.github.up2jakarta.cii;
 
 import io.github.up2jakarta.cii.api.TestUtil;
+import io.github.up2jakarta.cii.core.LocalDateAdapter;
 import io.github.up2jakarta.cii.edi.DocumentCodeType;
 import io.github.up2jakarta.cii.format.standard.CrossIndustryInvoiceType;
 import io.github.up2jakarta.cii.ppf.adapters.ProfileAdapter;
-import io.github.up2jakarta.xml.adapters.LocalDateAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

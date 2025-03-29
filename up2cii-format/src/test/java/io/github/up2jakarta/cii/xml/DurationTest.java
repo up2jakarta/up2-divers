@@ -1,7 +1,6 @@
 package io.github.up2jakarta.cii.xml;
 
 import io.github.up2jakarta.cii.core.Duration;
-import io.github.up2jakarta.xml.adapters.OffsetDate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -91,43 +90,6 @@ public class DurationTest {
         //When
         var startTime = LocalDate.of(2015, 5, 5);
         var endTime = LocalDate.of(2017, 10, 10);
-        {
-            //When
-            var duration = Duration.of(startTime, endTime);
-            //Then
-            Assertions.assertEquals(startTime, duration.getStartTime());
-            Assertions.assertEquals(endTime, duration.getEndTime());
-            assertFalse(duration.isNegative());
-
-            Assertions.assertEquals(2, duration.getYears());
-            Assertions.assertEquals(5, duration.getMonths());
-            Assertions.assertEquals(5, duration.getDays());
-            Assertions.assertEquals(0, duration.getHours());
-            Assertions.assertEquals(0, duration.getMinutes());
-            Assertions.assertEquals(0, duration.getSeconds());
-        }
-        {
-            //When
-            var duration = Duration.of(endTime, startTime);
-            //Then
-            Assertions.assertEquals(endTime, duration.getStartTime());
-            Assertions.assertEquals(startTime, duration.getEndTime());
-            assertTrue(duration.isNegative());
-
-            Assertions.assertEquals(-2, duration.getYears());
-            Assertions.assertEquals(-5, duration.getMonths());
-            Assertions.assertEquals(-5, duration.getDays());
-            Assertions.assertEquals(0, duration.getHours());
-            Assertions.assertEquals(0, duration.getMinutes());
-            Assertions.assertEquals(0, duration.getSeconds());
-        }
-    }
-
-    @Test
-    public void testDurationOfOffsetDate() {
-        //When
-        var startTime = OffsetDate.of(2015, 5, 5, ZoneOffset.UTC);
-        var endTime = OffsetDate.of(2017, 10, 10, ZoneOffset.UTC);
         {
             //When
             var duration = Duration.of(startTime, endTime);

@@ -1,6 +1,5 @@
 package io.github.up2jakarta.cii.api;
 
-import io.github.up2jakarta.cii.CII;
 import io.github.up2jakarta.cii.format.standard.CrossIndustryInvoiceType;
 import io.github.up2jakarta.xml.api.XReader;
 import io.github.up2jakarta.xml.api.XValidator;
@@ -11,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import static io.github.up2jakarta.cii.CII.getPath;
 import static io.github.up2jakarta.cii.api.TestUtil.loadResource;
 import static io.github.up2jakarta.cii.format.unmapped.InvoiceReaderTest.READER;
 import static io.github.up2jakarta.cii.format.unmapped.InvoiceWriterTest.WRITER;
@@ -26,7 +26,7 @@ public abstract class CodeAdapterTest {
 
     static {
         try {
-            final File ciiPath = loadResource(CII.XSD_ROOT).getParentFile().getParentFile().getParentFile();
+            final File ciiPath = loadResource(getPath()).getParentFile().getParentFile().getParentFile();
             XML_GENERATED_DIR = new File(ciiPath + separator + "target" + separator + "generated-xml");
             if (!XML_GENERATED_DIR.exists()) {
                 createDirectory(XML_GENERATED_DIR.toPath());

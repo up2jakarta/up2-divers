@@ -19,8 +19,8 @@ import static io.github.up2jakarta.cii.CII.*;
  */
 public class InvoiceWriter<I> extends XBuilder<I> implements XWriter<I> {
 
-    public InvoiceWriter(Class<I> type, final XmlAdapter<?, ?>[] adapters) {
-        super(CII_QNAME, type, false, CII_SCHEMA, adapters);
+    public InvoiceWriter(final Class<I> type, final XmlAdapter<?, ?>... adapters) {
+        super(CII_QNAME, type, getBuilder(), getSchema(), adapters);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class InvoiceWriter<I> extends XBuilder<I> implements XWriter<I> {
         try {
             var document = newDocument();
             var handler = newHandler(ErrorEnhancer::enhance, failFast, false);
-            var marshaller = newMarshaller(handler, NS_PREFIX_MAPPER);
+            var marshaller = newMarshaller(handler, CII::config);
             var root = newElement(invoice);
             marshaller.marshal(root, document);
             handler.throwValidationExceptionWhenError();
@@ -44,7 +44,7 @@ public class InvoiceWriter<I> extends XBuilder<I> implements XWriter<I> {
     public void write(I invoice, File xmlfile, boolean failFast) {
         try {
             var handler = newHandler(ErrorEnhancer::enhance, failFast, false);
-            var marshaller = newMarshaller(handler, NS_PREFIX_MAPPER);
+            var marshaller = newMarshaller(handler, CII::config);
             var root = newElement(invoice);
             marshaller.marshal(root, xmlfile);
             handler.throwValidationExceptionWhenError();
@@ -57,7 +57,7 @@ public class InvoiceWriter<I> extends XBuilder<I> implements XWriter<I> {
     public void write(I invoice, Writer writer, boolean failFast) {
         try {
             var handler = newHandler(ErrorEnhancer::enhance, failFast, false);
-            var marshaller = newMarshaller(handler, NS_PREFIX_MAPPER);
+            var marshaller = newMarshaller(handler, CII::config);
             var root = newElement(invoice);
             marshaller.marshal(root, writer);
             handler.throwValidationExceptionWhenError();

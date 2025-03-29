@@ -11,8 +11,6 @@ import io.github.up2jakarta.csv.input.InputError;
 import io.github.up2jakarta.csv.input.InputSegment;
 import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Listable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -26,8 +24,6 @@ import static java.util.Objects.requireNonNull;
  */
 @SuppressWarnings("ClassEscapesDefinedScope")
 public abstract class Mapper<S extends Segment, D extends DataType<D>> implements Listable<Property<?, D>> {
-
-    final static Logger LOGGER = LoggerFactory.getLogger(Mapper.class);
 
     protected final int offset;
     protected final Class<S> type;

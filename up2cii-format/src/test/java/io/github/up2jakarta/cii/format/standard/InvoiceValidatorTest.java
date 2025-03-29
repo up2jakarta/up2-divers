@@ -7,7 +7,6 @@ import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.api.XConfigurationException;
 import io.github.up2jakarta.xml.api.XValidator;
 import io.github.up2jakarta.xml.codelist.CodeList;
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,7 +157,7 @@ public class InvoiceValidatorTest {
 
     @Test
     public void testConfigClass() {
-        assertThrows(XConfigurationException.class, () -> new InvoiceValidator<>(CodeList.class, new XmlAdapter[0]));
+        assertThrows(XConfigurationException.class, () -> new InvoiceValidator<>(CodeList.class));
     }
 
 }

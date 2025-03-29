@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2-divers</artifactId>
-        <version>1.4.4</version>
+        <version>1.4.5</version>
     </parent>
 
     <artifactId>up2cii-format</artifactId>
@@ -32,7 +32,11 @@
             <artifactId>up2xml-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- XML dependencies -->
+        <!-- Required dependencies -->
+        <dependency>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>

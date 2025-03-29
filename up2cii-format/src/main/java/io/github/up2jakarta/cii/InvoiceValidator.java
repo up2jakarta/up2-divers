@@ -24,8 +24,8 @@ import static java.util.Collections.singletonList;
  */
 public class InvoiceValidator<I> extends XBuilder<I> implements XValidator<I> {
 
-    public InvoiceValidator(Class<I> type, final XmlAdapter<?, ?>[] adapters) {
-        super(CII_QNAME, type, false, CII_SCHEMA, adapters);
+    public InvoiceValidator(Class<I> type, final XmlAdapter<?, ?>... adapters) {
+        super(CII_QNAME, type, getBuilder(), getSchema(), adapters);
     }
 
     private static List<IValidationError> getOrThrowError(JAXBException ex) {
@@ -69,7 +69,7 @@ public class InvoiceValidator<I> extends XBuilder<I> implements XValidator<I> {
         var handler = new FailSafeHandler(ErrorEnhancer::enhance, false);
         try {
             var document = newDocument();
-            var marshaller = newMarshaller(handler, NS_PREFIX_MAPPER);
+            var marshaller = newMarshaller(handler, CII::config);
             var root = newElement(invoice);
             marshaller.marshal(root, document);
         } catch (JAXBException ex) {

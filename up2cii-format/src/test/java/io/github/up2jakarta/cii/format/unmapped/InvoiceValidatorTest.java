@@ -4,7 +4,6 @@ import io.github.up2jakarta.cii.InvoiceValidator;
 import io.github.up2jakarta.xml.api.IValidationError;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.api.XValidator;
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -20,7 +19,7 @@ public class InvoiceValidatorTest {
     static final XValidator<CrossIndustryInvoiceType> VALIDATOR;
 
     static {
-        VALIDATOR = new InvoiceValidator<>(CrossIndustryInvoiceType.class, new XmlAdapter[0]);
+        VALIDATOR = new InvoiceValidator<>(CrossIndustryInvoiceType.class);
     }
 
     @Test
