@@ -8,10 +8,10 @@
         <version>1.4.7</version>
     </parent>
 
-    <artifactId>up2xml-core</artifactId>
-    <name>Up2XML :: Core</name>
-    <description>XML processors for validating, reading and writing XML documents</description>
-    <url>https://github.com/up2jakarta/up2-divers/tree/master/up2xml-core</url>
+    <artifactId>up2job-core</artifactId>
+    <name>Up2Job :: Core</name>
+    <description>Spring Batch Extensions</description>
+    <url>https://github.com/up2jakarta/up2-divers/tree/master/up2job-core</url>
 
     <developers>
         <developer>
@@ -28,18 +28,13 @@
     </developers>
     <dependencies>
         <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
+            <groupId>io.github.up2jakarta</groupId>
+            <artifactId>up2csv-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-        </dependency>
-        <!-- Test dependencies -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
+            <groupId>org.springframework.batch</groupId>
+            <artifactId>spring-batch-core</artifactId>
         </dependency>
     </dependencies>
 

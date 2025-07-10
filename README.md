@@ -6,7 +6,7 @@ Diverse Frameworks & APIs for Jakarta EE
 
 ## Requirements
 
-1. JDK v17
+1. JDK v21
 2. Maven V3
 
 ## Maven Build
