@@ -56,7 +56,7 @@ public class MessageFunctionCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(17, error.getLineNumber());
             assertEquals(47, error.getColumnNumber());

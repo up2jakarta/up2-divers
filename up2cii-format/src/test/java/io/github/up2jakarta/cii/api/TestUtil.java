@@ -18,20 +18,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Function;
 
 import static io.github.up2jakarta.cii.CII.TOKEN_ADAPTER;
-import static io.github.up2jakarta.cii.CII.getClassLoader;
+import static io.github.up2jakarta.cii.CII.getLoader;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Named
 @Singleton
 public class TestUtil {
-
-    static {
-        Locale.setDefault(Locale.US);
-    }
 
     private final ApplicationContext context;
 
@@ -105,7 +100,7 @@ public class TestUtil {
     }
 
     public static File loadResource(final String resourcePath) throws FileNotFoundException {
-        var url = getClassLoader().getResource(resourcePath);
+        var url = getLoader().getResource(resourcePath);
         try {
             assert url != null;
             return new File(url.toURI());

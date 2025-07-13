@@ -1,25 +1,28 @@
 package io.github.up2jakarta.job.core;
 
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
+
 @SuppressWarnings("unused")
 public enum JobStatus {
 
     // Batch Status
-    COMPLETED(false, false),
+    COMPLETED(BatchStatus.COMPLETED),
     @Deprecated(forRemoval = true)
-    STARTING(true, false),
-    STARTED(true, false),
+    STARTING(BatchStatus.STARTING),
+    STARTED(BatchStatus.STARTED),
     @Deprecated(forRemoval = true)
-    STOPPING(true, false),
-    STOPPED(false, false),
-    FAILED(false, true),
-    ABANDONED(false, true),
-    UNKNOWN(false, true),
-    // Exit Code
+    STOPPING(BatchStatus.STOPPING),
+    STOPPED(BatchStatus.STOPPED),
+    FAILED(BatchStatus.FAILED),
+    ABANDONED(BatchStatus.ABANDONED),
+    UNKNOWN(BatchStatus.UNKNOWN),
+    // Exit Status
     @Deprecated(forRemoval = true)
-    EXECUTING(true, false),
+    EXECUTING(ExitStatus.EXECUTING),
     @Deprecated(forRemoval = true)
-    NOOP(false, false),
-    // Extended Code
+    NOOP(ExitStatus.NOOP),
+    // Extended Status
     REJECTED(false, true),
     CONTINUED(false, false),
     @Deprecated(forRemoval = true)
@@ -27,6 +30,14 @@ public enum JobStatus {
 
     private final boolean running;
     private final boolean failure;
+
+    JobStatus(BatchStatus status) {
+        this(status.isRunning(), status.isUnsuccessful());
+    }
+
+    JobStatus(ExitStatus status) {
+        this(status.isRunning(), false);
+    }
 
     JobStatus(boolean running, boolean failure) {
         this.running = running;

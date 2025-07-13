@@ -36,7 +36,7 @@ public class LinearMeasurementUnitCodeTest extends CodeAdapterTest {
             var delivery = trade.getApplicableHeaderTradeDelivery();
             var supplyChain = delivery.getRelatedSupplyChainConsignment();
             var transportEquipments = supplyChain.getUtilizedLogisticsTransportEquipment();
-            var transportEquipment = transportEquipments.get(0);
+            var transportEquipment = transportEquipments.getFirst();
             var linearMeasure = transportEquipment.getLoadingLengthMeasure();
             linearMeasure.setUnitCode(WRONG_CODE);
         });
@@ -53,7 +53,7 @@ public class LinearMeasurementUnitCodeTest extends CodeAdapterTest {
         final List<LogisticsTransportEquipmentType> transportEquipments = supplyChain.getUtilizedLogisticsTransportEquipment();
         assertNotNull(transportEquipments);
         assertEquals(1, transportEquipments.size());
-        final LogisticsTransportEquipmentType transportEquipment = transportEquipments.get(0);
+        final LogisticsTransportEquipmentType transportEquipment = transportEquipments.getFirst();
         assertNotNull(transportEquipment);
         final LinearUnitMeasureType linearMeasure = transportEquipment.getLoadingLengthMeasure();
         assertNotNull(linearMeasure);
@@ -74,7 +74,7 @@ public class LinearMeasurementUnitCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(195, error.getLineNumber());
             assertEquals(62, error.getColumnNumber());

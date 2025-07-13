@@ -35,17 +35,17 @@ public class AllowanceChargeReasonCodeTest extends CodeAdapterTest {
             var trade = i.getSupplyChainTradeTransaction();
             {
                 var items = trade.getIncludedSupplyChainTradeLineItem();
-                var item = items.get(0);
+                var item = items.getFirst();
                 var lineTrade = item.getSpecifiedLineTradeAgreement();
                 var net = lineTrade.getNetPriceProductTradePrice();
                 var charges = net.getAppliedTradeAllowanceCharge();
-                var charge = charges.get(0);
+                var charge = charges.getFirst();
                 charge.setReasonCode(WRONG_CODE);
             }
             {
                 var settlement = trade.getApplicableHeaderTradeSettlement();
                 var charges = settlement.getSpecifiedTradeAllowanceCharge();
-                var charge = charges.get(0);
+                var charge = charges.getFirst();
                 charge.setReasonCode(WRONG_CODE);
                 var discount = charges.get(1);
                 discount.setReasonCode(WRONG_CODE);
@@ -61,7 +61,7 @@ public class AllowanceChargeReasonCodeTest extends CodeAdapterTest {
             final List<SupplyChainTradeLineItemType> items = trade.getIncludedSupplyChainTradeLineItem();
             assertNotNull(items);
             assertEquals(1, items.size());
-            final SupplyChainTradeLineItemType item = items.get(0);
+            final SupplyChainTradeLineItemType item = items.getFirst();
             assertNotNull(item);
             final LineTradeAgreementType lineTrade = item.getSpecifiedLineTradeAgreement();
             assertNotNull(lineTrade);
@@ -71,7 +71,7 @@ public class AllowanceChargeReasonCodeTest extends CodeAdapterTest {
             assertNotNull(charges);
             assertEquals(1, charges.size());
             {
-                final TradeAllowanceChargeType charge = charges.get(0);
+                final TradeAllowanceChargeType charge = charges.getFirst();
                 assertNotNull(charge);
                 assertNull(charge.getChargeIndicator());
                 final ChargeReasonCodeType<?> code = charge.getReasonCode();
@@ -86,7 +86,7 @@ public class AllowanceChargeReasonCodeTest extends CodeAdapterTest {
             assertNotNull(charges);
             assertEquals(2, charges.size());
             {
-                final TradeAllowanceChargeType charge = charges.get(0);
+                final TradeAllowanceChargeType charge = charges.getFirst();
                 assertNotNull(charge);
                 assertNotNull(charge.getChargeIndicator());
                 assertFalse(charge.getChargeIndicator().isIndicator());
@@ -117,7 +117,7 @@ public class AllowanceChargeReasonCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(3, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(45, error.getLineNumber());
             assertEquals(61, error.getColumnNumber());

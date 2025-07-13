@@ -35,7 +35,7 @@ public class AllowanceChargeIdentificationCodeTest extends CodeAdapterTest {
             var trade = i.getSupplyChainTradeTransaction();
             var settlement = trade.getApplicableHeaderTradeSettlement();
             var charges = settlement.getSpecifiedTradeAllowanceCharge();
-            var charge = charges.get(0);
+            var charge = charges.getFirst();
             charge.setTypeCode(WRONG_CODE);
         });
     }
@@ -49,7 +49,7 @@ public class AllowanceChargeIdentificationCodeTest extends CodeAdapterTest {
         final List<TradeAllowanceChargeType> charges = settlement.getSpecifiedTradeAllowanceCharge();
         assertNotNull(charges);
         assertEquals(1, charges.size());
-        final TradeAllowanceChargeType charge = charges.get(0);
+        final TradeAllowanceChargeType charge = charges.getFirst();
         assertNotNull(charge);
         final AllowanceChargeIdentificationCodeType code = charge.getTypeCode();
         assertEquals(AllowanceChargeIdentificationCodeType.V_105, code);
@@ -67,7 +67,7 @@ public class AllowanceChargeIdentificationCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(246, error.getLineNumber());
             assertEquals(49, error.getColumnNumber());

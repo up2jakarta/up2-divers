@@ -33,10 +33,10 @@ public class ItemTypeIDCodeTest extends CodeAdapterTest {
         super(context, "invalid_item_type_id.xml", (i) -> {
             var trade = i.getSupplyChainTradeTransaction();
             var items = trade.getIncludedSupplyChainTradeLineItem();
-            var item = items.get(0);
+            var item = items.getFirst();
             var product = item.getSpecifiedTradeProduct();
             var classifications = product.getDesignatedProductClassification();
-            var classification = classifications.get(0);
+            var classification = classifications.getFirst();
             var classCode = classification.getClassCode();
             assertNotNull(classCode);
             classCode.setListID(WRONG_CODE);
@@ -50,14 +50,14 @@ public class ItemTypeIDCodeTest extends CodeAdapterTest {
         final List<SupplyChainTradeLineItemType> items = trade.getIncludedSupplyChainTradeLineItem();
         assertNotNull(items);
         assertEquals(1, items.size());
-        final SupplyChainTradeLineItemType item = items.get(0);
+        final SupplyChainTradeLineItemType item = items.getFirst();
         assertNotNull(item);
         final TradeProductType product = item.getSpecifiedTradeProduct();
         assertNotNull(product);
         final List<ProductClassificationType> classifications = product.getDesignatedProductClassification();
         assertNotNull(classifications);
         assertEquals(1, classifications.size());
-        final ProductClassificationType classification = classifications.get(0);
+        final ProductClassificationType classification = classifications.getFirst();
         assertNotNull(classification);
         final ProductClassCodeType classCode = classification.getClassCode();
         assertNotNull(classCode);
@@ -78,7 +78,7 @@ public class ItemTypeIDCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(36, error.getLineNumber());
             assertEquals(49, error.getColumnNumber());

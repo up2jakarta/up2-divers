@@ -1,40 +1,42 @@
-package io.github.up2jakarta.job.zip;
+package io.github.up2jakarta.job.flux;
 
+import io.github.up2jakarta.job.zip.ArchiveResource;
+import io.github.up2jakarta.job.zip.ArchiveWriter;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.Chunk;
 
 @SuppressWarnings("unused")
 public class FluxWriter<T, R extends ArchiveResource> implements ArchiveWriter<T, FluxResource<R>> {
 
-    private final ArchiveWriter<T, R> f2Writer;
-    private final ArchiveWriter<T, R> f1Writer;
+    private final ArchiveWriter<T, R> firstWriter;
+    private final ArchiveWriter<T, R> otherWriter;
 
     private FluxResource<R> flux;
 
-    public FluxWriter(ArchiveWriter<T, R> f2Writer, ArchiveWriter<T, R> f1Writer) {
-        this.f2Writer = f2Writer;
-        this.f1Writer = f1Writer;
+    public FluxWriter(ArchiveWriter<T, R> firstWriter, ArchiveWriter<T, R> otherWriter) {
+        this.firstWriter = firstWriter;
+        this.otherWriter = otherWriter;
     }
 
     @Override
     public boolean isTransient(T item) {
-        return f2Writer.isTransient(item) && f1Writer.isTransient(item);
+        return firstWriter.isTransient(item) && otherWriter.isTransient(item);
     }
 
     @Override
     public void open(FluxResource<R> flux) {
         this.flux = flux;
-        f2Writer.open(flux.getF2Archive());
-        f1Writer.open(flux.getF1Archive());
+        firstWriter.open(flux.getFirstArchive());
+        otherWriter.open(flux.getOtherArchive());
     }
 
     @Override
     public void write(T item) throws Exception {
-        if (f2Writer.isTransient(item)) {
-            f2Writer.write(item);
+        if (firstWriter.isTransient(item)) {
+            firstWriter.write(item);
         }
-        if (f1Writer.isTransient(item)) {
-            f1Writer.write(item);
+        if (otherWriter.isTransient(item)) {
+            otherWriter.write(item);
         }
     }
 

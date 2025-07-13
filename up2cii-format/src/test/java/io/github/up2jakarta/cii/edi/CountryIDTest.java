@@ -87,7 +87,7 @@ public class CountryIDTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(118, error.getLineNumber());
             assertEquals(55, error.getColumnNumber());

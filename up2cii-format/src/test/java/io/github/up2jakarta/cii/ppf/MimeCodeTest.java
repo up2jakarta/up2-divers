@@ -36,9 +36,9 @@ public class MimeCodeTest extends CodeAdapterTest {
             var trade = i.getSupplyChainTradeTransaction();
             var agreement = trade.getApplicableHeaderTradeAgreement();
             var documents = agreement.getAdditionalReferencedDocument();
-            var document = documents.get(0);
+            var document = documents.getFirst();
             var attachments = document.getAttachmentBinaryObject();
-            var attachment = attachments.get(0);
+            var attachment = attachments.getFirst();
             attachment.setMimeCode(WRONG_CODE);
         });
     }
@@ -52,12 +52,12 @@ public class MimeCodeTest extends CodeAdapterTest {
         final List<ReferencedDocumentType> documents = agreement.getAdditionalReferencedDocument();
         assertNotNull(documents);
         assertEquals(1, documents.size());
-        var document = documents.get(0);
+        var document = documents.getFirst();
         assertNotNull(document);
         final List<BinaryObjectType> attachments = document.getAttachmentBinaryObject();
         assertNotNull(attachments);
         assertEquals(1, attachments.size());
-        var attachment = attachments.get(0);
+        var attachment = attachments.getFirst();
         assertNotNull(attachment);
         {
             final MimeCodeType code = attachment.getMimeCode();
@@ -86,7 +86,7 @@ public class MimeCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(175, error.getLineNumber());
             assertEquals(85, error.getColumnNumber());

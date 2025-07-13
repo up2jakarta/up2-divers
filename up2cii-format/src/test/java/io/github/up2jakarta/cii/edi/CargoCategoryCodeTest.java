@@ -34,7 +34,7 @@ public class CargoCategoryCodeTest extends CodeAdapterTest {
             var delivery = trade.getApplicableHeaderTradeDelivery();
             var supplyChain = delivery.getRelatedSupplyChainConsignment();
             var chainConsignments = supplyChain.getIncludedSupplyChainConsignmentItem();
-            var chainConsignment = chainConsignments.get(0);
+            var chainConsignment = chainConsignments.getFirst();
             var cargo = chainConsignment.getNatureIdentificationTransportCargo();
             cargo.setTypeCode(WRONG_CODE);
         });
@@ -51,7 +51,7 @@ public class CargoCategoryCodeTest extends CodeAdapterTest {
         final List<SupplyChainConsignmentItemType> chainConsignments = supplyChain.getIncludedSupplyChainConsignmentItem();
         assertNotNull(chainConsignments);
         assertEquals(1, chainConsignments.size());
-        final SupplyChainConsignmentItemType chainConsignment = chainConsignments.get(0);
+        final SupplyChainConsignmentItemType chainConsignment = chainConsignments.getFirst();
         assertNotNull(chainConsignment);
         final TransportCargoType cargo = chainConsignment.getNatureIdentificationTransportCargo();
         assertNotNull(cargo);
@@ -72,7 +72,7 @@ public class CargoCategoryCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(189, error.getLineNumber());
             assertEquals(57, error.getColumnNumber());

@@ -35,7 +35,7 @@ public class TaxExemptionReasonCodeTest extends CodeAdapterTest {
             var trade = i.getSupplyChainTradeTransaction();
             var settlement = trade.getApplicableHeaderTradeSettlement();
             var taxes = settlement.getApplicableTradeTax();
-            var tax = taxes.get(0);
+            var tax = taxes.getFirst();
             tax.setExemptionReasonCode(WRONG_CODE);
         });
     }
@@ -49,7 +49,7 @@ public class TaxExemptionReasonCodeTest extends CodeAdapterTest {
         final List<TradeTaxType> taxes = settlement.getApplicableTradeTax();
         assertNotNull(taxes);
         assertEquals(1, taxes.size());
-        final TradeTaxType tax = taxes.get(0);
+        final TradeTaxType tax = taxes.getFirst();
         assertNotNull(tax);
         final TaxExemptionReasonCodeType code = tax.getExemptionReasonCode();
         assertNotNull(code);
@@ -68,7 +68,7 @@ public class TaxExemptionReasonCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(260, error.getLineNumber());
             assertEquals(71, error.getColumnNumber());

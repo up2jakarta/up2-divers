@@ -113,7 +113,7 @@ public abstract class BusinessAggregator<O extends Parsed<T, R>, B extends DataT
             entries.forEach(r -> r.handle(FATAL, root, buildMessage(root.getGroupType()), index));
             invoice = null;
         } else {
-            final BusinessEntry<T, R, B, E> main = roots.get(0);
+            final BusinessEntry<T, R, B, E> main = roots.getFirst();
             entries.removeAll(roots);
             link(main, entries);
             root.getLinker().link(null, main.getSegment());

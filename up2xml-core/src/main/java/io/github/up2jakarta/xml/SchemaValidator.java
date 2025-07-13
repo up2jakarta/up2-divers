@@ -1,14 +1,11 @@
-package io.github.up2jakarta.cii;
+package io.github.up2jakarta.xml;
 
-import io.github.up2jakarta.cii.core.ErrorEnhancer;
-import io.github.up2jakarta.cii.format.standard.CrossIndustryInvoiceType;
-import io.github.up2jakarta.xml.SchemaCollector;
-import io.github.up2jakarta.xml.XProcessor;
 import io.github.up2jakarta.xml.api.*;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -16,13 +13,14 @@ import java.util.List;
 
 /**
  * Thread-safe processor that checks CII-D16B invoices against Schema (Syntax).
- *
- * @see CrossIndustryInvoiceType
  */
-public class SchemaValidator extends XProcessor<CrossIndustryInvoiceType> implements IValidator<IValidationError> {
+public class SchemaValidator extends XProcessor<Void> implements IValidator<IValidationError> {
 
-    public SchemaValidator() {
-        super(CrossIndustryInvoiceType.class, CII.getSchema());
+    private final MessageEnhancer enhancer;
+
+    public SchemaValidator(Schema xsd, MessageEnhancer enhancer) {
+        super(Void.class, xsd);
+        this.enhancer = enhancer;
     }
 
     @Override
@@ -32,13 +30,13 @@ public class SchemaValidator extends XProcessor<CrossIndustryInvoiceType> implem
 
     @Override
     public List<IValidationError> validate(StreamSource xmlFile) throws IOException {
-        var handler = new SchemaCollector(ErrorEnhancer::enhance);
+        var handler = new SchemaCollector(enhancer);
         var validator = newValidator();
         validator.setErrorHandler(handler);
         try {
             validator.validate(xmlFile);
         } catch (SAXParseException e) {
-            return Collections.singletonList(new SAXParseError(SeverityType.FATAL, e, ErrorEnhancer::enhance));
+            return Collections.singletonList(new SAXParseError(SeverityType.FATAL, e, enhancer));
         } catch (SAXException e) {
             throw new XValidationException(e);
         }

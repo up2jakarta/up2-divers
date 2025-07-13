@@ -34,7 +34,7 @@ public class LineStatusCodeTest extends CodeAdapterTest {
         super(context, "invalid_line_status.xml", (i) -> {
             var trade = i.getSupplyChainTradeTransaction();
             var items = trade.getIncludedSupplyChainTradeLineItem();
-            var item = items.get(0);
+            var item = items.getFirst();
             var line = item.getAssociatedDocumentLineDocument();
             line.setLineStatusCode(WRONG_CODE);
         });
@@ -47,7 +47,7 @@ public class LineStatusCodeTest extends CodeAdapterTest {
         final List<SupplyChainTradeLineItemType> items = trade.getIncludedSupplyChainTradeLineItem();
         assertNotNull(items);
         assertEquals(1, items.size());
-        final SupplyChainTradeLineItemType item = items.get(0);
+        final SupplyChainTradeLineItemType item = items.getFirst();
         assertNotNull(item);
         final DocumentLineDocumentType line = item.getAssociatedDocumentLineDocument();
         assertNotNull(line);
@@ -67,7 +67,7 @@ public class LineStatusCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(26, error.getLineNumber());
             assertEquals(61, error.getColumnNumber());

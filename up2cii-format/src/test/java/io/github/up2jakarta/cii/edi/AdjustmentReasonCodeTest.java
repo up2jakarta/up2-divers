@@ -35,10 +35,10 @@ public class AdjustmentReasonCodeTest extends CodeAdapterTest {
         super(context, "valid4-formatCII.xml", "invalid_adjustment_reason.xml", (i) -> {
             var trade = i.getSupplyChainTradeTransaction();
             var items = trade.getIncludedSupplyChainTradeLineItem();
-            var item = items.get(0);
+            var item = items.getFirst();
             var delivery = item.getSpecifiedLineTradeDelivery();
             var adjustmentTypes = delivery.getSpecifiedDeliveryAdjustment();
-            var adjustmentType = adjustmentTypes.get(0);
+            var adjustmentType = adjustmentTypes.getFirst();
             adjustmentType.setReasonCode(WRONG_CODE);
         });
     }
@@ -50,14 +50,14 @@ public class AdjustmentReasonCodeTest extends CodeAdapterTest {
         final List<SupplyChainTradeLineItemType> items = trade.getIncludedSupplyChainTradeLineItem();
         assertNotNull(items);
         assertEquals(1, items.size());
-        final SupplyChainTradeLineItemType item = items.get(0);
+        final SupplyChainTradeLineItemType item = items.getFirst();
         assertNotNull(item);
         final LineTradeDeliveryType delivery = item.getSpecifiedLineTradeDelivery();
         assertNotNull(delivery);
         final List<DeliveryAdjustmentType> adjustmentTypes = delivery.getSpecifiedDeliveryAdjustment();
         assertNotNull(adjustmentTypes);
         assertEquals(1, adjustmentTypes.size());
-        final DeliveryAdjustmentType adjustmentType = adjustmentTypes.get(0);
+        final DeliveryAdjustmentType adjustmentType = adjustmentTypes.getFirst();
         assertNotNull(adjustmentTypes);
         final AdjustmentReasonCodeType code = adjustmentType.getReasonCode();
         assertEquals(AdjustmentReasonCodeType.V_1, code);
@@ -75,7 +75,7 @@ public class AdjustmentReasonCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(52, error.getLineNumber());
             assertEquals(57, error.getColumnNumber());

@@ -63,7 +63,7 @@ public class DocumentStatusCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(164, error.getLineNumber());
             assertEquals(53, error.getColumnNumber());

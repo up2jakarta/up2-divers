@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.edi;
 
 import io.github.up2jakarta.cii.core.AbstractFormatter;
-import io.github.up2jakarta.cii.core.DurationFormatter;
+import io.github.up2jakarta.cii.core.PDurationFormatter;
 import io.github.up2jakarta.cii.core.TemporalFormatter;
 import io.github.up2jakarta.cii.edi.adapters.TimePointFormatCodeAdapter;
 import io.github.up2jakarta.xml.codelist.*;
@@ -44,7 +44,7 @@ public enum TimePointFormatCodeType implements CodeList<TimePointFormatCodeType>
      * A period of time specified by giving the start time followed by the end time (both expressed by hours
      * minutes and seconds). Data is to be transmitted as consecutive characters without hyphen.
      */
-    V_502("502", "HHMMSS-HHMMSS", new DurationFormatter<>(FORMATTER_LOCAL_TIME, LocalTime.class, LocalTime::from)),
+    V_502("502", "HHMMSS-HHMMSS", new PDurationFormatter<>(FORMATTER_LOCAL_TIME, LocalTime.class, LocalTime::from)),
 
     /**
      * Time with seconds and with Time Zone: H = Hour; M = Minute, S = Seconds, Z = leading

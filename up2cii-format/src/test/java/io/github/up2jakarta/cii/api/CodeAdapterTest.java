@@ -10,31 +10,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-import static io.github.up2jakarta.cii.CII.getPath;
+import static io.github.up2jakarta.cii.TUConfiguration.xmlOutput;
 import static io.github.up2jakarta.cii.api.TestUtil.loadResource;
 import static io.github.up2jakarta.cii.format.unmapped.InvoiceReaderTest.READER;
 import static io.github.up2jakarta.cii.format.unmapped.InvoiceWriterTest.WRITER;
-import static java.io.File.separator;
-import static java.nio.file.Files.*;
+import static java.nio.file.Files.createFile;
+import static java.nio.file.Files.deleteIfExists;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class CodeAdapterTest {
 
-    public static final File XML_GENERATED_DIR;
+    static final File XML_DIR = xmlOutput();
     private static final String XML_CLASS_PATH = "xml/unece/";
-
-    static {
-        try {
-            final File ciiPath = loadResource(getPath()).getParentFile().getParentFile().getParentFile();
-            XML_GENERATED_DIR = new File(ciiPath + separator + "target" + separator + "generated-xml");
-            if (!XML_GENERATED_DIR.exists()) {
-                createDirectory(XML_GENERATED_DIR.toPath());
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     protected final File invalidInvoiceFile;
     protected CrossIndustryInvoiceType validInvoice;
@@ -58,7 +46,7 @@ public abstract class CodeAdapterTest {
         assertNotNull(xml);
         var invalid = READER.read(xml, true);
         error.accept(invalid);
-        var generatedFile = new File(XML_GENERATED_DIR, name);
+        var generatedFile = new File(XML_DIR, name);
         deleteIfExists(generatedFile.toPath());
         createFile(generatedFile.toPath());
         WRITER.write(invalid, generatedFile, true);

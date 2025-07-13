@@ -37,7 +37,7 @@ public class ContactTypeCodeTest extends CodeAdapterTest {
             var agreement = trade.getApplicableHeaderTradeAgreement();
             var seller = agreement.getSellerTradeParty();
             var contacts = seller.getDefinedTradeContact();
-            var contact = contacts.get(0);
+            var contact = contacts.getFirst();
             contact.setTypeCode(WRONG_CODE);
         });
     }
@@ -53,7 +53,7 @@ public class ContactTypeCodeTest extends CodeAdapterTest {
         final List<TradeContactType> contacts = seller.getDefinedTradeContact();
         assertNotNull(contacts);
         assertEquals(1, contacts.size());
-        final TradeContactType contact = contacts.get(0);
+        final TradeContactType contact = contacts.getFirst();
         assertNotNull(contact);
         final ContactTypeCodeType code = contact.getTypeCode();
         assertNotNull(code);
@@ -72,7 +72,7 @@ public class ContactTypeCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(104, error.getLineNumber());
             assertEquals(53, error.getColumnNumber());

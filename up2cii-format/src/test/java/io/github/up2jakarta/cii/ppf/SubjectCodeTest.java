@@ -33,7 +33,7 @@ public class SubjectCodeTest extends CodeAdapterTest {
         super(context, "invalid_subject.xml", (i) -> {
             var doc = i.getExchangedDocument();
             var notes = doc.getIncludedNote();
-            var note = notes.get(0);
+            var note = notes.getFirst();
             note.setSubjectCode(WRONG_CODE);
         });
     }
@@ -45,7 +45,7 @@ public class SubjectCodeTest extends CodeAdapterTest {
         final List<NoteType> notes = doc.getIncludedNote();
         assertNotNull(notes);
         assertEquals(1, notes.size());
-        final NoteType note = notes.get(0);
+        final NoteType note = notes.getFirst();
         assertNotNull(note);
         final SubjectCodeType code = note.getSubjectCode();
         assertNotNull(code);
@@ -64,7 +64,7 @@ public class SubjectCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(19, error.getLineNumber());
             assertEquals(51, error.getColumnNumber());

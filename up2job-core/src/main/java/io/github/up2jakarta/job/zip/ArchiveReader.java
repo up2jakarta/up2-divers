@@ -1,9 +1,9 @@
 package io.github.up2jakarta.job.zip;
 
+import io.github.up2jakarta.job.core.LoggerAware;
 import org.springframework.batch.item.ItemReader;
 
-@SuppressWarnings("unused")
-public interface ArchiveReader<T, R extends ArchiveResource> extends ItemReader<T> {
+public interface ArchiveReader<T, R extends ArchiveResource> extends ItemReader<T>, LoggerAware {
 
     void open(R resource);
 

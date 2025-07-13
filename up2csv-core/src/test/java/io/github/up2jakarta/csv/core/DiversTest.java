@@ -53,7 +53,7 @@ class DiversTest {
         {
             final List<SimpleErrorEntity> errors = lazyList.toList();
             assertEquals(1, errors.size());
-            final SimpleErrorEntity rowError = errors.get(0);
+            final SimpleErrorEntity rowError = errors.getFirst();
             assertSame(error, rowError);
             assertEquals(3, rowError.getKey().getOrder());
         }
@@ -63,7 +63,7 @@ class DiversTest {
         lazyList.addTo(target);
         // THEN
         assertEquals(1, target.size());
-        final SimpleErrorEntity rowError = target.get(0);
+        final SimpleErrorEntity rowError = target.getFirst();
         assertEquals(4, rowError.getKey().getOrder());
     }
 
@@ -80,7 +80,7 @@ class DiversTest {
         // THEN
         final List<InputErrorEntity> errors = lazyList.toList();
         assertEquals(1, errors.size());
-        final InputErrorEntity rowError = errors.get(0);
+        final InputErrorEntity rowError = errors.getFirst();
         assertSame(error, rowError);
         assertNull(rowError.getKey());
     }

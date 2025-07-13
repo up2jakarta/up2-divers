@@ -15,12 +15,11 @@ import static java.util.Collections.unmodifiableList;
 public class SchemaCollector implements ErrorHandler {
 
     private final MessageEnhancer enhancer;
+    private final List<IValidationError> errors = new LinkedList<>();
 
     public SchemaCollector(MessageEnhancer enhancer) {
         this.enhancer = enhancer;
     }
-
-    private final List<IValidationError> errors = new LinkedList<>();
 
     @Override
     public final void warning(final SAXParseException ex) {

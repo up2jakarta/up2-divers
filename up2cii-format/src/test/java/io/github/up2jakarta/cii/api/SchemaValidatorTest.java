@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.api;
 
-import io.github.up2jakarta.cii.SchemaValidator;
 import io.github.up2jakarta.cii.TUConfiguration;
+import io.github.up2jakarta.xml.SchemaValidator;
 import io.github.up2jakarta.xml.api.IValidationError;
 import io.github.up2jakarta.xml.api.SeverityType;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ public class SchemaValidatorTest {
         final File xmlFile = loadResource("xml/empty.xml");
         List<IValidationError> errors = validator.validate(xmlFile);
         assertEquals(1, errors.size());
-        final IValidationError error = errors.get(0);
+        final IValidationError error = errors.getFirst();
         assertEquals(SeverityType.FATAL, error.getSeverity());
         assertEquals(1, error.getLineNumber());
         assertEquals(1, error.getColumnNumber());
@@ -56,7 +56,7 @@ public class SchemaValidatorTest {
         final File xmlFile = loadResource("xml/invalid1-formatCII.xml");
         List<IValidationError> errors = validator.validate(xmlFile);
         assertEquals(1, errors.size());
-        final IValidationError error = errors.get(0);
+        final IValidationError error = errors.getFirst();
         assertEquals(SeverityType.ERROR, error.getSeverity());
         assertEquals(5, error.getLineNumber());
         assertEquals(22, error.getColumnNumber());
@@ -69,7 +69,7 @@ public class SchemaValidatorTest {
         final File xmlFile = loadResource("xml/invalid2-formatCII.xml");
         List<IValidationError> errors = validator.validate(xmlFile);
         assertEquals(1, errors.size());
-        final IValidationError error = errors.get(0);
+        final IValidationError error = errors.getFirst();
         assertEquals(SeverityType.FATAL, error.getSeverity());
         assertEquals(5, error.getLineNumber());
         assertEquals(21, error.getColumnNumber());

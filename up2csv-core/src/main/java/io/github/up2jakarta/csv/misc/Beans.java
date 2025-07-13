@@ -87,7 +87,7 @@ public final class Beans {
 
     public static Stack<Class<? extends Segment>> cleanStack(Stack<Class<? extends Segment>> stack) {
         final Stack<Class<? extends Segment>> result = new Stack<>();
-        result.push(stack.get(0));
+        result.push(stack.getFirst());
         for (Class<? extends Segment> superType : stack) {
             if (!superType.isAssignableFrom(result.peek())) {
                 result.push(superType);

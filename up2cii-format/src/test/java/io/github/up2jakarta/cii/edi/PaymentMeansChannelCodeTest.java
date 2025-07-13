@@ -35,7 +35,7 @@ public class PaymentMeansChannelCodeTest extends CodeAdapterTest {
             var trade = i.getSupplyChainTradeTransaction();
             var settlement = trade.getApplicableHeaderTradeSettlement();
             var payments = settlement.getSpecifiedTradeSettlementPaymentMeans();
-            var payment = payments.get(0);
+            var payment = payments.getFirst();
             payment.setPaymentChannelCode(WRONG_CODE);
         });
     }
@@ -49,7 +49,7 @@ public class PaymentMeansChannelCodeTest extends CodeAdapterTest {
         final List<TradeSettlementPaymentMeansType> payments = settlement.getSpecifiedTradeSettlementPaymentMeans();
         assertNotNull(payments);
         assertEquals(1, payments.size());
-        final TradeSettlementPaymentMeansType payment = payments.get(0);
+        final TradeSettlementPaymentMeansType payment = payments.getFirst();
         assertNotNull(payment);
         final PaymentMeansChannelCodeType code = payment.getPaymentChannelCode();
         assertEquals(PaymentMeansChannelCodeType.V_5, code);
@@ -67,7 +67,7 @@ public class PaymentMeansChannelCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(243, error.getLineNumber());
             assertEquals(69, error.getColumnNumber());

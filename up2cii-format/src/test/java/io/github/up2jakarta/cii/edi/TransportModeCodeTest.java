@@ -37,7 +37,7 @@ public class TransportModeCodeTest extends CodeAdapterTest {
             var delivery = trade.getApplicableHeaderTradeDelivery();
             var supplyChain = delivery.getRelatedSupplyChainConsignment();
             var transportMovements = supplyChain.getSpecifiedLogisticsTransportMovement();
-            var transportMovement = transportMovements.get(0);
+            var transportMovement = transportMovements.getFirst();
             transportMovement.setModeCode(WRONG_CODE);
         });
     }
@@ -53,7 +53,7 @@ public class TransportModeCodeTest extends CodeAdapterTest {
         final List<LogisticsTransportMovementType> transportMovements = supplyChain.getSpecifiedLogisticsTransportMovement();
         assertNotNull(transportMovements);
         assertEquals(1, transportMovements.size());
-        final LogisticsTransportMovementType transportMovement = transportMovements.get(0);
+        final LogisticsTransportMovementType transportMovement = transportMovements.getFirst();
         assertNotNull(transportMovement);
         final TransportModeCodeType code = transportMovement.getModeCode();
         assertEquals(TransportModeCodeType.V_5, code);
@@ -71,7 +71,7 @@ public class TransportModeCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(202, error.getLineNumber());
             assertEquals(53, error.getColumnNumber());

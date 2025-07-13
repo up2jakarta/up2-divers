@@ -27,7 +27,7 @@ public abstract class AbstractCollector implements ValidationEventHandler {
             errors = errors.stream().filter(e -> e.getSeverity() != SeverityType.WARNING).toList();
         }
         if (!errors.isEmpty()) {
-            final XValidationException cause = new XValidationException(errors.get(0));
+            final XValidationException cause = new XValidationException(errors.getFirst());
             if (errors.size() == 1) {
                 throw cause;
             }

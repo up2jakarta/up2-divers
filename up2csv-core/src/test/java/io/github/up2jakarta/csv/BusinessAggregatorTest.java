@@ -261,7 +261,7 @@ class BusinessAggregatorTest {
         // Warning
         assertEquals(1, errors.size());
         {
-            final InputErrorEntity e = errors.get(0);
+            final InputErrorEntity e = errors.getFirst();
             assertNotNull(e.getKey());
             assertEquals(detached, e.getKey().getRecord());
             assertNull(e.getTrace());

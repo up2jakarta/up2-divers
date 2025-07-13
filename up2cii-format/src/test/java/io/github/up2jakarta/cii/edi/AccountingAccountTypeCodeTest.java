@@ -36,7 +36,7 @@ public class AccountingAccountTypeCodeTest extends CodeAdapterTest {
             var trade = i.getSupplyChainTradeTransaction();
             var settlement = trade.getApplicableHeaderTradeSettlement();
             var taxes = settlement.getApplicableTradeTax();
-            var tax = taxes.get(0);
+            var tax = taxes.getFirst();
             var account = tax.getBuyerRepayableTaxSpecifiedTradeAccountingAccount();
             account.setTypeCode(WRONG_CODE);
         });
@@ -51,7 +51,7 @@ public class AccountingAccountTypeCodeTest extends CodeAdapterTest {
         final List<TradeTaxType> taxes = settlement.getApplicableTradeTax();
         assertNotNull(taxes);
         assertEquals(1, taxes.size());
-        final TradeTaxType tax = taxes.get(0);
+        final TradeTaxType tax = taxes.getFirst();
         assertNotNull(tax);
         final TradeAccountingAccountType account = tax.getBuyerRepayableTaxSpecifiedTradeAccountingAccount();
         assertNotNull(account);
@@ -71,7 +71,7 @@ public class AccountingAccountTypeCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(266, error.getLineNumber());
             assertEquals(53, error.getColumnNumber());

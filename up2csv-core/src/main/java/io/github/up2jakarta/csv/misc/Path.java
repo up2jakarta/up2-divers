@@ -46,7 +46,7 @@ public final class Path {
             return null;
         }
         if (overrides.size() == 1) {
-            return overrides.get(0);
+            return overrides.getFirst();
         }
         throw of(origin, "multiple @" + type.getSimpleName() + "(path = {})");
     }

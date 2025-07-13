@@ -22,7 +22,7 @@ public class HandlerTest {
         // Then
         assertNotNull(errors);
         assertEquals(1, errors.size());
-        var error = errors.get(0);
+        var error = errors.getFirst();
         assertNotNull(error);
         assertEquals(exception, error.getLinkedException());
         assertEquals(FATAL, error.getSeverity());
@@ -42,7 +42,7 @@ public class HandlerTest {
         // Then
         assertNotNull(errors);
         assertEquals(1, errors.size());
-        var error = errors.get(0);
+        var error = errors.getFirst();
         assertNotNull(error);
         assertEquals(exception, error.getLinkedException());
         assertEquals(ERROR, error.getSeverity());
@@ -62,7 +62,7 @@ public class HandlerTest {
         // Then
         assertNotNull(errors);
         assertEquals(1, errors.size());
-        var error = errors.get(0);
+        var error = errors.getFirst();
         assertNotNull(error);
         assertEquals(exception, error.getLinkedException());
         assertEquals(WARNING, error.getSeverity());
@@ -121,7 +121,7 @@ public class HandlerTest {
             // Then
             assertNotNull(errors);
             assertEquals(1, errors.size());
-            var error = errors.get(0);
+            var error = errors.getFirst();
             assertNotNull(error);
             assertEquals(WARNING, error.getSeverity());
             assertEquals(npe, error.getLinkedException());
@@ -147,7 +147,7 @@ public class HandlerTest {
             var errors = handler.getErrors();
             // Then
             assertEquals(1, errors.size());
-            var error = errors.get(0);
+            var error = errors.getFirst();
             assertNotNull(error);
             assertEquals(ERROR, error.getSeverity());
             assertEquals(npe, error.getLinkedException());
@@ -160,7 +160,7 @@ public class HandlerTest {
             // Then
             assertNotNull(errors);
             assertEquals(1, errors.size());
-            var error = errors.get(0);
+            var error = errors.getFirst();
             assertNotNull(error);
             assertEquals(FATAL, error.getSeverity());
             assertEquals(npe, error.getLinkedException());
@@ -181,7 +181,7 @@ public class HandlerTest {
         // Then
         assertNotNull(errors);
         assertEquals(1, errors.size());
-        var error = errors.get(0);
+        var error = errors.getFirst();
         assertNotNull(error);
         assertEquals(WARNING, error.getSeverity());
         assertEquals(npe, error.getLinkedException());

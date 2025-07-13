@@ -34,7 +34,7 @@ public class SchemeCodeTest extends CodeAdapterTest {
             var agreement = trade.getApplicableHeaderTradeAgreement();
             var seller = agreement.getSellerTradeParty();
             var ids = seller.getGlobalID();
-            var id = ids.get(0);
+            var id = ids.getFirst();
             id.setSchemeID(WRONG_CODE);
         });
     }
@@ -50,7 +50,7 @@ public class SchemeCodeTest extends CodeAdapterTest {
         final List<PartyIDType> ids = seller.getGlobalID();
         assertNotNull(ids);
         assertEquals(1, ids.size());
-        final PartyIDType id = ids.get(0);
+        final PartyIDType id = ids.getFirst();
         assertNotNull(id);
         final SchemeCodeType code = id.getSchemeID();
         assertNotNull(code);
@@ -69,7 +69,7 @@ public class SchemeCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(94, error.getLineNumber());
             assertEquals(46, error.getColumnNumber());

@@ -35,7 +35,7 @@ public class DocumentCodeTest extends CodeAdapterTest {
             var trade = i.getSupplyChainTradeTransaction();
             var agreement = trade.getApplicableHeaderTradeAgreement();
             var nodes = agreement.getAdditionalReferencedDocument();
-            var node = nodes.get(0);
+            var node = nodes.getFirst();
             node.setTypeCode(WRONG_CODE);
         });
     }
@@ -49,7 +49,7 @@ public class DocumentCodeTest extends CodeAdapterTest {
         final List<ReferencedDocumentType> nodes = agreement.getAdditionalReferencedDocument();
         assertNotNull(nodes);
         assertEquals(1, nodes.size());
-        var node = nodes.get(0);
+        var node = nodes.getFirst();
         assertNotNull(node);
         final DocumentCodeType code = node.getTypeCode();
         assertEquals(DocumentCodeType.V_50, code);
@@ -68,7 +68,7 @@ public class DocumentCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(174, error.getLineNumber());
             assertEquals(49, error.getColumnNumber());

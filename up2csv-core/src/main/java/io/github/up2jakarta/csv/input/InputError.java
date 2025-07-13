@@ -54,14 +54,14 @@ public interface InputError<R extends InputSegment<?>, K extends InputError.Key<
     void setCode(String code);
 
     /**
-     * @param type the source of data
-     */
-    void setType(D type);
-
-    /**
      * @return the source of data
      */
     D getType();
+
+    /**
+     * @param type the source of data
+     */
+    void setType(D type);
 
     /**
      * @return the error message

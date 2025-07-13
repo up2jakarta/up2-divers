@@ -100,7 +100,7 @@ class ConverterTest {
         assertEquals(Period.ofWeeks(1), entity.getShippingPeriod());
         assertEquals(CountryCodeType.FR, entity.getShippingCountry());
         // Error
-        final SimpleErrorEntity error = errors.get(0);
+        final SimpleErrorEntity error = errors.getFirst();
         assertEquals(row, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
         assertEquals(WARNING, error.getSeverity());
@@ -135,7 +135,7 @@ class ConverterTest {
         assertNull(entity.getShippingCountry());
         // Error Currency
         {
-            final SimpleErrorEntity error = errors.get(0);
+            final SimpleErrorEntity error = errors.getFirst();
             assertEquals(row, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
             assertEquals(ERROR, error.getSeverity());

@@ -32,9 +32,9 @@ public class LanguageCodeTest extends CodeAdapterTest {
         super(context, "invalid_language.xml", (i) -> {
             var doc = i.getExchangedDocument();
             var notes = doc.getIncludedNote();
-            var note = notes.get(0);
+            var note = notes.getFirst();
             var contents = note.getContent();
-            var content = contents.get(0);
+            var content = contents.getFirst();
             content.setLanguageID(WRONG_CODE);
         });
     }
@@ -46,12 +46,12 @@ public class LanguageCodeTest extends CodeAdapterTest {
         final List<NoteType> notes = doc.getIncludedNote();
         assertNotNull(notes);
         assertEquals(1, notes.size());
-        final NoteType note = notes.get(0);
+        final NoteType note = notes.getFirst();
         assertNotNull(note);
         final List<TextType> contents = note.getContent();
         assertNotNull(contents);
         assertEquals(1, contents.size());
-        final TextType content = contents.get(0);
+        final TextType content = contents.getFirst();
         assertNotNull(content);
         {
             final LanguageCodeType code = content.getLanguageID();
@@ -78,7 +78,7 @@ public class LanguageCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(18, error.getLineNumber());
             assertEquals(65, error.getColumnNumber());

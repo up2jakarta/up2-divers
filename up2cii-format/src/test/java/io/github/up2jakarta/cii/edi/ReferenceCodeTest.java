@@ -35,10 +35,10 @@ public class ReferenceCodeTest extends CodeAdapterTest {
         super(context, "invalid_reference.xml", (i) -> {
             var trade = i.getSupplyChainTradeTransaction();
             var items = trade.getIncludedSupplyChainTradeLineItem();
-            var item = items.get(0);
+            var item = items.getFirst();
             var settlement = item.getSpecifiedLineTradeSettlement();
             var references = settlement.getAdditionalReferencedDocument();
-            var reference = references.get(0);
+            var reference = references.getFirst();
             reference.setReferenceTypeCode(WRONG_CODE);
         });
     }
@@ -50,14 +50,14 @@ public class ReferenceCodeTest extends CodeAdapterTest {
         final List<SupplyChainTradeLineItemType> items = trade.getIncludedSupplyChainTradeLineItem();
         assertNotNull(items);
         assertEquals(1, items.size());
-        final SupplyChainTradeLineItemType item = items.get(0);
+        final SupplyChainTradeLineItemType item = items.getFirst();
         assertNotNull(item);
         final LineTradeSettlementType settlement = item.getSpecifiedLineTradeSettlement();
         assertNotNull(settlement);
         final List<ReferencedDocumentType> references = settlement.getAdditionalReferencedDocument();
         assertNotNull(references);
         assertEquals(1, references.size());
-        final ReferencedDocumentType reference = references.get(0);
+        final ReferencedDocumentType reference = references.getFirst();
         assertNotNull(reference);
         final ReferenceCodeType code = reference.getReferenceTypeCode();
         assertEquals(ReferenceCodeType.AOP, code);
@@ -75,7 +75,7 @@ public class ReferenceCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(84, error.getLineNumber());
             assertEquals(71, error.getColumnNumber());

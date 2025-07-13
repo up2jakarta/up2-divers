@@ -34,30 +34,41 @@ public class XContext {
         });
     }
 
-    public static Schema getSchema(final URL xsd) {
+    public static Schema newSchema(SchemaFactory sf, URL xsd) {
         try {
-            var factory = SchemaFactory.newDefaultInstance();
-            factory.setFeature(FEATURE_SECURE_PROCESSING, true);
-            factory.setProperty(ACCESS_EXTERNAL_SCHEMA, ALLOWED_PROTOCOL);
-            factory.setProperty(ACCESS_EXTERNAL_DTD, ALLOWED_PROTOCOL);
-            return factory.newSchema(xsd);
+            return sf.newSchema(xsd);
         } catch (SAXException e) {
             throw new XConfigurationException("Cannot parse XML schema", e);
         }
     }
 
-    public static DocumentBuilderFactory getDocumentBuilderFactory(final Schema schema, boolean validating) {
+    public static SchemaFactory newSchemaFactory() {
         try {
-            var dbf = DocumentBuilderFactory.newDefaultInstance();
+            var factory = SchemaFactory.newDefaultInstance();
+            factory.setFeature(FEATURE_SECURE_PROCESSING, true);
+            factory.setProperty(ACCESS_EXTERNAL_SCHEMA, ALLOWED_PROTOCOL);
+            factory.setProperty(ACCESS_EXTERNAL_DTD, ALLOWED_PROTOCOL);
+            return factory;
+        } catch (SAXException e) {
+            throw new XConfigurationException("Cannot secure XSD factory", e);
+        }
+    }
+
+    public static DocumentBuilderFactory newDocumentFactory(final Schema schema, boolean validating, boolean nsAware) {
+        try {
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
             dbf.setFeature(FEATURE_SECURE_PROCESSING, true);
             dbf.setAttribute(ACCESS_EXTERNAL_DTD, ALLOWED_PROTOCOL);
             dbf.setAttribute(ACCESS_EXTERNAL_SCHEMA, ALLOWED_PROTOCOL);
             dbf.setSchema(schema);
             dbf.setValidating(validating);
-            dbf.setNamespaceAware(true);
+            dbf.setNamespaceAware(nsAware);
+            dbf.setExpandEntityReferences(false);
+            dbf.setIgnoringComments(true);
             return dbf;
         } catch (ParserConfigurationException e) {
             throw new XConfigurationException("Cannot secure XML factory", e);
         }
     }
+
 }

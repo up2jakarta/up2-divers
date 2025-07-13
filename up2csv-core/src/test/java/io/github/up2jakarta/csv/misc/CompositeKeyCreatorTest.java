@@ -45,7 +45,7 @@ class CompositeKeyCreatorTest {
         assertNotNull(bean);
         assertEquals(1, errors.size());
         // Then Error
-        final InputErrorEntity error = errors.get(0);
+        final InputErrorEntity error = errors.getFirst();
         assertSame(row, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
         assertEquals(SeverityType.ERROR, error.getSeverity());

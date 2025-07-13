@@ -36,7 +36,7 @@ public class WeightMeasurementUnitCodeTest extends CodeAdapterTest {
             var delivery = trade.getApplicableHeaderTradeDelivery();
             var supplyChain = delivery.getRelatedSupplyChainConsignment();
             var chainConsignments = supplyChain.getIncludedSupplyChainConsignmentItem();
-            var chainConsignment = chainConsignments.get(0);
+            var chainConsignment = chainConsignments.getFirst();
             var weightMeasure = chainConsignment.getGrossWeightMeasure();
             weightMeasure.setUnitCode(WRONG_CODE);
         });
@@ -53,7 +53,7 @@ public class WeightMeasurementUnitCodeTest extends CodeAdapterTest {
         final List<SupplyChainConsignmentItemType> chainConsignments = supplyChain.getIncludedSupplyChainConsignmentItem();
         assertNotNull(chainConsignments);
         assertEquals(1, chainConsignments.size());
-        final SupplyChainConsignmentItemType chainConsignment = chainConsignments.get(0);
+        final SupplyChainConsignmentItemType chainConsignment = chainConsignments.getFirst();
         assertNotNull(chainConsignment);
         final WeightUnitMeasureType weightMeasure = chainConsignment.getGrossWeightMeasure();
         assertNotNull(weightMeasure);
@@ -74,7 +74,7 @@ public class WeightMeasurementUnitCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(187, error.getLineNumber());
             assertEquals(60, error.getColumnNumber());

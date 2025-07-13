@@ -35,7 +35,7 @@ public class VolumeMeasurementUnitCodeTest extends CodeAdapterTest {
             var delivery = trade.getApplicableHeaderTradeDelivery();
             var supplyChain = delivery.getRelatedSupplyChainConsignment();
             var volumeMeasures = supplyChain.getGrossVolumeMeasure();
-            var volumeMeasure = volumeMeasures.get(0);
+            var volumeMeasure = volumeMeasures.getFirst();
             volumeMeasure.setUnitCode(WRONG_CODE);
         });
     }
@@ -51,7 +51,7 @@ public class VolumeMeasurementUnitCodeTest extends CodeAdapterTest {
         final List<VolumeUnitMeasureType> volumeMeasures = supplyChain.getGrossVolumeMeasure();
         assertNotNull(volumeMeasures);
         assertEquals(1, volumeMeasures.size());
-        final VolumeUnitMeasureType volumeMeasure = volumeMeasures.get(0);
+        final VolumeUnitMeasureType volumeMeasure = volumeMeasures.getFirst();
         assertNotNull(volumeMeasure);
         assertEquals(BigDecimal.TEN, volumeMeasure.getValue());
         final VolumeMeasurementUnitCodeType code = volumeMeasure.getUnitCode();
@@ -70,7 +70,7 @@ public class VolumeMeasurementUnitCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(165, error.getLineNumber());
             assertEquals(56, error.getColumnNumber());

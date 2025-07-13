@@ -52,7 +52,7 @@ public class PartyRoleCodeTest extends CodeAdapterTest {
         final List<PartyRoleCodeType> roles = seller.getRoleCode();
         assertNotNull(roles);
         assertEquals(1, roles.size());
-        final PartyRoleCodeType code = roles.get(0);
+        final PartyRoleCodeType code = roles.getFirst();
         assertEquals(PartyRoleCodeType.AA, code);
         assertNotNull(code.getName());
     }
@@ -68,7 +68,7 @@ public class PartyRoleCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(96, error.getLineNumber());
             assertEquals(49, error.getColumnNumber());

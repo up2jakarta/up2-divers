@@ -35,7 +35,7 @@ public class PriceTypeCodeTest extends CodeAdapterTest {
         super(context, "invalid_price_type.xml", (i) -> {
             var trade = i.getSupplyChainTradeTransaction();
             var items = trade.getIncludedSupplyChainTradeLineItem();
-            var item = items.get(0);
+            var item = items.getFirst();
             var lineTrade = item.getSpecifiedLineTradeAgreement();
             var net = lineTrade.getNetPriceProductTradePrice();
             net.setTypeCode(WRONG_CODE);
@@ -49,7 +49,7 @@ public class PriceTypeCodeTest extends CodeAdapterTest {
         final List<SupplyChainTradeLineItemType> items = trade.getIncludedSupplyChainTradeLineItem();
         assertNotNull(items);
         assertEquals(1, items.size());
-        final SupplyChainTradeLineItemType item = items.get(0);
+        final SupplyChainTradeLineItemType item = items.getFirst();
         assertNotNull(item);
         final LineTradeAgreementType lineTrade = item.getSpecifiedLineTradeAgreement();
         assertNotNull(lineTrade);
@@ -72,7 +72,7 @@ public class PriceTypeCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(44, error.getLineNumber());
             assertEquals(53, error.getColumnNumber());

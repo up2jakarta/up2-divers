@@ -34,7 +34,7 @@ public class DimensionTypeCodeTest extends CodeAdapterTest {
             var delivery = trade.getApplicableHeaderTradeDelivery();
             var supplyChain = delivery.getRelatedSupplyChainConsignment();
             var transportEquipments = supplyChain.getUtilizedLogisticsTransportEquipment();
-            var transportEquipment = transportEquipments.get(0);
+            var transportEquipment = transportEquipments.getFirst();
             var linearMeasure = transportEquipment.getLinearSpatialDimension();
             linearMeasure.setTypeCode(WRONG_CODE);
         });
@@ -51,7 +51,7 @@ public class DimensionTypeCodeTest extends CodeAdapterTest {
         final List<LogisticsTransportEquipmentType> transportEquipments = supplyChain.getUtilizedLogisticsTransportEquipment();
         assertNotNull(transportEquipments);
         assertEquals(1, transportEquipments.size());
-        final LogisticsTransportEquipmentType transportEquipment = transportEquipments.get(0);
+        final LogisticsTransportEquipmentType transportEquipment = transportEquipments.getFirst();
         assertNotNull(transportEquipment);
         final SpatialDimensionType linearMeasure = transportEquipment.getLinearSpatialDimension();
         assertNotNull(linearMeasure);
@@ -71,7 +71,7 @@ public class DimensionTypeCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(173, error.getLineNumber());
             assertEquals(57, error.getColumnNumber());

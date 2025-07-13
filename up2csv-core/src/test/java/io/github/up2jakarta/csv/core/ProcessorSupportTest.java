@@ -52,7 +52,7 @@ public class ProcessorSupportTest {
         // When
         final List<ProcessorWrapper<?, DataId>> processors = getProcessors(context, field);
         assertEquals(1, processors.size());
-        final ProcessorWrapper<?, ?> processor = processors.get(0);
+        final ProcessorWrapper<?, ?> processor = processors.getFirst();
         // Then
         assertNull(processor.process(null));
         assertNull(processor.process(""));
@@ -71,7 +71,7 @@ public class ProcessorSupportTest {
         // When
         final List<ProcessorWrapper<?, DataId>> processors = getProcessors(context, field);
         assertEquals(1, processors.size());
-        final ProcessorWrapper<?, DataId> processor = processors.get(0);
+        final ProcessorWrapper<?, DataId> processor = processors.getFirst();
         // Then
         assertNull(processor.process(null));
         assertNull(processor.process(""));

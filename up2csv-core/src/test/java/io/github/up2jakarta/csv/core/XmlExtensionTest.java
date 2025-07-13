@@ -63,7 +63,7 @@ public class XmlExtensionTest {
         assertNotNull(bean);
         assertEquals(4, errors.size());
         {
-            final SimpleErrorEntity error = errors.get(0);
+            final SimpleErrorEntity error = errors.getFirst();
             assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(0, error.getOffset());
@@ -118,7 +118,7 @@ public class XmlExtensionTest {
         assertNotNull(bean);
         assertEquals(4, errors.size());
         {
-            final SimpleErrorEntity error = errors.get(0);
+            final SimpleErrorEntity error = errors.getFirst();
             assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(0, error.getOffset());

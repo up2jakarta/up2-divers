@@ -33,7 +33,7 @@ public class ScopeCodeTest extends CodeAdapterTest {
         super(context, "invalid_scope.xml", (i) -> {
             var ctx = i.getExchangedDocumentContext();
             var parameters = ctx.getBusinessProcessSpecifiedDocumentContextParameter();
-            var parameter = parameters.get(0);
+            var parameter = parameters.getFirst();
             parameter.setID(WRONG_CODE);
         });
     }
@@ -45,7 +45,7 @@ public class ScopeCodeTest extends CodeAdapterTest {
         final List<ScopeContextParameterType> parameters = context.getBusinessProcessSpecifiedDocumentContextParameter();
         assertNotNull(parameters);
         assertEquals(1, parameters.size());
-        final ScopeContextParameterType parameter = parameters.get(0);
+        final ScopeContextParameterType parameter = parameters.getFirst();
         assertNotNull(parameter);
         final ScopeType code = parameter.getID();
         assertNotNull(code);
@@ -64,7 +64,7 @@ public class ScopeCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(5, error.getLineNumber());
             assertEquals(33, error.getColumnNumber());

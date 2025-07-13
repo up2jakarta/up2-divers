@@ -9,16 +9,6 @@ package io.github.up2jakarta.xml.codelist;
 public interface CodeList<T extends CodeList<T>> {
 
     /**
-     * @return the code value.
-     */
-    String getCode();
-
-    /**
-     * @return the name value.
-     */
-    String getName();
-
-    /**
      * Generate and return an enum constant from the given {@code id}.
      *
      * @param code the code-list code
@@ -31,5 +21,15 @@ public interface CodeList<T extends CodeList<T>> {
         }
         return code.replace("-", "_");
     }
+
+    /**
+     * @return the code value.
+     */
+    String getCode();
+
+    /**
+     * @return the name value.
+     */
+    String getName();
 
 }

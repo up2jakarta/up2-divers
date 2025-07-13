@@ -26,13 +26,13 @@ public class PrefixMapper extends NamespacePrefixMapper {
         namespaceMap.put(XML_SCHEMA_RAM_NAMESPACE_URL, "ram");
     }
 
+    public static NamespacePrefixMapper getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
         return namespaceMap.getOrDefault(namespaceUri, suggestion);
-    }
-
-    public static NamespacePrefixMapper getInstance() {
-        return INSTANCE;
     }
 
 }

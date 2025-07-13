@@ -2,8 +2,8 @@ package io.github.up2jakarta.cii.edi;
 
 import io.github.up2jakarta.cii.TUConfiguration;
 import io.github.up2jakarta.cii.api.CodeAdapterTest;
-import io.github.up2jakarta.cii.core.Duration;
-import io.github.up2jakarta.cii.core.DurationFormatter;
+import io.github.up2jakarta.cii.core.PDuration;
+import io.github.up2jakarta.cii.core.PDurationFormatter;
 import io.github.up2jakarta.cii.core.TemporalFormatter;
 import io.github.up2jakarta.cii.format.standard.udt.DateStringType;
 import io.github.up2jakarta.cii.format.standard.udt.DateTimeType;
@@ -63,7 +63,7 @@ public class TimePointFormatCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(15, error.getLineNumber());
             assertEquals(46, error.getColumnNumber());
@@ -220,19 +220,19 @@ public class TimePointFormatCodeTest extends CodeAdapterTest {
         var startTime = LocalTime.of(15, 30, 5);
         var endTime = LocalTime.of(17, 40, 10);
         var testString = "153005-174010";
-        var testTemporal = io.github.up2jakarta.cii.core.Duration.of(startTime, endTime);
+        var testTemporal = PDuration.of(startTime, endTime);
         //Then
         var codeFormatter = code.getFormatter();
         assertNotNull(codeFormatter);
-        assertEquals(DurationFormatter.class, codeFormatter.getClass());
+        assertEquals(PDurationFormatter.class, codeFormatter.getClass());
         assertEquals(LocalTime.class, codeFormatter.getTemporalClass());
-        final DurationFormatter<LocalTime> formatter = (DurationFormatter<LocalTime>) codeFormatter;
+        final PDurationFormatter<LocalTime> formatter = (PDurationFormatter<LocalTime>) codeFormatter;
         {
             var duration = formatter.parse(testString);
             assertNotNull(duration);
-            assertEquals(Duration.class, duration.getClass());
+            assertEquals(PDuration.class, duration.getClass());
             assertEquals(LocalTime.class, duration.getStartTime().getClass());
-            assertEquals(LocalTime.class, duration.getEndTime().getClass());
+            assertEquals(LocalTime.class, duration.getUntilTime().getClass());
             assertEquals(testTemporal, duration);
         }
         {

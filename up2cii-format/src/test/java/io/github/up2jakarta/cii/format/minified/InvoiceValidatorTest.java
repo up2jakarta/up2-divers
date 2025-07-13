@@ -42,7 +42,7 @@ public class InvoiceValidatorTest {
         final File xmlFile = loadResource("xml/empty.xml");
         List<? extends IValidationError> errors = validator.validate(xmlFile);
         assertEquals(1, errors.size());
-        final IValidationError error = errors.get(0);
+        final IValidationError error = errors.getFirst();
         assertEquals(SeverityType.FATAL, error.getSeverity());
         assertEquals(1, error.getLineNumber());
         assertEquals(1, error.getColumnNumber());
@@ -56,7 +56,7 @@ public class InvoiceValidatorTest {
         List<? extends IValidationError> errors = validator.validate(xmlFile);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.FATAL, error.getSeverity());
             assertEquals(5, error.getLineNumber());
             assertEquals(22, error.getColumnNumber());
@@ -71,7 +71,7 @@ public class InvoiceValidatorTest {
         List<? extends IValidationError> errors = validator.validate(xmlFile);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.FATAL, error.getSeverity());
             assertEquals(5, error.getLineNumber());
             assertEquals(21, error.getColumnNumber());
@@ -86,7 +86,7 @@ public class InvoiceValidatorTest {
         List<? extends IValidationError> errors = validator.validate(xmlFile);
         assertEquals(8, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(61, error.getLineNumber());
             assertEquals(54, error.getColumnNumber());

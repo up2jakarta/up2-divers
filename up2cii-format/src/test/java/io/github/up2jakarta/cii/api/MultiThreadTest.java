@@ -17,7 +17,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static io.github.up2jakarta.cii.api.CodeAdapterTest.XML_GENERATED_DIR;
+import static io.github.up2jakarta.cii.api.CodeAdapterTest.XML_DIR;
 import static io.github.up2jakarta.cii.api.TestUtil.assertInvoice;
 import static io.github.up2jakarta.cii.api.TestUtil.loadResource;
 import static org.junit.jupiter.api.Assertions.*;
@@ -63,7 +63,7 @@ public class MultiThreadTest {
             futures.put(future, true);
         }
         // ADD invalid invoices
-        for (var xmlFile : Objects.requireNonNull(XML_GENERATED_DIR.listFiles())) {
+        for (var xmlFile : Objects.requireNonNull(XML_DIR.listFiles())) {
             var future = EXECUTOR_SERVICE.submit(new ReaderWriterCallable(xmlFile));
             futures.put(future, false);
         }
@@ -91,7 +91,7 @@ public class MultiThreadTest {
             futures.add(future);
         }
         // ADD invalid invoices
-        for (var xmlFile : Objects.requireNonNull(XML_GENERATED_DIR.listFiles())) {
+        for (var xmlFile : Objects.requireNonNull(XML_DIR.listFiles())) {
             var future = EXECUTOR_SERVICE.submit(new ReaderValidatorCallable(xmlFile));
             futures.add(future);
         }
@@ -113,7 +113,7 @@ public class MultiThreadTest {
             futures.put(future, 0);
         }
         // ADD invalid invoices
-        for (var xmlFile : Objects.requireNonNull(XML_GENERATED_DIR.listFiles())) {
+        for (var xmlFile : Objects.requireNonNull(XML_DIR.listFiles())) {
             var future = EXECUTOR_SERVICE.submit(new ValidatorCallable(xmlFile));
             var nbErrors = 1;
             if ("invalid_allowance_charge_reason.xml".equals(xmlFile.getName())) {

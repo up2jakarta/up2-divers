@@ -255,7 +255,7 @@ class MapperTest {
         assertEquals(1, errors.size());
         // Then Error 0
         {
-            final SimpleErrorEntity error = errors.get(0);
+            final SimpleErrorEntity error = errors.getFirst();
             assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(SeverityType.WARNING, error.getSeverity());
@@ -278,7 +278,7 @@ class MapperTest {
         assertNotNull(bean);
         assertEquals(1, errors.size());
         // Then Error
-        final SimpleErrorEntity error = errors.get(0);
+        final SimpleErrorEntity error = errors.getFirst();
         assertSame(row, error.getRecord());
         assertEquals(0, error.getOrder());
         assertEquals(SeverityType.WARNING, error.getSeverity());
@@ -300,7 +300,7 @@ class MapperTest {
         assertNotNull(bean);
         assertEquals(1, errors.size());
         // Then Error
-        final SimpleErrorEntity error = errors.get(0);
+        final SimpleErrorEntity error = errors.getFirst();
         assertSame(row, error.getRecord());
         assertEquals(0, error.getOrder());
         assertEquals(SeverityType.ERROR, error.getSeverity());
@@ -491,7 +491,7 @@ class MapperTest {
         // THEN
         assertEquals(3, fields.size());
         {
-            final Property<?, DataId> property = fields.get(0);
+            final Property<?, DataId> property = fields.getFirst();
             assertEquals("id", property.field.getName());
             assertEquals(0, property.offset);
         }
@@ -508,7 +508,7 @@ class MapperTest {
             final List<Property<?, DataId>> fProperties = ((Listable<Property<?, DataId>>) fragment).toList();
             assertEquals(2, fProperties.size());
             {
-                final Property<?, DataId> property = fProperties.get(0);
+                final Property<?, DataId> property = fProperties.getFirst();
                 assertEquals("id", property.field.getName());
                 assertEquals(2, property.offset);
             }
@@ -531,7 +531,7 @@ class MapperTest {
         final List<Property<?, DataId>> fields = ((Listable<Property<?, DataId>>) mapper).toList();
         // THEN
         assertEquals(2, fields.size());
-        assertEquals("id", fields.get(0).field.getName());
+        assertEquals("id", fields.getFirst().field.getName());
         assertEquals("name", fields.get(1).field.getName());
         for (final Property<?, DataId> p : fields) {
             assertInstanceOf(StringProperty.class, p);
@@ -556,7 +556,7 @@ class MapperTest {
         final List<Property<?, DataId>> fields = ((Listable<Property<?, DataId>>) mapper).toList();
         // THEN
         assertEquals(2, fields.size());
-        assertEquals("id", fields.get(0).field.getName());
+        assertEquals("id", fields.getFirst().field.getName());
         assertEquals("name", fields.get(1).field.getName());
         for (final Property<?, DataId> p : fields) {
             assertInstanceOf(StringProperty.class, p);
@@ -581,7 +581,7 @@ class MapperTest {
         final List<Property<?, DataId>> fields = ((Listable<Property<?, DataId>>) mapper).toList();
         // THEN
         assertEquals(2, fields.size());
-        assertEquals("id", fields.get(0).field.getName());
+        assertEquals("id", fields.getFirst().field.getName());
         assertEquals("name", fields.get(1).field.getName());
         for (final Property<?, DataId> p : fields) {
             assertInstanceOf(StringProperty.class, p);

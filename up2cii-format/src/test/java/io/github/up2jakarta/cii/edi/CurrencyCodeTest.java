@@ -59,7 +59,7 @@ public class CurrencyCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(234, error.getLineNumber());
             assertEquals(67, error.getColumnNumber());

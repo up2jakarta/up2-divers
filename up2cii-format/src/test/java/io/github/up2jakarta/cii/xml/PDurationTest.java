@@ -1,6 +1,6 @@
 package io.github.up2jakarta.cii.xml;
 
-import io.github.up2jakarta.cii.core.Duration;
+import io.github.up2jakarta.cii.core.PDuration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +9,7 @@ import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DurationTest {
+public class PDurationTest {
 
     @Test
     public void testDurationOfLocalTime() {
@@ -18,10 +18,10 @@ public class DurationTest {
         var endTime = LocalTime.of(17, 40, 10);
         {
             //When
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             //Then
             Assertions.assertEquals(startTime, duration.getStartTime());
-            Assertions.assertEquals(endTime, duration.getEndTime());
+            Assertions.assertEquals(endTime, duration.getUntilTime());
             assertFalse(duration.isNegative());
 
             Assertions.assertEquals(0, duration.getYears());
@@ -33,10 +33,10 @@ public class DurationTest {
         }
         {
             //When
-            var duration = Duration.of(endTime, startTime);
+            var duration = PDuration.of(endTime, startTime);
             //Then
             Assertions.assertEquals(endTime, duration.getStartTime());
-            Assertions.assertEquals(startTime, duration.getEndTime());
+            Assertions.assertEquals(startTime, duration.getUntilTime());
             assertTrue(duration.isNegative());
 
             Assertions.assertEquals(0, duration.getYears());
@@ -55,10 +55,10 @@ public class DurationTest {
         var endTime = OffsetTime.of(17, 40, 10, 0, ZoneOffset.UTC);
         {
             //When
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             //Then
             Assertions.assertEquals(startTime, duration.getStartTime());
-            Assertions.assertEquals(endTime, duration.getEndTime());
+            Assertions.assertEquals(endTime, duration.getUntilTime());
             assertFalse(duration.isNegative());
 
             Assertions.assertEquals(0, duration.getYears());
@@ -70,10 +70,10 @@ public class DurationTest {
         }
         {
             //When
-            var duration = Duration.of(endTime, startTime);
+            var duration = PDuration.of(endTime, startTime);
             //Then
             Assertions.assertEquals(endTime, duration.getStartTime());
-            Assertions.assertEquals(startTime, duration.getEndTime());
+            Assertions.assertEquals(startTime, duration.getUntilTime());
             assertTrue(duration.isNegative());
 
             Assertions.assertEquals(0, duration.getYears());
@@ -92,10 +92,10 @@ public class DurationTest {
         var endTime = LocalDate.of(2017, 10, 10);
         {
             //When
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             //Then
             Assertions.assertEquals(startTime, duration.getStartTime());
-            Assertions.assertEquals(endTime, duration.getEndTime());
+            Assertions.assertEquals(endTime, duration.getUntilTime());
             assertFalse(duration.isNegative());
 
             Assertions.assertEquals(2, duration.getYears());
@@ -107,10 +107,10 @@ public class DurationTest {
         }
         {
             //When
-            var duration = Duration.of(endTime, startTime);
+            var duration = PDuration.of(endTime, startTime);
             //Then
             Assertions.assertEquals(endTime, duration.getStartTime());
-            Assertions.assertEquals(startTime, duration.getEndTime());
+            Assertions.assertEquals(startTime, duration.getUntilTime());
             assertTrue(duration.isNegative());
 
             Assertions.assertEquals(-2, duration.getYears());
@@ -129,10 +129,10 @@ public class DurationTest {
         var endTime = LocalDateTime.of(2024, 10, 17, 17, 40, 10);
         {
             //When
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             // Then
             Assertions.assertEquals(startTime, duration.getStartTime());
-            Assertions.assertEquals(endTime, duration.getEndTime());
+            Assertions.assertEquals(endTime, duration.getUntilTime());
             assertFalse(duration.isNegative());
             assertFalse(duration.isZero());
             Assertions.assertEquals(1, duration.getYears());
@@ -151,10 +151,10 @@ public class DurationTest {
         var endTime = OffsetDateTime.of(2024, 10, 17, 17, 40, 10, 0, ZoneOffset.UTC);
         {
             //When
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             // Then
             Assertions.assertEquals(startTime, duration.getStartTime());
-            Assertions.assertEquals(endTime, duration.getEndTime());
+            Assertions.assertEquals(endTime, duration.getUntilTime());
             assertFalse(duration.isNegative());
             assertFalse(duration.isZero());
             Assertions.assertEquals(1, duration.getYears());
@@ -173,10 +173,10 @@ public class DurationTest {
         var endTime = ZonedDateTime.of(2024, 10, 17, 17, 40, 10, 0, ZoneOffset.UTC);
         {
             //When
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             // Then
             Assertions.assertEquals(startTime, duration.getStartTime());
-            Assertions.assertEquals(endTime, duration.getEndTime());
+            Assertions.assertEquals(endTime, duration.getUntilTime());
             assertFalse(duration.isNegative());
             assertFalse(duration.isZero());
             Assertions.assertEquals(1, duration.getYears());
@@ -195,10 +195,10 @@ public class DurationTest {
         var endTime = YearMonth.of(2017, 10);
         {
             //When
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             //Then
             Assertions.assertEquals(startTime, duration.getStartTime());
-            Assertions.assertEquals(endTime, duration.getEndTime());
+            Assertions.assertEquals(endTime, duration.getUntilTime());
             assertFalse(duration.isNegative());
 
             Assertions.assertEquals(2, duration.getYears());
@@ -210,10 +210,10 @@ public class DurationTest {
         }
         {
             //When
-            var duration = Duration.of(endTime, startTime);
+            var duration = PDuration.of(endTime, startTime);
             //Then
             Assertions.assertEquals(endTime, duration.getStartTime());
-            Assertions.assertEquals(startTime, duration.getEndTime());
+            Assertions.assertEquals(startTime, duration.getUntilTime());
             assertTrue(duration.isNegative());
 
             Assertions.assertEquals(-2, duration.getYears());
@@ -232,10 +232,10 @@ public class DurationTest {
         var endTime = Year.of(2023);
         {
             //When
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             //Then
             Assertions.assertEquals(startTime, duration.getStartTime());
-            Assertions.assertEquals(endTime, duration.getEndTime());
+            Assertions.assertEquals(endTime, duration.getUntilTime());
             assertFalse(duration.isNegative());
 
             Assertions.assertEquals(3, duration.getYears());
@@ -247,10 +247,10 @@ public class DurationTest {
         }
         {
             //When
-            var duration = Duration.of(endTime, startTime);
+            var duration = PDuration.of(endTime, startTime);
             //Then
             Assertions.assertEquals(endTime, duration.getStartTime());
-            Assertions.assertEquals(startTime, duration.getEndTime());
+            Assertions.assertEquals(startTime, duration.getUntilTime());
             assertTrue(duration.isNegative());
 
             Assertions.assertEquals(-3, duration.getYears());
@@ -269,10 +269,10 @@ public class DurationTest {
         var endTime = Instant.from(ZonedDateTime.of(2023, 9, 2, 17, 40, 10, 0, ZoneOffset.UTC));
         {
             //When
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             // Then
             Assertions.assertEquals(startTime, duration.getStartTime());
-            Assertions.assertEquals(endTime, duration.getEndTime());
+            Assertions.assertEquals(endTime, duration.getUntilTime());
             assertFalse(duration.isNegative());
             assertFalse(duration.isZero());
             Assertions.assertEquals(0, duration.getYears());
@@ -289,7 +289,7 @@ public class DurationTest {
         //When
         var startTime = LocalDateTime.of(2023, 9, 25, 15, 30, 5);
         var endTime = LocalDateTime.of(2023, 9, 27, 17, 40, 10);
-        var duration = Duration.of(startTime, endTime);
+        var duration = PDuration.of(startTime, endTime);
         {
             // Unit
             var units = duration.getUnits();
@@ -299,14 +299,14 @@ public class DurationTest {
             assertTrue(units.contains(ChronoUnit.HOURS));
             assertTrue(units.contains(ChronoUnit.MINUTES));
             assertTrue(units.contains(ChronoUnit.SECONDS));
+            assertTrue(units.contains(ChronoUnit.MILLIS));
+            assertTrue(units.contains(ChronoUnit.NANOS));
 
             assertFalse(units.contains(ChronoUnit.WEEKS));
             assertFalse(units.contains(ChronoUnit.HALF_DAYS));
-            assertFalse(units.contains(ChronoUnit.NANOS));
             assertFalse(units.contains(ChronoUnit.CENTURIES));
             assertFalse(units.contains(ChronoUnit.DECADES));
             assertFalse(units.contains(ChronoUnit.ERAS));
-            assertFalse(units.contains(ChronoUnit.MILLIS));
             assertFalse(units.contains(ChronoUnit.MILLENNIA));
             assertFalse(units.contains(ChronoUnit.MILLENNIA));
             assertFalse(units.contains(ChronoUnit.FOREVER));
@@ -329,54 +329,54 @@ public class DurationTest {
             var startTime = LocalTime.of(15, 30, 5);
             var endTime = LocalTime.of(17, 40, 10);
             // //Then
-            Assertions.assertEquals("PT2H10M5S", Duration.of(startTime, endTime).toString());
-            Assertions.assertEquals("PT-2H-10M-5S", Duration.of(endTime, startTime).toString());
-            Assertions.assertEquals("PT0S", Duration.of(startTime, startTime).toString());
+            Assertions.assertEquals("PT2H10M5S", PDuration.of(startTime, endTime).toString());
+            Assertions.assertEquals("PT-2H-10M-5S", PDuration.of(endTime, startTime).toString());
+            Assertions.assertEquals("PT0S", PDuration.of(startTime, startTime).toString());
         }
         {
             //When
             var startTime = LocalDateTime.of(2023, 9, 5, 10, 40, 10);
             var endTime = LocalDateTime.of(2023, 9, 25, 12, 50, 15);
             //Then
-            Assertions.assertEquals("P20DT2H10M5S", Duration.of(startTime, endTime).toString());
-            Assertions.assertEquals("P-20DT-2H-10M-5S", Duration.of(endTime, startTime).toString());
-            Assertions.assertEquals("PT0S", Duration.of(startTime, startTime).toString());
+            Assertions.assertEquals("P20DT2H10M5S", PDuration.of(startTime, endTime).toString());
+            Assertions.assertEquals("P-20DT-2H-10M-5S", PDuration.of(endTime, startTime).toString());
+            Assertions.assertEquals("PT0S", PDuration.of(startTime, startTime).toString());
         }
         {
             //When
             var startTime = LocalDateTime.of(2023, 9, 5, 10, 40, 10);
             var endTime = LocalDateTime.of(2023, 11, 25, 12, 50, 15);
             //Then
-            Assertions.assertEquals("P2M20DT2H10M5S", Duration.of(startTime, endTime).toString());
-            Assertions.assertEquals("P-2M-20DT-2H-10M-5S", Duration.of(endTime, startTime).toString());
-            Assertions.assertEquals("PT0S", Duration.of(startTime, startTime).toString());
+            Assertions.assertEquals("P2M20DT2H10M5S", PDuration.of(startTime, endTime).toString());
+            Assertions.assertEquals("P-2M-20DT-2H-10M-5S", PDuration.of(endTime, startTime).toString());
+            Assertions.assertEquals("PT0S", PDuration.of(startTime, startTime).toString());
         }
         {
             //When
             var startTime = LocalDateTime.of(2023, 9, 5, 10, 40, 10);
             var endTime = LocalDateTime.of(2028, 11, 25, 12, 50, 15);
             //Then
-            Assertions.assertEquals("P5Y2M20DT2H10M5S", Duration.of(startTime, endTime).toString());
-            Assertions.assertEquals("P-5Y-2M-20DT-2H-10M-5S", Duration.of(endTime, startTime).toString());
-            Assertions.assertEquals("PT0S", Duration.of(startTime, startTime).toString());
+            Assertions.assertEquals("P5Y2M20DT2H10M5S", PDuration.of(startTime, endTime).toString());
+            Assertions.assertEquals("P-5Y-2M-20DT-2H-10M-5S", PDuration.of(endTime, startTime).toString());
+            Assertions.assertEquals("PT0S", PDuration.of(startTime, startTime).toString());
         }
         {
             //When
             var startTime = LocalDateTime.of(2023, 9, 5, 10, 40, 10);
             var endTime = LocalDateTime.of(2028, 11, 25, 10, 40, 10);
             //Then
-            Assertions.assertEquals("P5Y2M20D", Duration.of(startTime, endTime).toString());
-            Assertions.assertEquals("P-5Y-2M-20D", Duration.of(endTime, startTime).toString());
-            Assertions.assertEquals("PT0S", Duration.of(startTime, startTime).toString());
+            Assertions.assertEquals("P5Y2M20D", PDuration.of(startTime, endTime).toString());
+            Assertions.assertEquals("P-5Y-2M-20D", PDuration.of(endTime, startTime).toString());
+            Assertions.assertEquals("PT0S", PDuration.of(startTime, startTime).toString());
         }
         {
             //When
             var startTime = LocalDate.of(2023, 9, 5);
             var endTime = LocalDate.of(2023, 9, 25);
             //Then
-            Assertions.assertEquals("P20D", Duration.of(startTime, endTime).toString());
-            Assertions.assertEquals("P-20D", Duration.of(endTime, startTime).toString());
-            Assertions.assertEquals("PT0S", Duration.of(startTime, startTime).toString());
+            Assertions.assertEquals("P20D", PDuration.of(startTime, endTime).toString());
+            Assertions.assertEquals("P-20D", PDuration.of(endTime, startTime).toString());
+            Assertions.assertEquals("PT0S", PDuration.of(startTime, startTime).toString());
         }
     }
 
@@ -386,19 +386,19 @@ public class DurationTest {
         var endTime = LocalTime.of(17, 40, 10);
         //Then
         {
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             assertEquals(endTime, duration.addTo(startTime));
             assertFalse(duration.isNegative());
             assertFalse(duration.isZero());
         }
         {
-            var duration = Duration.of(startTime, startTime);
+            var duration = PDuration.of(startTime, startTime);
             assertEquals(startTime, duration.addTo(startTime));
             assertFalse(duration.isNegative());
             assertTrue(duration.isZero());
         }
         {
-            var duration = Duration.of(endTime, startTime);
+            var duration = PDuration.of(endTime, startTime);
             assertEquals(startTime, duration.addTo(endTime));
             assertTrue(duration.isNegative());
             assertFalse(duration.isZero());
@@ -411,19 +411,19 @@ public class DurationTest {
         var endTime = LocalDateTime.of(2028, 8, 27, 17, 40, 10);
         //Then
         {
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             assertEquals(endTime, duration.addTo(startTime));
             assertFalse(duration.isNegative());
             assertFalse(duration.isZero());
         }
         {
-            var duration = Duration.of(startTime, startTime);
+            var duration = PDuration.of(startTime, startTime);
             assertEquals(startTime, duration.addTo(startTime));
             assertFalse(duration.isNegative());
             assertTrue(duration.isZero());
         }
         {
-            var duration = Duration.of(endTime, startTime);
+            var duration = PDuration.of(endTime, startTime);
             assertEquals(startTime, duration.addTo(endTime));
             assertTrue(duration.isNegative());
             assertFalse(duration.isZero());
@@ -436,19 +436,19 @@ public class DurationTest {
         var endTime = LocalDate.of(2028, 8, 27);
         //Then
         {
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             assertEquals(endTime, duration.addTo(startTime));
             assertFalse(duration.isNegative());
             assertFalse(duration.isZero());
         }
         {
-            var duration = Duration.of(startTime, startTime);
+            var duration = PDuration.of(startTime, startTime);
             assertEquals(startTime, duration.addTo(startTime));
             assertFalse(duration.isNegative());
             assertTrue(duration.isZero());
         }
         {
-            var duration = Duration.of(endTime, startTime);
+            var duration = PDuration.of(endTime, startTime);
             assertEquals(startTime, duration.addTo(endTime));
             assertTrue(duration.isNegative());
             assertFalse(duration.isZero());
@@ -458,28 +458,28 @@ public class DurationTest {
     @Test
     public void testSubtractFromLocalTime() {
         var startTime = LocalTime.of(15, 30, 5);
-        var endTime = LocalTime.of(17, 40, 10);
+        var endTime = LocalTime.of(17, 40, 10, 999_000_000);
         //Then
         {
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             assertEquals(startTime, duration.subtractFrom(endTime));
             assertFalse(duration.isNegative());
             assertFalse(duration.isZero());
-            Assertions.assertEquals(java.time.Duration.ofHours(2).plusMinutes(10).plusSeconds(5), duration.getDuration());
+            Assertions.assertEquals(Duration.ofHours(2).plusMinutes(10).plusSeconds(5).plusMillis(999), duration.toDuration());
         }
         {
-            var duration = Duration.of(startTime, startTime);
+            var duration = PDuration.of(startTime, startTime);
             assertEquals(startTime, duration.subtractFrom(startTime));
             assertFalse(duration.isNegative());
             assertTrue(duration.isZero());
-            Assertions.assertEquals(java.time.Duration.ZERO, duration.getDuration());
+            Assertions.assertEquals(Duration.ZERO, duration.toDuration());
         }
         {
-            var duration = Duration.of(endTime, startTime);
+            var duration = PDuration.of(endTime, startTime);
             assertEquals(endTime, duration.subtractFrom(startTime));
             assertTrue(duration.isNegative());
             assertFalse(duration.isZero());
-            Assertions.assertEquals(java.time.Duration.ofHours(-2).plusMinutes(-10).plusSeconds(-5), duration.getDuration());
+            Assertions.assertEquals(Duration.ofHours(-2).plusMinutes(-10).plusSeconds(-5).minusMillis(999), duration.toDuration());
         }
     }
 
@@ -489,28 +489,28 @@ public class DurationTest {
         var endTime = LocalDateTime.of(2028, 8, 27, 17, 40, 10);
         //Then
         {
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             assertEquals(startTime, duration.subtractFrom(endTime));
             assertFalse(duration.isNegative());
             assertFalse(duration.isZero());
-            Assertions.assertEquals(java.time.Duration.ofHours(2).plusMinutes(10).plusSeconds(5), duration.getDuration());
-            Assertions.assertEquals(Period.of(4, 11, 2), duration.getPeriod());
+            Assertions.assertEquals(Duration.ofHours(2).plusMinutes(10).plusSeconds(5), duration.toDuration());
+            Assertions.assertEquals(Period.of(4, 11, 2), duration.toPeriod());
         }
         {
-            var duration = Duration.of(startTime, startTime);
+            var duration = PDuration.of(startTime, startTime);
             assertEquals(startTime, duration.subtractFrom(startTime));
             assertFalse(duration.isNegative());
             assertTrue(duration.isZero());
-            Assertions.assertEquals(java.time.Duration.ZERO, duration.getDuration());
-            Assertions.assertEquals(Period.ZERO, duration.getPeriod());
+            Assertions.assertEquals(Duration.ZERO, duration.toDuration());
+            Assertions.assertEquals(Period.ZERO, duration.toPeriod());
         }
         {
-            var duration = Duration.of(endTime, startTime);
+            var duration = PDuration.of(endTime, startTime);
             assertEquals(endTime, duration.subtractFrom(startTime));
             assertTrue(duration.isNegative());
             assertFalse(duration.isZero());
-            Assertions.assertEquals(java.time.Duration.ofHours(-2).plusMinutes(-10).plusSeconds(-5), duration.getDuration());
-            Assertions.assertEquals(Period.of(-4, -11, -2), duration.getPeriod());
+            Assertions.assertEquals(Duration.ofHours(-2).plusMinutes(-10).plusSeconds(-5), duration.toDuration());
+            Assertions.assertEquals(Period.of(-4, -11, -2), duration.toPeriod());
         }
     }
 
@@ -520,25 +520,25 @@ public class DurationTest {
         var endTime = LocalDate.of(2028, 8, 27);
         //Then
         {
-            var duration = Duration.of(startTime, endTime);
+            var duration = PDuration.of(startTime, endTime);
             assertEquals(startTime, duration.subtractFrom(endTime));
             assertFalse(duration.isNegative());
             assertFalse(duration.isZero());
-            Assertions.assertEquals(Period.of(4, 11, 15), duration.getPeriod());
+            Assertions.assertEquals(Period.of(4, 11, 15), duration.toPeriod());
         }
         {
-            var duration = Duration.of(startTime, startTime);
+            var duration = PDuration.of(startTime, startTime);
             assertEquals(startTime, duration.subtractFrom(startTime));
             assertFalse(duration.isNegative());
             assertTrue(duration.isZero());
-            Assertions.assertEquals(Period.ZERO, duration.getPeriod());
+            Assertions.assertEquals(Period.ZERO, duration.toPeriod());
         }
         {
-            var duration = Duration.of(endTime, startTime);
+            var duration = PDuration.of(endTime, startTime);
             assertEquals(endTime, duration.subtractFrom(startTime));
             assertTrue(duration.isNegative());
             assertFalse(duration.isZero());
-            Assertions.assertEquals(Period.of(-4, -11, -15), duration.getPeriod());
+            Assertions.assertEquals(Period.of(-4, -11, -15), duration.toPeriod());
         }
     }
 }

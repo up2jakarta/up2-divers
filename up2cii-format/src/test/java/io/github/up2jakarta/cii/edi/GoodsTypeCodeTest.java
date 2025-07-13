@@ -37,7 +37,7 @@ public class GoodsTypeCodeTest extends CodeAdapterTest {
             var delivery = trade.getApplicableHeaderTradeDelivery();
             var supplyChain = delivery.getRelatedSupplyChainConsignment();
             var chainConsignments = supplyChain.getIncludedSupplyChainConsignmentItem();
-            var chainConsignment = chainConsignments.get(0);
+            var chainConsignment = chainConsignments.getFirst();
             chainConsignment.setTypeCode(WRONG_CODE);
         });
     }
@@ -53,7 +53,7 @@ public class GoodsTypeCodeTest extends CodeAdapterTest {
         final List<SupplyChainConsignmentItemType> chainConsignments = supplyChain.getIncludedSupplyChainConsignmentItem();
         assertNotNull(chainConsignments);
         assertEquals(1, chainConsignments.size());
-        final SupplyChainConsignmentItemType chainConsignment = chainConsignments.get(0);
+        final SupplyChainConsignmentItemType chainConsignment = chainConsignments.getFirst();
         assertNotNull(chainConsignment);
         final GoodsTypeCodeType code = chainConsignment.getTypeCode();
         assertNotNull(code);
@@ -72,7 +72,7 @@ public class GoodsTypeCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(185, error.getLineNumber());
             assertEquals(53, error.getColumnNumber());

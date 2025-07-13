@@ -1,7 +1,5 @@
 package io.github.up2jakarta.job.ctx;
 
-import jakarta.validation.constraints.NotNull;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -43,7 +41,7 @@ abstract class FaultHandler<T extends SupportAware> extends FlowHandler<T>
         // GETTER
         if (provider.isAnnotationPresent(method)) {
             final ContextParameter<?> parameter = provider.getParameter(method);
-            return getValue(parameter, method.getReturnType(), method.isAnnotationPresent(NotNull.class));
+            return getValue(parameter, method.getReturnType(), method.isAnnotationPresent(CMLinked.class));
         }
         // SETTER
         for (var i = 0; i < parameters.length; i++) {

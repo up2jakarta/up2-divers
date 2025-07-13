@@ -37,7 +37,7 @@ public class TransportEquipmentCategoryCodeTest extends CodeAdapterTest {
             var delivery = trade.getApplicableHeaderTradeDelivery();
             var supplyChain = delivery.getRelatedSupplyChainConsignment();
             var transportEquipments = supplyChain.getUtilizedLogisticsTransportEquipment();
-            var transportEquipment = transportEquipments.get(0);
+            var transportEquipment = transportEquipments.getFirst();
             transportEquipment.setCategoryCode(WRONG_CODE);
         });
     }
@@ -53,7 +53,7 @@ public class TransportEquipmentCategoryCodeTest extends CodeAdapterTest {
         final List<LogisticsTransportEquipmentType> transportEquipments = supplyChain.getUtilizedLogisticsTransportEquipment();
         assertNotNull(transportEquipments);
         assertEquals(1, transportEquipments.size());
-        final LogisticsTransportEquipmentType transportEquipment = transportEquipments.get(0);
+        final LogisticsTransportEquipmentType transportEquipment = transportEquipments.getFirst();
         assertNotNull(transportEquipment);
         final TransportEquipmentCategoryCodeType code = transportEquipment.getCategoryCode();
         assertEquals(TransportEquipmentCategoryCodeType.AB, code);
@@ -71,7 +71,7 @@ public class TransportEquipmentCategoryCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(196, error.getLineNumber());
             assertEquals(61, error.getColumnNumber());

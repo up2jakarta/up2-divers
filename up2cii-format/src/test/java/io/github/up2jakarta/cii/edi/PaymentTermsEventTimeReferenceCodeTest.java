@@ -35,10 +35,10 @@ public class PaymentTermsEventTimeReferenceCodeTest extends CodeAdapterTest {
         super(context, "invalid_payment_terms_event_time_reference.xml", (i) -> {
             var trade = i.getSupplyChainTradeTransaction();
             var items = trade.getIncludedSupplyChainTradeLineItem();
-            var item = items.get(0);
+            var item = items.getFirst();
             var settlement = item.getSpecifiedLineTradeSettlement();
             var terms = settlement.getSpecifiedTradePaymentTerms();
-            var term = terms.get(0);
+            var term = terms.getFirst();
             term.setFromEventCode(WRONG_CODE);
         });
     }
@@ -50,14 +50,14 @@ public class PaymentTermsEventTimeReferenceCodeTest extends CodeAdapterTest {
         final List<SupplyChainTradeLineItemType> items = trade.getIncludedSupplyChainTradeLineItem();
         assertNotNull(items);
         assertEquals(1, items.size());
-        final SupplyChainTradeLineItemType item = items.get(0);
+        final SupplyChainTradeLineItemType item = items.getFirst();
         assertNotNull(item);
         final LineTradeSettlementType settlement = item.getSpecifiedLineTradeSettlement();
         assertNotNull(settlement);
         final List<TradePaymentTermsType> terms = settlement.getSpecifiedTradePaymentTerms();
         assertNotNull(terms);
         assertEquals(1, terms.size());
-        final TradePaymentTermsType term = terms.get(0);
+        final TradePaymentTermsType term = terms.getFirst();
         assertNotNull(term);
         final PaymentTermsEventTimeReferenceCodeType code = term.getFromEventCode();
         assertEquals(PaymentTermsEventTimeReferenceCodeType.V_5, code);
@@ -75,7 +75,7 @@ public class PaymentTermsEventTimeReferenceCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(75, error.getLineNumber());
             assertEquals(63, error.getColumnNumber());

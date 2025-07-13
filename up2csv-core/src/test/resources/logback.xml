@@ -10,5 +10,5 @@
     </root>
     <logger name="org.springframework" level="WARN"/>
     <logger name="ch.qos.logback" level="WARN"/>
-    <logger name="jakarta.persistence" level="ERROR"/>
+
 </configuration>

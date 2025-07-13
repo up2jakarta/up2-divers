@@ -29,16 +29,16 @@ public class Attribute extends Parsable implements Linked {
         return key;
     }
 
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 
     public String getValue() {

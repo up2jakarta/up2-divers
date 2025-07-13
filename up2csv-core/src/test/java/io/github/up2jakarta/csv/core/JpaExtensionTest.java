@@ -61,7 +61,7 @@ public class JpaExtensionTest {
         assertNotNull(bean);
         assertEquals(5, errors.size());
         {
-            final SimpleErrorEntity error = errors.get(0);
+            final SimpleErrorEntity error = errors.getFirst();
             assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(0, error.getOffset());
@@ -127,7 +127,7 @@ public class JpaExtensionTest {
         assertNotNull(bean);
         assertEquals(3, errors.size());
         {
-            final SimpleErrorEntity error = errors.get(0);
+            final SimpleErrorEntity error = errors.getFirst();
             assertSame(row, error.getRecord());
             assertEquals(0, error.getOrder());
             assertEquals(0, error.getOffset());

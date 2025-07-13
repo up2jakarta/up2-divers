@@ -35,7 +35,7 @@ public class EASchemeIDTest extends CodeAdapterTest {
             var agreement = trade.getApplicableHeaderTradeAgreement();
             var seller = agreement.getSellerTradeParty();
             var communications = seller.getURIUniversalCommunication();
-            var communication = communications.get(0);
+            var communication = communications.getFirst();
             var uri = communication.getURIID();
             uri.setSchemeID(WRONG_CODE);
         });
@@ -52,7 +52,7 @@ public class EASchemeIDTest extends CodeAdapterTest {
         final List<UniversalCommunicationType> communications = seller.getURIUniversalCommunication();
         assertNotNull(communications);
         assertEquals(1, communications.size());
-        final UniversalCommunicationType communication = communications.get(0);
+        final UniversalCommunicationType communication = communications.getFirst();
         assertNotNull(communication);
         final UriIDType uri = communication.getURIID();
         assertNotNull(uri);
@@ -73,7 +73,7 @@ public class EASchemeIDTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(121, error.getLineNumber());
             assertEquals(47, error.getColumnNumber());

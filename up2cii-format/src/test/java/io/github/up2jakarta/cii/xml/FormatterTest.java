@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.xml;
 
-import io.github.up2jakarta.cii.core.Duration;
-import io.github.up2jakarta.cii.core.DurationFormatter;
+import io.github.up2jakarta.cii.core.PDuration;
+import io.github.up2jakarta.cii.core.PDurationFormatter;
 import io.github.up2jakarta.cii.core.TemporalFormatter;
 import io.github.up2jakarta.cii.edi.TimePointFormatCodeType;
 import org.junit.jupiter.api.Test;
@@ -119,7 +119,7 @@ public class FormatterTest {
     @Test
     public void test502() {
         // Given
-        var temporal = Duration.of(LocalTime.of(10, 30, 15), LocalTime.of(12, 15, 45));
+        var temporal = PDuration.of(LocalTime.of(10, 30, 15), LocalTime.of(12, 15, 45));
         var formatted = "103015-121545";
         // When
         var code = TimePointFormatCodeType.V_502;
@@ -129,9 +129,9 @@ public class FormatterTest {
         assertNull(formatter.format(null));
         assertNull(formatter.parse(null));
         assertTrue(formatter.isComposite());
-        assertEquals(DurationFormatter.class, formatter.getClass());
+        assertEquals(PDurationFormatter.class, formatter.getClass());
         assertEquals(LocalTime.class, formatter.getTemporalClass());
-        var codeFormatter = (DurationFormatter<LocalTime>) formatter;
+        var codeFormatter = (PDurationFormatter<LocalTime>) formatter;
         assertEquals(formatted, codeFormatter.format(temporal));
         assertEquals(temporal, codeFormatter.parse(formatted));
     }

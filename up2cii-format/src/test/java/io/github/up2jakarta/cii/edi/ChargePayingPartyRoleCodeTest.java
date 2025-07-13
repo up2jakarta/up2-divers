@@ -35,7 +35,7 @@ public class ChargePayingPartyRoleCodeTest extends CodeAdapterTest {
             var trade = i.getSupplyChainTradeTransaction();
             var settlement = trade.getApplicableHeaderTradeSettlement();
             var services = settlement.getSpecifiedLogisticsServiceCharge();
-            var service = services.get(0);
+            var service = services.getFirst();
             service.setPayingPartyRoleCode(WRONG_CODE);
         });
     }
@@ -49,7 +49,7 @@ public class ChargePayingPartyRoleCodeTest extends CodeAdapterTest {
         final List<LogisticsServiceChargeType> services = settlement.getSpecifiedLogisticsServiceCharge();
         assertNotNull(services);
         assertEquals(1, services.size());
-        final LogisticsServiceChargeType service = services.get(0);
+        final LogisticsServiceChargeType service = services.getFirst();
         assertNotNull(service);
         final ChargePayingPartyRoleCodeType code = service.getPayingPartyRoleCode();
         assertEquals(ChargePayingPartyRoleCodeType.IV, code);
@@ -67,7 +67,7 @@ public class ChargePayingPartyRoleCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(297, error.getLineNumber());
             assertEquals(71, error.getColumnNumber());

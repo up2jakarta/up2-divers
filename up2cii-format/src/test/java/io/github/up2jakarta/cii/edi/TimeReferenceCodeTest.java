@@ -35,7 +35,7 @@ public class TimeReferenceCodeTest extends CodeAdapterTest {
             var trade = i.getSupplyChainTradeTransaction();
             var settlement = trade.getApplicableHeaderTradeSettlement();
             var taxes = settlement.getApplicableTradeTax();
-            var tax = taxes.get(0);
+            var tax = taxes.getFirst();
             tax.setDueDateTypeCode(WRONG_CODE);
         });
     }
@@ -49,7 +49,7 @@ public class TimeReferenceCodeTest extends CodeAdapterTest {
         final List<TradeTaxType> taxes = settlement.getApplicableTradeTax();
         assertNotNull(taxes);
         assertEquals(1, taxes.size());
-        final TradeTaxType tax = taxes.get(0);
+        final TradeTaxType tax = taxes.getFirst();
         assertNotNull(tax);
         final TimeReferenceCodeType code = tax.getDueDateTypeCode();
         assertEquals(TimeReferenceCodeType.V_72, code);
@@ -67,7 +67,7 @@ public class TimeReferenceCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(261, error.getLineNumber());
             assertEquals(63, error.getColumnNumber());

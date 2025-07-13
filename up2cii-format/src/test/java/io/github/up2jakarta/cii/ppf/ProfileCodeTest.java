@@ -33,7 +33,7 @@ public class ProfileCodeTest extends CodeAdapterTest {
         super(context, "invalid_profile.xml", (i) -> {
             var ctx = i.getExchangedDocumentContext();
             var parameters = ctx.getGuidelineSpecifiedDocumentContextParameter();
-            var parameter = parameters.get(0);
+            var parameter = parameters.getFirst();
             parameter.setID(WRONG_CODE);
         });
     }
@@ -45,7 +45,7 @@ public class ProfileCodeTest extends CodeAdapterTest {
         final List<ProfileContextParameterType> parameters = context.getGuidelineSpecifiedDocumentContextParameter();
         assertNotNull(parameters);
         assertEquals(1, parameters.size());
-        final ProfileContextParameterType parameter = parameters.get(0);
+        final ProfileContextParameterType parameter = parameters.getFirst();
         assertNotNull(parameter);
         final ProfileType code = parameter.getID();
         assertNotNull(code);
@@ -64,7 +64,7 @@ public class ProfileCodeTest extends CodeAdapterTest {
         assertNotNull(errors);
         assertEquals(1, errors.size());
         {
-            final IValidationError error = errors.get(0);
+            final IValidationError error = errors.getFirst();
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(8, error.getLineNumber());
             assertEquals(33, error.getColumnNumber());
