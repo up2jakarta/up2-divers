@@ -3,7 +3,9 @@ package io.github.up2jakarta.csv;
 import io.github.up2jakarta.csv.impl.InputErrorEntity;
 import io.github.up2jakarta.csv.impl.InputRowEntity;
 import io.github.up2jakarta.csv.impl.InvoiceAggregator;
+import io.github.up2jakarta.csv.impl.InvoiceSeparator;
 import io.github.up2jakarta.csv.misc.BeanException;
+import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.csv.misc.MapperException;
 import io.github.up2jakarta.csv.test.agg.Attribute;
 import io.github.up2jakarta.csv.test.agg.Invoice;
@@ -12,27 +14,33 @@ import io.github.up2jakarta.csv.test.agg.Party;
 import io.github.up2jakarta.xml.api.SeverityType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.opentest4j.AssertionFailedError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.github.up2jakarta.csv.impl.DataId.*;
 import static io.github.up2jakarta.csv.impl.SegmentType.*;
 import static io.github.up2jakarta.csv.test.Tests.create;
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-class BusinessAggregatorTest {
+class BusinessTest {
 
     private final InvoiceAggregator aggregator;
+    private final InvoiceSeparator separator;
 
     @Autowired
-    BusinessAggregatorTest(InvoiceAggregator aggregator) {
+    BusinessTest(InvoiceAggregator aggregator, InvoiceSeparator separator) {
         this.aggregator = aggregator;
+        this.separator = separator;
     }
 
     private static void assertValid(Party party) {
@@ -76,8 +84,27 @@ class BusinessAggregatorTest {
         assertNotNull(invoice.getTaxAmount());
     }
 
+    private void assertExists(final String[] data, final List<InputRowEntity> rows) {
+        assertTrue(data.length > 2);
+        for (var it = rows.listIterator(); it.hasNext(); ) {
+            final InputRowEntity row = it.next();
+            final String type = row.getType().getCode();
+            final String[] source = row.getColumns();
+            if (type.equals(data[1]) && data.length == (source.length + 2)) {
+                for (var i = 0; i < source.length; i++) {
+                    if (!source[i].equals(data[i + 2])) {
+                        break;
+                    }
+                }
+                it.remove();
+                return;
+            }
+        }
+        throw new AssertionFailedError(Arrays.toString(data) + " does not exists");
+    }
+
     @Test
-    void testNull() throws BeanException {
+    void testAggregateNull() throws BeanException {
         // Given
         final InputRowEntity[] rows = null;
         final List<InputErrorEntity> errors = new LinkedList<>();
@@ -89,6 +116,16 @@ class BusinessAggregatorTest {
         // Then
         assertNull(invoice);
         assertEquals(0, errors.size());
+    }
+
+    @Test
+    void testSegregateNull() throws BeanException {
+        // Given
+        final AtomicInteger count = new AtomicInteger(0);
+        // When
+        separator.format(null, r -> count.incrementAndGet());
+        // Then
+        assertEquals(0, count.get());
     }
 
     @Test
@@ -181,59 +218,6 @@ class BusinessAggregatorTest {
     }
 
     @Test
-    void testValid1() throws BeanException {
-        // Given
-        final InputRowEntity[] rows = {
-                create(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                create(S02, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                create(S03, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                create(S04, "1199", "Software", "2", "120", "100", "20"),
-                create(S04, "2299", "Hardware", "1", "600", "500", "100"),
-                create(S05, "1199", "Support", "Yes"),
-                create(S05, "1199", "Duration", "one year"),
-                create(S05, "2299", "Type", "Net"),
-                create(S05, "2299", "Generation", "5th"),
-        };
-        // When
-        final Invoice invoice = aggregator.parse(rows, (i, r) -> {
-            assertEquals(0, r.size());
-            return i;
-        });
-        // Then
-        assertValid(invoice);
-        assertValid(invoice.getBuyer());
-        assertValid(invoice.getSeller());
-        assertEquals(2, invoice.getItems().size());
-        for (final Item item : invoice.getItems()) {
-            assertValid(item, 2);
-        }
-    }
-
-    @Test
-    void testValid2() throws BeanException {
-        // Given
-        final InputRowEntity[] rows = {
-                create(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                create(S02, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                create(S04, "1199", "Software", "2", "120", "100", "20"),
-                create(S04, "2299", "Hardware", "1", "600", "500", "100"),
-        };
-        // When
-        final Invoice invoice = aggregator.parse(rows, (i, r) -> {
-            assertEquals(0, r.size());
-            return i;
-        });
-        // Then
-        assertValid(invoice);
-        assertNull(invoice.getBuyer());
-        assertValid(invoice.getSeller());
-        assertEquals(2, invoice.getItems().size());
-        for (final Item item : invoice.getItems()) {
-            assertValid(item, 0);
-        }
-    }
-
-    @Test
     void testDetached() throws BeanException {
         // Given
         final InputRowEntity detached = create(S05, "9999", "Warning", "Detached");
@@ -270,6 +254,110 @@ class BusinessAggregatorTest {
             assertEquals(SeverityType.WARNING, e.getSeverity());
             assertEquals(S05.getErrorCode(), e.getCode());
             assertEquals("segment is detached", e.getMessage());
+        }
+    }
+
+    @Test
+    void testValid1() throws BeanException {
+        // Given
+        final InputRowEntity[] rows = {
+                create(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
+                create(S02, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                create(S03, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                create(S04, "1199", "Software", "2", "120", "100", "20"),
+                create(S04, "2299", "Hardware", "1", "600", "500", "100"),
+                create(S05, "1199", "Support", "Yes"),
+                create(S05, "1199", "Duration", "one year"),
+                create(S05, "2299", "Type", "Net"),
+                create(S05, "2299", "Generation", "5th"),
+        };
+        // When Parsing
+        final Invoice invoice = aggregator.parse(rows, (i, r) -> {
+            assertEquals(0, r.size());
+            return i;
+        });
+        // Then
+        assertValid(invoice);
+        assertValid(invoice.getBuyer());
+        assertValid(invoice.getSeller());
+        assertEquals(2, invoice.getItems().size());
+        for (final Item item : invoice.getItems()) {
+            assertValid(item, 2);
+        }
+        // When Formating
+        final List<InputRowEntity> source = new LinkedList<>(asList(rows));
+        separator.format(invoice, d -> {
+            assertEquals(invoice.getReference(), d[0]);
+            assertExists(d, source);
+        });
+        assertEquals(0, source.size());
+    }
+
+    @Test
+    void testValid2() throws BeanException {
+        // Given
+        final InputRowEntity[] rows = {
+                create(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
+                create(S02, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                create(S04, "1199", "Software", "2", "120", "100", "20"),
+                create(S04, "2299", "Hardware", "1", "600", "500", "100"),
+        };
+        // When Parsing
+        final Invoice invoice = aggregator.parse(rows, (i, r) -> {
+            assertEquals(0, r.size());
+            return i;
+        });
+        // Then
+        assertValid(invoice);
+        assertNull(invoice.getBuyer());
+        assertValid(invoice.getSeller());
+        assertEquals(2, invoice.getItems().size());
+        for (final Item item : invoice.getItems()) {
+            assertValid(item, 0);
+        }
+        // When Formating
+        final List<InputRowEntity> source = new LinkedList<>(asList(rows));
+        separator.format(invoice, d -> {
+            assertEquals(invoice.getReference(), d[0]);
+            assertExists(d, source);
+        });
+        assertEquals(0, source.size());
+    }
+
+    @Test
+    void testInvalid() throws BeanException {
+        // Given
+        final InputRowEntity invalid = create(S05, "1199", "Support", null);
+        final InputRowEntity[] rows = {
+                create(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
+                create(S02, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                create(S03, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                create(S04, "1199", "Software", "2", "120", "100", "20"),
+                invalid,
+        };
+        final List<InputErrorEntity> errors = new LinkedList<>();
+        // When
+        final Invoice invoice = aggregator.parse(rows, (i, r) -> {
+            errors.addAll(r);
+            return i;
+        });
+        assertValid(invoice);
+        assertValid(invoice.getBuyer());
+        assertValid(invoice.getSeller());
+        assertEquals(1, invoice.getItems().size());
+        assertEquals(1, invoice.getItems().getFirst().getAttributes().size());
+        // Warning
+        assertEquals(1, errors.size());
+        {
+            final InputErrorEntity e = errors.getFirst();
+            assertNotNull(e.getKey());
+            assertEquals(invalid, e.getKey().getRecord());
+            assertNull(e.getTrace());
+            assertEquals(D005, e.getType());
+            assertEquals(2 + 2, e.getOffset());
+            assertEquals(SeverityType.ERROR, e.getSeverity());
+            assertEquals(Errors.ERROR_VALIDATOR, e.getCode());
+            assertEquals("must not be null", e.getMessage());
         }
     }
 

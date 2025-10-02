@@ -61,7 +61,7 @@ public class HandlerSupportTest {
     @Test
     void testValidator() throws BeanException {
         // Given
-        final Mapper<Test1Validator, DataId> mapper = factory.build(Test1Validator.class);
+        final Mapper<Test1Validator, DataId> mapper = factory.build(Test1Validator.class, DataId.NONE);
         final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast(false);
         {
             // When

@@ -49,7 +49,7 @@ abstract class PositionProperty<T, D extends DataType<D>> extends Property<T, D>
      * @param value the property value
      * @return the formatted sequence
      */
-    abstract String format(T value) throws BeanException;
+    abstract String format(T value);
 
     @Override
     final T defaultValue() {

@@ -9,7 +9,7 @@ import io.github.up2jakarta.csv.input.InputType;
  *
  * @param <T> the input row type
  */
-public interface Parsed<T extends InputType<T>, R extends InputSegment<T>> extends Segment {
+public interface Parsed<T extends InputType<?, T>, R extends InputSegment<T>> extends Segment {
 
     /**
      * @return the record that being parsed.

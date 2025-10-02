@@ -7,7 +7,6 @@ import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.processor.TokenProcessor;
 import io.github.up2jakarta.csv.resolver.DecimalResolver;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
-import io.github.up2jakarta.csv.test.ext.DataIdResolver;
 import io.github.up2jakarta.csv.test.ext.DummyConverter;
 import jakarta.validation.Validator;
 import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -54,7 +53,13 @@ public class TUConfiguration {
     @Bean
     @Scope(value = SCOPE_SINGLETON)
     public InvoiceAggregator invoiceAggregator(MapperFactory<DataId> factory, ErrorCreator creator) throws BeanException {
-        return new InvoiceAggregator(factory, creator, SegmentType.S01);
+        return new InvoiceAggregator(factory, creator);
+    }
+
+    @Bean
+    @Scope(value = SCOPE_SINGLETON)
+    public InvoiceSeparator invoiceSeparator(MapperFactory<DataId> factory) throws BeanException {
+        return new InvoiceSeparator(factory);
     }
 
     /**

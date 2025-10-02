@@ -6,6 +6,7 @@ package io.github.up2jakarta.csv.input;
  *
  * @param <R> the input row type
  */
+@FunctionalInterface
 public interface InputRepository<R extends InputSegment<?>> {
 
     /**

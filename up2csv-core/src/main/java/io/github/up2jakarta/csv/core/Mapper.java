@@ -25,15 +25,13 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("ClassEscapesDefinedScope")
 public abstract class Mapper<S extends Segment, D extends DataType<D>> implements Listable<Property<?, D>> {
 
-    protected final int offset;
-    protected final Class<S> type;
-    protected final List<Property<?, D>> properties;
+    private final int offset;
     private final ValidationContext validation;
+    private final List<Property<?, D>> properties;
 
     Mapper(Class<S> type, BeanContext context, DataTypeResolver<D> resolver) throws BeanException {
         final Truncated truncated = type.getAnnotation(Truncated.class);
         this.offset = (truncated != null) ? truncated.value() : 0;
-        this.type = type;
         this.validation = ValidationContext.from(type);
         final MapperContext<D> mapperContext = new MapperContext<>(context, type, resolver, validation);
         this.properties = new BeanSupport<>(mapperContext).build(type);
@@ -46,11 +44,11 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
      * @param columns the input data
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
-     * @see #map(InputSegment, EventHandler)
+     * @see #map(InputSegment, int, EventHandler)
      * @see EventHandler#failFast(boolean)
      */
     public final S map(final String... columns) throws BeanException {
-        return map(failFast(true), columns);
+        return map(failFast(true), offset, columns);
     }
 
     /**
@@ -64,24 +62,10 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
      */
-    public final <R extends InputSegment<?>, V extends InputError<R, ?, D>> S map(R row, EventHandler<R, ?, D, V> handler) throws BeanException {
-        if (row == null || row.getColumns() == null) {
-            return null;
-        }
-        requireNonNull(handler, "handler is required");
-        final R source = handler.getSource();
-        if (source != null && source != row) {
-            throw new BeanException(EventHandler.class, "source", "does not match with row argument");
-        }
-        final S segment = map(handler, row.getColumns());
-        if (segment instanceof Parsed<?, ?> parsed) {
-            //noinspection unchecked
-            ((Parsed<?, R>) parsed).setRecord(row);
-        }
-        if (validation.isEnabled()) {
-            this.validate(segment, this.properties, validation.getGroups(), handler);
-        }
-        return segment;
+    public final <R extends InputSegment<?>, V extends InputError<R, ?, D>> S map(
+            R row, EventHandler<R, ?, D, V> handler
+    ) throws BeanException {
+        return this.map(row, offset, handler);
     }
 
     /**
@@ -95,7 +79,11 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
      */
-    public abstract <R extends InputSegment<?>, V extends InputError<R, ?, D>> S map(EventHandler<R, ?, D, V> handler, String... columns) throws BeanException;
+    public final <R extends InputSegment<?>, V extends InputError<R, ?, D>> S map(
+            EventHandler<R, ?, D, V> handler, String... columns
+    ) throws BeanException {
+        return this.map(handler, offset, columns);
+    }
 
     /**
      * Flat-Map the given to segment to CSV record within formatting.
@@ -104,19 +92,93 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
      * @return the formatted array of strings
      * @throws BeanException for any problem configuring and reading fields of the input to bean properties
      */
-    public abstract String[] unmap(S bean) throws BeanException;
+    public final String[] unmap(S bean) throws BeanException {
+        return this.unmap(bean, offset);
+    }
+
+    /**
+     * Map and validate input data to java bean depending on annotations like {@link Position}.
+     * and collect errors in the given collector after full-filling the error properties.
+     *
+     * @param row     the input data
+     * @param offset  the number of columns reserved {@link Truncated#value()}
+     * @param handler the error collector, must not be null
+     * @param <R>     the row type
+     * @param <V>     the error type
+     * @return the parsed segment
+     * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
+     */
+    public final <R extends InputSegment<?>, V extends InputError<R, ?, D>> S map(
+            R row, int offset, EventHandler<R, ?, D, V> handler
+    ) throws BeanException {
+        if (row == null || row.getColumns() == null) {
+            return null;
+        }
+        requireNonNull(handler, "handler is required");
+        final R source = handler.getSource();
+        if (source != null && source != row) {
+            throw new BeanException(EventHandler.class, "source", "does not match with row argument");
+        }
+        final S segment = map(handler, offset, row.getColumns());
+        if (segment instanceof Parsed<?, ?> parsed) {
+            //noinspection unchecked
+            ((Parsed<?, R>) parsed).setRecord(row);
+        }
+        if (validation.isEnabled()) {
+            this.validate(segment, offset, this.properties, validation.getGroups(), handler);
+        }
+        return segment;
+    }
+
+    /**
+     * Map without validation input data to java bean depending on annotations like {@link Position}.
+     * and collect errors in the given collector after full-filling the error properties.
+     *
+     * @param handler the error collector, must not be null
+     * @param offset  the number of columns reserved {@link Truncated#value()}
+     * @param columns the input data
+     * @param <R>     the row type
+     * @param <V>     the error type
+     * @return the parsed segment
+     * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
+     */
+    public abstract <R extends InputSegment<?>, V extends InputError<R, ?, D>> S map(
+            EventHandler<R, ?, D, V> handler, int offset, String... columns
+    ) throws BeanException;
+
+    /**
+     * Flat-Map the given to segment to CSV record within formatting.
+     *
+     * @param bean   the java bean
+     * @param offset the number of columns reserved {@link Truncated#value()}
+     * @return the formatted array of strings
+     * @throws BeanException for any problem configuring and reading fields of the input to bean properties
+     */
+    public abstract String[] unmap(S bean, int offset) throws BeanException;
 
     /**
      * Validates the given bean with the given JSR-303 validation groups and gathering
      * {@link jakarta.validation.ConstraintViolation} in the given handler.
      *
      * @param bean      the bean that is being validated
+     * @param offset    the number of columns reserved {@link Truncated#value()}
      * @param groups    the validation groups
      * @param collector the event handler
      * @param <R>       the input row type
      * @param <V>       the input error type
      */
-    protected abstract <R extends InputSegment<?>, V extends InputError<R, ?, D>> void validate(Object bean, List<Property<?, D>> properties, Class<?>[] groups, EventHandler<R, ?, D, V> collector);
+    protected abstract <R extends InputSegment<?>, V extends InputError<R, ?, D>> void validate(
+            Object bean, int offset, List<Property<?, D>> properties, Class<?>[] groups, EventHandler<R, ?, D, V> collector
+    );
+
+    /**
+     * Gets the number of columns reserved {@link Truncated#value()}
+     *
+     * @return the configured value
+     */
+    public int getOffset() {
+        return offset;
+    }
 
     @Override
     public final List<Property<?, D>> toList() {

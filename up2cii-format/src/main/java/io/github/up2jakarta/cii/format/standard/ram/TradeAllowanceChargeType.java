@@ -59,7 +59,7 @@ public class TradeAllowanceChargeType {
     @XmlElement(name = "UnitBasisAmount")
     private AmountType unitBasisAmount;
 
-    private ChargeReasonCodeType reasonCode;
+    private ChargeReasonCodeType<?> reasonCode;
 
     @XmlElement(name = "Reason")
     private TextType reason;
@@ -249,7 +249,7 @@ public class TradeAllowanceChargeType {
      * @return possible object is {@link ChargeReasonCodeType }
      */
     @XmlElement(name = "ReasonCode")
-    public final ChargeReasonCodeType getReasonCode() {
+    public final ChargeReasonCodeType<?> getReasonCode() {
         return reasonCode;
     }
 
@@ -258,7 +258,7 @@ public class TradeAllowanceChargeType {
      *
      * @param value allowed object is {@link ChargeReasonCodeType }
      */
-    public void setReasonCode(ChargeReasonCodeType value) {
+    public void setReasonCode(ChargeReasonCodeType<?> value) {
         this.reasonCode = ChargeReasonCodeAdapter.from(value, chargeIndicator);
     }
 

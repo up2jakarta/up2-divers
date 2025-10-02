@@ -17,11 +17,11 @@ public class Attribute extends Parsable implements Linked {
     @NotNull
     private Long id;
 
-    @Position(0)
+    @Position(1)
     @NotNull
     private String key;
 
-    @Position(1)
+    @Position(2)
     @NotNull
     private String value;
 

@@ -20,7 +20,9 @@ import jakarta.validation.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.Stack;
 
 import static java.util.Objects.requireNonNull;
 
@@ -80,6 +82,26 @@ public final class MapperFactory<D extends DataType<D>> {
     }
 
     /**
+     * Build a preconfigured CSV Mapper that is able to map input data to bean properties annotated by {@link Position}.
+     * Note that only {@link String} property are supported.
+     *
+     * @param type the type of segment that is being mapped
+     * @param data the data type
+     * @param <S>  The class of segment
+     * @return the CSV mapper
+     * @throws BeanException for any missing or wrong bean configuration
+     */
+    public <S extends Segment> Mapper<S, D> build(final Class<S> type, D data) throws BeanException {
+        //noinspection unchecked
+        return new DefaultMapper<>(type, context, validator, new DataTypeResolver<>((Class<D>) data.getClass()) {
+            @Override
+            public Optional<D> get(Stack<Class<? extends Segment>> stack, Field[] path, Field field) {
+                return Optional.of(data);
+            }
+        });
+    }
+
+    /**
      * Internal Mapper implementation.
      *
      * @param <S> the segment type
@@ -94,7 +116,7 @@ public final class MapperFactory<D extends DataType<D>> {
             super(type, context, resolver);
             this.validator = validator;
             this.constructor = Beans.getDefaultConstructor(type);
-            this.length = offset(super.properties) + 1;
+            this.length = this.offset(this.toList()) + 1;
         }
 
         private Property<?, D> findProperty(final ConstraintViolation<?> violation, List<Property<?, D>> origin) {
@@ -133,28 +155,33 @@ public final class MapperFactory<D extends DataType<D>> {
         }
 
         @Override
-        protected <R extends InputSegment<?>, V extends InputError<R, ?, D>> void validate(Object bean, List<Property<?, D>> ps, Class<?>[] g, EventHandler<R, ?, D, V> h) {
+        protected <R extends InputSegment<?>, V extends InputError<R, ?, D>> void validate(
+                Object bean, int offset, List<Property<?, D>> ps, Class<?>[] g, EventHandler<R, ?, D, V> h
+        ) {
             final Set<ConstraintViolation<Object>> violations = validator.validate(bean, g);
             for (final ConstraintViolation<?> v : violations) {
                 final Property<?, D> p = findProperty(v, ps);
                 if (p != null) {
                     final Error config = p.field.getAnnotation(Error.class);
-                    h.handleEvent(p.type, p.offset + this.offset, v, config);
+                    h.handleEvent(p.type, p.offset + offset, v, config);
                 } else {
                     h.handleEvent(null, Integer.MAX_VALUE, v, null);
                 }
             }
         }
 
-        private <T extends Segment, R extends InputSegment<?>, V extends InputError<R, ?, D>> T parse(Constructor<T> constructor, List<Property<?, D>> properties, EventHandler<R, ?, D, V> collector, String... columns) throws BeanException {
+        private <T extends Segment, R extends InputSegment<?>, V extends InputError<R, ?, D>> T parse(
+                Constructor<T> constructor, List<Property<?, D>> properties, EventHandler<R, ?, D, V> collector,
+                int offset, String... columns
+        ) throws BeanException {
             final T bean = Beans.newInstance(constructor);
             for (final Property<?, D> p : properties) {
                 if (p instanceof FragmentProperty<?, ?>) {
                     //noinspection unchecked
                     final FragmentProperty<?, D> fp = (FragmentProperty<?, D>) p;
-                    final Segment fragment = parse(fp.constructor, fp.properties, collector, columns);
+                    final Segment fragment = parse(fp.constructor, fp.properties, collector, offset, columns);
                     if (fp.validation.isEnabled()) {
-                        this.validate(fragment, fp.properties, fp.validation.getGroups(), collector);
+                        this.validate(fragment, offset, fp.properties, fp.validation.getGroups(), collector);
                     }
                     if (!(fragment instanceof Nullable nv) || nv.isNotNull()) {
                         Beans.setValue(bean, fragment, fp.setter);
@@ -170,12 +197,14 @@ public final class MapperFactory<D extends DataType<D>> {
         }
 
         @SuppressWarnings("unchecked")
-        private void format(String[] result, List<Property<?, D>> properties, Segment bean) throws BeanException {
+        private void format(
+                String[] result, int offset, List<Property<?, D>> properties, Segment bean
+        ) throws BeanException {
             for (final Property<?, D> p : properties) {
                 if (p instanceof FragmentProperty<?, ?> fp) {
                     final FragmentProperty<?, D> fragment = (FragmentProperty<?, D>) fp;
                     var value = fragment.getValue(bean);
-                    this.format(result, fragment.properties, value);
+                    this.format(result, offset, fragment.properties, value);
                 } else {
                     final PositionProperty<Object, D> pp = (PositionProperty<Object, D>) p;
                     var value = pp.getValue(bean);
@@ -185,22 +214,24 @@ public final class MapperFactory<D extends DataType<D>> {
         }
 
         @Override
-        public <R extends InputSegment<?>, V extends InputError<R, ?, D>> S map(EventHandler<R, ?, D, V> handler, String... columns) throws BeanException {
+        public <R extends InputSegment<?>, V extends InputError<R, ?, D>> S map(
+                EventHandler<R, ?, D, V> handler, int offset, String... columns
+        ) throws BeanException {
             if (columns == null) {
                 return null;
             }
             requireNonNull(handler, "handler is required");
-            return parse(this.constructor, this.properties, handler, columns);
+            return parse(this.constructor, this.toList(), handler, offset, columns);
         }
 
         @Override
-        public String[] unmap(S bean) throws BeanException {
+        public String[] unmap(S bean, int offset) throws BeanException {
             if (bean == null) {
                 return null;
             }
             final String[] result = new String[offset + length];
             if (length != 0) {
-                format(result, properties, bean);
+                format(result, offset, this.toList(), bean);
             }
             return result;
         }
@@ -218,7 +249,9 @@ public final class MapperFactory<D extends DataType<D>> {
         private final ValidationContext validation;
         private final Constructor<T> constructor;
 
-        FragmentProperty(Class<T> sType, D dType, Field field, int offset, ValidationContext v, List<Property<?, D>> ps) throws BeanException {
+        FragmentProperty(
+                Class<T> sType, D dType, Field field, int offset, ValidationContext v, List<Property<?, D>> ps
+        ) throws BeanException {
             super(field, dType, offset);
             this.constructor = Beans.getDefaultConstructor(sType);
             this.properties = ps;

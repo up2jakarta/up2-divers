@@ -29,6 +29,7 @@ Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready enti
     - Bean Checker API
     - BusinessData Resolver API
 - Business Aggregation for multi-segments mapping
+- Business Segregation for multi-segments unmapping
 
 # Requirements
 
@@ -40,7 +41,7 @@ Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready enti
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.4.8</version>
+        <version>1.4.9</version>
     </dependency>
     <!-- Optional JSR-303 Validation Provider -->
     <!-- Optional JPA Provider -->
@@ -585,9 +586,9 @@ private MapperFactory factory;
 }
 ```
 
-# Business Aggregation
+# Business Aggregation & Segregation
 
-The final goal of `Up2CSV` is to parse a `business-object` in case of data is spread over several segments.
+The final goal of `Up2CSV` is to parse and format `business objects` in case of data is spread over several segments.
 
 ## Sample Business Case
 
@@ -610,7 +611,7 @@ It's impossible to present a `business-property` within `0..n` cardinality
   simplify the validation.
 - And more depending on the `business-logic`
 
-See [BusinessAggregatorTest.java](src/test/java/io/github/up2jakarta/csv/BusinessAggregatorTest.java) for more details.
+See [BusinessTest.java](src/test/java/io/github/up2jakarta/csv/BusinessTest.java) for more details.
 
 # Best practices
 

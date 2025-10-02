@@ -9,8 +9,8 @@ public class InvoiceAggregator extends BusinessAggregator<Invoice, DataId, Segme
 
     private final ErrorCreator creator;
 
-    public InvoiceAggregator(MapperFactory<DataId> factory, ErrorCreator creator, SegmentType root) throws BeanException {
-        super(factory, root, Invoice.class, 0);
+    public InvoiceAggregator(MapperFactory<DataId> factory, ErrorCreator creator) throws BeanException {
+        super(factory, SegmentType.S01, Invoice.class, 0);
         this.creator = creator;
     }
 

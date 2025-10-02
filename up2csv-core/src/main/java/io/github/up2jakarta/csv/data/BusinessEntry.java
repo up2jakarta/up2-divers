@@ -11,7 +11,7 @@ import io.github.up2jakarta.xml.codelist.PropertyException;
 
 import java.util.List;
 
-public final class BusinessEntry<T extends InputType<T>, A extends InputSegment<?>, D extends DataType<D>, C extends InputError<A, ?, ?>> {
+public final class BusinessEntry<T extends InputType<D, T>, A extends InputSegment<T>, D extends DataType<D>, C extends InputError<A, ?, ?>> {
 
     private final Parsed<T, ?> segment;
     private final EventHandler<A, ?, D, C> handler;
@@ -29,7 +29,7 @@ public final class BusinessEntry<T extends InputType<T>, A extends InputSegment<
         return segment.getRecord().getType();
     }
 
-    public boolean filter(BusinessEntry<T, A, D, C> parent, InputType<T> type) {
+    public boolean filter(BusinessEntry<T, A, D, C> parent, InputType<D, T> type) {
         if (type != this.getType()) {
             return false;
         }
@@ -43,10 +43,9 @@ public final class BusinessEntry<T extends InputType<T>, A extends InputSegment<
         handler.addTo(target);
     }
 
-    public void handle(SeverityType severity, InputType<?> segment, String message, int index) {
+    public void handle(SeverityType severity, InputType<D, ?> segment, String message, int index) {
         final PropertyException error = new PropertyException(severity, segment.getErrorCode(), message);
-        //noinspection unchecked
-        handler.handleEvent((D) segment.getGroupType(), index, error, null, false);
+        handler.handleEvent(segment.getBusinessType(), index, error, null, false);
     }
 
 }

@@ -1,9 +1,6 @@
 package io.github.up2jakarta.csv.test.agg;
 
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.Up2Decimal;
-import io.github.up2jakarta.csv.annotation.Up2Temporal;
-import io.github.up2jakarta.csv.annotation.Up2Token;
+import io.github.up2jakarta.csv.annotation.*;
 import io.github.up2jakarta.csv.impl.Parsable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -15,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Valid
+@Truncated(2)
 @SuppressWarnings("unused")
 public class Invoice extends Parsable {
 
