@@ -14,6 +14,10 @@ public class Test3Bean implements Segment {
     @Enumerated
     private XML1Enum enum1;
 
+    public XML1Enum getEnum1() {
+        return enum1;
+    }
+
     public void setEnum1(XML1Enum enum1) {
         this.enum1 = enum1;
     }

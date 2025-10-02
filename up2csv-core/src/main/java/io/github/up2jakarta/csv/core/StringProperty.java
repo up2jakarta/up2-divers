@@ -13,13 +13,18 @@ import java.util.List;
 final class StringProperty<D extends DataType<D>> extends PositionProperty<String, D> {
 
     StringProperty(Field field, D type, int offset, List<ProcessorWrapper<?, D>> processors) throws BeanException {
-        super(field, type, offset, processors);
+        super(field, type, offset, processors, v -> v);
     }
 
     @Override
     void setValue(Object bean, String value, int offset, EventHandler<?, ?, D, ?> handler) throws BeanException {
         value = process(value, offset, handler);
         Beans.setValue(bean, value, setter);
+    }
+
+    @Override
+    String format(String value) {
+        return value;
     }
 
 }

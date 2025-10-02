@@ -18,7 +18,8 @@ Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready enti
 - Support of IoC container like CDI (Contexts and Dependency Injection) provider or Spring or whatever
 - Configuration based on @Annotation
 - Support of Java OOP (Object-Oriented Programming)
-- Business Aggregator
+- Mapping from flat-data to java-bean
+- Unmapping from java-bean to flat data
 - Extensions
     - Processor API
     - Conversion Resolver API
@@ -27,6 +28,7 @@ Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready enti
     - Conversion Extension API
     - Bean Checker API
     - BusinessData Resolver API
+- Business Aggregation for multi-segments mapping
 
 # Requirements
 
@@ -176,7 +178,7 @@ This annotation allows the automatic conversion of `boolean` and its wrapper.
 public Up2Segment implements Segment {
 
     @Position(0)
-    @Up2Boolean("Yes")
+    @Up2Boolean(trueValue = "Yes", falseValue = "No")
     private Boolean valid;
 }
 ```
@@ -513,7 +515,7 @@ public TestSegment implements Segment {
 
 See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/impl)
 
-# Use of Up2CSV
+# Mapping of flat-data
 
 - Without error collecting (fail-fast)
 
@@ -556,6 +558,30 @@ private EventCreator<InputRowImpl, ?, ?, InputErrorImpl> creator;
     // Here the bean is full-filled automatically
     // Here the errors is full-filled automatically 
     // ... Persistence or ETL or whateven processing
+}
+```
+
+# Unmapping of java-bean
+
+During the unmapping of java-bean:
+
+- The `Processor API` are not supported for String properties except the annotation `@Up2Default` without modifying the source.
+- The JSR-303 validation is not supported because default values maybe are not supplied.
+- The formatting of properties are done with the same annotations for mapping aka `Resolver API`
+- The annotation `@Truncated` is supported
+
+``` java
+@Inject
+private MapperFactory factory;
+
+{
+    // GIVEN Singleton
+    final Mapper<Up2Segment> mapper = factory.build(Up2Segment.class);
+    final Up2Segment bean ; // ... full-fill the bean
+    // WHEN
+    final String[] data = mapper.unmap(bean);
+    // THEN
+    // Here the data is full-filled automatically 
 }
 ```
 

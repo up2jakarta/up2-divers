@@ -65,21 +65,22 @@ final class BeanSupport<D extends DataType<D>> {
         return csv;
     }
 
-    private static void checkDefault(Field field, Conversion<?> conversion) throws BeanException {
-        final Up2Default defaultValue = field.getAnnotation(Up2Default.class);
-        if (defaultValue != null) {
-            try {
-                conversion.apply(defaultValue.value());
-            } catch (Throwable ex) {
-                throw new BeanException(field, "@Up2Default[value] cannot be converted");
-            }
-        }
-    }
-
     private static Method getRepeatableValue(Class<? extends Annotation> annotationType) throws BeanException {
         final Repeatable repeatable = annotationType.getDeclaredAnnotation(Repeatable.class);
         if (repeatable != null) {
             return Beans.getMethod(repeatable.value(), "value", "class", "value()");
+        }
+        return null;
+    }
+
+    static <T> T getDefault(Field field, PropertyParser<T> conversion) throws BeanException {
+        final Up2Default defaultValue = field.getAnnotation(Up2Default.class);
+        if (defaultValue != null) {
+            try {
+                return conversion.apply(defaultValue.value());
+            } catch (Throwable ex) {
+                throw new BeanException(field, "@Up2Default[value] cannot be converted");
+            }
         }
         return null;
     }
@@ -131,26 +132,29 @@ final class BeanSupport<D extends DataType<D>> {
         return unmodifiableList(result);
     }
 
+    @SuppressWarnings("unchecked")
     private Conversion<?> getConversion(MapperContext<D> context, Field field, Class<?> type) throws BeanException {
         final Up2Converter converter = field.getAnnotation(Up2Converter.class);
         final Error error = field.getAnnotation(Error.class);
         if (converter != null) {
-            final TypeConverter<?> tConverter = getBean(context.getContext(), converter.value());
+            final TypeConverter<Object> tConverter = (TypeConverter<Object>) getBean(context.getContext(), converter.value());
             if (!tConverter.getSupportedType().isAssignableFrom(field.getType())) {
                 throw new BeanException(field, "@Converter[value] does not support " + field.getType().getSimpleName());
             }
             if (error == null) {
-                return Conversion.of(tConverter::parse, tConverter.getErrorSeverity(), tConverter.getErrorCode());
+                var p = PropertyParser.of(tConverter::parse, tConverter.getErrorSeverity(), tConverter.getErrorCode());
+                var f = PropertyFormatter.of(tConverter::format, tConverter.getErrorSeverity(), tConverter.getErrorCode());
+                return new Conversion<>(p, f);
             }
-            return Conversion.of(tConverter::parse, error);
+            return new Conversion<>(tConverter::parse, tConverter::format, error);
         }
         for (final Annotation annotation : field.getAnnotations()) {
             final Resolver resolver = annotation.annotationType().getAnnotation(Resolver.class);
             if (resolver != null) {
-                //noinspection unchecked
-                var conversionResolver = (ConversionResolver<Annotation>) getBean(context.getContext(), resolver.value());
-                final Conversion<?> conversion = conversionResolver.resolve(annotation, field);
-                return Conversion.of(conversion, error);
+                var cResolver = (ConversionResolver<Annotation>) getBean(context.getContext(), resolver.value());
+                final PropertyParser<Object> p = (PropertyParser<Object>) cResolver.forParsing(annotation, field);
+                final PropertyFormatter<Object> f = (PropertyFormatter<Object>) cResolver.forFormatting(annotation, field);
+                return new Conversion<>(p, f, error);
             }
         }
         return context.getConversion(field, type);
@@ -196,19 +200,19 @@ final class BeanSupport<D extends DataType<D>> {
                     result.add(new StringProperty<>(field, dataType, index, processors));
                 } else {
                     final Conversion<?> conversion = getConversion(context, field, fieldType);
-                    checkDefault(field, conversion);
-                    result.add(new ConvertedProperty<>(field, dataType, index, processors, conversion));
+                    result.add(new ObjectProperty<>(field, dataType, index, processors, conversion));
                 }
                 context.getChecker().afterPositionProperty(field, fieldType, index);
             } else {
                 context.getChecker().unknownProperty(field, fieldType);
             }
         }
-        return unmodifiableList(result);
+        return result;
     }
 
     List<Property<?, D>> build(Class<? extends Segment> beanType) throws BeanException {
-        return getProperties(beanType, context);
+        final List<Property<?, D>> result = getProperties(beanType, context);
+        return unmodifiableList(result);
     }
 
 }

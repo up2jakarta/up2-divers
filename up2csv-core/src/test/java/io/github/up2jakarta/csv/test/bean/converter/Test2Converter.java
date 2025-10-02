@@ -25,8 +25,16 @@ public class Test2Converter implements Segment {
     @Error(value = TU_P_006, severity = SeverityType.ERROR)
     private Integer other;
 
+    public CurrencyCodeType getTest() {
+        return test;
+    }
+
     public void setTest(CurrencyCodeType test) {
         this.test = test;
+    }
+
+    public Integer getOther() {
+        return other;
     }
 
     public void setOther(Integer other) {

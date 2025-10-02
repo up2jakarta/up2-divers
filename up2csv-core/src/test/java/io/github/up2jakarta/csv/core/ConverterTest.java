@@ -71,7 +71,7 @@ class ConverterTest {
         assertEquals(CurrencyCodeType.TND, entity.getCurrency());
         assertEquals(new BigDecimal("4.0625"), entity.getQuantity());
         assertEquals(MeasurementUnitCode.C62, entity.getUnit());
-        assertEquals(true, entity.getValid());
+        assertEquals(true, entity.isValid());
         assertEquals(Period.ofWeeks(1), entity.getShippingPeriod());
         assertEquals(CountryCodeType.TN, entity.getShippingCountry());
     }
@@ -96,7 +96,7 @@ class ConverterTest {
         assertEquals(CurrencyCodeType.EUR, entity.getCurrency());
         assertEquals(new BigDecimal("4.0625"), entity.getQuantity());
         assertEquals(MeasurementUnitCode.KGM, entity.getUnit());
-        assertEquals(true, entity.getValid());
+        assertEquals(true, entity.isValid());
         assertEquals(Period.ofWeeks(1), entity.getShippingPeriod());
         assertEquals(CountryCodeType.FR, entity.getShippingCountry());
         // Error
@@ -130,7 +130,7 @@ class ConverterTest {
         assertNull(entity.getCurrency());
         assertEquals(new BigDecimal("4.0625"), entity.getQuantity());
         assertEquals(MeasurementUnitCode.KGM, entity.getUnit());
-        assertEquals(true, entity.getValid());
+        assertEquals(true, entity.isValid());
         assertEquals(Period.ofWeeks(1), entity.getShippingPeriod());
         assertNull(entity.getShippingCountry());
         // Error Currency

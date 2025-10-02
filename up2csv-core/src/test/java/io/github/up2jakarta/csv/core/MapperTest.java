@@ -6,6 +6,7 @@ import io.github.up2jakarta.csv.impl.*;
 import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Listable;
 import io.github.up2jakarta.csv.test.Tests;
+import io.github.up2jakarta.csv.test.bean.converter.SupportEntity;
 import io.github.up2jakarta.csv.test.bean.jpa.NoteEntity;
 import io.github.up2jakarta.csv.test.bean.mapper.*;
 import io.github.up2jakarta.csv.test.bean.mapper.oneshot.AbstractAddress;
@@ -26,6 +27,7 @@ import java.util.List;
 
 import static io.github.up2jakarta.csv.core.EventHandler.failFast;
 import static io.github.up2jakarta.csv.misc.Errors.ERROR_VALIDATOR;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("unchecked")
@@ -74,15 +76,78 @@ class MapperTest {
     }
 
     @Test
+    void testUnmapNull() throws BeanException {
+        // Given
+        final ValidBean bean = null;
+        final Mapper<ValidBean, DataId> mapper = factory.build(ValidBean.class);
+        // When
+        final String[] out = mapper.unmap(bean);
+        // Then
+        assertNull(out);
+    }
+
+    @Test
+    void testUnmapDefault() throws BeanException {
+        // Given
+        final DefaultBean bean = new DefaultBean();
+        final Mapper<DefaultBean, DataId> mapper = factory.build(DefaultBean.class);
+        // When
+        final String[] out = mapper.unmap(bean);
+        // Then Bean
+        assertNull(bean.getCode());
+        assertNull(bean.getReference());
+        // Then Unmapping
+        assertNotNull(out);
+        assertEquals(3, out.length);
+        for (String s : out) {
+            assertEquals("*", s);
+        }
+    }
+
+    @Test
+    void testUnmapEmpty() throws BeanException {
+        // Given
+        final ValidBean bean = new ValidBean();
+        final Mapper<ValidBean, DataId> mapper = factory.build(ValidBean.class);
+        // When
+        final String[] out = mapper.unmap(bean);
+        // Then
+        assertNotNull(out);
+        assertArrayEquals(new String[]{null, null}, out);
+    }
+
+    @Test
+    void testUnmapSize() throws BeanException {
+        // GIVEN
+        final String[] data = {"100", "Test 100", "2024-07-25", "57.00", "TND", "4.0625", "C62", "Y", "P9D", "TN", "dGVzdA=="};
+        final Mapper<SupportEntity, DataId> parser = factory.build(SupportEntity.class);
+        // WHEN
+        final SupportEntity entity = parser.map(data);
+        assertNotNull(entity);
+        assertArrayEquals("test".getBytes(UTF_8), entity.getBase64());
+        // When Unmapping
+        final String[] out = parser.unmap(entity);
+        // Then
+        assertNotNull(out);
+        assertEquals(data.length + 1, out.length);
+        assertNull(out[0]);
+        for (var i = 0; i < data.length; i++) {
+            assertEquals(data[i], out[i + 1]);
+        }
+    }
+
+
+    @Test
     void testOneShot() throws BeanException {
         // Given
         final Mapper<ClientSegment, DataId> mapper = factory.build(ClientSegment.class);
-        // When
-        final ClientSegment bean = mapper.map(
+        final String[] data = new String[]{
                 "AAB", "UP2", "CSV", "TN-0000-1111-9999", "TND",
                 "TN", "Tunis", "1001", "11 FreeAvenue",
                 "FR", "Paris", "75020", "999 FreeAvenue", "Building B9", "6th floor, D26"
-        );
+        };
+        // When
+        final ClientSegment bean = mapper.map(data);
         // Then
         assertNotNull(bean);
         assertEquals("AAB", bean.getKey());
@@ -107,32 +172,43 @@ class MapperTest {
         assertEquals("999 FreeAvenue", complexAddress.getAddressLine1());
         assertEquals("Building B9", complexAddress.getAddressLine2());
         assertEquals("6th floor, D26", complexAddress.getAddressLine3());
+        // When Unmapping
+        final String[] out = mapper.unmap(bean);
+        assertArrayEquals(data, out);
     }
 
     @Test
     void validBean() throws BeanException {
         // Given
         final Mapper<SimpleSegment, DataId> mapper = factory.build(SimpleSegment.class);
+        final String[] data = new String[]{"AAB", "ABBESSI", "Software engineer"};
         // When
-        final SimpleSegment bean = mapper.map("AAB", "ABBESSI", "Software engineer");
+        final SimpleSegment bean = mapper.map(data);
         // Then
         assertNotNull(bean);
         assertEquals("AAB", bean.getCode());
         assertEquals("ABBESSI", bean.getName());
         assertEquals("Software engineer", bean.getRole());
+        // When Unmapping
+        final String[] out = mapper.unmap(bean);
+        assertArrayEquals(data, out);
     }
 
     @Test
     void testInnerStaticClass() throws BeanException {
         // Given
         final Mapper<InnerStaticSegment, DataId> mapper = factory.build(InnerStaticSegment.class);
+        final String[] data = new String[]{"AAB", "ABBESSI"};
         // When
-        final InnerStaticSegment bean = mapper.map("AAB", "ABBESSI");
+        final InnerStaticSegment bean = mapper.map(data);
         // Then
         assertNotNull(bean);
         assertEquals("AAB", bean.getId());
         assertNotNull(bean.getInner());
         assertEquals("ABBESSI", bean.getInner().getName());
+        // When Unmapping
+        final String[] out = mapper.unmap(bean);
+        assertArrayEquals(data, out);
     }
 
     @Test
@@ -165,66 +241,86 @@ class MapperTest {
     void validBeanNullColumn() throws BeanException {
         // Given
         final Mapper<SimpleSegment, DataId> mapper = factory.build(SimpleSegment.class);
+        final String[] data = new String[]{"AAB", "ABBESSI", null};
         // When
-        final SimpleSegment bean = mapper.map("AAB", "ABBESSI", null);
+        final SimpleSegment bean = mapper.map(data);
         // Then
         assertNotNull(bean);
         assertEquals("AAB", bean.getCode());
         assertEquals("ABBESSI", bean.getName());
         assertNull(bean.getRole());
+        // When Unmapping
+        final String[] out = mapper.unmap(bean);
+        assertArrayEquals(data, out);
     }
 
     @Test
     void validBeanEmptyColumn() throws BeanException {
         // Given
         final Mapper<SimpleSegment, DataId> mapper = factory.build(SimpleSegment.class);
+        final String[] data = new String[]{"AAB", "ABBESSI", ""};
         // When
-        final SimpleSegment bean = mapper.map("AAB", "ABBESSI", "");
+        final SimpleSegment bean = mapper.map(data);
         // Then
         assertNotNull(bean);
         assertEquals("AAB", bean.getCode());
         assertEquals("ABBESSI", bean.getName());
         assertEquals("", bean.getRole());
+        // When Unmapping
+        final String[] out = mapper.unmap(bean);
+        assertArrayEquals(data, out);
     }
 
     @Test
     void validComplexBean() throws BeanException {
         // Given
         final Mapper<ComplexSegment, DataId> mapper = factory.build(ComplexSegment.class);
+        final String[] data = new String[]{"AAB", "TN", "Tunisia"};
         // When
-        final ComplexSegment bean = mapper.map("AAB", "TN", "Tunisia");
+        final ComplexSegment bean = mapper.map(data);
         // Then
         assertNotNull(bean);
         assertEquals("AAB", bean.getCode());
         assertNotNull(bean.getCountry());
         assertEquals("TN", bean.getCountry().getCode());
         assertEquals("Tunisia", bean.getCountry().getName());
+        // When Unmapping
+        final String[] out = mapper.unmap(bean);
+        assertArrayEquals(data, out);
     }
 
     @Test
     void validExtendedBean() throws BeanException {
         // Given
         final Mapper<ExtendedCountryBean, DataId> mapper = factory.build(ExtendedCountryBean.class);
+        final String[] data = new String[]{"TND", "TN", "Tunisia"};
         // When
-        final ExtendedCountryBean bean = mapper.map("TND", "TN", "Tunisia");
+        final ExtendedCountryBean bean = mapper.map(data);
         // Then
         assertNotNull(bean);
         assertEquals("TND", bean.getCurrency());
         assertEquals("TN", bean.getCode());
         assertEquals("Tunisia", bean.getName());
+        // When Unmapping
+        final String[] out = mapper.unmap(bean);
+        assertArrayEquals(data, out);
     }
 
     @Test
     void validGenericBean() throws BeanException {
         // Given
         final Mapper<GenericCountryBean, DataId> mapper = factory.build(GenericCountryBean.class);
+        final String[] data = new String[]{"TND", "TN", "Tunisia"};
         // When
-        final GenericCountryBean bean = mapper.map("TND", "TN", "Tunisia");
+        final GenericCountryBean bean = mapper.map(data);
         // Then
         assertNotNull(bean);
         assertEquals("TND", bean.getCurrency());
         assertEquals("TN", bean.getCode());
         assertEquals("Tunisia", bean.getName());
+        // When Unmapping
+        final String[] out = mapper.unmap(bean);
+        assertArrayEquals(data, out);
     }
 
     @Test

@@ -1,9 +1,7 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.extension.Conversion;
-import io.github.up2jakarta.csv.extension.ConversionExtension;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.extension.*;
 import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.xml.api.SeverityType;
@@ -46,6 +44,41 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
         }
     }
 
+    private <T extends Enum<T>> Conversion<?> ofOrdinal(Class<T> type, Optional<Error> error, SeverityType et, String ec) {
+        final Object[] constants = type.getEnumConstants();
+        final PropertyParser<Object> p = v -> {
+            try {
+                final int ordinal = Integer.parseInt(v);
+                return constants[ordinal];
+            } catch (Throwable exception) {
+                final String msg = String.format(FORMAT, v, type.getSimpleName());
+                throw new PropertyException(et, ec, msg);
+            }
+        };
+        final PropertyFormatter<Object> f = v -> {
+            for (var i = 0; i < constants.length; i++) {
+                if (v == constants[i]) {
+                    return String.valueOf(i);
+                }
+            }
+            final String msg = String.format(FORMAT, v, type.getSimpleName());
+            throw new PropertyException(et, ec, msg);
+        };
+        return new Conversion<>(p, f, error);
+    }
+
+    private <T extends Enum<T>> Conversion<?> ofName(Class<T> type, Optional<Error> error, SeverityType et, String ec) {
+        final PropertyParser<Object> p = v -> {
+            try {
+                return Enum.valueOf(type, v);
+            } catch (IllegalArgumentException exception) {
+                final String msg = String.format(FORMAT, v, type.getSimpleName());
+                throw new PropertyException(et, ec, msg);
+            }
+        };
+        return new Conversion<>(p, Object::toString, error);
+    }
+
     @Override
     public Optional<Enumerated> get(Class<? extends Segment> segmentType, Field property, Class<?> type, Field... path) throws BeanException {
         final Enumerated jpa = property.getAnnotation(Enumerated.class);
@@ -68,30 +101,15 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
         //noinspection unchecked,rawtypes
         final Class<? extends Enum> enumType = (Class<Enum>) pType;
         check(property, enumType, Enum::name);
-        final Optional<Error> error = CodeListResolver.getError(property);
+        final Optional<Error> error = ConversionResolver.getError(property);
         final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);
         final String code = error.map(Error::value).orElse(Errors.ERROR_XML_ENUM);
         if (EnumType.STRING == config.value()) {
-            return v -> {
-                try {
-                    //noinspection unchecked
-                    return Enum.valueOf(enumType, v);
-                } catch (IllegalArgumentException exception) {
-                    final String msg = String.format(FORMAT, v, enumType.getSimpleName());
-                    throw new PropertyException(type, code, msg);
-                }
-            };
+            //noinspection unchecked
+            return ofName(enumType, error, type, code);
         }
-        final Object[] constants = enumType.getEnumConstants();
-        return v -> {
-            try {
-                final int ordinal = Integer.parseInt(v);
-                return constants[ordinal];
-            } catch (Throwable exception) {
-                final String msg = String.format(FORMAT, v, enumType.getSimpleName());
-                throw new PropertyException(type, code, msg);
-            }
-        };
+        //noinspection unchecked
+        return ofOrdinal(enumType, error, type, code);
     }
 
 }

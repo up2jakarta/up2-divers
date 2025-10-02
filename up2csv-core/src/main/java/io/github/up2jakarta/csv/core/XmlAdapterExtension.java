@@ -1,11 +1,11 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.extension.BeanContext;
-import io.github.up2jakarta.csv.extension.Conversion;
-import io.github.up2jakarta.csv.extension.ConversionExtension;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.extension.*;
 import io.github.up2jakarta.csv.misc.BeanException;
+import io.github.up2jakarta.csv.misc.Errors;
+import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.xml.codelist.PropertyException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -67,10 +67,19 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
     @Override
     public Conversion<?> resolve(Field property, Class<?> type, XmlJavaTypeAdapter config) throws BeanException {
         //noinspection unchecked
-        final Class<? extends XmlAdapter<String, ?>> adapterType = (Class<? extends XmlAdapter<String, ?>>) config.value();
-        final Optional<Error> error = CodeListResolver.getError(property);
-        final XmlAdapter<String, ?> adapter = getBean(context, adapterType);
-        return Conversion.of(adapter::unmarshal, error.orElse(null));
+        final Class<? extends XmlAdapter<String, Object>> adapterType = (Class<? extends XmlAdapter<String, Object>>) config.value();
+        final Optional<Error> error = ConversionResolver.getError(property);
+        final XmlAdapter<String, Object> adapter = getBean(context, adapterType);
+        final PropertyFormatter<Object> f = v -> {
+            try {
+                return adapter.marshal(v);
+            } catch (Exception ex) {
+                final SeverityType severityType = error.map(Error::severity).orElse(SeverityType.ERROR);
+                final String code = error.map(Error::value).orElse(Errors.ERROR_XML_ENUM);
+                throw PropertyException.of(severityType, code, ex);
+            }
+        };
+        return new Conversion<>(adapter::unmarshal, f, error);
     }
 
 }

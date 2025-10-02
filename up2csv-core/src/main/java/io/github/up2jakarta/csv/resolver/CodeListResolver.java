@@ -1,9 +1,11 @@
-package io.github.up2jakarta.csv.core;
+package io.github.up2jakarta.csv.resolver;
 
 import io.github.up2jakarta.csv.annotation.Error;
 import io.github.up2jakarta.csv.annotation.Up2CodeList;
 import io.github.up2jakarta.csv.extension.Conversion;
 import io.github.up2jakarta.csv.extension.ConversionResolver;
+import io.github.up2jakarta.csv.extension.PropertyFormatter;
+import io.github.up2jakarta.csv.extension.PropertyParser;
 import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Beans;
 import io.github.up2jakarta.csv.misc.Errors;
@@ -26,16 +28,8 @@ import static io.github.up2jakarta.xml.codelist.CodeListConverter.parse;
 @Singleton
 public final class CodeListResolver extends ConversionResolver<Up2CodeList> {
 
-    static Optional<Error> getError(Field property) {
-        final Error error = property.getAnnotation(Error.class);
-        if (error == null) {
-            return Optional.ofNullable(property.getType().getAnnotation(Error.class));
-        }
-        return Optional.of(error);
-    }
-
     @Override
-    public Conversion<? extends CodeList<?>> resolve(Up2CodeList config, Field property) throws BeanException {
+    public PropertyParser<? extends CodeList<?>> forParsing(Up2CodeList config, Field property) throws BeanException {
         //noinspection unchecked
         final Class<CodeList<?>> clType = (Class<CodeList<?>>) property.getType();
         if (!clType.isEnum()) {
@@ -45,9 +39,15 @@ public final class CodeListResolver extends ConversionResolver<Up2CodeList> {
         if (types.length == 0 || clType != types[0]) {
             throw new BeanException(property, "type must implements CodeList<" + clType.getSimpleName() + ">");
         }
-        final Optional<Error> error = CodeListResolver.getError(property);
+        final Optional<Error> error = getError(property);
         final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);
         final String code = error.map(Error::value).orElse(Errors.ERROR_CODE_LIST);
         return v -> parse(v, clType, Stream.of(clType.getEnumConstants()), type, code);
     }
+
+    @Override
+    public PropertyFormatter<? extends CodeList<?>> forFormatting(Up2CodeList config, Field property) {
+        return CodeList::getCode;
+    }
+
 }

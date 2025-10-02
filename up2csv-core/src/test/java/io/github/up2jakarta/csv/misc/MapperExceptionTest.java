@@ -104,7 +104,6 @@ public class MapperExceptionTest {
         final Mapper<Test1Exception, DataId> mapper = factory.build(Test1Exception.class);
         final List<String> expected = Arrays.asList(
                 "io.github.up2jakarta.csv.misc.MapperException: io.github.up2jakarta.xml.codelist.PropertyException: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
-                "Caused by: io.github.up2jakarta.xml.codelist.PropertyException: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
                 "Caused by: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
                 "Multiple events have been occurred:",
                 "1) the data #[1] has warning: W001 - Unknown value [EURO] for CodeList[CountryCodeType]",

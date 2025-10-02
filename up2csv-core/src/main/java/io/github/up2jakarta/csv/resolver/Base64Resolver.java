@@ -1,8 +1,9 @@
 package io.github.up2jakarta.csv.resolver;
 
 import io.github.up2jakarta.csv.annotation.Up2Base64;
-import io.github.up2jakarta.csv.extension.Conversion;
 import io.github.up2jakarta.csv.extension.ConversionResolver;
+import io.github.up2jakarta.csv.extension.PropertyFormatter;
+import io.github.up2jakarta.csv.extension.PropertyParser;
 import io.github.up2jakarta.csv.misc.BeanException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -15,14 +16,20 @@ import java.util.Base64;
 public final class Base64Resolver extends ConversionResolver<Up2Base64> {
 
     private static final Base64.Decoder DECODER = Base64.getDecoder();
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Override
-    public Conversion<byte[]> resolve(Up2Base64 config, Field property) throws BeanException {
+    public PropertyParser<byte[]> forParsing(Up2Base64 config, Field property) throws BeanException {
         final Class<?> pType = property.getType();
         if (pType == byte[].class) {
             return v -> DECODER.decode(v.getBytes(config.encoding()));
         }
         throw new BeanException(property, "must not be annotated by @Up2Base64");
+    }
+
+    @Override
+    public PropertyFormatter<byte[]> forFormatting(Up2Base64 config, Field property) {
+        return ENCODER::encodeToString;
     }
 
 }

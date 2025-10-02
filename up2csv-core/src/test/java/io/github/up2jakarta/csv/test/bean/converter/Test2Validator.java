@@ -33,12 +33,24 @@ public class Test2Validator implements Segment {
     @Up2NotEmpty(payload = Up2Warn.class)
     private String andMore;
 
+    public String getSequence() {
+        return sequence;
+    }
+
     public void setSequence(String sequence) {
         this.sequence = sequence;
     }
 
+    public String getOther() {
+        return other;
+    }
+
     public void setOther(String other) {
         this.other = other;
+    }
+
+    public String getAndMore() {
+        return andMore;
     }
 
     public void setAndMore(String andMore) {

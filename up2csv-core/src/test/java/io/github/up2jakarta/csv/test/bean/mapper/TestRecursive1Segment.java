@@ -13,8 +13,16 @@ public class TestRecursive1Segment implements Segment {
     @Fragment(1)
     private TestRecursive2Segment recursive;
 
+    public String getId() {
+        return id;
+    }
+
     public void setId(String id) {
         this.id = id;
+    }
+
+    public TestRecursive2Segment getRecursive() {
+        return recursive;
     }
 
     public void setRecursive(TestRecursive2Segment recursive) {

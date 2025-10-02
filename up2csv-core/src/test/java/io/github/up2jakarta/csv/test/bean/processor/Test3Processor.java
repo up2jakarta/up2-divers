@@ -21,8 +21,16 @@ public class Test3Processor implements Segment {
     @Error(value = Errors.ERROR_PROCESSOR, severity = SeverityType.WARNING)
     private String other;
 
+    public String getTest() {
+        return test;
+    }
+
     public void setTest(String test) {
         this.test = test;
+    }
+
+    public String getOther() {
+        return other;
     }
 
     public void setOther(String other) {

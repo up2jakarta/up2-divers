@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.resolver;
 
 import io.github.up2jakarta.csv.annotation.Up2Number;
-import io.github.up2jakarta.csv.extension.Conversion;
 import io.github.up2jakarta.csv.extension.ConversionResolver;
+import io.github.up2jakarta.csv.extension.PropertyParser;
 import io.github.up2jakarta.csv.misc.BeanException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -15,7 +15,7 @@ import java.math.BigInteger;
 public final class NumberResolver extends ConversionResolver<Up2Number> {
 
     @Override
-    public Conversion<? extends Number> resolve(Up2Number config, Field property) throws BeanException {
+    public PropertyParser<? extends Number> forParsing(Up2Number config, Field property) throws BeanException {
         final Class<?> fieldType = property.getType();
         if (fieldType == BigInteger.class) {
             return BigInteger::new;
@@ -34,4 +34,5 @@ public final class NumberResolver extends ConversionResolver<Up2Number> {
         }
         throw new BeanException(property, "must not be annotated by @Up2Number");
     }
+
 }

@@ -13,8 +13,16 @@ public class InnerSegment implements Segment {
     @Fragment(0)
     private InnerFragment inner;
 
+    public String getId() {
+        return id;
+    }
+
     public void setId(String id) {
         this.id = id;
+    }
+
+    public InnerFragment getInner() {
+        return inner;
     }
 
     public void setInner(InnerFragment inner) {
@@ -25,6 +33,10 @@ public class InnerSegment implements Segment {
 
         @Position(1)
         private String name;
+
+        public String getName() {
+            return name;
+        }
 
         public void setName(String name) {
             this.name = name;

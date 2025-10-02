@@ -38,6 +38,11 @@ public final class Errors {
      */
     public static final String ERROR_XML_ENUM = "UP2-P005";
 
+    /**
+     * Default error code for {@link jakarta.xml.bind.annotation.XmlEnum}
+     */
+    public static final String ERROR_BOOLEAN = "UP2-P006";
+
     private Errors() {
     }
 

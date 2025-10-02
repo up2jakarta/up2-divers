@@ -38,15 +38,24 @@ public class XmlExtensionTest {
     void testValidBean() throws BeanException {
         // Given
         final Mapper<Test1Bean, DataId> mapper = factory.build(Test1Bean.class);
+        final String[] data = {"ALL", "2", "THREE", "TND", "*"};
         // When
-        final Test1Bean bean = mapper.map("1", "2", "THREE", "TND", "*");
+        final Test1Bean bean = mapper.map(data);
         // Then
         assertNotNull(bean);
-        assertEquals(XML1Enum.ONE, bean.getEnum1());
+        assertEquals(XML1Enum.ALL, bean.getEnum1());
         assertEquals(XML2Enum.TWO, bean.getEnum2());
         assertEquals(XML3Enum.THREE, bean.getEnum3());
         assertEquals(CurrencyCodeType.TND, bean.getAdapter1());
         assertEquals(TestCodeList.ANY, bean.getAdapter2());
+        // When Unmapping
+        final String[] out = mapper.unmap(bean);
+        // Then
+        assertNotNull(out);
+        assertEquals(data.length, out.length);
+        for (var i = 0; i < data.length; i++) {
+            assertEquals(data[i], out[i]);
+        }
     }
 
     @Test

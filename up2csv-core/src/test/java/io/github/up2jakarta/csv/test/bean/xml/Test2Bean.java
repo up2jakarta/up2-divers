@@ -45,12 +45,24 @@ public class Test2Bean implements Segment {
         this.enum1 = enum1;
     }
 
+    public XML2Enum getEnum2() {
+        return enum2;
+    }
+
     public void setEnum2(XML2Enum enum2) {
         this.enum2 = enum2;
     }
 
+    public CurrencyCodeType getAdapter1() {
+        return adapter1;
+    }
+
     public void setAdapter1(CurrencyCodeType adapter1) {
         this.adapter1 = adapter1;
+    }
+
+    public TestCodeList getAdapter2() {
+        return adapter2;
     }
 
     public void setAdapter2(TestCodeList adapter2) {

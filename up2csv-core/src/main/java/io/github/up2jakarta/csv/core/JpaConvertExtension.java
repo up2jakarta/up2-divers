@@ -1,10 +1,7 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.extension.BeanContext;
-import io.github.up2jakarta.csv.extension.Conversion;
-import io.github.up2jakarta.csv.extension.ConversionExtension;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.extension.*;
 import io.github.up2jakarta.csv.misc.BeanException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -104,10 +101,10 @@ public final class JpaConvertExtension extends ConversionExtension<Entity, Conve
     @Override
     public Conversion<?> resolve(Field property, Class<?> type, Convert config) throws BeanException {
         //noinspection unchecked
-        final Class<? extends AttributeConverter<?, String>> converterType = config.converter();
-        final Optional<Error> error = CodeListResolver.getError(property);
-        final AttributeConverter<?, String> converter = getBean(context, converterType);
-        return Conversion.of(converter::convertToEntityAttribute, error.orElse(null));
+        final Class<? extends AttributeConverter<Object, String>> converterType = config.converter();
+        final Optional<Error> error = ConversionResolver.getError(property);
+        final AttributeConverter<Object, String> converter = getBean(context, converterType);
+        return new Conversion<>(converter::convertToEntityAttribute, converter::convertToDatabaseColumn, error);
     }
 
 }

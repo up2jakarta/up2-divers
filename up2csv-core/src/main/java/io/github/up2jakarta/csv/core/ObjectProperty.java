@@ -9,15 +9,23 @@ import io.github.up2jakarta.csv.misc.Beans;
 import java.lang.reflect.Field;
 import java.util.List;
 
-final class ConvertedProperty<T, D extends DataType<D>> extends PositionProperty<String, D> {
+final class ObjectProperty<T, D extends DataType<D>> extends PositionProperty<T, D> {
 
     private final Error config;
-    private final Conversion<T> parser;
+    private final Conversion<T> adapter;
 
-    ConvertedProperty(Field field, D type, int offset, List<ProcessorWrapper<?, D>> processors, Conversion<T> parser) throws BeanException {
-        super(field, type, offset, processors);
-        this.parser = parser;
+    ObjectProperty(Field field, D type, int offset, List<ProcessorWrapper<?, D>> processors, Conversion<T> adapter) throws BeanException {
+        super(field, type, offset, processors, adapter.parser());
+        this.adapter = adapter;
         this.config = field.getAnnotation(Error.class);
+    }
+
+    @Override
+    String format(T value) {
+        if (value != null) {
+            return adapter.formatter().apply(value);
+        }
+        return null;
     }
 
     @Override
@@ -25,7 +33,7 @@ final class ConvertedProperty<T, D extends DataType<D>> extends PositionProperty
         value = process(value, offset, handler);
         if (value != null) {
             try {
-                var converted = parser.apply(value);
+                var converted = adapter.parser().apply(value);
                 Beans.setValue(bean, converted, setter);
             } catch (BeanException beanException) {
                 throw beanException;

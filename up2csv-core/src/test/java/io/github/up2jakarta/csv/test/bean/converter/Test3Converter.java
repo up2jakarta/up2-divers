@@ -13,6 +13,10 @@ public class Test3Converter implements Segment {
     @Up2Converter(CountryConverter.class)
     private CurrencyCodeType test;
 
+    public CurrencyCodeType getTest() {
+        return test;
+    }
+
     public void setTest(CurrencyCodeType test) {
         this.test = test;
     }

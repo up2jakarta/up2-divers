@@ -11,6 +11,10 @@ public class Test5Processor implements Segment {
     @Dummy4
     String attribute;
 
+    public String getAttribute() {
+        return attribute;
+    }
+
     public void setAttribute(String attribute) {
         this.attribute = attribute;
     }

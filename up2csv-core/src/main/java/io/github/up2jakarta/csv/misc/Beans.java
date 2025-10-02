@@ -158,14 +158,14 @@ public final class Beans {
         return getMethod(field.getDeclaringClass(), "set" + pName, pName, "setter", field.getType());
     }
 
-    @SuppressWarnings("unused")
     public static Method getAccessibleGetter(Field field) throws BeanException {
         return getAccessibleGetter(field.getDeclaringClass(), field);
     }
 
     public static Method getAccessibleGetter(Class<?> type, Field field) throws BeanException {
-        String pName = capitalize(field.getName());
-        if (type == Boolean.class || type == boolean.class) {
+        final String pName = capitalize(field.getName());
+        final Class<?> ft = field.getType();
+        if (ft == Boolean.class || ft == boolean.class) {
             return getMethod(type, "is" + pName, pName, "getter");
         }
         return getMethod(type, "get" + pName, pName, "getter");

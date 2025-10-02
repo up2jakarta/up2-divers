@@ -36,8 +36,9 @@ public class JpaExtensionTest {
     void testValidBean() throws BeanException {
         // Given
         final Mapper<Test1Bean, DataId> mapper = factory.build(Test1Bean.class);
+        final String[] data = {"ONE", "TWO", "0", "0", "*"};
         // When
-        final Test1Bean bean = mapper.map("ONE", "TWO", "0", "0", "*");
+        final Test1Bean bean = mapper.map(data);
         // Then
         assertNotNull(bean);
         assertEquals(XML1Enum.ONE, bean.getEnum1());
@@ -45,6 +46,14 @@ public class JpaExtensionTest {
         assertEquals(XML1Enum.ONE, bean.getEnum3());
         assertEquals(XML2Enum.TWO, bean.getEnum4());
         assertEquals(TestCodeList.ANY, bean.getAdapter());
+        // When Unmapping
+        final String[] out = mapper.unmap(bean);
+        // Then
+        assertNotNull(out);
+        assertEquals(data.length, out.length);
+        for (var i = 0; i < data.length; i++) {
+            assertEquals(data[i], out[i]);
+        }
     }
 
     @Test

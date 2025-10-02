@@ -1,9 +1,7 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.extension.Conversion;
-import io.github.up2jakarta.csv.extension.ConversionExtension;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.extension.*;
 import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.xml.api.SeverityType;
@@ -81,16 +79,21 @@ public final class XmlEnumExtension extends ConversionExtension<XmlType, XmlEnum
     @Override
     public Conversion<?> resolve(Field property, Class<?> enumType, XmlEnum config) throws BeanException {
         final Map<String, Object> mapping = getConstants(enumType, property);
-        final Optional<Error> error = CodeListResolver.getError(property);
+        final Optional<Error> error = ConversionResolver.getError(property);
         final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);
         final String code = error.map(Error::value).orElse(Errors.ERROR_XML_ENUM);
-        return v -> mapping.entrySet().stream().filter(e -> e.getKey().equals(v))
+        final PropertyParser<Object> p = v -> mapping.entrySet().stream().filter(e -> e.getKey().equals(v))
                 .map(Map.Entry::getValue)
                 .findAny()
                 .orElseThrow(() -> {
                     final String msg = String.format(FORMAT, v, enumType.getSimpleName());
                     return new PropertyException(type, code, msg);
                 });
+        final PropertyFormatter<Object> f = v -> mapping.entrySet().stream().filter(e -> e.getValue().equals(v))
+                .map(Map.Entry::getKey)
+                .findAny()
+                .orElseGet(v::toString);
+        return new Conversion<>(p, f);
     }
 
 }

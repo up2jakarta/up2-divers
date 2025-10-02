@@ -63,7 +63,7 @@ public class SupportEntity extends ParsedEntity<Integer> {
 
     @Position(7)
     @Column(name = "TU_VALID")
-    @Up2Boolean("Y")
+    @Up2Boolean(trueValue = "Y", falseValue = "N")
     private Boolean valid;
 
     @Position(8)
@@ -76,6 +76,10 @@ public class SupportEntity extends ParsedEntity<Integer> {
     @Error(value = ISO_3166)
     @Up2CodeList
     private CountryCodeType shippingCountry;
+
+    @Position(10)
+    @Up2Base64
+    private byte[] base64;
 
     public Integer getKey() {
         return key;
@@ -133,12 +137,8 @@ public class SupportEntity extends ParsedEntity<Integer> {
         this.unit = unit;
     }
 
-    public Boolean getValid() {
+    public Boolean isValid() {
         return valid;
-    }
-
-    public void setValid(Boolean valid) {
-        this.valid = valid;
     }
 
     public Period getShippingPeriod() {
@@ -156,4 +156,21 @@ public class SupportEntity extends ParsedEntity<Integer> {
     public void setShippingCountry(CountryCodeType shippingCountry) {
         this.shippingCountry = shippingCountry;
     }
+
+    public Boolean getValid() {
+        return valid;
+    }
+
+    public void setValid(Boolean valid) {
+        this.valid = valid;
+    }
+
+    public byte[] getBase64() {
+        return base64;
+    }
+
+    public void setBase64(byte[] base64) {
+        this.base64 = base64;
+    }
+
 }

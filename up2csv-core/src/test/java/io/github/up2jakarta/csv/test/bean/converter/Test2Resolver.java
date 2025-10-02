@@ -26,8 +26,16 @@ public class Test2Resolver implements Segment {
     @Up2TemporalAmount
     private Duration duration;
 
+    public MeasurementUnitCode getUnit() {
+        return unit;
+    }
+
     public void setUnit(MeasurementUnitCode unit) {
         this.unit = unit;
+    }
+
+    public Duration getDuration() {
+        return duration;
     }
 
     public void setDuration(Duration duration) {

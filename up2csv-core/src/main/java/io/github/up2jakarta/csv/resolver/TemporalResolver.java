@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.resolver;
 
 import io.github.up2jakarta.csv.annotation.Up2Temporal;
-import io.github.up2jakarta.csv.extension.Conversion;
 import io.github.up2jakarta.csv.extension.ConversionResolver;
+import io.github.up2jakarta.csv.extension.PropertyParser;
 import io.github.up2jakarta.csv.misc.BeanException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -16,7 +16,7 @@ import java.time.temporal.Temporal;
 public final class TemporalResolver extends ConversionResolver<Up2Temporal> {
 
     @Override
-    public Conversion<? extends Temporal> resolve(Up2Temporal config, Field property) throws BeanException {
+    public PropertyParser<? extends Temporal> forParsing(Up2Temporal config, Field property) throws BeanException {
         final Class<?> fieldType = property.getType();
         if (fieldType == LocalTime.class) {
             return LocalTime::parse;
@@ -47,4 +47,5 @@ public final class TemporalResolver extends ConversionResolver<Up2Temporal> {
         }
         throw new BeanException(property, "must not be annotated by @Up2Temporal");
     }
+
 }

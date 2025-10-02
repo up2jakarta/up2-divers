@@ -29,12 +29,24 @@ public class Test1Resolver implements Segment {
     @Up2TemporalAmount
     private Duration duration;
 
+    public CurrencyCodeType getCurrency() {
+        return currency;
+    }
+
     public void setCurrency(CurrencyCodeType currency) {
         this.currency = currency;
     }
 
+    public MeasurementUnitCode getUnit() {
+        return unit;
+    }
+
     public void setUnit(MeasurementUnitCode unit) {
         this.unit = unit;
+    }
+
+    public Duration getDuration() {
+        return duration;
     }
 
     public void setDuration(Duration duration) {

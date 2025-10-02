@@ -11,6 +11,7 @@ import jakarta.xml.bind.annotation.XmlType;
 @Error(value = Test1Bean.XML_XXX, severity = SeverityType.WARNING)
 public enum XML1Enum {
 
-    @XmlEnumValue("1") ONE
+    @XmlEnumValue("1") ONE,
+    ALL
 
 }

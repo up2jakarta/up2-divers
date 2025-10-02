@@ -18,8 +18,16 @@ public class Test1Converter implements Segment {
     @Up2Converter(DummyConverter.class)
     private Integer other;
 
+    public CurrencyCodeType getTest() {
+        return test;
+    }
+
     public void setTest(CurrencyCodeType test) {
         this.test = test;
+    }
+
+    public Integer getOther() {
+        return other;
     }
 
     public void setOther(Integer other) {

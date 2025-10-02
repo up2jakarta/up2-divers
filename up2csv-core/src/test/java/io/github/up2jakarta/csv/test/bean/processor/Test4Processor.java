@@ -22,8 +22,16 @@ public class Test4Processor implements Segment {
     @Error(value = TU_P_003, severity = SeverityType.ERROR)
     private String other;
 
+    public String getTest() {
+        return test;
+    }
+
     public void setTest(String test) {
         this.test = test;
+    }
+
+    public String getOther() {
+        return other;
     }
 
     public void setOther(String other) {

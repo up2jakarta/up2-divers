@@ -98,6 +98,15 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
     public abstract <R extends InputSegment<?>, V extends InputError<R, ?, D>> S map(EventHandler<R, ?, D, V> handler, String... columns) throws BeanException;
 
     /**
+     * Flat-Map the given to segment to CSV record within formatting.
+     *
+     * @param bean the java bean
+     * @return the formatted array of strings
+     * @throws BeanException for any problem configuring and reading fields of the input to bean properties
+     */
+    public abstract String[] unmap(S bean) throws BeanException;
+
+    /**
      * Validates the given bean with the given JSR-303 validation groups and gathering
      * {@link jakarta.validation.ConstraintViolation} in the given handler.
      *
@@ -107,7 +116,7 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
      * @param <R>       the input row type
      * @param <V>       the input error type
      */
-    abstract <R extends InputSegment<?>, V extends InputError<R, ?, D>> void validate(Object bean, List<Property<?, D>> properties, Class<?>[] groups, EventHandler<R, ?, D, V> collector);
+    protected abstract <R extends InputSegment<?>, V extends InputError<R, ?, D>> void validate(Object bean, List<Property<?, D>> properties, Class<?>[] groups, EventHandler<R, ?, D, V> collector);
 
     @Override
     public final List<Property<?, D>> toList() {

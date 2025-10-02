@@ -16,7 +16,12 @@ public @interface Up2Boolean {
     /**
      * @return the sequence corresponding to {@link Boolean#TRUE}
      */
-    String value() default "true";
+    String trueValue() default "true";
+
+    /**
+     * @return the sequence corresponding to {@link Boolean#FALSE}
+     */
+    String falseValue() default "false";
 
 }
 
