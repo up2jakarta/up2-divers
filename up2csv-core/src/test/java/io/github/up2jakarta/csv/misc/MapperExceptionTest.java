@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MapperExceptionTest {
 
     private final ErrorCreator creator;
-    private final MapperFactory<DataId> factory;
+    private final MapperFactory<BusinessType> factory;
 
     @Autowired
-    MapperExceptionTest(MapperFactory<DataId> factory, ErrorCreator creator) {
+    MapperExceptionTest(MapperFactory<BusinessType> factory, ErrorCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -101,7 +101,7 @@ public class MapperExceptionTest {
     @Test
     void testWithinCauses() throws BeanException {
         // Given
-        final Mapper<Test1Exception, DataId> mapper = factory.build(Test1Exception.class);
+        final Mapper<Test1Exception, BusinessType> mapper = factory.build(Test1Exception.class);
         final List<String> expected = Arrays.asList(
                 "io.github.up2jakarta.csv.misc.MapperException: io.github.up2jakarta.xml.codelist.PropertyException: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
                 "Caused by: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
@@ -159,7 +159,7 @@ public class MapperExceptionTest {
     @Test
     void testTrace() throws BeanException {
         // Given
-        final Mapper<Test2Exception, DataId> mapper = factory.build(Test2Exception.class);
+        final Mapper<Test2Exception, BusinessType> mapper = factory.build(Test2Exception.class);
         final List<String> expected = Arrays.asList(
                 "io.github.up2jakarta.csv.misc.MapperException: io.github.up2jakarta.xml.codelist.PropertyException: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
                 "Caused by: io.github.up2jakarta.xml.codelist.PropertyException: io.github.up2jakarta.csv.test.ext.DummyException: dummy",

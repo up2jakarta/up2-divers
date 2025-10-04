@@ -24,10 +24,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class JpaExtensionTest {
 
     private final SimpleCreator creator;
-    private final MapperFactory<DataId> factory;
+    private final MapperFactory<BusinessType> factory;
 
     @Autowired
-    JpaExtensionTest(MapperFactory<DataId> factory, SimpleCreator creator) {
+    JpaExtensionTest(MapperFactory<BusinessType> factory, SimpleCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -35,7 +35,7 @@ public class JpaExtensionTest {
     @Test
     void testValidBean() throws BeanException {
         // Given
-        final Mapper<Test1Bean, DataId> mapper = factory.build(Test1Bean.class);
+        final Mapper<Test1Bean, BusinessType> mapper = factory.build(Test1Bean.class);
         final String[] data = {"ONE", "TWO", "0", "0", "*"};
         // When
         final Test1Bean bean = mapper.map(data);
@@ -59,7 +59,7 @@ public class JpaExtensionTest {
     @Test
     void testDefaultErrors() throws BeanException {
         // Given
-        final Mapper<Test1Bean, DataId> mapper = factory.build(Test1Bean.class);
+        final Mapper<Test1Bean, BusinessType> mapper = factory.build(Test1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "11", "22", "33", "44", "ANY");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
@@ -125,7 +125,7 @@ public class JpaExtensionTest {
     @Test
     void testOverrideErrors() throws BeanException {
         // Given
-        final Mapper<Test2Bean, DataId> mapper = factory.build(Test2Bean.class);
+        final Mapper<Test2Bean, BusinessType> mapper = factory.build(Test2Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "11", "22", "ANY");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);

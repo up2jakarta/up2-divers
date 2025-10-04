@@ -1,13 +1,13 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.input.InputError;
-import io.github.up2jakarta.csv.input.InputError.Key;
+import io.github.up2jakarta.csv.api.IError;
+import io.github.up2jakarta.csv.api.IError.Key;
 import io.github.up2jakarta.xml.api.SeverityType;
 import jakarta.persistence.*;
 
 @MappedSuperclass
 @SuppressWarnings("unused")
-abstract class AbstractError<K extends Key<InputRowEntity>> implements InputError<InputRowEntity, K, DataId> {
+abstract class AbstractError<K extends Key<InputRowEntity>> implements IError<InputRowEntity, K, BusinessType> {
 
     @Column(name = "ERR_COLUMN_INDEX", nullable = false)
     private Integer offset;

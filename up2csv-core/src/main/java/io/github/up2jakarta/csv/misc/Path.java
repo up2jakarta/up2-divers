@@ -20,7 +20,7 @@ public final class Path {
 
     private final String[] path;
 
-    private Path(String[] path) {
+    private Path(String... path) {
         this.path = path;
     }
 

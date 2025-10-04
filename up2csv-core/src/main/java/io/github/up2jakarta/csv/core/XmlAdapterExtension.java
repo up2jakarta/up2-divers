@@ -1,7 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.extension.*;
+import io.github.up2jakarta.csv.api.ext.*;
+import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.xml.api.SeverityType;

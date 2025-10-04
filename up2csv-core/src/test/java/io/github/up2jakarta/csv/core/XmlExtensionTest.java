@@ -26,10 +26,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class XmlExtensionTest {
 
     private final SimpleCreator creator;
-    private final MapperFactory<DataId> factory;
+    private final MapperFactory<BusinessType> factory;
 
     @Autowired
-    XmlExtensionTest(MapperFactory<DataId> factory, SimpleCreator creator) {
+    XmlExtensionTest(MapperFactory<BusinessType> factory, SimpleCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -37,7 +37,7 @@ public class XmlExtensionTest {
     @Test
     void testValidBean() throws BeanException {
         // Given
-        final Mapper<Test1Bean, DataId> mapper = factory.build(Test1Bean.class);
+        final Mapper<Test1Bean, BusinessType> mapper = factory.build(Test1Bean.class);
         final String[] data = {"ALL", "2", "THREE", "TND", "*"};
         // When
         final Test1Bean bean = mapper.map(data);
@@ -61,7 +61,7 @@ public class XmlExtensionTest {
     @Test
     void testDefaultErrors() throws BeanException {
         // Given
-        final Mapper<Test1Bean, DataId> mapper = factory.build(Test1Bean.class);
+        final Mapper<Test1Bean, BusinessType> mapper = factory.build(Test1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "11", "2", "33", "ILS", "ANY");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
@@ -116,7 +116,7 @@ public class XmlExtensionTest {
     @Test
     void testOverrideErrors() throws BeanException {
         // Given
-        final Mapper<Test2Bean, DataId> mapper = factory.build(Test2Bean.class);
+        final Mapper<Test2Bean, BusinessType> mapper = factory.build(Test2Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "11", "22", "ILS", "ANY");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);

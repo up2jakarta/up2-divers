@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.annotation.*;
-import io.github.up2jakarta.csv.core.MapperFactory.FragmentProperty;
+import io.github.up2jakarta.csv.api.ext.*;
+import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.cfg.*;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.extension.*;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Beans;
 import io.github.up2jakarta.xml.codelist.TypeConverter;
@@ -73,7 +73,7 @@ final class BeanSupport<D extends DataType<D>> {
         return null;
     }
 
-    static <T> T getDefault(Field field, PropertyParser<T> conversion) throws BeanException {
+    static <T> T getDefault(Field field, PropertyConverter<T> conversion) throws BeanException {
         final Up2Default defaultValue = field.getAnnotation(Up2Default.class);
         if (defaultValue != null) {
             try {
@@ -118,13 +118,13 @@ final class BeanSupport<D extends DataType<D>> {
             final Class<? extends Annotation> aType = annotation.annotationType();
             final Processor processor = aType.getAnnotation(Processor.class);
             if (processor != null) {
-                final Class<? extends ConfigurableProcessor<?>> pType = processor.value();
-                final Type[] types = Beans.getTypeArguments(pType, ConfigurableProcessor.class);
+                final Class<? extends InputProcessor<?>> pType = processor.value();
+                final Type[] types = Beans.getTypeArguments(pType, InputProcessor.class);
                 if (types.length == 0 || aType != types[0]) {
                     final String aName = aType.getSimpleName();
-                    throw new BeanException(aType, "@Processor[value] must implements ConfigurableProcessor<" + aName + ">");
+                    throw new BeanException(aType, "@Processor[value] must implements InputProcessor<" + aName + ">");
                 }
-                final ConfigurableProcessor<? extends Annotation> delegate = getBean(context, pType);
+                final InputProcessor<? extends Annotation> delegate = getBean(context, pType);
                 //noinspection rawtypes,unchecked
                 result.add(new ProcessorWrapper(delegate, processor.skip(), annotation));
             }
@@ -142,7 +142,7 @@ final class BeanSupport<D extends DataType<D>> {
                 throw new BeanException(field, "@Converter[value] does not support " + field.getType().getSimpleName());
             }
             if (error == null) {
-                var p = PropertyParser.of(tConverter::parse, tConverter.getErrorSeverity(), tConverter.getErrorCode());
+                var p = PropertyConverter.of(tConverter::parse, tConverter.getErrorSeverity(), tConverter.getErrorCode());
                 var f = PropertyFormatter.of(tConverter::format, tConverter.getErrorSeverity(), tConverter.getErrorCode());
                 return new Conversion<>(p, f);
             }
@@ -152,7 +152,7 @@ final class BeanSupport<D extends DataType<D>> {
             final Resolver resolver = annotation.annotationType().getAnnotation(Resolver.class);
             if (resolver != null) {
                 var cResolver = (ConversionResolver<Annotation>) getBean(context.getContext(), resolver.value());
-                final PropertyParser<Object> p = (PropertyParser<Object>) cResolver.forParsing(annotation, field);
+                final PropertyConverter<Object> p = (PropertyConverter<Object>) cResolver.forParsing(annotation, field);
                 final PropertyFormatter<Object> f = (PropertyFormatter<Object>) cResolver.forFormatting(annotation, field);
                 return new Conversion<>(p, f, error);
             }
@@ -185,12 +185,12 @@ final class BeanSupport<D extends DataType<D>> {
                 final D dataType = context.getDataType(field);
                 //noinspection unchecked
                 final Class<? extends Segment> fType = (Class<? extends Segment>) fieldType;
-                final int fOffset = offset + fragment.value();
+                final int fo = offset + fragment.value();
                 context.getChecker().beforeFragmentProperty(field, fType);
-                final List<Property<?, D>> fProps = getProperties(fType, context.with(field, fOffset, fType));
+                final List<Property<?, D>> fProps = getProperties(fType, context.with(field, fo, fType));
                 context.getChecker().afterFragmentProperty(field, fType);
                 final ValidationContext fContext = context.getValidation(field);
-                result.add(new FragmentProperty<>(fType, dataType, field, fOffset, fContext, fProps));
+                result.add(new BeanProperty<>(fType, dataType, field, fo, fragment.nullable(), fContext, fProps));
             } else if (position != null) {
                 final D dataType = context.getDataType(field);
                 final int index = offset + position.value();

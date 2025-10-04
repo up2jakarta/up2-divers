@@ -8,6 +8,7 @@ import java.util.List;
  *
  * @param <E> the element type.
  */
+@FunctionalInterface
 public interface Listable<E> {
 
     /**

@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.test.bean.mapper;
 
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.Up2Token;
-import io.github.up2jakarta.csv.annotation.ValidOverride;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.cfg.Up2Token;
+import io.github.up2jakarta.csv.cfg.ValidOverride;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.misc.Errors;
 import jakarta.validation.constraints.Size;
 

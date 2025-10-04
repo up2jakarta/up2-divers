@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.input.InputRepository;
+import io.github.up2jakarta.csv.api.IErrorRepository;
 
-public class SimpleHandler extends io.github.up2jakarta.csv.misc.SimpleHandler<InputRowEntity, DataId, SimpleErrorEntity> {
+public class SimpleHandler extends io.github.up2jakarta.csv.misc.SimpleHandler<InputRowEntity, BusinessType, SimpleErrorEntity> {
 
-    public SimpleHandler(InputRowEntity row, SimpleCreator creator, InputRepository<InputRowEntity> repository) {
+    public SimpleHandler(InputRowEntity row, SimpleCreator creator, IErrorRepository<InputRowEntity> repository) {
         super(row, creator, repository);
     }
 

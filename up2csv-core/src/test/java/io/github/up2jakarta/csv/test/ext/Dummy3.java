@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.test.ext;
 
-import io.github.up2jakarta.csv.annotation.Processor;
+import io.github.up2jakarta.csv.cfg.Processor;
 
 import java.lang.annotation.*;
 

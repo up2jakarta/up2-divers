@@ -1,11 +1,11 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.annotation.Up2Default;
-import io.github.up2jakarta.csv.annotation.Up2Token;
-import io.github.up2jakarta.csv.annotation.Up2Trim;
-import io.github.up2jakarta.csv.extension.BeanContext;
-import io.github.up2jakarta.csv.impl.DataId;
+import io.github.up2jakarta.csv.api.ext.BeanContext;
+import io.github.up2jakarta.csv.cfg.Up2Default;
+import io.github.up2jakarta.csv.cfg.Up2Token;
+import io.github.up2jakarta.csv.cfg.Up2Trim;
+import io.github.up2jakarta.csv.impl.BusinessType;
 import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.csv.misc.MapperException;
@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ProcessorSupportTest {
 
     private final BeanContext context;
-    private final MapperFactory<DataId> factory;
+    private final MapperFactory<BusinessType> factory;
 
     @Autowired
-    ProcessorSupportTest(BeanContext context, MapperFactory<DataId> factory) {
+    ProcessorSupportTest(BeanContext context, MapperFactory<BusinessType> factory) {
         this.context = context;
         this.factory = factory;
     }
@@ -50,7 +50,7 @@ public class ProcessorSupportTest {
         }
         final Field field = TestProcessor.class.getDeclaredField("attribute");
         // When
-        final List<ProcessorWrapper<?, DataId>> processors = getProcessors(context, field);
+        final List<ProcessorWrapper<?, BusinessType>> processors = getProcessors(context, field);
         assertEquals(1, processors.size());
         final ProcessorWrapper<?, ?> processor = processors.getFirst();
         // Then
@@ -69,9 +69,9 @@ public class ProcessorSupportTest {
         }
         final Field field = TestProcessor.class.getDeclaredField("attribute");
         // When
-        final List<ProcessorWrapper<?, DataId>> processors = getProcessors(context, field);
+        final List<ProcessorWrapper<?, BusinessType>> processors = getProcessors(context, field);
         assertEquals(1, processors.size());
-        final ProcessorWrapper<?, DataId> processor = processors.getFirst();
+        final ProcessorWrapper<?, BusinessType> processor = processors.getFirst();
         // Then
         assertNull(processor.process(null));
         assertNull(processor.process(""));
@@ -90,7 +90,7 @@ public class ProcessorSupportTest {
         }
         final Field field = TestProcessor.class.getDeclaredField("p");
         // When
-        final List<ProcessorWrapper<?, DataId>> processors = getProcessors(context, field);
+        final List<ProcessorWrapper<?, BusinessType>> processors = getProcessors(context, field);
         assertEquals(3, processors.size());
         // Then
         var value = "\t\nundefined\t\n";
@@ -168,7 +168,7 @@ public class ProcessorSupportTest {
         // THEN
         assertEquals(Dummy4.class, thrown.getSource());
         assertEquals("class", thrown.getLocator());
-        assertEquals("Dummy4[class] - @Processor[value] must implements ConfigurableProcessor<Dummy4>", thrown.getMessage());
+        assertEquals("Dummy4[class] - @Processor[value] must implements InputProcessor<Dummy4>", thrown.getMessage());
     }
 
 }

@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.test.bean.converter;
 
-import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.ValidOverride;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.cfg.ValidOverride;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.test.validation.Up2NotEmpty;
 import io.github.up2jakarta.csv.test.validation.Up2Warn;
 import io.github.up2jakarta.xml.api.SeverityType;

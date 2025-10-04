@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.extension.CheckerContext;
-import io.github.up2jakarta.csv.extension.Segment;
-import io.github.up2jakarta.csv.extension.SegmentListener;
+import io.github.up2jakarta.csv.api.ext.CheckerContext;
+import io.github.up2jakarta.csv.api.ext.SegmentListener;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.misc.BeanException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * UP2 {@link io.github.up2jakarta.csv.annotation.Position} checker implementation, useful for persist-able output result.
+ * UP2 {@link io.github.up2jakarta.csv.cfg.Position} checker implementation, useful for persist-able output result.
  */
 @Named
 @Singleton

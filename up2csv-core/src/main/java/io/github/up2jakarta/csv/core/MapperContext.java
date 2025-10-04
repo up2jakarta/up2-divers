@@ -1,12 +1,12 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.*;
+import io.github.up2jakarta.csv.api.ext.BeanContext;
+import io.github.up2jakarta.csv.api.ext.Conversion;
+import io.github.up2jakarta.csv.api.ext.ConversionExtension;
+import io.github.up2jakarta.csv.cfg.*;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
-import io.github.up2jakarta.csv.extension.BeanContext;
-import io.github.up2jakarta.csv.extension.Conversion;
-import io.github.up2jakarta.csv.extension.ConversionExtension;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Path;
 

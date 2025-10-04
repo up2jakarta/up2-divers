@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.Up2Decimal;
-import io.github.up2jakarta.csv.annotation.Up2Default;
-import io.github.up2jakarta.csv.annotation.Up2Number;
-import io.github.up2jakarta.csv.extension.CheckerContext;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.api.ext.CheckerContext;
+import io.github.up2jakarta.csv.cfg.Up2Decimal;
+import io.github.up2jakarta.csv.cfg.Up2Default;
+import io.github.up2jakarta.csv.cfg.Up2Number;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.misc.BeanException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;

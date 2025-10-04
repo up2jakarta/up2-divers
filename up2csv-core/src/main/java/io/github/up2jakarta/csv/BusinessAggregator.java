@@ -1,14 +1,12 @@
 package io.github.up2jakarta.csv;
 
-import io.github.up2jakarta.csv.core.EventHandler;
-import io.github.up2jakarta.csv.core.MapperFactory;
+import io.github.up2jakarta.csv.api.IError;
+import io.github.up2jakarta.csv.api.IFullType;
+import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.core.*;
 import io.github.up2jakarta.csv.data.BusinessCreator;
-import io.github.up2jakarta.csv.data.BusinessEntry;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.extension.Parsed;
-import io.github.up2jakarta.csv.input.InputError;
-import io.github.up2jakarta.csv.input.InputSegment;
-import io.github.up2jakarta.csv.input.Linkable;
+import io.github.up2jakarta.csv.data.Recordable;
 import io.github.up2jakarta.csv.misc.BeanException;
 
 import java.util.ArrayList;
@@ -21,13 +19,13 @@ import static io.github.up2jakarta.csv.data.DataType.isValid;
 import static io.github.up2jakarta.xml.api.SeverityType.*;
 
 public abstract class BusinessAggregator<
-        T extends Parsed<I, R>,
+        T extends Recordable<I, R>,
         B extends DataType<B>,
-        I extends Enum<I> & Linkable<B, I>,
-        R extends InputSegment<I>,
-        E extends InputError<R, ?, B>
+        I extends Enum<I> & IFullType<B, I>,
+        R extends IRecord<I>,
+        E extends IError<R, ?, B>
         >
-        extends BusinessMapper<B, I, T, Parsed<I, ?>> {
+        extends BusinessProcessor<B, I, T, Recordable<I, ?>> {
 
     private final int idIndex;
 
@@ -36,36 +34,42 @@ public abstract class BusinessAggregator<
         this.idIndex = uidIndex;
     }
 
-    private void link(BusinessEntry<I, R, B, E> parent, List<BusinessEntry<I, R, B, E>> data) {
-        this.getJoins(parent.getType()).forEach(type -> {
-            final List<BusinessEntry<I, R, B, E>> segments = data.stream().filter(e -> e.filter(parent, type)).toList();
+    private void link(BusinessEntry<I, R, B, E> parent, List<BusinessEntry<I, R, B, E>> data) throws BeanException {
+        for (final I type : this.getJoins(parent.getType())) {
+            final List<BusinessEntry<I, R, B, E>> children = new LinkedList<>();
+            for (final BusinessEntry<I, R, B, E> e : data) {
+                if (e.filter(parent, type)) {
+                    children.add(e);
+                }
+            }
             // Validating Cardinality
-            if (!isValid(type.getBusinessType(), segments.size())) {
-                if (segments.isEmpty()) {
+            if (!isValid(type.getBusinessType(), children.size())) {
+                if (children.isEmpty()) {
                     parent.handle(ERROR, type, "segment is required", idIndex);
                 } else {
                     final String msg = buildMessage(type.getBusinessType());
                     parent.handle(ERROR, type, msg, idIndex);
-                    segments.forEach(e -> e.handle(ERROR, type, msg, idIndex));
+                    children.forEach(e -> e.handle(ERROR, type, msg, idIndex));
                 }
             }
             // Linking
-            segments.forEach(item -> {
-                data.remove(item);
+            for (final BusinessEntry<I, R, B, E> child : children) {
+                data.remove(child);
                 if (this.hasJoins(type)) {
-                    link(item, data);
+                    link(child, data);
                 }
-                type.linker().link(parent.getSegment(), item.getSegment());
-            });
-        });
+                type.linker().link(parent.getBean(), child.getBean());
+            }
+        }
     }
 
     private List<BusinessEntry<I, R, B, E>> map(R[] rows, Consumer<BusinessEntry<I, R, B, E>> main) throws BeanException {
         final List<BusinessEntry<I, R, B, E>> entries = new ArrayList<>(rows.length);
         for (final R row : rows) {
             final EventHandler<R, ?, B, E> handler = newHandler(row);
-            final Parsed<I, ?> entity = this.getMapper(row.getType()).map(row, offset, handler);
-            final BusinessEntry<I, R, B, E> record = new BusinessEntry<>(entity, handler);
+            final Mapper<Recordable<I, ?>, B> mapper = this.getMapper(row.getType());
+            final Recordable<I, ?> entity = mapper.map(row, offset, handler);
+            final BusinessEntry<I, R, B, E> record = new BusinessEntry<>(mapper, entity, handler);
             entries.add(record);
             if (root == row.getType()) {
                 main.accept(record);
@@ -89,10 +93,10 @@ public abstract class BusinessAggregator<
             final BusinessEntry<I, R, B, E> main = roots.getFirst();
             entries.removeAll(roots);
             link(main, entries);
-            root.linker().link(null, main.getSegment());
+            root.linker().link(null, main.getBean());
             entries.forEach(r -> r.handle(WARNING, r.getType(), "segment is detached", idIndex));
             //noinspection unchecked
-            invoice = (T) main.getSegment();
+            invoice = (T) main.getBean();
         }
         final List<E> errors = new LinkedList<>();
         store.forEach(r -> r.collect(errors));

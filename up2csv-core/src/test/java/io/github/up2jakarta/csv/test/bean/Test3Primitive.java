@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.test.bean;
 
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.Up2Decimal;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.cfg.Up2Decimal;
+import io.github.up2jakarta.csv.data.Segment;
 
 @SuppressWarnings("unused")
 public class Test3Primitive implements Segment {

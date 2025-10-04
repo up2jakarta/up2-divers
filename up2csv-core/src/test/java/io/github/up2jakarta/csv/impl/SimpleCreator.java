@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.misc.SimpleKeyCreator;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SimpleCreator extends SimpleKeyCreator<InputRowEntity, DataId, SimpleErrorEntity> {
+public class SimpleCreator extends SimpleKeyCreator<InputRowEntity, BusinessType, SimpleErrorEntity> {
 
     public SimpleCreator() {
         super(SimpleErrorEntity::new);

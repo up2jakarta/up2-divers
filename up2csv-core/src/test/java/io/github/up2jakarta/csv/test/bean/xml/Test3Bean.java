@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.test.bean.xml;
 
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.Up2EnableXML;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.cfg.Up2EnableXML;
+import io.github.up2jakarta.csv.data.Segment;
 
 //@XmlType
 @Up2EnableXML

@@ -1,7 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.extension.*;
+import io.github.up2jakarta.csv.api.ext.*;
+import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.xml.api.SeverityType;
@@ -46,7 +47,7 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
 
     private <T extends Enum<T>> Conversion<?> ofOrdinal(Class<T> type, Optional<Error> error, SeverityType et, String ec) {
         final Object[] constants = type.getEnumConstants();
-        final PropertyParser<Object> p = v -> {
+        final PropertyConverter<Object> p = v -> {
             try {
                 final int ordinal = Integer.parseInt(v);
                 return constants[ordinal];
@@ -68,7 +69,7 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
     }
 
     private <T extends Enum<T>> Conversion<?> ofName(Class<T> type, Optional<Error> error, SeverityType et, String ec) {
-        final PropertyParser<Object> p = v -> {
+        final PropertyConverter<Object> p = v -> {
             try {
                 return Enum.valueOf(type, v);
             } catch (IllegalArgumentException exception) {

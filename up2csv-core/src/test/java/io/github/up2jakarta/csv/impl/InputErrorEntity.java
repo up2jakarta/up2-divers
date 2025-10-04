@@ -14,7 +14,7 @@ public class InputErrorEntity extends AbstractError<InputErrorEntity.PKey> {
     private PKey key;
 
     @Transient
-    private DataId type;
+    private BusinessType type;
 
     @Override
     public PKey getKey() {
@@ -27,12 +27,12 @@ public class InputErrorEntity extends AbstractError<InputErrorEntity.PKey> {
     }
 
     @Override
-    public DataId getType() {
+    public BusinessType getType() {
         return type;
     }
 
     @Override
-    public void setType(DataId type) {
+    public void setType(BusinessType type) {
         this.type = type;
     }
 

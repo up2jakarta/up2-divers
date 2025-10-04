@@ -1,6 +1,5 @@
 package io.github.up2jakarta.csv.data;
 
-import io.github.up2jakarta.csv.extension.Segment;
 import io.github.up2jakarta.csv.misc.BeanException;
 
 import java.lang.reflect.Field;
@@ -11,7 +10,7 @@ import java.util.Stack;
  * The business resolver data type.
  *
  * @param <D> the business data type
- * @see io.github.up2jakarta.csv.input.InputError#setType(DataType)
+ * @see io.github.up2jakarta.csv.api.IError#setType(DataType)
  */
 public abstract class DataTypeResolver<D extends DataType<D>> {
 
@@ -19,6 +18,15 @@ public abstract class DataTypeResolver<D extends DataType<D>> {
 
     protected DataTypeResolver(Class<D> type) {
         this.type = type;
+    }
+
+    public static <D extends DataType<D>> DataTypeResolver<D> empty(Class<D> type) {
+        return new DataTypeResolver<>(type) {
+            @Override
+            public Optional<D> get(Stack<Class<? extends Segment>> stack, Field[] path, Field field) {
+                return Optional.empty();
+            }
+        };
     }
 
     /**
@@ -42,6 +50,20 @@ public abstract class DataTypeResolver<D extends DataType<D>> {
         if (value != null && !type.isAssignableFrom(value.getClass())) {
             throw new BeanException(value.getClass(), "class", "invalid data type");
         }
+    }
+
+    public final DataTypeResolver<D> or(Optional<D> defaultValue) {
+        final DataTypeResolver<D> delegate = this;
+        return new DataTypeResolver<>(type) {
+            @Override
+            public Optional<D> get(Stack<Class<? extends Segment>> stack, Field[] path, Field field) throws BeanException {
+                final Optional<D> value = delegate.get(stack, path, field);
+                if (value.isEmpty()) {
+                    return defaultValue;
+                }
+                return value;
+            }
+        };
     }
 
 }

@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class ConverterTest {
 
     private final SimpleCreator creator;
-    private final MapperFactory<DataId> factory;
+    private final MapperFactory<BusinessType> factory;
 
     @Autowired
-    ConverterTest(MapperFactory<DataId> factory, SimpleCreator creator) {
+    ConverterTest(MapperFactory<BusinessType> factory, SimpleCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -46,8 +46,8 @@ class ConverterTest {
     @Test
     void testCache() throws BeanException {
         // GIVEN
-        final Mapper<ValidEntity, DataId> instance1 = factory.build(ValidEntity.class);
-        final Mapper<ValidEntity, DataId> instance2 = factory.build(ValidEntity.class);
+        final Mapper<ValidEntity, BusinessType> instance1 = factory.build(ValidEntity.class);
+        final Mapper<ValidEntity, BusinessType> instance2 = factory.build(ValidEntity.class);
         // THEN
         assertNotSame(instance1, instance2);
     }
@@ -56,7 +56,7 @@ class ConverterTest {
     void testSupport() throws BeanException {
         // GIVEN
         final String[] data = {"100", "Test\t 100", "2024-07-25", "57.000001", "TND", "4.06250001", "C62", "Y", "P1W", "TN"};
-        final Mapper<SupportEntity, DataId> parser = factory.build(SupportEntity.class);
+        final Mapper<SupportEntity, BusinessType> parser = factory.build(SupportEntity.class);
         final InputRowEntity row = create(SegmentType.S00, data);
         final SimpleHandler handler = new SimpleHandler(row, creator);
         // WHEN
@@ -80,7 +80,7 @@ class ConverterTest {
     void testJSR_303_Validation() throws BeanException {
         // GIVEN
         final String[] data = {"100", "8888_8888", "2024-07-25", "57.000001", "EUR", "4.06250001", "KGM", "Y", "P1W", "FR"};
-        final Mapper<SupportEntity, DataId> parser = factory.build(SupportEntity.class);
+        final Mapper<SupportEntity, BusinessType> parser = factory.build(SupportEntity.class);
         final InputRowEntity row = create(SegmentType.S00, data);
         final SimpleHandler handler = new SimpleHandler(row, creator);
         // WHEN
@@ -114,7 +114,7 @@ class ConverterTest {
     void testError() throws BeanException {
         // GIVEN
         final String[] data = {"100", "99998888", "2024-07-25", "57.000001", "ILS", "4.06250001", "KGM", "Y", "P1W", "IL"};
-        final Mapper<SupportEntity, DataId> parser = factory.build(SupportEntity.class);
+        final Mapper<SupportEntity, BusinessType> parser = factory.build(SupportEntity.class);
         final InputRowEntity row = create(SegmentType.S00, data);
         final SimpleHandler handler = new SimpleHandler(row, creator);
         // WHEN

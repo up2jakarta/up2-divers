@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.test.bean.converter;
 
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.Up2Default;
-import io.github.up2jakarta.csv.annotation.Up2Number;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.cfg.Up2Default;
+import io.github.up2jakarta.csv.cfg.Up2Number;
+import io.github.up2jakarta.csv.data.Segment;
 
 @SuppressWarnings("unused")
 public class DefaultBean implements Segment {

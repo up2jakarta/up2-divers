@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.test.bean.mapper;
 
-import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.Truncated;
-import io.github.up2jakarta.csv.annotation.Up2EnableXML;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.cfg.Truncated;
+import io.github.up2jakarta.csv.cfg.Up2EnableXML;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.test.codelist.CountryCodeType;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 import io.github.up2jakarta.csv.test.ext.Dummy1;

@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.extension.Parsed;
+import io.github.up2jakarta.csv.data.Recordable;
 import io.github.up2jakarta.csv.impl.InputRowEntity;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.misc.BeanException;
@@ -103,9 +103,9 @@ class BeansTest {
     @Test
     void testGetParsedArguments() throws BeanException {
         // Given
-        final Class<? extends Parsed<?, ?>> beanType = SupportEntity.class;
+        final Class<? extends Recordable<?, ?>> beanType = SupportEntity.class;
         // When
-        final Type[] arguments = getTypeArguments(beanType, Parsed.class);
+        final Type[] arguments = getTypeArguments(beanType, Recordable.class);
         // Then
         assertEquals(SegmentType.class, arguments[0]);
         assertEquals(InputRowEntity.class, arguments[1]);
@@ -114,7 +114,7 @@ class BeansTest {
     @Test
     void testGetObjectArguments() throws BeanException {
         // Given
-        final Class<? extends Parsed<?, ?>> beanType = SupportEntity.class;
+        final Class<? extends Recordable<?, ?>> beanType = SupportEntity.class;
         // When
         final Type[] arguments = getTypeArguments(beanType, Object.class);
         // Then

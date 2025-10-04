@@ -23,10 +23,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class CompositeKeyCreatorTest {
 
     private final ErrorCreator creator;
-    private final MapperFactory<DataId> factory;
+    private final MapperFactory<BusinessType> factory;
 
     @Autowired
-    CompositeKeyCreatorTest(MapperFactory<DataId> factory, ErrorCreator creator) {
+    CompositeKeyCreatorTest(MapperFactory<BusinessType> factory, ErrorCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -34,7 +34,7 @@ class CompositeKeyCreatorTest {
     @Test
     void testOneShot() throws BeanException {
         // Given
-        final Mapper<Validator1Bean, DataId> mapper = factory.build(Validator1Bean.class);
+        final Mapper<Validator1Bean, BusinessType> mapper = factory.build(Validator1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "eTND");
         // When
         final ErrorHandler handler = new ErrorHandler(row, creator);
@@ -56,7 +56,7 @@ class CompositeKeyCreatorTest {
     @Test
     void hackCreator() {
         // Given
-        final CompositeKeyCreator<?, ?, DataId, SimpleErrorEntity> creator = new CompositeKeyCreator<>(SimpleErrorEntity::new, null);
+        final CompositeKeyCreator<?, ?, BusinessType, SimpleErrorEntity> creator = new CompositeKeyCreator<>(SimpleErrorEntity::new, null);
         final SimpleErrorEntity error = creator.newInstance();
         // When
         final IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> error.setKey(error));

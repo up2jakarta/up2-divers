@@ -1,13 +1,14 @@
 package io.github.up2jakarta.csv.test.bean.mapper;
 
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.data.Segment;
 
 @SuppressWarnings("unused")
 public class CountryBean implements Segment {
 
     @Position(1)
     private String code;
+
     @Position(2)
     private String name;
 

@@ -1,15 +1,18 @@
 package io.github.up2jakarta.csv.misc;
 
-import io.github.up2jakarta.csv.extension.BeanContext;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.api.ext.BeanContext;
+import io.github.up2jakarta.csv.data.Segment;
 
 import java.lang.reflect.*;
+import java.util.Arrays;
 import java.util.Stack;
 
 import static java.util.Arrays.stream;
 
 @SuppressWarnings("unused")
 public final class Beans {
+
+    public static final Object UNDEFINED = new Object();
 
     public static final Type[] NO_TYPES = {};
 
@@ -205,6 +208,12 @@ public final class Beans {
         } catch (Throwable ex) {
             throw new BeanException(bean.getClass(), getter, ex.getMessage());
         }
+    }
+
+    public static <T> T[] concat(T[] source, T value) {
+        final T[] values = Arrays.copyOf(source, source.length + 1);
+        values[source.length] = value;
+        return values;
     }
 
 }

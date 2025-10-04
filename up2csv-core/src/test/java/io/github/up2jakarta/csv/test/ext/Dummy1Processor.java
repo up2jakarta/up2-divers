@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.test.ext;
 
-import io.github.up2jakarta.csv.extension.ConfigurableProcessor;
+import io.github.up2jakarta.csv.api.ext.InputProcessor;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.codelist.PropertyException;
 import jakarta.inject.Named;
@@ -8,7 +8,7 @@ import jakarta.inject.Singleton;
 
 @Named
 @Singleton
-public class Dummy1Processor extends ConfigurableProcessor<Dummy1> {
+public class Dummy1Processor extends InputProcessor<Dummy1> {
 
     public static final String TU_P_001 = "TU-P001";
 

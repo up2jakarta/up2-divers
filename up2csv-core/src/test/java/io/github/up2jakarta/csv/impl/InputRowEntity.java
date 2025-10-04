@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.input.InputSegment;
+import io.github.up2jakarta.csv.api.IRecord;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -9,7 +9,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "TB_INPUT_ROWS")
 @SuppressWarnings("unused")
-public class InputRowEntity implements InputSegment<SegmentType> {
+public class InputRowEntity implements IRecord<SegmentType> {
 
     @EmbeddedId
     private InputRowEntity.PKey key;

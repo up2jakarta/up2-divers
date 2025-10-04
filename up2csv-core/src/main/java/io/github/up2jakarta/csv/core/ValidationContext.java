@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.ValidOverride;
+import io.github.up2jakarta.csv.cfg.ValidOverride;
 import io.github.up2jakarta.csv.misc.BeanException;
 import jakarta.validation.Valid;
 

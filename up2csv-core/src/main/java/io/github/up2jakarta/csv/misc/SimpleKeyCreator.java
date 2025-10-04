@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.misc;
 
+import io.github.up2jakarta.csv.api.IError;
+import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.EventCreator;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.input.InputError;
-import io.github.up2jakarta.csv.input.InputSegment;
 
 import java.util.function.Supplier;
 
@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  * @param <R> the input row
  * @param <E> the simple error
  */
-public class SimpleKeyCreator<R extends InputSegment<?>, D extends DataType<D>, E extends InputError.Key<R> & InputError<R, E, D>> extends EventCreator<R, E, D, E> {
+public class SimpleKeyCreator<R extends IRecord<?>, D extends DataType<D>, E extends IError.Key<R> & IError<R, E, D>> extends EventCreator<R, E, D, E> {
 
     private final Supplier<E> errorCreator;
 

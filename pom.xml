@@ -2,9 +2,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>3.4.9</version>
+    </parent>
+
     <groupId>io.github.up2jakarta</groupId>
     <artifactId>up2-divers</artifactId>
-    <version>1.4.9</version>
+    <version>1.5.0</version>
     <packaging>pom</packaging>
 
     <name>Up2Jakarta :: Divers</name>
@@ -49,26 +55,89 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <csv.version>1.14.1</csv.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Spring Boot -->
+            <!-- Modules -->
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>3.4.9</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <groupId>io.github.up2jakarta</groupId>
+                <artifactId>up2cii-format</artifactId>
+                <version>1.5.0</version>
             </dependency>
-            <!-- CSV Dependencies -->
+            <dependency>
+                <groupId>io.github.up2jakarta</groupId>
+                <artifactId>up2csv-core</artifactId>
+                <version>1.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.up2jakarta</groupId>
+                <artifactId>up2job-core</artifactId>
+                <version>1.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.up2jakarta</groupId>
+                <artifactId>up2xml-core</artifactId>
+                <version>1.5.0</version>
+            </dependency>
+            <!-- Divers -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-csv</artifactId>
-                <version>1.14.1</version>
+                <version>${csv.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.4.1</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-java</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireJavaVersion>
+                                        <message>This build requires at least Java ${java.version}, update your JVM, and
+                                            run the build again
+                                        </message>
+                                        <version>${java.version}</version>
+                                    </requireJavaVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <parameters>true</parameters>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <argLine>
+                            -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+                            -Xshare:off
+                        </argLine>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
     <profiles>
         <profile>

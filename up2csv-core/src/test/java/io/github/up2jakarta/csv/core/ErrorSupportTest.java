@@ -30,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ErrorSupportTest {
 
     private final SimpleCreator creator;
-    private final MapperFactory<DataId> factory;
+    private final MapperFactory<BusinessType> factory;
 
     @Autowired
-    ErrorSupportTest(MapperFactory<DataId> factory, SimpleCreator creator) {
+    ErrorSupportTest(MapperFactory<BusinessType> factory, SimpleCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -41,7 +41,7 @@ public class ErrorSupportTest {
     @Test
     void testProcessorWithoutError() throws BeanException {
         // Given
-        final Mapper<Test3Processor, DataId> mapper = factory.build(Test3Processor.class);
+        final Mapper<Test3Processor, BusinessType> mapper = factory.build(Test3Processor.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "property", "dummy");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
@@ -76,7 +76,7 @@ public class ErrorSupportTest {
     @Test
     void testProcessorWithinError() throws BeanException {
         // Given
-        final Mapper<Test4Processor, DataId> mapper = factory.build(Test4Processor.class);
+        final Mapper<Test4Processor, BusinessType> mapper = factory.build(Test4Processor.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "property", "dummy");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
@@ -111,7 +111,7 @@ public class ErrorSupportTest {
     @Test
     void testConverterWithoutError() throws BeanException {
         // Given
-        final Mapper<Test1Converter, DataId> mapper = factory.build(Test1Converter.class);
+        final Mapper<Test1Converter, BusinessType> mapper = factory.build(Test1Converter.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "ILS", "int");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
@@ -146,7 +146,7 @@ public class ErrorSupportTest {
     @Test
     void testConverterWithinError() throws BeanException {
         // Given
-        final Mapper<Test2Converter, DataId> mapper = factory.build(Test2Converter.class);
+        final Mapper<Test2Converter, BusinessType> mapper = factory.build(Test2Converter.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "ILS", "int");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
@@ -181,7 +181,7 @@ public class ErrorSupportTest {
     @Test
     void testResolverWithoutError() throws BeanException {
         // Given
-        final Mapper<Test1Resolver, DataId> mapper = factory.build(Test1Resolver.class);
+        final Mapper<Test1Resolver, BusinessType> mapper = factory.build(Test1Resolver.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "ISL", "XGM", "XPT24H");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
@@ -226,7 +226,7 @@ public class ErrorSupportTest {
     @Test
     void testResolverWithinError() throws BeanException {
         // Given
-        final Mapper<Test2Resolver, DataId> mapper = factory.build(Test2Resolver.class);
+        final Mapper<Test2Resolver, BusinessType> mapper = factory.build(Test2Resolver.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "date", "duration");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
@@ -261,7 +261,7 @@ public class ErrorSupportTest {
     @Test
     void testValidatorWithoutError() throws BeanException {
         // Given
-        final Mapper<Test1Validator, DataId> mapper = factory.build(Test1Validator.class);
+        final Mapper<Test1Validator, BusinessType> mapper = factory.build(Test1Validator.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "+1", "101", "", null, "-1");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
@@ -347,7 +347,7 @@ public class ErrorSupportTest {
     @Test
     void testValidatorWithinError() throws BeanException {
         // Given
-        final Mapper<Test2Validator, DataId> mapper = factory.build(Test2Validator.class);
+        final Mapper<Test2Validator, BusinessType> mapper = factory.build(Test2Validator.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "", null);
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);

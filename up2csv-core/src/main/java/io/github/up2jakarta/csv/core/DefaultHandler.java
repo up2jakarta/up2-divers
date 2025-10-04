@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.Error;
+import io.github.up2jakarta.csv.api.IError;
+import io.github.up2jakarta.csv.api.IErrorRepository;
+import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.input.InputError;
-import io.github.up2jakarta.csv.input.InputRepository;
-import io.github.up2jakarta.csv.input.InputSegment;
 import io.github.up2jakarta.csv.misc.MapperException;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.codelist.PropertyException;
@@ -18,14 +18,14 @@ import java.util.List;
 /**
  * Default implementation.
  */
-public class DefaultHandler<R extends InputSegment<?>, K extends InputError.Key<R>, D extends DataType<D>, E extends InputError<R, K, D>> extends EventHandler<R, K, D, E> {
+public class DefaultHandler<R extends IRecord<?>, K extends IError.Key<R>, D extends DataType<D>, E extends IError<R, K, D>> extends EventHandler<R, K, D, E> {
 
     private static final List<String> CLASS_NAMES = List.of(
             ObjectProperty.class.getName(),
             PositionProperty.class.getName(),
             StringProperty.class.getName(),
             EventHandler.class.getName(),
-            MapperFactory.FragmentProperty.class.getName(),
+            BeanProperty.class.getName(),
             MapperFactory.class.getName() + "$DefaultMapper",
             ProcessorWrapper.class.getName(),
             TechnicalChecker.class.getName(),
@@ -43,7 +43,7 @@ public class DefaultHandler<R extends InputSegment<?>, K extends InputError.Key<
      * @param creator    the error creator
      * @param repository the input repository
      */
-    public DefaultHandler(R row, EventCreator<R, K, D, E> creator, InputRepository<R> repository) {
+    public DefaultHandler(R row, EventCreator<R, K, D, E> creator, IErrorRepository<R> repository) {
         this.row = row;
         this.creator = creator;
         this.collector = new LazyList<>(() -> repository.max(row));

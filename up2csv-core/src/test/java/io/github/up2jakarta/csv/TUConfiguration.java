@@ -1,11 +1,12 @@
 package io.github.up2jakarta.csv;
 
+import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.core.MapperFactory;
-import io.github.up2jakarta.csv.extension.BeanContext;
+import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.impl.*;
 import io.github.up2jakarta.csv.misc.BeanException;
-import io.github.up2jakarta.csv.processor.TokenProcessor;
-import io.github.up2jakarta.csv.resolver.DecimalResolver;
+import io.github.up2jakarta.csv.prc.TokenProcessor;
+import io.github.up2jakarta.csv.slv.DecimalResolver;
 import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
 import io.github.up2jakarta.csv.test.ext.DummyConverter;
 import jakarta.validation.Validator;
@@ -46,19 +47,19 @@ public class TUConfiguration {
 
     @Bean
     @Scope(value = SCOPE_SINGLETON)
-    DataIdResolver resolver() {
-        return DataIdResolver.INSTANCE;
+    DataTypeResolver<BusinessType> resolver() {
+        return DataTypeResolver.empty(BusinessType.class);
     }
 
     @Bean
     @Scope(value = SCOPE_SINGLETON)
-    public InvoiceAggregator invoiceAggregator(MapperFactory<DataId> factory, ErrorCreator creator) throws BeanException {
+    public InvoiceAggregator invoiceAggregator(MapperFactory<BusinessType> factory, ErrorCreator creator) throws BeanException {
         return new InvoiceAggregator(factory, creator);
     }
 
     @Bean
     @Scope(value = SCOPE_SINGLETON)
-    public InvoiceSeparator invoiceSeparator(MapperFactory<DataId> factory) throws BeanException {
+    public InvoiceSeparator invoiceSeparator(MapperFactory<BusinessType> factory) throws BeanException {
         return new InvoiceSeparator(factory);
     }
 

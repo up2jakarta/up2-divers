@@ -1,7 +1,11 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.extension.*;
+import io.github.up2jakarta.csv.api.ext.BeanContext;
+import io.github.up2jakarta.csv.api.ext.Conversion;
+import io.github.up2jakarta.csv.api.ext.ConversionExtension;
+import io.github.up2jakarta.csv.api.ext.ConversionResolver;
+import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.misc.BeanException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;

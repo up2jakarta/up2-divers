@@ -1,36 +1,39 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.input.InputLinker;
-import io.github.up2jakarta.csv.input.Linkable;
-import io.github.up2jakarta.csv.test.agg.Invoice;
+import io.github.up2jakarta.csv.api.BeanLinker;
+import io.github.up2jakarta.csv.api.IFullType;
+import io.github.up2jakarta.csv.test.sample.Invoice;
 
-import static io.github.up2jakarta.csv.impl.DataId.*;
+import static io.github.up2jakarta.csv.impl.BusinessType.*;
 import static io.github.up2jakarta.csv.impl.SegmentLinker.*;
 
 @SuppressWarnings("unused")
-public enum SegmentType implements Linkable<DataId, SegmentType> {
+public enum SegmentType implements IFullType<BusinessType, SegmentType> {
 
-    S00("00", "Header", none(), NONE),
-    S99("99", "Footer", none(), NONE),
+    S00("00", "Test", none(), NONE),
 
-    S01("01", "Invoice", none(Invoice.class), D001),
-    S02("02", "Seller", seller(), D002),
-    S03("03", "Buyer", buyer(), D003),
-    S04("04", "Items", items(), D004),
-    S05("05", "Product Attributes", attributes(), D005),
-    ;
+    S01("01", none(Invoice.class), D001),
+    S02("02", seller(), D002),
+    S03("03", buyer(), D003),
+    S04("04", items(), D004),
+    S05("05", attributes(), D005),
+    S06("06", amounts(), D006),
+    S07("07", notes(), D007);
 
     private final SegmentLinker<?, ?> linker;
-    private final DataId groupType;
+    private final BusinessType groupType;
     private final String name;
     private final String code;
 
-    <P extends Parsable, T extends Parsable>
-    SegmentType(String code, String name, SegmentLinker<P, T> linker, DataId groupType) {
+    <P extends Parsable, T extends Parsable> SegmentType(String code, SegmentLinker<P, T> linker, BusinessType type) {
+        this(code, type.getName(), linker, type);
+    }
+
+    <P extends Parsable, T extends Parsable> SegmentType(String code, String name, SegmentLinker<P, T> linker, BusinessType type) {
         this.code = code;
         this.name = name;
         this.linker = linker;
-        this.groupType = groupType;
+        this.groupType = type;
     }
 
     @Override
@@ -44,7 +47,7 @@ public enum SegmentType implements Linkable<DataId, SegmentType> {
     }
 
     @Override
-    public DataId getBusinessType() {
+    public BusinessType getBusinessType() {
         return groupType;
     }
 
@@ -55,7 +58,7 @@ public enum SegmentType implements Linkable<DataId, SegmentType> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public InputLinker<SegmentType, ?, ?> linker() {
+    public BeanLinker<SegmentType, ?, ?> linker() {
         return linker;
     }
 

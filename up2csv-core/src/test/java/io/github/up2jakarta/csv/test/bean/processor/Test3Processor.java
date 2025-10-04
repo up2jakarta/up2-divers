@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.test.bean.processor;
 
-import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.csv.test.ext.Dummy1Processor;
 import io.github.up2jakarta.csv.test.ext.Dummy3;

@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.Error;
+import io.github.up2jakarta.csv.api.ext.InputProcessor;
+import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.extension.ConfigurableProcessor;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.codelist.PropertyException;
 
@@ -14,15 +14,15 @@ import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
 
 /**
- * Wrapper for {@link ConfigurableProcessor}.
+ * Wrapper for {@link InputProcessor}.
  */
 final class ProcessorWrapper<A extends Annotation, D extends DataType<D>> {
 
-    private final ConfigurableProcessor<A> delegate;
+    private final InputProcessor<A> delegate;
     private final Class<? extends RuntimeException> skip;
     private final A config;
 
-    ProcessorWrapper(ConfigurableProcessor<A> delegate, Class<? extends RuntimeException> skip, A config) {
+    ProcessorWrapper(InputProcessor<A> delegate, Class<? extends RuntimeException> skip, A config) {
         this.delegate = delegate;
         this.config = config;
         this.skip = skip;

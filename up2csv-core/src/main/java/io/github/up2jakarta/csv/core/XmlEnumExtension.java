@@ -1,7 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.extension.*;
+import io.github.up2jakarta.csv.api.ext.*;
+import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.misc.BeanException;
 import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.xml.api.SeverityType;
@@ -82,7 +83,7 @@ public final class XmlEnumExtension extends ConversionExtension<XmlType, XmlEnum
         final Optional<Error> error = ConversionResolver.getError(property);
         final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);
         final String code = error.map(Error::value).orElse(Errors.ERROR_XML_ENUM);
-        final PropertyParser<Object> p = v -> mapping.entrySet().stream().filter(e -> e.getKey().equals(v))
+        final PropertyConverter<Object> p = v -> mapping.entrySet().stream().filter(e -> e.getKey().equals(v))
                 .map(Map.Entry::getValue)
                 .findAny()
                 .orElseThrow(() -> {

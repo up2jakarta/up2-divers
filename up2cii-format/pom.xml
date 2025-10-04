@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2-divers</artifactId>
-        <version>1.4.9</version>
+        <version>1.5.0</version>
     </parent>
 
     <artifactId>up2cii-format</artifactId>
@@ -30,7 +30,6 @@
         <dependency>
             <groupId>io.github.up2jakarta</groupId>
             <artifactId>up2xml-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <!-- Required dependencies -->
         <dependency>

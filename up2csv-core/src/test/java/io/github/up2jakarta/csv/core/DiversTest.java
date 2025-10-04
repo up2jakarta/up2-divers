@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.impl.InputErrorEntity;
 import io.github.up2jakarta.csv.impl.InputRowEntity;
 import io.github.up2jakarta.csv.impl.SimpleErrorEntity;
-import io.github.up2jakarta.csv.processor.TrimProcessor;
+import io.github.up2jakarta.csv.prc.TrimProcessor;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;

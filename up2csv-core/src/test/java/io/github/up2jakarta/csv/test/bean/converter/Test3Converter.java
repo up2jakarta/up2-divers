@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.test.bean.converter;
 
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.Up2Converter;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.cfg.Up2Converter;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.test.codelist.CountryConverter;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
 

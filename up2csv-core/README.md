@@ -41,7 +41,7 @@ Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready enti
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.4.9</version>
+        <version>1.5.0</version>
     </dependency>
     <!-- Optional JSR-303 Validation Provider -->
     <!-- Optional JPA Provider -->
@@ -507,12 +507,15 @@ public TestSegment implements Segment {
 
 ## Input API
 
-### The specifications are described in [io.github.up2jakarta.csv.input](./src/main/java/io/github/up2jakarta/csv/input)
+### The specifications are described in [io.gitHub.up2jakarta.csv.api](./src/main/java/io/github/up2jakarta/csv/api)
 
-- `InputError`: Input error presentation (model)
-- `InputRepository`: input error repository (helpful for error id generation)
-- `InputSegment`: Input record presentation (model)
-- `InputType`: Segment discriminator type
+- `BeanJoiner`: Bean getter for segregation processing only.
+- `BeanLinker`: Bean linker for aggregation/segregation processing.
+- `IError`: Input error representation (model) tor error handling.
+- `IErrorRepository`: input error repository (helpful for generating error identifiers)
+- `IRecord`: Input record representation (model)
+- `IType`: Segment definition for segregation processing only. 
+- `IFullType`: Segment definition for aggregation /segregation processing.
 
 See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/impl)
 
@@ -524,7 +527,7 @@ See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/impl)
 @Inject
 private MapperFactory factory;
 
-{
+public void test() {
     // GIVEN Singleton
     final Mapper<Up2Segment> mapper = factory.build(Up2Segment.class);
     // WHEN
@@ -541,16 +544,15 @@ private MapperFactory factory;
 private MapperFactory factory;
 
 @Inject
-private InputRepository<InputRowImpl> repository;
+private IRepository<InputRowImpl> repository;
 
 @Inject
 private EventCreator<InputRowImpl, ?, ?, InputErrorImpl> creator;
 
-{
+public void process(final InputRowImpl row) {
     // GIVEN Singletons
     final Mapper<Up2Segment> mapper = factory.build(Up2Segment.class);
     // GIVEN Prototypes
-    final InputRowImpl row ; // ... retrive it from repository or CSV file
     final EventHandler<InputRowImpl, ?, ?, InputErrorImpl> handler = new EventHandlerImpl<>(row, creator, repository) ;
     // WHEN
     final Up2Segment bean = mapper.map(row, handler);
@@ -575,7 +577,7 @@ During the unmapping of java-bean:
 @Inject
 private MapperFactory factory;
 
-{
+public void test() {
     // GIVEN Singleton
     final Mapper<Up2Segment> mapper = factory.build(Up2Segment.class);
     final Up2Segment bean ; // ... full-fill the bean
@@ -611,7 +613,7 @@ It's impossible to present a `business-property` within `0..n` cardinality
   simplify the validation.
 - And more depending on the `business-logic`
 
-See [BusinessTest.java](src/test/java/io/github/up2jakarta/csv/BusinessTest.java) for more details.
+See [BusinessTests.java](src/test/java/io/github/up2jakarta/csv/BusinessTests.java) for more details.
 
 # Best practices
 

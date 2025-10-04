@@ -1,13 +1,13 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.input.InputError;
-import io.github.up2jakarta.csv.input.InputSegment;
+import io.github.up2jakarta.csv.api.IError;
+import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.misc.LazyCounter;
 
 import java.util.*;
 import java.util.function.IntSupplier;
 
-final class LazyList<R extends InputSegment<?>, E extends InputError<R, ?, ?>> {
+final class LazyList<R extends IRecord<?>, E extends IError<R, ?, ?>> {
 
     private final Set<E> errors;
     private final Set<Integer> offsets;

@@ -17,9 +17,12 @@ final class StringProperty<D extends DataType<D>> extends PositionProperty<Strin
     }
 
     @Override
-    void setValue(Object bean, String value, int offset, EventHandler<?, ?, D, ?> handler) throws BeanException {
+    String parse(Object bean, String value, int offset, EventHandler<?, ?, D, ?> handler) throws BeanException {
         value = process(value, offset, handler);
-        Beans.setValue(bean, value, setter);
+        if (value != null) {
+            Beans.setValue(bean, value, setter);
+        }
+        return value;
     }
 
     @Override

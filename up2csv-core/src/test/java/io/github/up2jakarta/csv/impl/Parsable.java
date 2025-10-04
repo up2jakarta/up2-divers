@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.extension.Parsed;
+import io.github.up2jakarta.csv.data.Recordable;
 
-public abstract class Parsable implements Parsed<SegmentType, InputRowEntity> {
+public abstract class Parsable implements Recordable<SegmentType, InputRowEntity> {
 
     private InputRowEntity origin;
 

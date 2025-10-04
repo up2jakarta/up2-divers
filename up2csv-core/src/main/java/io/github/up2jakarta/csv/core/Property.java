@@ -14,11 +14,11 @@ import java.lang.reflect.Method;
  */
 abstract class Property<V, D extends DataType<D>> {
 
-    protected final Method setter;
-    protected final Method getter;
-    protected final Field field;
     protected final int offset;
     protected final D type;
+    final Method setter;
+    final Method getter;
+    final Field field;
 
     Property(Field field, D type, int offset) throws BeanException {
         this.type = type;
@@ -29,11 +29,11 @@ abstract class Property<V, D extends DataType<D>> {
     }
 
     /**
-     * Get the formatted value of the given property.
+     * Get the property value of the given bean.
      *
      * @param bean the bean object
-     * @return the formatted value
-     * @throws BeanException f the property is not accessible for read
+     * @return the property value, or else the default value
+     * @throws BeanException if the property is not accessible for read
      */
     final V getValue(Object bean) throws BeanException {
         //noinspection unchecked

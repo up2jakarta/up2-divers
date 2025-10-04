@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.extension.Parsed;
+import io.github.up2jakarta.csv.data.Recordable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
@@ -8,7 +8,7 @@ import jakarta.persistence.MappedSuperclass;
 import java.io.Serializable;
 
 @MappedSuperclass
-public abstract class ParsedEntity<K extends Serializable> implements Parsed<SegmentType, InputRowEntity> {
+public abstract class ParsedEntity<K extends Serializable> implements Recordable<SegmentType, InputRowEntity> {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private InputRowEntity row;

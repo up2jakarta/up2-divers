@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.extension.CheckerContext;
-import io.github.up2jakarta.csv.extension.Segment;
-import io.github.up2jakarta.csv.extension.SegmentListener;
+import io.github.up2jakarta.csv.api.ext.CheckerContext;
+import io.github.up2jakarta.csv.api.ext.SegmentListener;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.misc.BeanException;
 
 import java.lang.reflect.Field;

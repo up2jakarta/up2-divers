@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.input.InputError.Key;
+import io.github.up2jakarta.csv.api.IError.Key;
 import jakarta.persistence.*;
 
 @Entity
@@ -24,7 +24,7 @@ public class SimpleErrorEntity extends AbstractError<SimpleErrorEntity> implemen
     private Integer order;
 
     @Transient
-    private DataId type;
+    private BusinessType type;
 
     @Override
     public SimpleErrorEntity getKey() {
@@ -50,12 +50,12 @@ public class SimpleErrorEntity extends AbstractError<SimpleErrorEntity> implemen
     }
 
     @Override
-    public DataId getType() {
+    public BusinessType getType() {
         return type;
     }
 
     @Override
-    public void setType(DataId type) {
+    public void setType(BusinessType type) {
         this.type = type;
     }
 

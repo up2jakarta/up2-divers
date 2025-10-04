@@ -3,13 +3,13 @@ package io.github.up2jakarta.csv.impl;
 import io.github.up2jakarta.csv.BusinessSeparator;
 import io.github.up2jakarta.csv.core.MapperFactory;
 import io.github.up2jakarta.csv.misc.BeanException;
-import io.github.up2jakarta.csv.test.agg.Invoice;
+import io.github.up2jakarta.csv.test.sample.Invoice;
 
 import java.util.function.Consumer;
 
-public class InvoiceSeparator extends BusinessSeparator<Invoice, DataId, SegmentType> {
+public class InvoiceSeparator extends BusinessSeparator<Invoice, BusinessType, SegmentType> {
 
-    public InvoiceSeparator(MapperFactory<DataId> factory) throws BeanException {
+    public InvoiceSeparator(MapperFactory<BusinessType> factory) throws BeanException {
         super(factory, SegmentType.S01, Invoice.class, Invoice::getReference);
     }
 

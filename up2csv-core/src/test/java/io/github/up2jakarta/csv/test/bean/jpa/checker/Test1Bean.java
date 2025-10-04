@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.test.bean.jpa.checker;
 
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.Up2EnableJPA;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.cfg.Up2EnableJPA;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.test.bean.jpa.XML1Enum;
 import io.github.up2jakarta.csv.test.bean.jpa.XML2Enum;
 import io.github.up2jakarta.csv.test.codelist.TestCodeList;

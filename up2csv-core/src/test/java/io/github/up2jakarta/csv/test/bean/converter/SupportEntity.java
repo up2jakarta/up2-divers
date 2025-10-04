@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.test.bean.converter;
 
-import io.github.up2jakarta.csv.annotation.Error;
-import io.github.up2jakarta.csv.annotation.*;
+import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.cfg.*;
 import io.github.up2jakarta.csv.impl.ParsedEntity;
 import io.github.up2jakarta.csv.misc.Errors;
 import io.github.up2jakarta.csv.test.codelist.*;

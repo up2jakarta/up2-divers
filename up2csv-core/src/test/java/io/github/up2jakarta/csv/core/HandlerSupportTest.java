@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.impl.DataId;
+import io.github.up2jakarta.csv.impl.BusinessType;
 import io.github.up2jakarta.csv.impl.InputErrorEntity;
 import io.github.up2jakarta.csv.impl.InputRowEntity;
 import io.github.up2jakarta.csv.impl.SegmentType;
@@ -34,20 +34,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 public class HandlerSupportTest {
 
-    private final MapperFactory<DataId> factory;
+    private final MapperFactory<BusinessType> factory;
 
     @Autowired
-    HandlerSupportTest(MapperFactory<DataId> factory) {
+    HandlerSupportTest(MapperFactory<BusinessType> factory) {
         this.factory = factory;
     }
 
     @Test
     void testNull() throws BeanException {
         // Given
-        final Mapper<ValidBean, DataId> mapper = factory.build(ValidBean.class);
+        final Mapper<ValidBean, BusinessType> mapper = factory.build(ValidBean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "");
         // When
-        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = null;
+        final EventHandler<InputRowEntity, ?, BusinessType, InputErrorEntity> handler = null;
         final NullPointerException npe1 = assertThrows(NullPointerException.class, () -> mapper.map(row, null));
         final NullPointerException npe2 = assertThrows(NullPointerException.class, () -> mapper.map(handler, ""));
         // Then
@@ -61,8 +61,8 @@ public class HandlerSupportTest {
     @Test
     void testValidator() throws BeanException {
         // Given
-        final Mapper<Test1Validator, DataId> mapper = factory.build(Test1Validator.class, DataId.NONE);
-        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast(false);
+        final Mapper<Test1Validator, BusinessType> mapper = factory.build(Test1Validator.class, BusinessType.NONE);
+        final EventHandler<InputRowEntity, ?, BusinessType, InputErrorEntity> handler = EventHandler.failFast(false);
         {
             // When
             final InputRowEntity row = Tests.create(SegmentType.S00, "+1", "1", "1", "1", "1", "1", "1");
@@ -73,7 +73,7 @@ public class HandlerSupportTest {
             assertEquals(SeverityType.ERROR, error.getSeverityType());
             assertNotNull(error.getCause());
             assertEquals("size must be between 0 and 1", error.getCause().getMessage());
-            assertEquals(DataId.NONE, error.getDataType());
+            assertEquals(BusinessType.NONE, error.getDataType());
             assertNull(error.getCause().getCause());
         }
         {
@@ -156,8 +156,8 @@ public class HandlerSupportTest {
     @Test
     void testResolver() throws BeanException {
         // Given
-        final Mapper<Test1Resolver, DataId> mapper = factory.build(Test1Resolver.class);
-        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast(false);
+        final Mapper<Test1Resolver, BusinessType> mapper = factory.build(Test1Resolver.class);
+        final EventHandler<InputRowEntity, ?, BusinessType, InputErrorEntity> handler = EventHandler.failFast(false);
         {
             // When
             final InputRowEntity row = Tests.create(SegmentType.S00, "ISL", "KGM", "PT24H");
@@ -200,8 +200,8 @@ public class HandlerSupportTest {
     @Test
     void testConverter() throws BeanException {
         // Given
-        final Mapper<Test1Converter, DataId> mapper = factory.build(Test1Converter.class);
-        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast(false);
+        final Mapper<Test1Converter, BusinessType> mapper = factory.build(Test1Converter.class);
+        final EventHandler<InputRowEntity, ?, BusinessType, InputErrorEntity> handler = EventHandler.failFast(false);
         {
             final InputRowEntity row = Tests.create(SegmentType.S00, "ILS", "1");
             final MapperException error = assertThrows(MapperException.class, () -> mapper.map(row, handler));
@@ -232,8 +232,8 @@ public class HandlerSupportTest {
     @Test
     void testProcessor() throws BeanException {
         // Given
-        final Mapper<Test3Processor, DataId> mapper = factory.build(Test3Processor.class);
-        final EventHandler<InputRowEntity, ?, DataId, InputErrorEntity> handler = EventHandler.failFast(false);
+        final Mapper<Test3Processor, BusinessType> mapper = factory.build(Test3Processor.class);
+        final EventHandler<InputRowEntity, ?, BusinessType, InputErrorEntity> handler = EventHandler.failFast(false);
         {
             final InputRowEntity row = Tests.create(SegmentType.S00, "property");
             final MapperException error = assertThrows(MapperException.class, () -> mapper.map(row, handler));

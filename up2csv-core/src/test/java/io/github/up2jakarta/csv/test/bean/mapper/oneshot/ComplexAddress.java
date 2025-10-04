@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.test.bean.mapper.oneshot;
 
-import io.github.up2jakarta.csv.annotation.Position;
+import io.github.up2jakarta.csv.cfg.Position;
 
 @SuppressWarnings("unused")
 public final class ComplexAddress extends AddressSegment<String> {

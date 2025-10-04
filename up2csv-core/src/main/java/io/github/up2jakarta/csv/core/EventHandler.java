@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.annotation.Error;
+import io.github.up2jakarta.csv.api.IError;
+import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.input.InputError;
-import io.github.up2jakarta.csv.input.InputSegment;
 import io.github.up2jakarta.csv.misc.Listable;
 import io.github.up2jakarta.csv.misc.MapperException;
 import io.github.up2jakarta.xml.api.SeverityType;
@@ -32,7 +32,7 @@ import static java.util.Optional.ofNullable;
  * @param <D> the business data type
  * @param <C> the error type
  */
-public abstract class EventHandler<A extends InputSegment<?>, B extends InputError.Key<A>, D extends DataType<D>, C extends InputError<A, B, ?>> implements Listable<C> {
+public abstract class EventHandler<A extends IRecord<?>, B extends IError.Key<A>, D extends DataType<D>, C extends IError<A, B, ?>> implements Listable<C> {
 
     private static Optional<Error> getError(ConstraintViolation<?> violation) {
         final ConstraintDescriptor<?> descriptor = violation.getConstraintDescriptor();
@@ -89,7 +89,7 @@ public abstract class EventHandler<A extends InputSegment<?>, B extends InputErr
      * @param <V>       the error type
      * @return an instance that fails at the first throw error or warning depending on the given flag <code>noWarning</code>.
      */
-    public static <R extends InputSegment<?>, D extends DataType<D>, V extends InputError<R, ?, D>> EventHandler<R, ?, D, V> failFast(boolean noWarning) {
+    public static <R extends IRecord<?>, D extends DataType<D>, V extends IError<R, ?, D>> EventHandler<R, ?, D, V> failFast(boolean noWarning) {
         if (noWarning) {
             //noinspection unchecked
             return (EventHandler<R, ?, D, V>) FastHandler.NO_WARNING;
@@ -127,7 +127,7 @@ public abstract class EventHandler<A extends InputSegment<?>, B extends InputErr
     /**
      * Fail-fast implementation.
      */
-    private static class FastHandler<D extends DataType<D>> extends EventHandler<InputSegment<?>, InputError.Key<InputSegment<?>>, D, InputError<InputSegment<?>, InputError.Key<InputSegment<?>>, ?>> {
+    private static class FastHandler<D extends DataType<D>> extends EventHandler<IRecord<?>, IError.Key<IRecord<?>>, D, IError<IRecord<?>, IError.Key<IRecord<?>>, ?>> {
 
         private static final EventHandler<?, ?, ?, ?> INSTANCE = new FastHandler<>(true);
         private static final EventHandler<?, ?, ?, ?> NO_WARNING = new FastHandler<>(false);
@@ -139,12 +139,12 @@ public abstract class EventHandler<A extends InputSegment<?>, B extends InputErr
         }
 
         @Override
-        InputSegment<?> getSource() {
+        IRecord<?> getSource() {
             return null;
         }
 
         @Override
-        public List<InputError<InputSegment<?>, InputError.Key<InputSegment<?>>, ?>> toList() {
+        public List<IError<IRecord<?>, IError.Key<IRecord<?>>, ?>> toList() {
             return emptyList();
         }
 

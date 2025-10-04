@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.test.bean;
 
-import io.github.up2jakarta.csv.annotation.*;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.cfg.*;
+import io.github.up2jakarta.csv.data.Segment;
 
 @SuppressWarnings("unused")
 public class Test1Primitive implements Segment {

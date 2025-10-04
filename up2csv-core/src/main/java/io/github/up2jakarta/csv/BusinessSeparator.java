@@ -1,16 +1,18 @@
 package io.github.up2jakarta.csv;
 
+import io.github.up2jakarta.csv.api.IType;
+import io.github.up2jakarta.csv.core.BusinessProcessor;
 import io.github.up2jakarta.csv.core.MapperFactory;
 import io.github.up2jakarta.csv.data.BusinessConsumer;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.extension.Segment;
-import io.github.up2jakarta.csv.input.InputType;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.misc.BeanException;
 
+import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class BusinessSeparator<T extends Segment, B extends DataType<B>, I extends Enum<I> & InputType<B, I>> extends BusinessMapper<B, I, T, Segment> {
+public abstract class BusinessSeparator<T extends Segment, B extends DataType<B>, I extends Enum<I> & IType<B, I>> extends BusinessProcessor<B, I, T, Segment> {
 
     private static final int MD_LENGTH = 2;
 
@@ -31,7 +33,11 @@ public abstract class BusinessSeparator<T extends Segment, B extends DataType<B>
         final String[] data = this.getMapper(type).unmap(bean, offset);
         consumer.accept(bean, type, data);
         for (final I segment : this.getJoins(type)) {
-            for (var value : segment.joiner().joins(bean)) {
+            final Collection<Segment> values = segment.joiner().joins(bean);
+            if (values == null) {
+                continue;
+            }
+            for (var value : values) {
                 this.format(value, segment, consumer);
             }
         }

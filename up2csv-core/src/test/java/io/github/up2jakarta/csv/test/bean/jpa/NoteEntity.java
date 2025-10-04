@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.test.bean.jpa;
 
-import io.github.up2jakarta.csv.annotation.Fragment;
-import io.github.up2jakarta.csv.annotation.Position;
-import io.github.up2jakarta.csv.annotation.Up2EnableJPA;
-import io.github.up2jakarta.csv.annotation.ValidOverride;
-import io.github.up2jakarta.csv.extension.Segment;
+import io.github.up2jakarta.csv.cfg.Fragment;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.cfg.Up2EnableJPA;
+import io.github.up2jakarta.csv.cfg.ValidOverride;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.test.codelist.CountryCodeType;
 import io.github.up2jakarta.csv.test.codelist.CountryConverter;
 import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
@@ -45,12 +45,12 @@ public class NoteEntity implements Segment {
     @Fragment(2)
     @Embedded
     @Valid
-    private NoteId<CountryCodeType> test1;
+    private NoteProperty<CountryCodeType> test1;
 
     @Fragment(4)
     @Valid
     @Embedded
-    private NoteId<CurrencyCodeType> test2;
+    private NoteProperty<CurrencyCodeType> test2;
 
     public long getKey() {
         return key;
@@ -76,19 +76,19 @@ public class NoteEntity implements Segment {
         this.content = content;
     }
 
-    public NoteId<CountryCodeType> getTest1() {
+    public NoteProperty<CountryCodeType> getTest1() {
         return test1;
     }
 
-    public void setTest1(NoteId<CountryCodeType> test1) {
+    public void setTest1(NoteProperty<CountryCodeType> test1) {
         this.test1 = test1;
     }
 
-    public NoteId<CurrencyCodeType> getTest2() {
+    public NoteProperty<CurrencyCodeType> getTest2() {
         return test2;
     }
 
-    public void setTest2(NoteId<CurrencyCodeType> test2) {
+    public void setTest2(NoteProperty<CurrencyCodeType> test2) {
         this.test2 = test2;
     }
 
