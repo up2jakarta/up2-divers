@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.test.bean.mapper;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
+import io.github.up2jakarta.csv.test.clv.CurrencyConverter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 

@@ -6,4 +6,8 @@ public class DummyException extends RuntimeException {
         super(message);
     }
 
+    public DummyException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

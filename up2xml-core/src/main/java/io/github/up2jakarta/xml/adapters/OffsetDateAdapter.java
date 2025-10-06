@@ -1,7 +1,7 @@
 package io.github.up2jakarta.xml.adapters;
 
 import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.codelist.TypeConverter;
+import io.github.up2jakarta.xml.clv.TypeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import java.time.LocalDate;

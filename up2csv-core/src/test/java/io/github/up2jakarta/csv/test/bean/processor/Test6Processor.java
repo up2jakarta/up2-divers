@@ -6,7 +6,7 @@ import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.test.ext.Dummy1;
 
-import static io.github.up2jakarta.csv.misc.Errors.ERROR_PROCESSOR;
+import static io.github.up2jakarta.csv.core.Errors.ERROR_PROCESSOR;
 
 @Truncated(1)
 @SuppressWarnings("unused")

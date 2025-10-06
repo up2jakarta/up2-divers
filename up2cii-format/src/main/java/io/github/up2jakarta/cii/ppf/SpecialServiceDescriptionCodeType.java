@@ -1,9 +1,9 @@
 package io.github.up2jakarta.cii.ppf;
 
 import io.github.up2jakarta.cii.ppf.adapters.SpecialServiceDescriptionCodeAdapter;
-import io.github.up2jakarta.xml.codelist.Agency;
-import io.github.up2jakarta.xml.codelist.Documented;
-import io.github.up2jakarta.xml.codelist.Schema;
+import io.github.up2jakarta.xml.clv.Agency;
+import io.github.up2jakarta.xml.clv.Documented;
+import io.github.up2jakarta.xml.clv.Schema;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import javax.annotation.processing.Generated;

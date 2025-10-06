@@ -4,57 +4,60 @@ import io.github.up2jakarta.csv.api.IError;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Recordable;
-import io.github.up2jakarta.csv.misc.BeanException;
-import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.codelist.PropertyException;
+import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.xml.clv.PropertyException;
 
 import java.util.List;
 
-import static io.github.up2jakarta.csv.misc.Beans.UNDEFINED;
+public final class BusinessEntry<T extends IType<D, T>, R extends IRecord<T>, D extends DataType<D>, E extends IError<D>> {
 
-public final class BusinessEntry<T extends IType<D, T>, A extends IRecord<T>, D extends DataType<D>, C extends IError<A, ?, ?>> {
+    private final T type;
+    private final Segment bean;
+    private final EventHandler<R, D, E> handler;
+    private final Mapper<Segment, D> mapper;
 
-    private final Recordable<T, ?> bean;
-    private final EventHandler<A, ?, D, C> handler;
-    private final Mapper<Recordable<T, ?>, D> mapper;
-
-    public BusinessEntry(Mapper<Recordable<T, ?>, D> mapper, Recordable<T, ?> bean, EventHandler<A, ?, D, C> handler) {
+    public BusinessEntry(Mapper<Segment, D> mapper, T type, Segment bean, EventCollector<R, D, E> handler) {
         this.bean = bean;
-        this.handler = handler;
+        this.type = type;
         this.mapper = mapper;
+        this.handler = handler;
     }
 
-    public Recordable<T, ?> getBean() {
-        return bean;
+    public <B extends Segment> B getBean() {
+        //noinspection unchecked
+        return (B) bean;
     }
 
     public T getType() {
-        return bean.getRecord().getType();
+        return type;
     }
 
-    public boolean filter(BusinessEntry<T, A, D, C> parent, IType<D, T> type) throws BeanException {
+    public R getSource() {
+        return handler.row;
+    }
+
+    public boolean isParent(BusinessEntry<T, R, D, E> parent, IType<D, T> type) throws BeanException {
         if (type != this.getType()) {
             return false;
         }
-        final Object key = mapper.parentId(bean, parent.bean.getClass());
-        if (key == UNDEFINED) {
-            return true;
+        if (mapper.parentId.exists()) {
+            final Object key = mapper.parentId.get(bean);
+            if (key == null) {
+                return false;
+            }
+            final Object pid = parent.mapper.businessId.get(parent.bean);
+            return key.equals(pid);
         }
-        final Object pid = parent.mapper.businessId(parent.bean);
-        if (pid == null || key == null) {
-            return false;
-        }
-        return pid.equals(key);
+        return true;
     }
 
-    public void collect(List<C> target) {
-        handler.addTo(target);
+    public void collect(List<E> target) {
+        target.addAll(handler.toCollection());
     }
 
-    public void handle(SeverityType severity, IType<D, ?> segment, String message, int index) {
-        final PropertyException error = new PropertyException(severity, segment.getErrorCode(), message);
-        handler.handleEvent(segment.getBusinessType(), index, error, null, false);
+    public void handle(IType<D, ?> type, int index, String message) {
+        final PropertyException error = new PropertyException(type.getErrorLevel(), type.getErrorCode(), message);
+        handler.handleEvent(type.getBusinessType(), index, error, null);
     }
 
 }

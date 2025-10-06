@@ -1,14 +1,13 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.cfg.ValidOverride;
-import io.github.up2jakarta.csv.misc.BeanException;
 import jakarta.validation.Valid;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 
-import static io.github.up2jakarta.csv.misc.BeanException.of;
-import static io.github.up2jakarta.csv.misc.Path.getOverride;
+import static io.github.up2jakarta.csv.core.BeanException.of;
+import static io.github.up2jakarta.csv.core.ext.Path.getOverride;
 
 /**
  * Context representation for JSR-303 validation.

@@ -1,8 +1,8 @@
 package io.github.up2jakarta.job.zip;
 
 import io.github.up2jakarta.job.core.BusinessId;
-import io.github.up2jakarta.job.core.KeyCoder;
 import io.github.up2jakarta.job.flux.FluxSupplier;
+import io.github.up2jakarta.xml.adapters.KeyCoder;
 
 import java.io.InputStream;
 import java.util.Optional;

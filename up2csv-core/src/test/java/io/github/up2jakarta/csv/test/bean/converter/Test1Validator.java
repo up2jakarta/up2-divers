@@ -1,11 +1,11 @@
 package io.github.up2jakarta.csv.test.bean.converter;
 
+import io.github.up2jakarta.csv.api.Warning;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Number;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.misc.Errors;
-import io.github.up2jakarta.csv.test.validation.Up2NotEmpty;
-import io.github.up2jakarta.csv.test.validation.Up2Warn;
+import io.github.up2jakarta.csv.test.valid.Up2NotEmpty;
+import io.github.up2jakarta.csv.test.valid.Up2Warn;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
@@ -19,16 +19,16 @@ public class Test1Validator implements Segment {
 
     @Position(1)
     @Up2Number
-    @Max(value = 100, payload = Errors.Warning.class)
+    @Max(value = 100, payload = Warning.class)
     private Integer aWarning;
 
     @Position(2)
-    @NotEmpty(payload = Errors.Warning.class)
+    @NotEmpty(payload = Warning.class)
     private String anError;
 
     @Position(3)
     @Up2Number
-    @NotNull(payload = Errors.Warning.class)
+    @NotNull(payload = Warning.class)
     private Integer aFatal;
 
     @Position(4)

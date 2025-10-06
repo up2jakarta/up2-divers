@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.cfg;
 
 import io.github.up2jakarta.csv.api.ext.Conversion;
-import io.github.up2jakarta.csv.core.XmlAdapterExtension;
-import io.github.up2jakarta.csv.core.XmlEnumExtension;
+import io.github.up2jakarta.csv.core.ext.XmlAdapterExtension;
+import io.github.up2jakarta.csv.core.ext.XmlEnumExtension;
 
 import java.lang.annotation.*;
 

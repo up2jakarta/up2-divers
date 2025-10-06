@@ -1,8 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.misc.BeanException;
-import io.github.up2jakarta.csv.misc.Beans;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -15,13 +13,16 @@ import java.lang.reflect.Method;
 abstract class Property<V, D extends DataType<D>> {
 
     protected final int offset;
-    protected final D type;
+    protected final D dataType;
+    protected final Class<?> fieldType;
+
     final Method setter;
     final Method getter;
     final Field field;
 
-    Property(Field field, D type, int offset) throws BeanException {
-        this.type = type;
+    Property(Field field, Class<V> fieldType, D dataType, int offset) throws BeanException {
+        this.dataType = dataType;
+        this.fieldType = fieldType;
         this.field = field;
         this.offset = offset;
         this.setter = Beans.getAccessibleSetter(field);

@@ -1,8 +1,7 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.impl.BusinessType;
-import io.github.up2jakarta.csv.misc.BeanException;
+import io.github.up2jakarta.csv.ops.impl.GroupType;
 import io.github.up2jakarta.csv.test.bean.jpa.checker.base.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,17 +15,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 class JpaBaseCheckerTest {
 
-    private final MapperFactory<BusinessType> factory;
+    private final MapperFactory<GroupType> factory;
 
     @Autowired
-    JpaBaseCheckerTest(MapperFactory<BusinessType> factory) {
+    JpaBaseCheckerTest(MapperFactory<GroupType> factory) {
         this.factory = factory;
     }
 
     @Test
     void testActivation() throws BeanException {
         // WHEN
-        final Mapper<Test1Entity, BusinessType> mapper = factory.build(Test1Entity.class);
+        final Mapper<Test1Entity, GroupType> mapper = factory.build(Test1Entity.class);
         // THEN
         assertNotNull(mapper);
     }
@@ -34,7 +33,7 @@ class JpaBaseCheckerTest {
     @Test
     void testColumnNullable1() throws BeanException {
         // WHEN
-        final Mapper<Test17Entity, BusinessType> mapper = factory.build(Test17Entity.class);
+        final Mapper<Test17Entity, GroupType> mapper = factory.build(Test17Entity.class);
         // THEN
         assertNotNull(mapper);
     }
@@ -42,7 +41,7 @@ class JpaBaseCheckerTest {
     @Test
     void testColumnNullable2() throws BeanException {
         // WHEN
-        final Mapper<Test18Entity, BusinessType> mapper = factory.build(Test18Entity.class);
+        final Mapper<Test18Entity, GroupType> mapper = factory.build(Test18Entity.class);
         // THEN
         assertNotNull(mapper);
     }

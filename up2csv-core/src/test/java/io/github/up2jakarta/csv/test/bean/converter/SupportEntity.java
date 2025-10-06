@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.test.bean.converter;
 
+import io.github.up2jakarta.csv.api.Warning;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.*;
-import io.github.up2jakarta.csv.impl.ParsedEntity;
-import io.github.up2jakarta.csv.misc.Errors;
-import io.github.up2jakarta.csv.test.codelist.*;
+import io.github.up2jakarta.csv.test.ParsedEntity;
+import io.github.up2jakarta.csv.test.clv.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 
-import static io.github.up2jakarta.csv.test.codelist.CountryConverter.ISO_3166;
+import static io.github.up2jakarta.csv.test.clv.CountryConverter.ISO_3166;
 
 @Valid
 @Truncated(1)
@@ -31,7 +31,7 @@ public class SupportEntity extends ParsedEntity<Integer> {
 
     @Position(1)
     @Column(name = "TU_REF", length = 8)
-    @Size(max = 8, payload = Errors.Warning.class)
+    @Size(max = 8, payload = Warning.class)
     @Up2Token
     private String reference;
 

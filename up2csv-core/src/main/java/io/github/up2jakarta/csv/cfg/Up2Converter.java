@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.cfg;
 
 import io.github.up2jakarta.csv.api.ext.BeanContext;
-import io.github.up2jakarta.xml.codelist.TypeConverter;
+import io.github.up2jakarta.xml.clv.TypeConverter;
 
 import java.lang.annotation.*;
 

@@ -1,5 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
+import io.github.up2jakarta.csv.BusinessBuilder;
 import io.github.up2jakarta.csv.api.IError;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.ext.BeanContext;
@@ -7,7 +8,6 @@ import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.misc.BeanException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -87,9 +87,18 @@ public final class MapperFactory<D extends DataType<D>> {
     }
 
     /**
+     * Creates and returns new business builder.
+     *
+     * @return new instance of business-builder
+     */
+    public BusinessBuilder<D> builder() {
+        return new BusinessBuilder<>(this);
+    }
+
+    /**
      * Internal Mapper implementation.
      */
-    private final class DefaultMapper<S extends Segment> extends Mapper<S, D> {
+    final class DefaultMapper<S extends Segment> extends Mapper<S, D> {
 
         private final int length;
 
@@ -99,16 +108,12 @@ public final class MapperFactory<D extends DataType<D>> {
         }
 
         @Override
-        protected <R extends IRecord<?>, V extends IError<R, ?, D>> void validate(
-                Object bean, int offset, BeanNode<?, D> node, EventHandler<R, ?, D, V> handler
-        ) {
+        protected <R extends IRecord<?>, E extends IError<D>> void validate(Object bean, int offset, BeanNode<?, D> node, EventHandler<R, D, E> handler) {
             node.validate(bean, offset, validator, handler);
         }
 
         @Override
-        public <R extends IRecord<?>, V extends IError<R, ?, D>> S map(
-                EventHandler<R, ?, D, V> handler, int offset, String... columns
-        ) throws BeanException {
+        public <R extends IRecord<?>, E extends IError<D>> S map(EventHandler<R, D, E> handler, int offset, String... columns) throws BeanException {
             if (columns == null) {
                 return null;
             }

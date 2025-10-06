@@ -6,7 +6,7 @@ import io.github.up2jakarta.xml.api.IValidationError;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.api.XConfigurationException;
 import io.github.up2jakarta.xml.api.XValidator;
-import io.github.up2jakarta.xml.codelist.CodeList;
+import io.github.up2jakarta.xml.clv.CodeList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

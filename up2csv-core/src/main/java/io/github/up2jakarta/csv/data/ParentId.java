@@ -23,7 +23,7 @@ import java.lang.annotation.*;
  *
  *         public class ItemAttribute implements Segment {
  *
- *              &#064;ParentId(InvoiceItem.class)
+ *              &#064;ParentId
  *              &#064;Position(0)
  *              private String itemId;
  *
@@ -44,14 +44,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
 public @interface ParentId {
-
-    /**
-     * Gets the supported parent classes, by default supports all classes.
-     * <p>
-     * In parent-child relationship, if parent-class is not supported then the annotation will be ignored.
-     *
-     * @return the supported parent classes.
-     */
-    Class<? extends Segment>[] value() default {Segment.class};
 
 }

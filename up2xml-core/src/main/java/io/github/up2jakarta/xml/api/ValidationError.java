@@ -1,6 +1,6 @@
 package io.github.up2jakarta.xml.api;
 
-import io.github.up2jakarta.xml.codelist.CodeListException;
+import io.github.up2jakarta.xml.clv.CodeListException;
 import jakarta.xml.bind.ValidationEvent;
 
 public class ValidationError implements IValidationError {

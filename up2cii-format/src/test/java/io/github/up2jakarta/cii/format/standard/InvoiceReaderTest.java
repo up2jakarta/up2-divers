@@ -6,7 +6,7 @@ import io.github.up2jakarta.xml.api.XConfigurationException;
 import io.github.up2jakarta.xml.api.XMultipleException;
 import io.github.up2jakarta.xml.api.XReader;
 import io.github.up2jakarta.xml.api.XValidationException;
-import io.github.up2jakarta.xml.codelist.CodeList;
+import io.github.up2jakarta.xml.clv.CodeList;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

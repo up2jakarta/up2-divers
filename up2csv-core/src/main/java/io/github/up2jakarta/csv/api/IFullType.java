@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.api;
 
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Recordable;
+import io.github.up2jakarta.csv.data.Segment;
 
 /**
  * Extension of {@link IType} that's able to aggregate multiple segments in one-shot.
@@ -24,6 +24,6 @@ public interface IFullType<B extends DataType<B>, I extends IFullType<B, I>> ext
      * @param <P> the parent type
      * @return non-null accessor
      */
-    <C extends Recordable<I, ?>, P extends Recordable<I, ?>> BeanLinker<I, C, P> linker();
+    <C extends Segment, P extends Segment> BeanLinker<C, P> linker();
 
 }

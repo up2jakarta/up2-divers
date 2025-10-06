@@ -4,7 +4,7 @@ import io.github.up2jakarta.cii.core.AbstractFormatter;
 import io.github.up2jakarta.cii.core.PDurationFormatter;
 import io.github.up2jakarta.cii.core.TemporalFormatter;
 import io.github.up2jakarta.cii.edi.adapters.TimePointFormatCodeAdapter;
-import io.github.up2jakarta.xml.codelist.*;
+import io.github.up2jakarta.xml.clv.*;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import javax.annotation.processing.Generated;

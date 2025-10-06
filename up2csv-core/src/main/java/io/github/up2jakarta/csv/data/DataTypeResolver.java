@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.data;
 
-import io.github.up2jakarta.csv.misc.BeanException;
+import io.github.up2jakarta.csv.core.BeanException;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import java.util.Stack;
  * The business resolver data type.
  *
  * @param <D> the business data type
- * @see io.github.up2jakarta.csv.api.IError#setType(DataType)
+ * @see io.github.up2jakarta.csv.api.IError#getType()
  */
 public abstract class DataTypeResolver<D extends DataType<D>> {
 

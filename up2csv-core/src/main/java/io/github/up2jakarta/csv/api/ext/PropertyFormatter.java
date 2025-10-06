@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.api.ext;
 
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.codelist.PropertyException;
+import io.github.up2jakarta.xml.clv.PropertyException;
 
 /**
  * Formatting function that is able to convert the property value of type {@link R} to the target {@link String} type.

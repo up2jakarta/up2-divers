@@ -1,18 +1,17 @@
 package io.github.up2jakarta.csv.api;
 
 import io.github.up2jakarta.csv.api.fct.*;
-import io.github.up2jakarta.csv.data.Recordable;
+import io.github.up2jakarta.csv.data.Segment;
 
 import java.util.function.BiConsumer;
 
 /**
  * Link accessor that's able to link beans of a relationship parent-child (association)
  *
- * @param <I> the segment type
  * @param <C> the child type
  * @param <P> the parent type
  */
-public abstract class BeanLinker<I extends IType<?, I>, C extends Recordable<I, ?>, P extends Recordable<I, ?>> extends BeanJoiner<C, P> {
+public abstract class BeanLinker<C extends Segment, P extends Segment> extends BeanJoiner<C, P> {
 
     private final BiConsumer<P, C> linker;
 

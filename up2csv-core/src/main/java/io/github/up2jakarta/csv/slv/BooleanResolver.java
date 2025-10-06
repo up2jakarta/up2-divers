@@ -5,10 +5,10 @@ import io.github.up2jakarta.csv.api.ext.PropertyConverter;
 import io.github.up2jakarta.csv.api.ext.PropertyFormatter;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Up2Boolean;
-import io.github.up2jakarta.csv.misc.BeanException;
-import io.github.up2jakarta.csv.misc.Errors;
+import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.Errors;
 import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.codelist.PropertyException;
+import io.github.up2jakarta.xml.clv.PropertyException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 

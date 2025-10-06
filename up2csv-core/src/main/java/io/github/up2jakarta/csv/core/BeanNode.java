@@ -4,12 +4,10 @@ import io.github.up2jakarta.csv.api.IError;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.data.Collectable;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.misc.BeanException;
-import io.github.up2jakarta.csv.misc.Beans;
-import io.github.up2jakarta.csv.misc.Listable;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 
@@ -17,7 +15,7 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Set;
 
-abstract class BeanNode<S extends Segment, D extends DataType<D>> implements Listable<Property<?, D>> {
+abstract class BeanNode<S extends Segment, D extends DataType<D>> implements Collectable<Property<?, D>> {
 
     private final ValidationContext context;
     private final Constructor<S> constructor;
@@ -101,8 +99,8 @@ abstract class BeanNode<S extends Segment, D extends DataType<D>> implements Lis
         }
     }
 
-    protected <R extends IRecord<?>, V extends IError<R, ?, D>> void validate(
-            Object bean, int offset, Validator validator, EventHandler<R, ?, D, V> handler
+    protected <R extends IRecord<?>, V extends IError<D>> void validate(
+            Object bean, int offset, Validator validator, EventHandler<R, D, V> handler
     ) {
         if (context.isEnabled()) {
             final Set<ConstraintViolation<Object>> violations = validator.validate(bean, context.getGroups());
@@ -110,7 +108,7 @@ abstract class BeanNode<S extends Segment, D extends DataType<D>> implements Lis
                 final Property<?, D> p = this.property(v);
                 if (p != null) {
                     final Error config = p.field.getAnnotation(Error.class);
-                    handler.handleEvent(p.type, p.offset + offset, v, config);
+                    handler.handleEvent(p.dataType, p.offset + offset, v, config);
                 } else {
                     handler.handleEvent(null, Integer.MAX_VALUE, v, null);
                 }
@@ -118,8 +116,8 @@ abstract class BeanNode<S extends Segment, D extends DataType<D>> implements Lis
         }
     }
 
-    final <R extends IRecord<?>, V extends IError<R, ?, D>> S parse(
-            Validator validator, EventHandler<R, ?, D, V> handler, int offset, String... columns
+    final <R extends IRecord<?>, V extends IError<D>> S parse(
+            Validator validator, EventHandler<R, D, V> handler, int offset, String... columns
     ) throws BeanException {
         final S bean = this.newInstance();
         var empty = true;
@@ -152,7 +150,7 @@ abstract class BeanNode<S extends Segment, D extends DataType<D>> implements Lis
     }
 
     @Override
-    public final List<Property<?, D>> toList() {
+    public final List<Property<?, D>> toCollection() {
         return this.properties;
     }
 

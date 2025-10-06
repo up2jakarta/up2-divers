@@ -4,7 +4,7 @@ package io.github.up2jakarta.xml;
 import io.github.up2jakarta.xml.api.AbstractCollector;
 import io.github.up2jakarta.xml.api.IValidationError;
 import io.github.up2jakarta.xml.api.XValidationException;
-import io.github.up2jakarta.xml.codelist.CodeListException;
+import io.github.up2jakarta.xml.clv.CodeListException;
 import jakarta.xml.bind.ValidationEvent;
 
 import java.util.Collections;

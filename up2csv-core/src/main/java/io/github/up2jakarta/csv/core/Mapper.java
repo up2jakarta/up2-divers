@@ -6,12 +6,10 @@ import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.data.*;
-import io.github.up2jakarta.csv.misc.BeanException;
-import io.github.up2jakarta.csv.misc.Listable;
+import io.github.up2jakarta.xml.api.SeverityType;
 
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.EventHandler.failFast;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -20,20 +18,21 @@ import static java.util.Objects.requireNonNull;
  * @param <S> the segment type
  */
 @SuppressWarnings("ClassEscapesDefinedScope")
-public abstract class Mapper<S extends Segment, D extends DataType<D>> implements Listable<Property<?, D>> {
+public abstract class Mapper<S extends Segment, D extends DataType<D>> implements Collectable<Property<?, D>> {
 
     protected final int offset;
+    protected final Class<S> type;
     protected final BeanNode<S, D> node;
-
-    private final BusinessGetter parentId;
-    private final BusinessGetter businessId;
+    protected final PropertyGetter<S> parentId;
+    protected final PropertyGetter<S> businessId;
 
     Mapper(Class<S> type, BeanContext context, DataTypeResolver<D> resolver) throws BeanException {
+        this.type = type;
         final Truncated truncated = type.getAnnotation(Truncated.class);
-        this.offset = (truncated != null) ? truncated.value() : 0;
-        this.node = BeanNode.root(type, context, resolver);
-        this.parentId = BusinessGetter.find(type, this.toList(), ParentId.class);
-        this.businessId = BusinessGetter.find(type, this.toList(), BusinessId.class);
+        offset = (truncated != null) ? truncated.value() : 0;
+        node = BeanNode.root(type, context, resolver);
+        parentId = PropertyGetter.parentId(type, this.toCollection());
+        businessId = PropertyGetter.businessId(type, this.toCollection());
     }
 
     /**
@@ -43,10 +42,10 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
      * @see #map(IRecord, int, EventHandler)
-     * @see EventHandler#failFast(boolean)
+     * @see FastHandler#of(SeverityType)
      */
     public final S map(final String... columns) throws BeanException {
-        return map(failFast(true), offset, columns);
+        return map(FastHandler.of(SeverityType.ERROR), offset, columns);
     }
 
     /**
@@ -56,13 +55,11 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
      * @param row     the input data
      * @param handler the error collector, must not be null
      * @param <R>     the row type
-     * @param <V>     the error type
+     * @param <E>     the error type
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
      */
-    public final <R extends IRecord<?>, V extends IError<R, ?, D>> S map(
-            R row, EventHandler<R, ?, D, V> handler
-    ) throws BeanException {
+    public final <R extends IRecord<?>, E extends IError<D>> S map(R row, EventHandler<R, D, E> handler) throws BeanException {
         return this.map(row, offset, handler);
     }
 
@@ -73,13 +70,11 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
      * @param handler the error collector, must not be null
      * @param columns the input data
      * @param <R>     the row type
-     * @param <V>     the error type
+     * @param <E>     the error type
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
      */
-    public final <R extends IRecord<?>, V extends IError<R, ?, D>> S map(
-            EventHandler<R, ?, D, V> handler, String... columns
-    ) throws BeanException {
+    public final <R extends IRecord<?>, E extends IError<D>> S map(EventHandler<R, D, E> handler, String... columns) throws BeanException {
         return this.map(handler, offset, columns);
     }
 
@@ -102,19 +97,16 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
      * @param offset  the number of columns reserved {@link Truncated#value()}
      * @param handler the error collector, must not be null
      * @param <R>     the row type
-     * @param <V>     the error type
+     * @param <E>     the error type
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
      */
-    public final <R extends IRecord<?>, V extends IError<R, ?, D>> S map(
-            R row, int offset, EventHandler<R, ?, D, V> handler
-    ) throws BeanException {
+    public final <R extends IRecord<?>, E extends IError<D>> S map(R row, int offset, EventHandler<R, D, E> handler) throws BeanException {
         if (row == null || row.getColumns() == null) {
             return null;
         }
         requireNonNull(handler, "handler is required");
-        final R source = handler.getSource();
-        if (source != null && source != row) {
+        if (!(handler instanceof FastHandler<?>) && handler.row != row) {
             throw new BeanException(EventHandler.class, "source", "does not match with row argument");
         }
         final S segment = map(handler, offset, row.getColumns());
@@ -138,13 +130,11 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
      * @param offset  the number of columns reserved {@link Truncated#value()}
      * @param columns the input data
      * @param <R>     the row type
-     * @param <V>     the error type
+     * @param <E>     the error type
      * @return the parsed segment
      * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
      */
-    public abstract <R extends IRecord<?>, V extends IError<R, ?, D>> S map(
-            EventHandler<R, ?, D, V> handler, int offset, String... columns
-    ) throws BeanException;
+    public abstract <R extends IRecord<?>, E extends IError<D>> S map(EventHandler<R, D, E> handler, int offset, String... columns) throws BeanException;
 
     /**
      * Flat-Map the given to segment to CSV record within formatting.
@@ -165,38 +155,22 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
      * @param node    the property node
      * @param handler the event handler
      * @param <R>     the input row type
-     * @param <V>     the input error type
+     * @param <E>     the input error type
      */
-    protected abstract <R extends IRecord<?>, V extends IError<R, ?, D>> void validate(
-            Object bean, int offset, BeanNode<?, D> node, EventHandler<R, ?, D, V> handler
+    protected abstract <R extends IRecord<?>, E extends IError<D>> void validate(
+            Object bean, int offset, BeanNode<?, D> node, EventHandler<R, D, E> handler
     );
 
     /**
-     * Gets and return the business-id of the given bean.
-     *
-     * @param bean the segment instance
-     * @return the business identifier
-     * @throws BeanException if the {@link BusinessId} property is not accessible for read
+     * @return the value of {@link Truncated} if exists, or else <code>0</code>
      */
-    protected Object businessId(S bean) throws BeanException {
-        return businessId.get(bean, null);
-    }
-
-    /**
-     * Gets and return the paren-id of the given bean.
-     *
-     * @param bean       the segment instance
-     * @param parentType the parent class
-     * @return the parent identifier
-     * @throws BeanException if the {@link ParentId} property is not accessible for read
-     */
-    protected Object parentId(S bean, Class<? extends Segment> parentType) throws BeanException {
-        return parentId.get(bean, parentType);
+    public final int getOffset() {
+        return offset;
     }
 
     @Override
-    public final List<Property<?, D>> toList() {
-        return node.toList();
+    public final List<Property<?, D>> toCollection() {
+        return node.toCollection();
     }
 
 }

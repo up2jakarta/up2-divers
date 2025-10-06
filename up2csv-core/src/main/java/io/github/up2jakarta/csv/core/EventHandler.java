@@ -3,105 +3,26 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.api.IError;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.data.Collectable;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.misc.Listable;
-import io.github.up2jakarta.csv.misc.MapperException;
-import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.codelist.CodeListException;
-import io.github.up2jakarta.xml.codelist.PropertyException;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.metadata.ConstraintDescriptor;
-
-import java.lang.annotation.Annotation;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import static io.github.up2jakarta.csv.misc.Errors.ERROR_CONVERTER;
-import static io.github.up2jakarta.csv.misc.Errors.ERROR_VALIDATOR;
-import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
 
 /**
  * Internal handler that handles events during the mapping, validation and parsing phases.
  *
- * @param <A> the input row type
- * @param <B> the error key type
+ * @param <R> the input row type
  * @param <D> the business data type
- * @param <C> the error type
+ * @param <E> the error type
+ * @see EventCollector for custom definition.
+ * @see FastHandler  for fail-fast handler
  */
-public abstract class EventHandler<A extends IRecord<?>, B extends IError.Key<A>, D extends DataType<D>, C extends IError<A, B, ?>> implements Listable<C> {
+public abstract class EventHandler<R extends IRecord<?>, D extends DataType<D>, E extends IError<D>> implements Collectable<E> {
 
-    private static Optional<Error> getError(ConstraintViolation<?> violation) {
-        final ConstraintDescriptor<?> descriptor = violation.getConstraintDescriptor();
-        final Class<? extends Annotation> annotationType = descriptor.getAnnotation().annotationType();
-        return descriptor.getPayload().stream()
-                .filter(Error.Payload.class::isAssignableFrom)
-                .map(c -> c.getAnnotation(Error.class))
-                .filter(Objects::nonNull)
-                .max(Comparator.comparingInt(e -> e.severity().getLevel()))
-                .or(() -> ofNullable(annotationType.getAnnotation(Error.class)));
+    protected final R row;
+
+    EventHandler(R row) {
+        this.row = row;
     }
-
-    protected static SeverityType getSeverity(ConstraintViolation<?> violation, Error config) {
-        if (config != null) {
-            return config.severity();
-        }
-        return getError(violation).map(Error::severity).orElse(SeverityType.ERROR);
-    }
-
-    protected static String getErrorCode(ConstraintViolation<?> violation, Error config) {
-        if (config != null) {
-            return config.value();
-        }
-        return getError(violation).map(Error::value).orElse(ERROR_VALIDATOR);
-    }
-
-    protected static SeverityType getSeverity(Throwable exception, Error config) {
-        if (config != null) {
-            return config.severity();
-        }
-        if (exception instanceof PropertyException pException) {
-            return pException.getSeverityType();
-        }
-        return SeverityType.ERROR;
-    }
-
-    protected static String getErrorCode(Throwable exception, Error config) {
-        if (exception instanceof CodeListException clException) {
-            return clException.getErrorCode();
-        }
-        if (config != null) {
-            return config.value();
-        }
-        if (exception instanceof PropertyException pException) {
-            return pException.getErrorCode();
-        }
-        return ERROR_CONVERTER;
-    }
-
-    /**
-     * @param noWarning ignore warnings
-     * @param <R>       the input record-segment
-     * @param <D>       the business data-type
-     * @param <V>       the error type
-     * @return an instance that fails at the first throw error or warning depending on the given flag <code>noWarning</code>.
-     */
-    public static <R extends IRecord<?>, D extends DataType<D>, V extends IError<R, ?, D>> EventHandler<R, ?, D, V> failFast(boolean noWarning) {
-        if (noWarning) {
-            //noinspection unchecked
-            return (EventHandler<R, ?, D, V>) FastHandler.NO_WARNING;
-        }
-        //noinspection unchecked
-        return (EventHandler<R, ?, D, V>) FastHandler.INSTANCE;
-    }
-
-    /**
-     * @return the source input row
-     */
-    abstract A getSource();
 
     /**
      * Handle the JSR-303 constraint violation caused by the input at the given offset.
@@ -120,52 +41,7 @@ public abstract class EventHandler<A extends IRecord<?>, B extends IError.Key<A>
      * @param offset    the input index
      * @param exception thr thrown exception
      * @param config    the error annotation defined at property level
-     * @param trace     forces the stack trace
      */
-    public abstract void handleEvent(D type, int offset, Throwable exception, Error config, boolean trace);
-
-    /**
-     * Fail-fast implementation.
-     */
-    private static class FastHandler<D extends DataType<D>> extends EventHandler<IRecord<?>, IError.Key<IRecord<?>>, D, IError<IRecord<?>, IError.Key<IRecord<?>>, ?>> {
-
-        private static final EventHandler<?, ?, ?, ?> INSTANCE = new FastHandler<>(true);
-        private static final EventHandler<?, ?, ?, ?> NO_WARNING = new FastHandler<>(false);
-
-        private final boolean any;
-
-        private FastHandler(boolean any) {
-            this.any = any;
-        }
-
-        @Override
-        IRecord<?> getSource() {
-            return null;
-        }
-
-        @Override
-        public List<IError<IRecord<?>, IError.Key<IRecord<?>>, ?>> toList() {
-            return emptyList();
-        }
-
-        @Override
-        public void handleEvent(D data, int offset, ConstraintViolation<?> violation, Error config) {
-            final SeverityType type = getSeverity(violation, config);
-            final String code = getErrorCode(violation, config);
-            if (any || type != WARNING) {
-                throw new MapperException(data, offset, type, code, new PropertyException(type, code, violation.getMessage()));
-            }
-        }
-
-        @Override
-        public void handleEvent(D data, int offset, Throwable exception, Error config, boolean trace) {
-            final SeverityType type = getSeverity(exception, config);
-            final String code = getErrorCode(exception, config);
-            if (any || type != WARNING) {
-                throw new MapperException(data, offset, type, code, PropertyException.of(type, code, exception));
-            }
-        }
-
-    }
+    public abstract void handleEvent(D type, int offset, Exception exception, Error config);
 
 }

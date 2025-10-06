@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.test.bean.jpa.checker.base;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2EnableJPA;
 import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.impl.ParsedEntity;
+import io.github.up2jakarta.csv.test.ParsedEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 

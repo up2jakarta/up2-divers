@@ -1,105 +1,22 @@
 package io.github.up2jakarta.csv.api;
 
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.xml.api.SeverityType;
 
 /**
  * Contact interface for an input error.
  *
- * @param <R> the input row type
- * @param <K> the identifier type of input error
+ * @param <D> the input row type
  */
-public interface IError<R extends IRecord<?>, K extends IError.Key<R>, D extends DataType<D>> {
+public interface IError<D extends DataType<D>> extends io.github.up2jakarta.xml.api.IError {
 
     /**
-     * @return the identifier
-     */
-    K getKey();
-
-    /**
-     * @param ignore the error key
-     */
-    default void setKey(K ignore) {
-        throw new IllegalStateException("I'm the the key");
-    }
-
-    /**
-     * @return the input index
+     * @return the data offset of the input record
      */
     Integer getOffset();
 
     /**
-     * @param offset the input index
-     */
-    void setOffset(Integer offset);
-
-    /**
-     * @return the error severity
-     */
-    SeverityType getSeverity();
-
-    /**
-     * @param severity the error severity
-     */
-    void setSeverity(SeverityType severity);
-
-    /**
-     * @return the error code for known exception
-     */
-    String getCode();
-
-    /**
-     * @param code the error code for known exception
-     */
-    void setCode(String code);
-
-    /**
-     * @return the source of data
+     * @return the business data type
      */
     D getType();
-
-    /**
-     * @param type the source of data
-     */
-    void setType(D type);
-
-    /**
-     * @return the error message
-     */
-    String getMessage();
-
-    /**
-     * @param message the error message
-     */
-    void setMessage(String message);
-
-    /**
-     * @return the the error stack trace
-     */
-    String getTrace();
-
-    /**
-     * @param trace the error stack trace
-     */
-    void setTrace(String trace);
-
-    /**
-     * Contact interface for input error identifier.
-     *
-     * @param <R> the input row type
-     */
-    interface Key<R extends IRecord<?>> {
-
-        /**
-         * @param order the error order in the list of errors related th the row
-         */
-        void setOrder(Integer order);
-
-        /**
-         * @param record the related input record
-         */
-        void setRecord(R record);
-
-    }
 
 }

@@ -4,8 +4,8 @@ import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Converter;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
-import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
+import io.github.up2jakarta.csv.test.clv.CurrencyCodeType;
+import io.github.up2jakarta.csv.test.clv.CurrencyConverter;
 import io.github.up2jakarta.csv.test.ext.DummyConverter;
 import io.github.up2jakarta.xml.api.SeverityType;
 

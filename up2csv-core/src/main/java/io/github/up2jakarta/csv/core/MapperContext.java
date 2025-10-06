@@ -4,11 +4,10 @@ import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.api.ext.Conversion;
 import io.github.up2jakarta.csv.api.ext.ConversionExtension;
 import io.github.up2jakarta.csv.cfg.*;
+import io.github.up2jakarta.csv.core.ext.Path;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.misc.BeanException;
-import io.github.up2jakarta.csv.misc.Path;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -16,9 +15,9 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 import static io.github.up2jakarta.csv.core.BeanSupport.getAnnotationsByType;
-import static io.github.up2jakarta.csv.misc.Beans.*;
-import static io.github.up2jakarta.csv.misc.Path.addOverride;
-import static io.github.up2jakarta.csv.misc.Path.getOverride;
+import static io.github.up2jakarta.csv.core.Beans.*;
+import static io.github.up2jakarta.csv.core.ext.Path.addOverride;
+import static io.github.up2jakarta.csv.core.ext.Path.getOverride;
 
 final class MapperContext<D extends DataType<D>> {
     private final Map<Path, PositionOverride> positions = new LinkedHashMap<>();

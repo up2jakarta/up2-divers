@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.test.ext;
 
 import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.codelist.TypeConverter;
+import io.github.up2jakarta.xml.clv.TypeConverter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,6 +16,13 @@ public class DummyConverter extends TypeConverter<Integer> {
 
     @Override
     public Integer parse(String value) {
+        if ("dummy".equals(value)) {
+            try {
+                Dummy1Processor.process("NPE");
+            } catch (RuntimeException ex) {
+                throw new DummyException("Dummy message", ex);
+            }
+        }
         return Integer.parseInt(value);
     }
 

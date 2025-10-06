@@ -41,7 +41,7 @@ Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready enti
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.5.0</version>
+        <version>1.5.1</version>
     </dependency>
     <!-- Optional JSR-303 Validation Provider -->
     <!-- Optional JPA Provider -->
@@ -424,16 +424,15 @@ public TestSegment implements Segment {
 
 You can also use the JSR-303 validation `Payload` to override the error severity and error code.
 
-Up2 comes with three predefined payloads to override the error severity.
+Up2 comes with two predefined payloads to override the error severity, by default is `SeverityType.ERROR`.
 
-- Errors.Fatal.class
-- Errors.Error.class
-- Errors.Warning.class
+- [Warning.class](src/main/java/io/github/up2jakarta/csv/api/Warning.java)
+- [Fatal.class](src/main/java/io/github/up2jakarta/csv/api/Fatal.java)
 
 You can define your own payload of course:
 
 ``` java
-@Error(value = "UP2-100100", severity = SeverityType.ERROR) // Here the magic
+@Error(value = "UP2-100100", severity = SeverityType.WARNING) // Here is the magic
 public interface Up2Payload extends Error.Payload {
 }
 ```
@@ -467,7 +466,7 @@ Enables JSR-303 validation
 public TestSegment implements Segment {
 
     @Position(0)
-    @Size(min = 1, max = 3, payload = Errors.Fatal.class)
+    @Size(min = 1, max = 3, payload = SeverityFatal.class)
     private String code;
 
 }
@@ -482,8 +481,8 @@ Enables JSR-303 validation within specific groups.
 public TestSegment implements Segment {
 
     @Position(0)
-    @Size(min = 1, max = 3, payload = Errors.Fatal.class, groups = Up2Group.class)
-    @Size(min = 1, max = 2, payload = Errors.Error.class) // Default
+    @Size(min = 1, max = 3, payload = SeverityFatal.class, groups = Up2Group.class)
+    @Size(min = 1, max = 2, payload = SeverityError.class) // Default
     private String code;
 
 }
@@ -512,12 +511,11 @@ public TestSegment implements Segment {
 - `BeanJoiner`: Bean getter for segregation processing only.
 - `BeanLinker`: Bean linker for aggregation/segregation processing.
 - `IError`: Input error representation (model) tor error handling.
-- `IErrorRepository`: input error repository (helpful for generating error identifiers)
 - `IRecord`: Input record representation (model)
 - `IType`: Segment definition for segregation processing only. 
-- `IFullType`: Segment definition for aggregation /segregation processing.
+- `IFullType`: Segment definition for aggregation/segregation processing.
 
-See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/impl)
+See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/ops/impl)
 
 # Mapping of flat-data
 
@@ -547,16 +545,16 @@ private MapperFactory factory;
 private IRepository<InputRowImpl> repository;
 
 @Inject
-private EventCreator<InputRowImpl, ?, ?, InputErrorImpl> creator;
+private EventCreator<InputRowImpl, ?, InputErrorImpl> creator;
 
 public void process(final InputRowImpl row) {
     // GIVEN Singletons
     final Mapper<Up2Segment> mapper = factory.build(Up2Segment.class);
     // GIVEN Prototypes
-    final EventHandler<InputRowImpl, ?, ?, InputErrorImpl> handler = new EventHandlerImpl<>(row, creator, repository) ;
+    final EventCollector<InputRowImpl, ?, InputErrorImpl> handler = new EventCollectorImpl<>(row, creator, repository) ;
     // WHEN
     final Up2Segment bean = mapper.map(row, handler);
-    final List<InputErrorImpl> errors = handler.toList();
+    final Collection<InputErrorImpl> errors = handler.toCollection();
     // THEN
     // Here the bean is full-filled automatically
     // Here the errors is full-filled automatically 
@@ -613,7 +611,7 @@ It's impossible to present a `business-property` within `0..n` cardinality
   simplify the validation.
 - And more depending on the `business-logic`
 
-See [BusinessTests.java](src/test/java/io/github/up2jakarta/csv/BusinessTests.java) for more details.
+See [Business Tests](src/test/java/io/github/up2jakarta/csv/ops) for more details.
 
 # Best practices
 

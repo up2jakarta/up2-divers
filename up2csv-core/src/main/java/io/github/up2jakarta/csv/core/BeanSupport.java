@@ -5,9 +5,7 @@ import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.*;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.misc.BeanException;
-import io.github.up2jakarta.csv.misc.Beans;
-import io.github.up2jakarta.xml.codelist.TypeConverter;
+import io.github.up2jakarta.xml.clv.TypeConverter;
 import jakarta.validation.Valid;
 
 import java.lang.annotation.Annotation;
@@ -16,12 +14,10 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiConsumer;
 
-import static io.github.up2jakarta.csv.misc.Beans.getBean;
-import static io.github.up2jakarta.csv.misc.Beans.getFieldType;
+import static io.github.up2jakarta.csv.core.Beans.*;
 import static java.util.Collections.unmodifiableList;
 
 final class BeanSupport<D extends DataType<D>> {
@@ -73,12 +69,44 @@ final class BeanSupport<D extends DataType<D>> {
         return null;
     }
 
+    private static <A extends Annotation> void walkPath(
+            List<? extends Property<?, ?>> properties, Class<A> annotationType,
+            BiConsumer<A, Property<?, ?>[]> collector, Property<?, ?>... stack
+    ) throws BeanException {
+        for (final Property<?, ?> property : properties) {
+            final Field field = property.field;
+            final A annotation = field.getAnnotation(annotationType);
+            if (property instanceof BeanProperty<?, ?> fp) {
+                if (annotation != null) {
+                    throw new BeanException(field, "must not be annotated with @" + annotationType.getSimpleName());
+                }
+                walkPath(fp.toCollection(), annotationType, collector, concat(stack, property));
+            } else if (annotation != null) {
+                collector.accept(annotation, concat(stack, property));
+            }
+        }
+    }
+
+    static <A extends Annotation> Property<?, ?>[] uniquePath(
+            Class<? extends Segment> sType, Class<A> aType, List<? extends Property<?, ?>> properties
+    ) throws BeanException {
+        final Map<A, Property<?, ?>[]> found = new LinkedHashMap<>();
+        walkPath(properties, aType, found::put);
+        if (found.isEmpty()) {
+            return null;
+        }
+        if (found.size() == 1) {
+            return found.entrySet().iterator().next().getValue();
+        }
+        throw new BeanException(sType, "multiple @" + aType.getSimpleName() + " are found");
+    }
+
     static <T> T getDefault(Field field, PropertyConverter<T> conversion) throws BeanException {
         final Up2Default defaultValue = field.getAnnotation(Up2Default.class);
         if (defaultValue != null) {
             try {
                 return conversion.apply(defaultValue.value());
-            } catch (Throwable ex) {
+            } catch (Exception ex) {
                 throw new BeanException(field, "@Up2Default[value] cannot be converted");
             }
         }
@@ -101,7 +129,7 @@ final class BeanSupport<D extends DataType<D>> {
                     //noinspection unchecked
                     final A[] indirectArray = (A[]) repeatValue.invoke(annotation);
                     result.addAll(Arrays.asList(indirectArray));
-                } catch (Throwable t) {
+                } catch (Exception t) {
                     throw new BeanException(repeatValue.getDeclaringClass(), t.getMessage());
                 }
             }
@@ -200,7 +228,7 @@ final class BeanSupport<D extends DataType<D>> {
                     result.add(new StringProperty<>(field, dataType, index, processors));
                 } else {
                     final Conversion<?> conversion = getConversion(context, field, fieldType);
-                    result.add(new ObjectProperty<>(field, dataType, index, processors, conversion));
+                    result.add(new ObjectProperty<>(field, fieldType, dataType, index, processors, conversion));
                 }
                 context.getChecker().afterPositionProperty(field, fieldType, index);
             } else {

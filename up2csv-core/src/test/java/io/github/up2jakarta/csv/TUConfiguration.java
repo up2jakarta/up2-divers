@@ -1,23 +1,30 @@
 package io.github.up2jakarta.csv;
 
 import io.github.up2jakarta.csv.api.ext.BeanContext;
+import io.github.up2jakarta.csv.api.hdl.IErrorCreator;
+import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.MapperFactory;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
-import io.github.up2jakarta.csv.impl.*;
-import io.github.up2jakarta.csv.misc.BeanException;
+import io.github.up2jakarta.csv.ops.impl.GroupType;
+import io.github.up2jakarta.csv.ops.impl.Invoice1Aggregator;
+import io.github.up2jakarta.csv.ops.impl.Invoice2Aggregator;
+import io.github.up2jakarta.csv.ops.impl.SimpleCreator;
 import io.github.up2jakarta.csv.prc.TokenProcessor;
 import io.github.up2jakarta.csv.slv.DecimalResolver;
-import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
+import io.github.up2jakarta.csv.test.clv.CurrencyConverter;
 import io.github.up2jakarta.csv.test.ext.DummyConverter;
 import jakarta.validation.Validator;
 import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
-import static io.github.up2jakarta.csv.test.Tests.messageInterpolator;
+import java.util.Locale;
+import java.util.Set;
+
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_SINGLETON;
 
 @Configuration
@@ -36,7 +43,14 @@ public class TUConfiguration {
     @Bean
     @Scope(value = SCOPE_SINGLETON)
     public Validator validator() {
-        return MapperFactory.validator(messageInterpolator());
+        return MapperFactory.validator(
+                new ParameterMessageInterpolator(
+                        Set.of(Locale.ENGLISH, Locale.FRENCH),
+                        Locale.ENGLISH,
+                        context -> Locale.ENGLISH,
+                        false
+                )
+        );
     }
 
     @Bean
@@ -47,44 +61,29 @@ public class TUConfiguration {
 
     @Bean
     @Scope(value = SCOPE_SINGLETON)
-    DataTypeResolver<BusinessType> resolver() {
-        return DataTypeResolver.empty(BusinessType.class);
+    DataTypeResolver<GroupType> resolver() {
+        return DataTypeResolver.empty(GroupType.class);
     }
 
     @Bean
     @Scope(value = SCOPE_SINGLETON)
-    public InvoiceAggregator invoiceAggregator(MapperFactory<BusinessType> factory, ErrorCreator creator) throws BeanException {
-        return new InvoiceAggregator(factory, creator);
+    public Invoice1Aggregator invoice1Aggregator(MapperFactory<GroupType> factory, SimpleCreator creator) throws BeanException {
+        return new Invoice1Aggregator(factory, creator);
     }
 
     @Bean
     @Scope(value = SCOPE_SINGLETON)
-    public InvoiceSeparator invoiceSeparator(MapperFactory<BusinessType> factory) throws BeanException {
-        return new InvoiceSeparator(factory);
+    public Invoice2Aggregator invoice2Aggregator(MapperFactory<GroupType> factory, SimpleCreator creator) throws BeanException {
+        return new Invoice2Aggregator(factory, creator);
     }
 
     /**
-     * Choose one {@link io.github.up2jakarta.csv.core.EventCreator} depends on your implementation:
-     *
-     * @see #compositeKeyCreator() for composite key implementation
+     * Choose one {@link IErrorCreator} depends on your implementation:
      */
     @Bean
     @Scope(value = SCOPE_SINGLETON)
-    @Deprecated(forRemoval = true)
-    public SimpleCreator simpleKeyCreator() {
+    public SimpleCreator simpleCreator() {
         return new SimpleCreator();
-    }
-
-    /**
-     * Choose one {@link io.github.up2jakarta.csv.core.EventCreator} depends on your implementation:
-     *
-     * @see #simpleKeyCreator() for simple key implementation
-     */
-    @Bean
-    @Scope(value = SCOPE_SINGLETON)
-    @Deprecated(forRemoval = true)
-    public ErrorCreator compositeKeyCreator() {
-        return new ErrorCreator();
     }
 
 }

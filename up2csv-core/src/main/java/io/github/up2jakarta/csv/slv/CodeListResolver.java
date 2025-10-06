@@ -6,11 +6,11 @@ import io.github.up2jakarta.csv.api.ext.PropertyConverter;
 import io.github.up2jakarta.csv.api.ext.PropertyFormatter;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Up2CodeList;
-import io.github.up2jakarta.csv.misc.BeanException;
-import io.github.up2jakarta.csv.misc.Beans;
-import io.github.up2jakarta.csv.misc.Errors;
+import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.Beans;
+import io.github.up2jakarta.csv.core.Errors;
 import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.codelist.CodeList;
+import io.github.up2jakarta.xml.clv.CodeList;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
@@ -19,7 +19,7 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static io.github.up2jakarta.xml.codelist.CodeListConverter.parse;
+import static io.github.up2jakarta.xml.clv.CodeListConverter.parse;
 
 /**
  * Up2 {@link Conversion} resolver that supports {@link CodeList} types.

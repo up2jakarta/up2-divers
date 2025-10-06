@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.cfg;
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports {@link io.github.up2jakarta.csv.api.IError#setOffset(Integer)}
+ * Up2 Annotation that supports {@link io.github.up2jakarta.csv.api.IError#getOffset()}
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

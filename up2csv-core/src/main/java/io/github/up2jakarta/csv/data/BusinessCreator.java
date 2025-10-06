@@ -6,6 +6,6 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 @FunctionalInterface
-public interface BusinessCreator<T, I extends Recordable<?, ?>, E extends IError<?, ?, ?>> extends BiFunction<I, List<E>, T> {
+public interface BusinessCreator<T, I extends Segment, E extends IError<?>> extends BiFunction<I, List<E>, T> {
 
 }

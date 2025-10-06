@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.api.ext;
 
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.codelist.PropertyException;
+import io.github.up2jakarta.xml.clv.PropertyException;
 
 /**
  * Parsing function that is able to convert input data to the target {@link R} type.
@@ -40,7 +40,7 @@ public interface PropertyConverter<R> {
         return v -> {
             try {
                 return origin.apply(v);
-            } catch (RuntimeException error) {
+            } catch (Exception error) {
                 throw PropertyException.of(type, code, error);
             }
         };

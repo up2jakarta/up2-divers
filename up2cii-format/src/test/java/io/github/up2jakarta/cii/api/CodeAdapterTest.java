@@ -3,7 +3,7 @@ package io.github.up2jakarta.cii.api;
 import io.github.up2jakarta.cii.format.standard.CrossIndustryInvoiceType;
 import io.github.up2jakarta.xml.api.XReader;
 import io.github.up2jakarta.xml.api.XValidator;
-import io.github.up2jakarta.xml.codelist.CodeListException;
+import io.github.up2jakarta.xml.clv.CodeListException;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;

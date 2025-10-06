@@ -1,8 +1,8 @@
 package io.github.up2jakarta.cii.ppf;
 
-import io.github.up2jakarta.xml.codelist.Agency;
-import io.github.up2jakarta.xml.codelist.CodeList;
-import io.github.up2jakarta.xml.codelist.Documented;
+import io.github.up2jakarta.xml.clv.Agency;
+import io.github.up2jakarta.xml.clv.CodeList;
+import io.github.up2jakarta.xml.clv.Documented;
 
 /**
  * Specific {@link Documented} for URI Scheme Identification Code.

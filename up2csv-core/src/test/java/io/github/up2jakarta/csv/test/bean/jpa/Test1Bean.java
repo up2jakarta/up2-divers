@@ -3,8 +3,8 @@ package io.github.up2jakarta.csv.test.bean.jpa;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2EnableJPA;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.test.codelist.TestCodeList;
-import io.github.up2jakarta.csv.test.codelist.TestCodeListConverter;
+import io.github.up2jakarta.csv.test.clv.TestCodeList;
+import io.github.up2jakarta.csv.test.clv.TestCodeListConverter;
 import jakarta.persistence.*;
 
 @Entity

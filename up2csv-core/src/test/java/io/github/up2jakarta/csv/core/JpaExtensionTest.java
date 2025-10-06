@@ -1,13 +1,11 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.impl.*;
-import io.github.up2jakarta.csv.misc.BeanException;
-import io.github.up2jakarta.csv.misc.Errors;
+import io.github.up2jakarta.csv.ops.impl.*;
 import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.jpa.*;
-import io.github.up2jakarta.csv.test.codelist.TestCodeList;
-import io.github.up2jakarta.csv.test.codelist.TestCodeListConverter;
+import io.github.up2jakarta.csv.test.clv.TestCodeList;
+import io.github.up2jakarta.csv.test.clv.TestCodeListConverter;
 import io.github.up2jakarta.xml.api.SeverityType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,10 +23,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class JpaExtensionTest {
 
     private final SimpleCreator creator;
-    private final MapperFactory<BusinessType> factory;
+    private final MapperFactory<GroupType> factory;
 
     @Autowired
-    JpaExtensionTest(MapperFactory<BusinessType> factory, SimpleCreator creator) {
+    JpaExtensionTest(MapperFactory<GroupType> factory, SimpleCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -35,7 +34,7 @@ public class JpaExtensionTest {
     @Test
     void testValidBean() throws BeanException {
         // Given
-        final Mapper<Test1Bean, BusinessType> mapper = factory.build(Test1Bean.class);
+        final Mapper<Test1Bean, GroupType> mapper = factory.build(Test1Bean.class);
         final String[] data = {"ONE", "TWO", "0", "0", "*"};
         // When
         final Test1Bean bean = mapper.map(data);
@@ -59,20 +58,20 @@ public class JpaExtensionTest {
     @Test
     void testDefaultErrors() throws BeanException {
         // Given
-        final Mapper<Test1Bean, BusinessType> mapper = factory.build(Test1Bean.class);
+        final Mapper<Test1Bean, GroupType> mapper = factory.build(Test1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "11", "22", "33", "44", "ANY");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test1Bean bean = mapper.map(row, handler);
-        final List<SimpleErrorEntity> errors = handler.toList();
+        final List<InputErrorEntity> errors = new ArrayList<>(handler.toCollection());
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
         assertEquals(5, errors.size());
         {
-            final SimpleErrorEntity error = errors.getFirst();
-            assertSame(row, error.getRecord());
-            assertEquals(0, error.getOrder());
+            final InputErrorEntity error = errors.getFirst();
+            assertSame(row, error.getKey().getRecord());
+            assertEquals(0, error.getKey().getOrder());
             assertEquals(0, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Test1Bean.JPA_XXX, error.getCode());
@@ -80,9 +79,9 @@ public class JpaExtensionTest {
             assertNull(error.getTrace());
         }
         {
-            final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRecord());
-            assertEquals(1, error.getOrder());
+            final InputErrorEntity error = errors.get(1);
+            assertSame(row, error.getKey().getRecord());
+            assertEquals(1, error.getKey().getOrder());
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(Errors.ERROR_XML_ENUM, error.getCode());
@@ -91,9 +90,9 @@ public class JpaExtensionTest {
         }
 
         {
-            final SimpleErrorEntity error = errors.get(2);
-            assertSame(row, error.getRecord());
-            assertEquals(2, error.getOrder());
+            final InputErrorEntity error = errors.get(2);
+            assertSame(row, error.getKey().getRecord());
+            assertEquals(2, error.getKey().getOrder());
             assertEquals(2, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Test1Bean.JPA_XXX, error.getCode());
@@ -101,9 +100,9 @@ public class JpaExtensionTest {
             assertNull(error.getTrace());
         }
         {
-            final SimpleErrorEntity error = errors.get(3);
-            assertSame(row, error.getRecord());
-            assertEquals(3, error.getOrder());
+            final InputErrorEntity error = errors.get(3);
+            assertSame(row, error.getKey().getRecord());
+            assertEquals(3, error.getKey().getOrder());
             assertEquals(3, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(Errors.ERROR_XML_ENUM, error.getCode());
@@ -111,9 +110,9 @@ public class JpaExtensionTest {
             assertNull(error.getTrace());
         }
         {
-            final SimpleErrorEntity error = errors.get(4);
-            assertSame(row, error.getRecord());
-            assertEquals(4, error.getOrder());
+            final InputErrorEntity error = errors.get(4);
+            assertSame(row, error.getKey().getRecord());
+            assertEquals(4, error.getKey().getOrder());
             assertEquals(4, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(TestCodeListConverter.TU_001, error.getCode());
@@ -125,20 +124,20 @@ public class JpaExtensionTest {
     @Test
     void testOverrideErrors() throws BeanException {
         // Given
-        final Mapper<Test2Bean, BusinessType> mapper = factory.build(Test2Bean.class);
+        final Mapper<Test2Bean, GroupType> mapper = factory.build(Test2Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "11", "22", "ANY");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test2Bean bean = mapper.map(row, handler);
-        final List<SimpleErrorEntity> errors = handler.toList();
+        final List<InputErrorEntity> errors = new ArrayList<>(handler.toCollection());
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
         assertEquals(3, errors.size());
         {
-            final SimpleErrorEntity error = errors.getFirst();
-            assertSame(row, error.getRecord());
-            assertEquals(0, error.getOrder());
+            final InputErrorEntity error = errors.getFirst();
+            assertSame(row, error.getKey().getRecord());
+            assertEquals(0, error.getKey().getOrder());
             assertEquals(0, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Test2Bean.XML_001, error.getCode());
@@ -146,9 +145,9 @@ public class JpaExtensionTest {
             assertNull(error.getTrace());
         }
         {
-            final SimpleErrorEntity error = errors.get(1);
-            assertSame(row, error.getRecord());
-            assertEquals(1, error.getOrder());
+            final InputErrorEntity error = errors.get(1);
+            assertSame(row, error.getKey().getRecord());
+            assertEquals(1, error.getKey().getOrder());
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Test2Bean.XML_002, error.getCode());
@@ -156,9 +155,9 @@ public class JpaExtensionTest {
             assertNull(error.getTrace());
         }
         {
-            final SimpleErrorEntity error = errors.get(2);
-            assertSame(row, error.getRecord());
-            assertEquals(2, error.getOrder());
+            final InputErrorEntity error = errors.get(2);
+            assertSame(row, error.getKey().getRecord());
+            assertEquals(2, error.getKey().getOrder());
             assertEquals(2, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Test2Bean.XML_003, error.getCode());

@@ -1,8 +1,8 @@
 package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.CountryIDType;
-import io.github.up2jakarta.xml.codelist.CodeListConverter;
-import io.github.up2jakarta.xml.codelist.CodeListException;
+import io.github.up2jakarta.xml.clv.CodeListConverter;
+import io.github.up2jakarta.xml.clv.CodeListException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;

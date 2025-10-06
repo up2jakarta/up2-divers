@@ -1,6 +1,6 @@
 package io.github.up2jakarta.job.ctx;
 
-import io.github.up2jakarta.xml.codelist.CodeList;
+import io.github.up2jakarta.xml.clv.CodeList;
 
 public enum FlowSource implements CodeList<FlowSource> {
 

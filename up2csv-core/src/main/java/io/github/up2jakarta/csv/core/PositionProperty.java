@@ -3,7 +3,6 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.api.ext.PropertyConverter;
 import io.github.up2jakarta.csv.cfg.Required;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.misc.BeanException;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -17,19 +16,19 @@ abstract class PositionProperty<T, D extends DataType<D>> extends Property<T, D>
     private final T defaultValue;
     private final List<ProcessorWrapper<?, D>> processors;
 
-    PositionProperty(Field field, D type, int offset, List<ProcessorWrapper<?, D>> processors, PropertyConverter<T> parser) throws BeanException {
-        super(field, type, offset);
+    PositionProperty(Field field, Class<T> fieldType, D dataType, int offset, List<ProcessorWrapper<?, D>> processors, PropertyConverter<T> parser) throws BeanException {
+        super(field, fieldType, dataType, offset);
         this.processors = processors;
         this.defaultValue = BeanSupport.getDefault(field, parser);
         this.required = field.isAnnotationPresent(Required.class);
     }
 
-    protected final String process(String value, int offset, EventHandler<?, ?, D, ?> handler) {
+    protected final String process(String value, int offset, EventHandler<?, D, ?> handler) {
         for (final ProcessorWrapper<?, D> processor : processors) {
             try {
                 value = processor.process(value);
             } catch (RuntimeException ex) {
-                processor.handle(field, type, offset + super.offset, ex, handler);
+                processor.handle(field, dataType, offset + super.offset, ex, handler);
             }
         }
         return value;
@@ -45,7 +44,7 @@ abstract class PositionProperty<T, D extends DataType<D>> extends Property<T, D>
      * @return the parsed value
      * @throws BeanException if the property is not accessible for write
      */
-    abstract T parse(Object bean, String value, int offset, EventHandler<?, ?, D, ?> handler) throws BeanException;
+    abstract T parse(Object bean, String value, int offset, EventHandler<?, D, ?> handler) throws BeanException;
 
     /**
      * Formats the given value for CSV output.

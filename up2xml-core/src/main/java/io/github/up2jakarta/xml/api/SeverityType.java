@@ -1,6 +1,6 @@
 package io.github.up2jakarta.xml.api;
 
-import io.github.up2jakarta.xml.codelist.CodeList;
+import io.github.up2jakarta.xml.clv.CodeList;
 import jakarta.xml.bind.ValidationEvent;
 
 /**

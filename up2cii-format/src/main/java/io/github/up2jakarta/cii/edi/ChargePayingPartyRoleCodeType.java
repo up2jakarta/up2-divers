@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.edi;
 
 import io.github.up2jakarta.cii.edi.adapters.ChargePayingPartyRoleCodeAdapter;
-import io.github.up2jakarta.xml.codelist.*;
+import io.github.up2jakarta.xml.clv.*;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import javax.annotation.processing.Generated;

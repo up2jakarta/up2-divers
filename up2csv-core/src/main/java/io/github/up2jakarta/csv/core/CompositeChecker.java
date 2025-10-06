@@ -5,14 +5,13 @@ import io.github.up2jakarta.csv.api.ext.CheckerContext;
 import io.github.up2jakarta.csv.api.ext.SegmentListener;
 import io.github.up2jakarta.csv.cfg.Checker;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.misc.BeanException;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.core.BeanSupport.getAnnotationsByType;
-import static io.github.up2jakarta.csv.misc.Beans.getBean;
+import static io.github.up2jakarta.csv.core.Beans.getBean;
 
 final class CompositeChecker implements CheckerContext {
 

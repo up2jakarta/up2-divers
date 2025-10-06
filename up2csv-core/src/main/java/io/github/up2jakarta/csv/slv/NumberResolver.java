@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.slv;
 import io.github.up2jakarta.csv.api.ext.ConversionResolver;
 import io.github.up2jakarta.csv.api.ext.PropertyConverter;
 import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.misc.BeanException;
+import io.github.up2jakarta.csv.core.BeanException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 

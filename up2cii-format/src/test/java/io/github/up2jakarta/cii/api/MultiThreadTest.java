@@ -67,7 +67,6 @@ public class MultiThreadTest {
             var future = EXECUTOR_SERVICE.submit(new ReaderWriterCallable(xmlFile));
             futures.put(future, false);
         }
-        System.out.println("Test ReaderWriter: " + futures.size());
         // WAIT and TEST results
         for (var future : futures.entrySet()) {
             try {
@@ -95,7 +94,6 @@ public class MultiThreadTest {
             var future = EXECUTOR_SERVICE.submit(new ReaderValidatorCallable(xmlFile));
             futures.add(future);
         }
-        System.out.println("Test ReaderValidator: " + futures.size());
         // WAIT and TEST validation results
         for (var future : futures) {
             var result = future.get();
@@ -121,7 +119,6 @@ public class MultiThreadTest {
             }
             futures.put(future, nbErrors);
         }
-        System.out.println("Test Validator: " + futures.size());
         // WAIT and TEST validation errors
         for (var future : futures.entrySet()) {
             var result = future.getKey().get();

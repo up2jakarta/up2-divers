@@ -2,6 +2,8 @@ package io.github.up2jakarta.csv.api;
 
 /**
  * Contact interface for an input record.
+ *
+ * @param <T> the segment type definition
  */
 public interface IRecord<T extends IType<?, T>> {
 

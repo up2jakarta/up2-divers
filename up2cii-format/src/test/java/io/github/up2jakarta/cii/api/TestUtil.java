@@ -2,7 +2,7 @@ package io.github.up2jakarta.cii.api;
 
 import io.github.up2jakarta.cii.InvoiceValidator;
 import io.github.up2jakarta.xml.api.*;
-import io.github.up2jakarta.xml.codelist.*;
+import io.github.up2jakarta.xml.clv.*;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;

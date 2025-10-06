@@ -1,10 +1,9 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
+import io.github.up2jakarta.csv.data.Collectable;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.impl.*;
-import io.github.up2jakarta.csv.misc.BeanException;
-import io.github.up2jakarta.csv.misc.Listable;
+import io.github.up2jakarta.csv.ops.impl.*;
 import io.github.up2jakarta.csv.test.Tests;
 import io.github.up2jakarta.csv.test.bean.converter.SupportEntity;
 import io.github.up2jakarta.csv.test.bean.jpa.NoteEntity;
@@ -14,19 +13,20 @@ import io.github.up2jakarta.csv.test.bean.mapper.oneshot.ClientSegment;
 import io.github.up2jakarta.csv.test.bean.mapper.oneshot.ComplexAddress;
 import io.github.up2jakarta.csv.test.bean.mapper.oneshot.SimpleAddress;
 import io.github.up2jakarta.csv.test.bean.processor.ProcessorBean;
-import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
-import io.github.up2jakarta.csv.test.codelist.CurrencyConverter;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.csv.test.clv.CurrencyCodeType;
+import io.github.up2jakarta.csv.test.clv.CurrencyConverter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.EventHandler.failFast;
-import static io.github.up2jakarta.csv.misc.Errors.ERROR_VALIDATOR;
+import static io.github.up2jakarta.csv.core.Errors.ERROR_VALIDATOR;
+import static io.github.up2jakarta.xml.api.SeverityType.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,10 +36,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class MapperTest {
 
     private final SimpleCreator creator;
-    private final MapperFactory<BusinessType> factory;
+    private final MapperFactory<GroupType> factory;
 
     @Autowired
-    MapperTest(MapperFactory<BusinessType> factory, SimpleCreator creator) {
+    MapperTest(MapperFactory<GroupType> factory, SimpleCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -47,9 +47,9 @@ class MapperTest {
     @Test
     void testCache() throws BeanException {
         // Given
-        final Mapper<ValidBean, BusinessType> mapper1 = factory.build(ValidBean.class);
+        final Mapper<ValidBean, GroupType> mapper1 = factory.build(ValidBean.class);
         // When
-        final Mapper<ValidBean, BusinessType> mapper2 = factory.build(ValidBean.class);
+        final Mapper<ValidBean, GroupType> mapper2 = factory.build(ValidBean.class);
         // Then
         assertNotSame(mapper1, mapper2);
     }
@@ -59,7 +59,7 @@ class MapperTest {
     void testNull() throws BeanException {
         // Given
         final String[] data = null;
-        final Mapper<ValidBean, BusinessType> mapper = factory.build(ValidBean.class);
+        final Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
         final InputRowEntity row3 = Tests.create(SegmentType.S00, data);
         final SimpleHandler handler2 = new SimpleHandler(null, creator);
         final SimpleHandler handler3 = new SimpleHandler(row3, creator);
@@ -79,7 +79,7 @@ class MapperTest {
     void testUnmapNull() throws BeanException {
         // Given
         final ValidBean bean = null;
-        final Mapper<ValidBean, BusinessType> mapper = factory.build(ValidBean.class);
+        final Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
         // When
         final String[] out = mapper.unmap(bean);
         // Then
@@ -90,7 +90,7 @@ class MapperTest {
     void testUnmapDefault() throws BeanException {
         // Given
         final DefaultBean bean = new DefaultBean();
-        final Mapper<DefaultBean, BusinessType> mapper = factory.build(DefaultBean.class);
+        final Mapper<DefaultBean, GroupType> mapper = factory.build(DefaultBean.class);
         // When
         final String[] out = mapper.unmap(bean);
         // Then Bean
@@ -108,7 +108,7 @@ class MapperTest {
     void testUnmapEmpty() throws BeanException {
         // Given
         final ValidBean bean = new ValidBean();
-        final Mapper<ValidBean, BusinessType> mapper = factory.build(ValidBean.class);
+        final Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
         // When
         final String[] out = mapper.unmap(bean);
         // Then
@@ -120,7 +120,7 @@ class MapperTest {
     void testUnmapSize() throws BeanException {
         // GIVEN
         final String[] data = {"100", "Test 100", "2024-07-25", "57.00", "TND", "4.0625", "C62", "Y", "P9D", "TN", "dGVzdA=="};
-        final Mapper<SupportEntity, BusinessType> parser = factory.build(SupportEntity.class);
+        final Mapper<SupportEntity, GroupType> parser = factory.build(SupportEntity.class);
         // WHEN
         final SupportEntity entity = parser.map(data);
         assertNotNull(entity);
@@ -140,7 +140,7 @@ class MapperTest {
     @Test
     void testOneShot() throws BeanException {
         // Given
-        final Mapper<ClientSegment, BusinessType> mapper = factory.build(ClientSegment.class);
+        final Mapper<ClientSegment, GroupType> mapper = factory.build(ClientSegment.class);
         final String[] data = new String[]{
                 "AAB", "UP2", "CSV", "TN-0000-1111-9999", "TND",
                 "TN", "Tunis", "1001", "11 FreeAvenue",
@@ -180,7 +180,7 @@ class MapperTest {
     @Test
     void validBean() throws BeanException {
         // Given
-        final Mapper<SimpleSegment, BusinessType> mapper = factory.build(SimpleSegment.class);
+        final Mapper<SimpleSegment, GroupType> mapper = factory.build(SimpleSegment.class);
         final String[] data = new String[]{"AAB", "ABBESSI", "Software engineer"};
         // When
         final SimpleSegment bean = mapper.map(data);
@@ -197,7 +197,7 @@ class MapperTest {
     @Test
     void testInnerStaticClass() throws BeanException {
         // Given
-        final Mapper<InnerStaticSegment, BusinessType> mapper = factory.build(InnerStaticSegment.class);
+        final Mapper<InnerStaticSegment, GroupType> mapper = factory.build(InnerStaticSegment.class);
         final String[] data = new String[]{"AAB", "ABBESSI"};
         // When
         final InnerStaticSegment bean = mapper.map(data);
@@ -214,7 +214,7 @@ class MapperTest {
     @Test
     void validBeanMoreColumns() throws BeanException {
         // Given
-        final Mapper<SimpleSegment, BusinessType> mapper = factory.build(SimpleSegment.class);
+        final Mapper<SimpleSegment, GroupType> mapper = factory.build(SimpleSegment.class);
         // When
         final SimpleSegment bean = mapper.map("AAB", "ABBESSI", "Software engineer", "MORE");
         // Then
@@ -227,7 +227,7 @@ class MapperTest {
     @Test
     void validBeanLessColumns() throws BeanException {
         // Given
-        final Mapper<SimpleSegment, BusinessType> mapper = factory.build(SimpleSegment.class);
+        final Mapper<SimpleSegment, GroupType> mapper = factory.build(SimpleSegment.class);
         // When
         final SimpleSegment bean = mapper.map("AAB", "ABBESSI");
         // Then
@@ -240,7 +240,7 @@ class MapperTest {
     @Test
     void validBeanNullColumn() throws BeanException {
         // Given
-        final Mapper<SimpleSegment, BusinessType> mapper = factory.build(SimpleSegment.class);
+        final Mapper<SimpleSegment, GroupType> mapper = factory.build(SimpleSegment.class);
         final String[] data = new String[]{"AAB", "ABBESSI", null};
         // When
         final SimpleSegment bean = mapper.map(data);
@@ -257,7 +257,7 @@ class MapperTest {
     @Test
     void validBeanEmptyColumn() throws BeanException {
         // Given
-        final Mapper<SimpleSegment, BusinessType> mapper = factory.build(SimpleSegment.class);
+        final Mapper<SimpleSegment, GroupType> mapper = factory.build(SimpleSegment.class);
         final String[] data = new String[]{"AAB", "ABBESSI", ""};
         // When
         final SimpleSegment bean = mapper.map(data);
@@ -274,7 +274,7 @@ class MapperTest {
     @Test
     void validComplexBean() throws BeanException {
         // Given
-        final Mapper<ComplexSegment, BusinessType> mapper = factory.build(ComplexSegment.class);
+        final Mapper<ComplexSegment, GroupType> mapper = factory.build(ComplexSegment.class);
         final String[] data = new String[]{"AAB", "TN", "Tunisia"};
         // When
         final ComplexSegment bean = mapper.map(data);
@@ -292,7 +292,7 @@ class MapperTest {
     @Test
     void validExtendedBean() throws BeanException {
         // Given
-        final Mapper<ExtendedCountryBean, BusinessType> mapper = factory.build(ExtendedCountryBean.class);
+        final Mapper<ExtendedCountryBean, GroupType> mapper = factory.build(ExtendedCountryBean.class);
         final String[] data = new String[]{"TND", "TN", "Tunisia"};
         // When
         final ExtendedCountryBean bean = mapper.map(data);
@@ -309,7 +309,7 @@ class MapperTest {
     @Test
     void validGenericBean() throws BeanException {
         // Given
-        final Mapper<GenericCountryBean, BusinessType> mapper = factory.build(GenericCountryBean.class);
+        final Mapper<GenericCountryBean, GroupType> mapper = factory.build(GenericCountryBean.class);
         final String[] data = new String[]{"TND", "TN", "Tunisia"};
         // When
         final GenericCountryBean bean = mapper.map(data);
@@ -326,7 +326,7 @@ class MapperTest {
     @Test
     void testProcessors() throws BeanException {
         // Given
-        final Mapper<ProcessorBean, BusinessType> mapper = factory.build(ProcessorBean.class);
+        final Mapper<ProcessorBean, GroupType> mapper = factory.build(ProcessorBean.class);
         // When
         final ProcessorBean bean = mapper.map("TND\t\n(Dinar)", "TN\t\n(Tunisia)", "\n\t Tunisian\tDinar \n\t");
         // Then
@@ -339,45 +339,47 @@ class MapperTest {
     @Test
     void testValidatedAnnotation() throws BeanException {
         // Given
-        final Mapper<Validator2Bean, BusinessType> mapper = factory.build(Validator2Bean.class);
+        final Mapper<Validator2Bean, GroupType> mapper = factory.build(Validator2Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "\n\t");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Validator2Bean bean = mapper.map(row, handler);
-        final List<SimpleErrorEntity> errors = handler.toList();
+        final Collection<InputErrorEntity> errors = handler.toCollection();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
-        assertEquals(1, errors.size());
-        // Then Error 0
-        {
-            final SimpleErrorEntity error = errors.getFirst();
-            assertSame(row, error.getRecord());
-            assertEquals(0, error.getOrder());
-            assertEquals(SeverityType.WARNING, error.getSeverity());
+        assertEquals(2, errors.size());
+        for (final InputErrorEntity error : errors) {
+            assertSame(row, error.getKey().getRecord());
+            assertTrue(error.getKey().getOrder() >= 0);
             assertEquals(ERROR_VALIDATOR, error.getCode());
-            assertEquals("size must be between 1 and 3", error.getMessage());
+            if (error.getSeverity() == FATAL) {
+                assertEquals("must not be empty", error.getMessage());
+            } else {
+                assertEquals(WARNING, error.getSeverity());
+                assertEquals("size must be between 1 and 3", error.getMessage());
+            }
         }
     }
 
     @Test
     void testValidationGroupsAnnotation() throws BeanException {
         // Given
-        final Mapper<ValidatedGroupsBean, BusinessType> mapper = factory.build(ValidatedGroupsBean.class);
+        final Mapper<ValidatedGroupsBean, GroupType> mapper = factory.build(ValidatedGroupsBean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "\t\n");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final ValidatedGroupsBean bean = mapper.map(row, handler);
-        final List<SimpleErrorEntity> errors = handler.toList();
+        final Collection<InputErrorEntity> errors = handler.toCollection();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
         assertEquals(1, errors.size());
         // Then Error
-        final SimpleErrorEntity error = errors.getFirst();
-        assertSame(row, error.getRecord());
-        assertEquals(0, error.getOrder());
-        assertEquals(SeverityType.WARNING, error.getSeverity());
+        final InputErrorEntity error = errors.iterator().next();
+        assertSame(row, error.getKey().getRecord());
+        assertEquals(0, error.getKey().getOrder());
+        assertEquals(WARNING, error.getSeverity());
         assertEquals(ERROR_VALIDATOR, error.getCode());
         assertEquals("size must be between 1 and 3", error.getMessage());
     }
@@ -385,21 +387,21 @@ class MapperTest {
     @Test
     void testValidAnnotation() throws BeanException {
         // Given
-        final Mapper<Validator1Bean, BusinessType> mapper = factory.build(Validator1Bean.class);
+        final Mapper<Validator1Bean, GroupType> mapper = factory.build(Validator1Bean.class);
         final InputRowEntity row = Tests.create(SegmentType.S00, "eTND");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Validator1Bean bean = mapper.map(row, handler);
-        final List<SimpleErrorEntity> errors = handler.toList();
+        final Collection<InputErrorEntity> errors = handler.toCollection();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
         assertEquals(1, errors.size());
         // Then Error
-        final SimpleErrorEntity error = errors.getFirst();
-        assertSame(row, error.getRecord());
-        assertEquals(0, error.getOrder());
-        assertEquals(SeverityType.ERROR, error.getSeverity());
+        final InputErrorEntity error = errors.iterator().next();
+        assertSame(row, error.getKey().getRecord());
+        assertEquals(0, error.getKey().getOrder());
+        assertEquals(ERROR, error.getSeverity());
         assertEquals(CurrencyConverter.ISO_4217, error.getCode());
         assertEquals("size must be between 0 and 3", error.getMessage());
     }
@@ -582,34 +584,34 @@ class MapperTest {
     @SuppressWarnings("unchecked")
     void testValidRecursive() throws BeanException {
         // When
-        final Mapper<TestRecursive6Segment, BusinessType> mapper = factory.build(TestRecursive6Segment.class);
-        final List<Property<?, BusinessType>> fields = ((Listable<Property<?, BusinessType>>) mapper).toList();
+        final Mapper<TestRecursive6Segment, GroupType> mapper = factory.build(TestRecursive6Segment.class);
+        final List<Property<?, GroupType>> fields = new ArrayList<>(mapper.toCollection());
         // THEN
         assertEquals(3, fields.size());
         {
-            final Property<?, BusinessType> property = fields.getFirst();
+            final Property<?, GroupType> property = fields.getFirst();
             assertEquals("id", property.field.getName());
             assertEquals(0, property.offset);
         }
         {
-            final Property<?, BusinessType> property = fields.get(1);
+            final Property<?, GroupType> property = fields.get(1);
             assertEquals("any", property.field.getName());
             assertEquals(1, property.offset);
         }
         {
-            final Property<?, BusinessType> fragment = fields.get(2);
+            final Property<?, GroupType> fragment = fields.get(2);
             assertEquals("fragment", fragment.field.getName());
             assertEquals(2, fragment.offset);
-            assertInstanceOf(Listable.class, fragment);
-            final List<Property<?, BusinessType>> fProperties = ((Listable<Property<?, BusinessType>>) fragment).toList();
+            assertInstanceOf(Collectable.class, fragment);
+            final List<Property<?, GroupType>> fProperties = new ArrayList<>(((Collectable<Property<?, GroupType>>) fragment).toCollection());
             assertEquals(2, fProperties.size());
             {
-                final Property<?, BusinessType> property = fProperties.getFirst();
+                final Property<?, GroupType> property = fProperties.getFirst();
                 assertEquals("id", property.field.getName());
                 assertEquals(2, property.offset);
             }
             {
-                final Property<?, BusinessType> property = fProperties.get(1);
+                final Property<?, GroupType> property = fProperties.get(1);
                 assertEquals("name", property.field.getName());
                 assertEquals(2 + 1, property.offset);
             }
@@ -621,21 +623,21 @@ class MapperTest {
         // GIVEN
         final String id = "V";
         final String name = "V";
-        final Mapper<ValidBean, BusinessType> mapper = factory.build(ValidBean.class);
+        final Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
         // WHEN
         final ValidBean bean = mapper.map(id, name);
-        final List<Property<?, BusinessType>> fields = ((Listable<Property<?, BusinessType>>) mapper).toList();
+        final List<Property<?, GroupType>> fields = new ArrayList<>(mapper.toCollection());
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.getFirst().field.getName());
         assertEquals("name", fields.get(1).field.getName());
-        for (final Property<?, BusinessType> p : fields) {
+        for (final Property<?, GroupType> p : fields) {
             assertInstanceOf(StringProperty.class, p);
-            final StringProperty<BusinessType> f = (StringProperty<BusinessType>) p;
+            final StringProperty<GroupType> f = (StringProperty<GroupType>) p;
             f.field.setAccessible(true);
             assertEquals("V", f.field.get(bean));
             // When
-            f.parse(bean, "Test", 0, failFast(false));
+            f.parse(bean, "Test", 0, FastHandler.of(WARNING));
             // Then
             assertEquals("Test", f.field.get(bean));
         }
@@ -646,21 +648,21 @@ class MapperTest {
         // GIVEN
         final String id = "V";
         final String name = "V";
-        final Mapper<NoOrderBean, BusinessType> mapper = factory.build(NoOrderBean.class);
+        final Mapper<NoOrderBean, GroupType> mapper = factory.build(NoOrderBean.class);
         // WHEN
         final NoOrderBean bean = mapper.map(id, name);
-        final List<Property<?, BusinessType>> fields = ((Listable<Property<?, BusinessType>>) mapper).toList();
+        final List<Property<?, GroupType>> fields = new ArrayList<>(mapper.toCollection());
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.getFirst().field.getName());
         assertEquals("name", fields.get(1).field.getName());
-        for (final Property<?, BusinessType> p : fields) {
+        for (final Property<?, GroupType> p : fields) {
             assertInstanceOf(StringProperty.class, p);
-            final StringProperty<BusinessType> f = (StringProperty<BusinessType>) p;
+            final StringProperty<GroupType> f = (StringProperty<GroupType>) p;
             f.field.setAccessible(true);
             assertEquals("V", f.field.get(bean));
             // When
-            f.parse(bean, "Test", 0, failFast(false));
+            f.parse(bean, "Test", 0, FastHandler.of(WARNING));
             // Then
             assertEquals("Test", f.field.get(bean));
         }
@@ -671,21 +673,21 @@ class MapperTest {
         // GIVEN
         final String id = "V";
         final String name = "V";
-        final Mapper<NoPositionBean, BusinessType> mapper = factory.build(NoPositionBean.class);
+        final Mapper<NoPositionBean, GroupType> mapper = factory.build(NoPositionBean.class);
         // WHEN
         final NoPositionBean bean = mapper.map(id, name);
-        final List<Property<?, BusinessType>> fields = ((Listable<Property<?, BusinessType>>) mapper).toList();
+        final List<Property<?, GroupType>> fields = new ArrayList<>(mapper.toCollection());
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.getFirst().field.getName());
         assertEquals("name", fields.get(1).field.getName());
-        for (final Property<?, BusinessType> p : fields) {
+        for (final Property<?, GroupType> p : fields) {
             assertInstanceOf(StringProperty.class, p);
-            final StringProperty<BusinessType> f = (StringProperty<BusinessType>) p;
+            final StringProperty<GroupType> f = (StringProperty<GroupType>) p;
             f.field.setAccessible(true);
             assertEquals("V", f.field.get(bean));
             // When
-            f.parse(bean, "Test", 0, failFast(false));
+            f.parse(bean, "Test", 0, FastHandler.of(WARNING));
             // Then
             assertEquals("Test", f.field.get(bean));
         }
@@ -694,7 +696,7 @@ class MapperTest {
     @Test
     void testRequired() throws BeanException {
         // Given
-        final Mapper<NoteEntity, BusinessType> mapper = factory.build(NoteEntity.class);
+        final Mapper<NoteEntity, GroupType> mapper = factory.build(NoteEntity.class);
         final String[] data = new String[]{"ZZZ", "Content", null, "FR", "XXX", "EUR"};
         // When
         final NoteEntity segment = mapper.map(data);
@@ -711,7 +713,7 @@ class MapperTest {
     @Test
     void testTrimFragment() throws BeanException {
         // Given
-        final Mapper<ComplexSegment, BusinessType> mapper = factory.build(ComplexSegment.class);
+        final Mapper<ComplexSegment, GroupType> mapper = factory.build(ComplexSegment.class);
         final String[] data = new String[]{"", null};
         // When
         final ComplexSegment segment = mapper.map(data);

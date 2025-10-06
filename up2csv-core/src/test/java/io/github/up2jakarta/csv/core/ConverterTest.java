@@ -1,12 +1,11 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.impl.*;
-import io.github.up2jakarta.csv.misc.BeanException;
+import io.github.up2jakarta.csv.ops.impl.*;
 import io.github.up2jakarta.csv.test.bean.converter.*;
-import io.github.up2jakarta.csv.test.codelist.CountryCodeType;
-import io.github.up2jakarta.csv.test.codelist.CurrencyCodeType;
-import io.github.up2jakarta.csv.test.codelist.MeasurementUnitCode;
+import io.github.up2jakarta.csv.test.clv.CountryCodeType;
+import io.github.up2jakarta.csv.test.clv.CurrencyCodeType;
+import io.github.up2jakarta.csv.test.clv.MeasurementUnitCode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +15,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.misc.Errors.ERROR_VALIDATOR;
+import static io.github.up2jakarta.csv.core.Errors.ERROR_VALIDATOR;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,10 +29,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class ConverterTest {
 
     private final SimpleCreator creator;
-    private final MapperFactory<BusinessType> factory;
+    private final MapperFactory<GroupType> factory;
 
     @Autowired
-    ConverterTest(MapperFactory<BusinessType> factory, SimpleCreator creator) {
+    ConverterTest(MapperFactory<GroupType> factory, SimpleCreator creator) {
         this.factory = factory;
         this.creator = creator;
     }
@@ -46,8 +47,8 @@ class ConverterTest {
     @Test
     void testCache() throws BeanException {
         // GIVEN
-        final Mapper<ValidEntity, BusinessType> instance1 = factory.build(ValidEntity.class);
-        final Mapper<ValidEntity, BusinessType> instance2 = factory.build(ValidEntity.class);
+        final Mapper<ValidEntity, GroupType> instance1 = factory.build(ValidEntity.class);
+        final Mapper<ValidEntity, GroupType> instance2 = factory.build(ValidEntity.class);
         // THEN
         assertNotSame(instance1, instance2);
     }
@@ -56,13 +57,13 @@ class ConverterTest {
     void testSupport() throws BeanException {
         // GIVEN
         final String[] data = {"100", "Test\t 100", "2024-07-25", "57.000001", "TND", "4.06250001", "C62", "Y", "P1W", "TN"};
-        final Mapper<SupportEntity, BusinessType> parser = factory.build(SupportEntity.class);
+        final Mapper<SupportEntity, GroupType> parser = factory.build(SupportEntity.class);
         final InputRowEntity row = create(SegmentType.S00, data);
         final SimpleHandler handler = new SimpleHandler(row, creator);
         // WHEN
         final SupportEntity entity = parser.map(row, handler);
         assertNotNull(entity);
-        assertEquals(0, handler.toList().size());
+        assertEquals(0, handler.toCollection().size());
         // THEN
         assertEquals(100, entity.getKey());
         assertEquals("Test 100", entity.getReference());
@@ -80,13 +81,13 @@ class ConverterTest {
     void testJSR_303_Validation() throws BeanException {
         // GIVEN
         final String[] data = {"100", "8888_8888", "2024-07-25", "57.000001", "EUR", "4.06250001", "KGM", "Y", "P1W", "FR"};
-        final Mapper<SupportEntity, BusinessType> parser = factory.build(SupportEntity.class);
+        final Mapper<SupportEntity, GroupType> parser = factory.build(SupportEntity.class);
         final InputRowEntity row = create(SegmentType.S00, data);
         final SimpleHandler handler = new SimpleHandler(row, creator);
         // WHEN
         final SupportEntity entity = parser.map(row, handler);
         assertNotNull(entity);
-        final List<SimpleErrorEntity> errors = handler.toList();
+        final Collection<InputErrorEntity> errors = handler.toCollection();
         assertEquals(1, errors.size());
         // THEN
         assertEquals(100, entity.getKey());
@@ -100,7 +101,7 @@ class ConverterTest {
         assertEquals(Period.ofWeeks(1), entity.getShippingPeriod());
         assertEquals(CountryCodeType.FR, entity.getShippingCountry());
         // Error
-        final SimpleErrorEntity error = errors.getFirst();
+        final InputErrorEntity error = errors.iterator().next();
         assertEquals(row, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
         assertEquals(WARNING, error.getSeverity());
@@ -114,13 +115,13 @@ class ConverterTest {
     void testError() throws BeanException {
         // GIVEN
         final String[] data = {"100", "99998888", "2024-07-25", "57.000001", "ILS", "4.06250001", "KGM", "Y", "P1W", "IL"};
-        final Mapper<SupportEntity, BusinessType> parser = factory.build(SupportEntity.class);
+        final Mapper<SupportEntity, GroupType> parser = factory.build(SupportEntity.class);
         final InputRowEntity row = create(SegmentType.S00, data);
         final SimpleHandler handler = new SimpleHandler(row, creator);
         // WHEN
         final SupportEntity entity = parser.map(row, handler);
         assertNotNull(entity);
-        final List<SimpleErrorEntity> errors = handler.toList();
+        final List<InputErrorEntity> errors = new ArrayList<>(handler.toCollection());
         assertEquals(2, errors.size());
         // THEN
         assertEquals(100, entity.getKey());
@@ -135,7 +136,7 @@ class ConverterTest {
         assertNull(entity.getShippingCountry());
         // Error Currency
         {
-            final SimpleErrorEntity error = errors.getFirst();
+            final InputErrorEntity error = errors.getFirst();
             assertEquals(row, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
             assertEquals(ERROR, error.getSeverity());
@@ -146,7 +147,7 @@ class ConverterTest {
         }
         // Error Country
         {
-            final SimpleErrorEntity error = errors.get(1);
+            final InputErrorEntity error = errors.get(1);
             assertEquals(row, error.getKey().getRecord());
             assertEquals(1, error.getKey().getOrder());
             assertEquals(ERROR, error.getSeverity());

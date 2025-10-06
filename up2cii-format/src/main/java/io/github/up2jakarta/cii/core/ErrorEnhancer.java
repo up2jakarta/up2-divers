@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.core;
 
 import io.github.up2jakarta.cii.CII;
-import io.github.up2jakarta.xml.codelist.PropertyException;
+import io.github.up2jakarta.xml.clv.PropertyException;
 
 import java.util.Map;
 
@@ -16,7 +16,7 @@ public abstract class ErrorEnhancer {
 
     public static String enhance(Throwable cause, String msg) {
         if (cause instanceof PropertyException pex) {
-            return pex.getErrorCode() + ": " + msg + ".";
+            return pex.getCode() + ": " + msg + ".";
         }
         for (var replacement : NS_ENHANCEMENTS.entrySet()) {
             msg = msg.replace(replacement.getKey(), replacement.getValue());
