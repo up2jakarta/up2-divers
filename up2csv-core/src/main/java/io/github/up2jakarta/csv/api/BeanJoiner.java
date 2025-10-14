@@ -99,4 +99,9 @@ public abstract class BeanJoiner<T extends Segment, P extends Segment> {
         return joins.apply(parent);
     }
 
+    @Override
+    public final String toString() {
+        return type.getSimpleName();
+    }
+
 }

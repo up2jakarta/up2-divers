@@ -18,7 +18,7 @@ import java.util.Set;
  * @param <D> the data type
  * @param <E> the error type
  */
-public class FullCollector<R extends IRecordEntity<?>, D extends DataType<D>, E extends IErrorEntity<R, ?, D>> extends EventCollector<R, D, E> {
+public class FullCollector<R extends IRecordEntity<?, ?, ?>, D extends DataType<D>, E extends IErrorEntity<R, ?, D>> extends EventCollector<R, D, E> {
 
     private final Set<E> errors = new LinkedHashSet<>();
     private final IErrorCreator<R, D, E> creator;

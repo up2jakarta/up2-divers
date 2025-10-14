@@ -5,13 +5,13 @@ import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.cfg.Up2Default;
 import io.github.up2jakarta.csv.cfg.Up2Token;
 import io.github.up2jakarta.csv.cfg.Up2Trim;
+import io.github.up2jakarta.csv.core.misc.ext.Dummy4;
+import io.github.up2jakarta.csv.core.misc.prc.Test2Processor;
+import io.github.up2jakarta.csv.core.misc.prc.Test5Processor;
+import io.github.up2jakarta.csv.core.misc.prc.Test6Processor;
 import io.github.up2jakarta.csv.impl.FastException;
-import io.github.up2jakarta.csv.ops.impl.GroupType;
+import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.prc.TrimProcessor;
-import io.github.up2jakarta.csv.test.bean.processor.Test2Processor;
-import io.github.up2jakarta.csv.test.bean.processor.Test5Processor;
-import io.github.up2jakarta.csv.test.bean.processor.Test6Processor;
-import io.github.up2jakarta.csv.test.ext.Dummy4;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.clv.PropertyException;
 import org.junit.jupiter.api.Test;
@@ -25,6 +25,7 @@ import java.util.List;
 
 import static io.github.up2jakarta.csv.core.BeanSupport.getProcessors;
 import static io.github.up2jakarta.csv.core.Errors.ERROR_PROCESSOR;
+import static io.github.up2jakarta.csv.core.MapperExceptionTest.DUMMY;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -45,14 +46,13 @@ public class ProcessorSupportTest {
         // GIVEN
         final String[] data = {null, "", " \t\n", "- \t\n", "\n\t - \t\n", "\n\t DATA \t\n", "DA - TA"};
         // WHEN
-        final String[] trim = TrimProcessor.trim(data, "", "-");
+        TrimProcessor.trim(data, "", "-");
         // THEN
-        assertEquals(data.length, trim.length);
         for (var i = 0; i < 5; i++) {
-            assertNull(trim[i]);
+            assertNull(data[i]);
         }
-        assertEquals("DATA", trim[5]);
-        assertEquals("DA - TA", trim[6]);
+        assertEquals("DATA", data[5]);
+        assertEquals("DA - TA", data[6]);
     }
 
     @Test
@@ -61,9 +61,9 @@ public class ProcessorSupportTest {
         // GIVEN
         final String[] data = null;
         // WHEN
-        final String[] trim = TrimProcessor.trim(data);
+        TrimProcessor.trim(data);
         // THEN
-        assertNull(trim);
+        assertNull(data);
     }
 
     @Test
@@ -138,7 +138,7 @@ public class ProcessorSupportTest {
             assertEquals(SeverityType.ERROR, thrown.getSeverity());
             assertEquals(Errors.ERROR_PROCESSOR, thrown.getCode());
             assertEquals(1, thrown.getOffset());
-            assertEquals("io.github.up2jakarta.csv.test.ext.DummyException: dummy", thrown.getCause().getMessage());
+            assertEquals(DUMMY + ": dummy", thrown.getCause().getMessage());
         }
         {
             // When

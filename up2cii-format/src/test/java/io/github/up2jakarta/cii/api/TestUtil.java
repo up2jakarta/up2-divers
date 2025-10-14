@@ -20,8 +20,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 
-import static io.github.up2jakarta.cii.CII.TOKEN_ADAPTER;
 import static io.github.up2jakarta.cii.CII.getLoader;
+import static io.github.up2jakarta.xml.adapters.KeyCoder.token;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Named
@@ -37,7 +37,7 @@ public class TestUtil {
     private static <I extends Enum<I>> void assertNaming(I constant, String code) {
         assertNotNull(code);
         assertFalse(code.isBlank());
-        assertEquals(code, TOKEN_ADAPTER.unmarshal(code));
+        assertEquals(code, token(code));
         assertEquals(CodeList.constant(code), constant.name());
     }
 

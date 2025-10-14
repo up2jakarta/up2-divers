@@ -4,17 +4,15 @@ import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.api.hdl.IErrorCreator;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.MapperFactory;
+import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
+import io.github.up2jakarta.csv.core.misc.ext.DummyConverter;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
-import io.github.up2jakarta.csv.ops.impl.GroupType;
-import io.github.up2jakarta.csv.ops.impl.Invoice1Aggregator;
-import io.github.up2jakarta.csv.ops.impl.Invoice2Aggregator;
-import io.github.up2jakarta.csv.ops.impl.SimpleCreator;
+import io.github.up2jakarta.csv.impl.GroupType;
+import io.github.up2jakarta.csv.impl.InvoiceAggregator;
+import io.github.up2jakarta.csv.impl.SimpleCreator;
 import io.github.up2jakarta.csv.prc.TokenProcessor;
 import io.github.up2jakarta.csv.slv.DecimalResolver;
-import io.github.up2jakarta.csv.test.clv.CurrencyConverter;
-import io.github.up2jakarta.csv.test.ext.DummyConverter;
 import jakarta.validation.Validator;
-import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -33,12 +31,6 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
         DummyConverter.class, CurrencyConverter.class
 })
 public class TUConfiguration {
-
-    @Bean
-    @Scope(value = SCOPE_SINGLETON)
-    public CollapsedStringAdapter tokenAdapter() {
-        return new CollapsedStringAdapter(); // for @Up2Token
-    }
 
     @Bean
     @Scope(value = SCOPE_SINGLETON)
@@ -67,14 +59,8 @@ public class TUConfiguration {
 
     @Bean
     @Scope(value = SCOPE_SINGLETON)
-    public Invoice1Aggregator invoice1Aggregator(MapperFactory<GroupType> factory, SimpleCreator creator) throws BeanException {
-        return new Invoice1Aggregator(factory, creator);
-    }
-
-    @Bean
-    @Scope(value = SCOPE_SINGLETON)
-    public Invoice2Aggregator invoice2Aggregator(MapperFactory<GroupType> factory, SimpleCreator creator) throws BeanException {
-        return new Invoice2Aggregator(factory, creator);
+    public InvoiceAggregator invoiceAggregator(MapperFactory<GroupType> factory, SimpleCreator creator) throws BeanException {
+        return new InvoiceAggregator(factory, creator);
     }
 
     /**

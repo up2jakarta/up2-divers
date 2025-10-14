@@ -1,11 +1,10 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.ops.impl.*;
-import io.github.up2jakarta.csv.test.Tests;
-import io.github.up2jakarta.csv.test.bean.jpa.*;
-import io.github.up2jakarta.csv.test.clv.TestCodeList;
-import io.github.up2jakarta.csv.test.clv.TestCodeListConverter;
+import io.github.up2jakarta.csv.core.misc.clv.TestCodeList;
+import io.github.up2jakarta.csv.core.misc.clv.TestCodeListConverter;
+import io.github.up2jakarta.csv.core.misc.jpa.*;
+import io.github.up2jakarta.csv.impl.*;
 import io.github.up2jakarta.xml.api.SeverityType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.github.up2jakarta.csv.ops.misc.Tests.record;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -59,7 +59,7 @@ public class JpaExtensionTest {
     void testDefaultErrors() throws BeanException {
         // Given
         final Mapper<Test1Bean, GroupType> mapper = factory.build(Test1Bean.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "11", "22", "33", "44", "ANY");
+        final InputRowEntity row = record(SegmentType.S00, "11", "22", "33", "44", "ANY");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test1Bean bean = mapper.map(row, handler);
@@ -125,7 +125,7 @@ public class JpaExtensionTest {
     void testOverrideErrors() throws BeanException {
         // Given
         final Mapper<Test2Bean, GroupType> mapper = factory.build(Test2Bean.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "11", "22", "ANY");
+        final InputRowEntity row = record(SegmentType.S00, "11", "22", "ANY");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test2Bean bean = mapper.map(row, handler);

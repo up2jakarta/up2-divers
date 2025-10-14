@@ -10,6 +10,7 @@ import io.github.up2jakarta.xml.api.SeverityType;
 
 import java.util.List;
 
+import static io.github.up2jakarta.csv.core.ext.Path.getOverride;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -28,7 +29,7 @@ public abstract class Mapper<S extends Segment, D extends DataType<D>> implement
 
     Mapper(Class<S> type, BeanContext context, DataTypeResolver<D> resolver) throws BeanException {
         this.type = type;
-        final Truncated truncated = type.getAnnotation(Truncated.class);
+        final Truncated truncated = getOverride(type, Truncated.class);
         offset = (truncated != null) ? truncated.value() : 0;
         node = BeanNode.root(type, context, resolver);
         parentId = PropertyGetter.parentId(type, this.toCollection());

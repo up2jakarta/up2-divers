@@ -1,16 +1,20 @@
 package io.github.up2jakarta.csv.data;
 
+import java.io.Serializable;
+
 /**
- * Contract interface for identifiable bean.
+ * Contract interface for identifiable bean, useful for entity persistence .
  *
- * @see io.github.up2jakarta.csv.api.IRecord
- * @see BusinessObject
+ * @param <K> the unique key type
+ * @see io.github.up2jakarta.csv.api.hdl.IRecordEntity
+ * @see io.github.up2jakarta.csv.api.hdl.IErrorEntity
+ * @see io.github.up2jakarta.csv.api.hdl.ISourceEntity
  */
-public interface Identifiable<K extends Comparable<K>> {
+public interface Identifiable<K> extends Serializable {
 
     /**
-     * @return the unique business identifier
+     * @return the unique key for persistence
      */
-    K getReference();
+    K getKey();
 
 }

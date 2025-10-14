@@ -1,0 +1,44 @@
+package io.github.up2jakarta.csv.core.misc.cvr;
+
+import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.cfg.Up2CodeList;
+import io.github.up2jakarta.csv.cfg.Up2TemporalAmount;
+import io.github.up2jakarta.csv.core.misc.clv.MeasurementUnitCode;
+import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.xml.api.SeverityType;
+
+import java.time.Duration;
+
+@SuppressWarnings("unused")
+public class Test2Resolver implements Segment {
+
+    public static final String TU_P_007 = "TU-P007";
+    public static final String TU_P_008 = "TU-P008";
+
+    @Position(0)
+    @Error(value = TU_P_007, severity = SeverityType.ERROR)
+    @Up2CodeList
+    private MeasurementUnitCode unit;
+
+    @Position(1)
+    @Error(value = TU_P_008, severity = SeverityType.WARNING)
+    @Up2TemporalAmount
+    private Duration duration;
+
+    public MeasurementUnitCode getUnit() {
+        return unit;
+    }
+
+    public void setUnit(MeasurementUnitCode unit) {
+        this.unit = unit;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+}

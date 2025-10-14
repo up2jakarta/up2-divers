@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.api.ext.BeanContext;
-import io.github.up2jakarta.csv.core.ops.BusinessType;
 import io.github.up2jakarta.csv.data.Segment;
 
 import java.lang.reflect.*;
@@ -213,23 +212,6 @@ public final class Beans {
         final T[] values = Arrays.copyOf(source, source.length + 1);
         values[source.length] = value;
         return values;
-    }
-
-    public static void join(String join, Mapper<Segment, ?> child, Mapper<Segment, ?> parent, Class<?> type) throws BeanException {
-        if (!child.parentId.exists()) {
-            return;
-        }
-        if (!parent.businessId.exists()) {
-            throw new BeanException(type, "must have one property annotated by @BusinessId to link with #[" + join + ']');
-        }
-        child.parentId.checkType(child.type, parent.businessId);
-    }
-
-    public static int offset(Mapper<Segment, ?> mapper, BusinessType<?> type) {
-        if (mapper.businessId.hasKey()) {
-            return type.getBeanIdIndex();
-        }
-        return mapper.offset;
     }
 
 }

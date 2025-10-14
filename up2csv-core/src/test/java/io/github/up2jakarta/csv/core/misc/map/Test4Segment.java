@@ -1,0 +1,16 @@
+package io.github.up2jakarta.csv.core.misc.map;
+
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.data.Segment;
+
+@SuppressWarnings("ALL")
+public class Test4Segment implements Segment {
+
+    @Position(0)
+    private String Upper;
+
+    public void setUpper(String upper) {
+        Upper = upper;
+    }
+
+}

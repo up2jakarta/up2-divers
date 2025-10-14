@@ -18,17 +18,14 @@ public final class TrimProcessor extends InputProcessor<Up2Trim> {
      *
      * @param values     input data
      * @param nullValues values looks like <code>null</code>
-     * @return data that has been trimmed
      */
-    public static String[] trim(String[] values, String... nullValues) {
+    public static void trim(String[] values, String... nullValues) {
         if (values == null || values.length == 0) {
-            return values;
+            return;
         }
-        final String[] result = new String[values.length];
         for (var i = 0; i < values.length; i++) {
-            result[i] = trim(values[i], nullValues);
+            values[i] = trim(values[i], nullValues);
         }
-        return result;
     }
 
     /**

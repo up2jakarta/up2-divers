@@ -5,6 +5,7 @@ import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.ops.ModeType;
 import io.github.up2jakarta.xml.clv.PropertyException;
 
 import java.util.List;
@@ -13,14 +14,32 @@ public final class BusinessEntry<T extends IType<D, T>, R extends IRecord<T>, D 
 
     private final T type;
     private final Segment bean;
-    private final EventHandler<R, D, E> handler;
     private final Mapper<Segment, D> mapper;
+    private final EventHandler<R, D, E> handler;
 
     public BusinessEntry(Mapper<Segment, D> mapper, T type, Segment bean, EventCollector<R, D, E> handler) {
         this.bean = bean;
         this.type = type;
         this.mapper = mapper;
         this.handler = handler;
+    }
+
+    public static int offset(Mapper<Segment, ?> mapper, ModeType mode) {
+        if (mapper.businessId.hasKey()) {
+            return mode.getBeanIdIndex();
+        }
+        return mode.getLength();
+    }
+
+    public static void join(String name, Mapper<Segment, ?> child, Mapper<Segment, ?> parent) throws BeanException {
+        if (!child.parentId.exists()) {
+            return;
+        }
+        if (!parent.businessId.exists()) {
+            final Class<?> type = parent.type;
+            throw new BeanException(type, "must have one property annotated by @BusinessId to link with #[" + name + ']');
+        }
+        child.parentId.checkType(child.type, parent.businessId);
     }
 
     public <B extends Segment> B getBean() {

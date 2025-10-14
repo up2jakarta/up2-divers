@@ -13,8 +13,6 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.validation.*;
 
-import java.util.Optional;
-
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -83,7 +81,7 @@ public final class MapperFactory<D extends DataType<D>> {
      * @throws BeanException for any missing or wrong bean configuration
      */
     public <S extends Segment> Mapper<S, D> build(final Class<S> type, D data) throws BeanException {
-        return new DefaultMapper<>(type, resolver.or(Optional.of(data)));
+        return new DefaultMapper<>(type, resolver.or(data));
     }
 
     /**

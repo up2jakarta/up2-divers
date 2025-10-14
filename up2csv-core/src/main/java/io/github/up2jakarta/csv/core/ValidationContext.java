@@ -1,6 +1,7 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.cfg.ValidOverride;
+import io.github.up2jakarta.csv.data.Segment;
 import jakarta.validation.Valid;
 
 import java.lang.reflect.AnnotatedElement;
@@ -43,20 +44,24 @@ public class ValidationContext {
      * @return the validation context
      * @throws BeanException if wrong configuration
      */
-    public static ValidationContext from(Class<?> type) throws BeanException {
-        final ValidOverride override = getOverride(ValidOverride.class, type, ValidOverride::path);
-        if (override != null) {
-            if (override.disable()) {
-                return DISABLED;
+    public static ValidationContext from(Class<? extends Segment> type) throws BeanException {
+        while (type != Segment.class && Segment.class.isAssignableFrom(type)) {
+            final ValidOverride override = getOverride(ValidOverride.class, type, ValidOverride::path);
+            if (override != null) {
+                if (override.disable()) {
+                    return DISABLED;
+                }
+                if (override.groups().length == 0) {
+                    return DEFAULT;
+                }
+                checkGroups(override, type);
+                return new ValidationContext(true, override.groups());
             }
-            if (override.groups().length == 0) {
+            if (type.isAnnotationPresent(Valid.class)) {
                 return DEFAULT;
             }
-            checkGroups(override, type);
-            return new ValidationContext(true, override.groups());
-        }
-        if (type.isAnnotationPresent(Valid.class)) {
-            return DEFAULT;
+            //noinspection unchecked
+            type = (Class<? extends Segment>) type.getSuperclass();
         }
         return DISABLED;
     }

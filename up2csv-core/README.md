@@ -31,17 +31,13 @@ Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready enti
 - Business Aggregation for multi-segments mapping
 - Business Segregation for multi-segments unmapping
 
-# Requirements
-
-- Java 17
-
 # Dependencies
 
 ``` xml
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.5.1</version>
+        <version>1.5.2</version>
     </dependency>
     <!-- Optional JSR-303 Validation Provider -->
     <!-- Optional JPA Provider -->
@@ -512,10 +508,10 @@ public TestSegment implements Segment {
 - `BeanLinker`: Bean linker for aggregation/segregation processing.
 - `IError`: Input error representation (model) tor error handling.
 - `IRecord`: Input record representation (model)
-- `IType`: Segment definition for segregation processing only. 
+- `IType`: Segment definition for segregation processing only.
 - `IFullType`: Segment definition for aggregation/segregation processing.
 
-See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/ops/impl)
+See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/impl)
 
 # Mapping of flat-data
 
@@ -611,7 +607,7 @@ It's impossible to present a `business-property` within `0..n` cardinality
   simplify the validation.
 - And more depending on the `business-logic`
 
-See [Business Tests](src/test/java/io/github/up2jakarta/csv/ops) for more details.
+See [Business Tests](src/test/java/io/github/up2jakarta/csv/ops/BusinessInvoiceTests.java) for more details.
 
 # Best practices
 

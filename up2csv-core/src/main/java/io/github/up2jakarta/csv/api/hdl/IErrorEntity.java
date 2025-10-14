@@ -3,6 +3,7 @@ package io.github.up2jakarta.csv.api.hdl;
 import io.github.up2jakarta.csv.api.IError;
 import io.github.up2jakarta.csv.api.hdl.IErrorEntity.IKey;
 import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.Identifiable;
 
 /**
  * Contact interface for an input error with cause property, useful for error persistence.
@@ -11,12 +12,7 @@ import io.github.up2jakarta.csv.data.DataType;
  * @param <K> the error key type
  * @param <D> the input row type
  */
-public interface IErrorEntity<R extends IRecordEntity<?>, K extends IKey<R>, D extends DataType<D>> extends IError<D> {
-
-    /**
-     * @return the identifier
-     */
-    K getKey();
+public interface IErrorEntity<R extends IRecordEntity<?, ?, ?>, K extends IKey<R>, D extends DataType<D>> extends IError<D>, Identifiable<K> {
 
     /**
      * @return the the error stack trace
@@ -28,7 +24,7 @@ public interface IErrorEntity<R extends IRecordEntity<?>, K extends IKey<R>, D e
      *
      * @param <R> the input row type
      */
-    interface IKey<R extends IRecordEntity<?>> {
+    interface IKey<R extends IRecordEntity<?, ?, ?>> {
 
         /**
          * @return the computed order by record

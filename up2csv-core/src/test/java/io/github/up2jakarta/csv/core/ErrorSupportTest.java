@@ -1,16 +1,15 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.ops.impl.*;
-import io.github.up2jakarta.csv.test.Tests;
-import io.github.up2jakarta.csv.test.bean.converter.*;
-import io.github.up2jakarta.csv.test.bean.processor.Test3Processor;
-import io.github.up2jakarta.csv.test.bean.processor.Test4Processor;
-import io.github.up2jakarta.csv.test.clv.CurrencyConverter;
-import io.github.up2jakarta.csv.test.clv.MeasurementUnitConverter;
-import io.github.up2jakarta.csv.test.ext.Dummy1Processor;
-import io.github.up2jakarta.csv.test.ext.DummyConverter;
-import io.github.up2jakarta.csv.test.valid.Up2Warn;
+import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
+import io.github.up2jakarta.csv.core.misc.clv.MeasurementUnitConverter;
+import io.github.up2jakarta.csv.core.misc.cvr.*;
+import io.github.up2jakarta.csv.core.misc.ext.Dummy1Processor;
+import io.github.up2jakarta.csv.core.misc.ext.DummyConverter;
+import io.github.up2jakarta.csv.core.misc.prc.Test3Processor;
+import io.github.up2jakarta.csv.core.misc.prc.Test4Processor;
+import io.github.up2jakarta.csv.core.misc.vld.Up2Warn;
+import io.github.up2jakarta.csv.impl.*;
 import io.github.up2jakarta.xml.api.SeverityType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +22,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.core.Errors.*;
+import static io.github.up2jakarta.csv.core.MapperExceptionTest.DUMMY;
+import static io.github.up2jakarta.csv.ops.misc.Tests.ERROR_CODE;
+import static io.github.up2jakarta.csv.ops.misc.Tests.record;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -42,7 +44,7 @@ public class ErrorSupportTest {
     void testProcessorWithoutError() throws BeanException {
         // Given
         final Mapper<Test3Processor, GroupType> mapper = factory.build(Test3Processor.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "property", "dummy");
+        final InputRowEntity row = record(SegmentType.S00, "property", "dummy");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test3Processor bean = mapper.map(row, handler);
@@ -68,7 +70,7 @@ public class ErrorSupportTest {
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(ERROR_PROCESSOR, error.getCode());
-            assertEquals("io.github.up2jakarta.csv.test.ext.DummyException: dummy", error.getMessage());
+            assertEquals(DUMMY + ": dummy", error.getMessage());
             assertNotNull(error.getTrace());
         }
     }
@@ -77,7 +79,7 @@ public class ErrorSupportTest {
     void testProcessorWithinError() throws BeanException {
         // Given
         final Mapper<Test4Processor, GroupType> mapper = factory.build(Test4Processor.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "property", "dummy");
+        final InputRowEntity row = record(SegmentType.S00, "property", "dummy");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test4Processor bean = mapper.map(row, handler);
@@ -103,7 +105,7 @@ public class ErrorSupportTest {
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(Test4Processor.TU_P_003, error.getCode());
-            assertEquals("io.github.up2jakarta.csv.test.ext.DummyException: dummy", error.getMessage());
+            assertEquals(DUMMY + ": dummy", error.getMessage());
             assertNotNull(error.getTrace());
         }
     }
@@ -112,7 +114,7 @@ public class ErrorSupportTest {
     void testConverterWithoutError() throws BeanException {
         // Given
         final Mapper<Test1Converter, GroupType> mapper = factory.build(Test1Converter.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "ILS", "int");
+        final InputRowEntity row = record(SegmentType.S00, "ILS", "int");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test1Converter bean = mapper.map(row, handler);
@@ -147,7 +149,7 @@ public class ErrorSupportTest {
     void testConverterWithinError() throws BeanException {
         // Given
         final Mapper<Test2Converter, GroupType> mapper = factory.build(Test2Converter.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "ILS", "int");
+        final InputRowEntity row = record(SegmentType.S00, "ILS", "int");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test2Converter bean = mapper.map(row, handler);
@@ -182,7 +184,7 @@ public class ErrorSupportTest {
     void testResolverWithoutError() throws BeanException {
         // Given
         final Mapper<Test1Resolver, GroupType> mapper = factory.build(Test1Resolver.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "ISL", "XGM", "XPT24H");
+        final InputRowEntity row = record(SegmentType.S00, "ISL", "XGM", "XPT24H");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test1Resolver bean = mapper.map(row, handler);
@@ -227,7 +229,7 @@ public class ErrorSupportTest {
     void testResolverWithinError() throws BeanException {
         // Given
         final Mapper<Test2Resolver, GroupType> mapper = factory.build(Test2Resolver.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "date", "duration");
+        final InputRowEntity row = record(SegmentType.S00, "date", "duration");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test2Resolver bean = mapper.map(row, handler);
@@ -262,7 +264,7 @@ public class ErrorSupportTest {
     void testValidatorWithoutError() throws BeanException {
         // Given
         final Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "+1", "101", "", null, "-1");
+        final InputRowEntity row = record(SegmentType.S00, "+1", "101", "", null, "-1");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test1Validator bean = mapper.map(row, handler);
@@ -328,7 +330,7 @@ public class ErrorSupportTest {
             assertNotNull(error.getKey().getOrder());
             assertEquals(5, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
-            assertEquals(Tests.ERROR_CODE, error.getCode());
+            assertEquals(ERROR_CODE, error.getCode());
             assertEquals("must not be empty", error.getMessage());
             assertNull(error.getTrace());
         }
@@ -348,7 +350,7 @@ public class ErrorSupportTest {
     void testValidatorWithinError() throws BeanException {
         // Given
         final Mapper<Test2Validator, GroupType> mapper = factory.build(Test2Validator.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "", null);
+        final InputRowEntity row = record(SegmentType.S00, "", null);
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test2Validator bean = mapper.map(row, handler);

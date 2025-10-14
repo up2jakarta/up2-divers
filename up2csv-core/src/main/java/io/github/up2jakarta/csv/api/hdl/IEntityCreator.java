@@ -18,7 +18,7 @@ import java.util.Optional;
  * @param <D> the data type
  * @param <E> the error type
  */
-public interface IEntityCreator<R extends IRecordEntity<?>, D extends DataType<D>, E extends IErrorEntity<R, ?, D>> extends IErrorCreator<R, D, E> {
+public interface IEntityCreator<R extends IRecordEntity<?, ?, ?>, D extends DataType<D>, E extends IErrorEntity<R, ?, D>> extends IErrorCreator<R, D, E> {
 
     static Optional<String> trace(PropertyException cause) {
         return Optional.ofNullable(cause.getCause()).map(c -> {

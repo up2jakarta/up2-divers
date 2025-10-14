@@ -2,26 +2,20 @@ package io.github.up2jakarta.csv;
 
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.MapperFactory;
-import io.github.up2jakarta.csv.core.ops.FastAggregator;
-import io.github.up2jakarta.csv.core.ops.FastSeparator;
-import io.github.up2jakarta.csv.core.ops.FullAggregator;
-import io.github.up2jakarta.csv.core.ops.FullSeparator;
-import io.github.up2jakarta.csv.impl.SimpleAggregator;
-import io.github.up2jakarta.csv.ops.impl.*;
-import io.github.up2jakarta.csv.ops.impl.dto.Invoice1;
-import io.github.up2jakarta.csv.ops.impl.dto.Invoice2;
-import io.github.up2jakarta.csv.ops.impl.dto.Invoice3;
+import io.github.up2jakarta.csv.impl.*;
+import io.github.up2jakarta.csv.impl.dto.Invoice;
+import io.github.up2jakarta.csv.ops.*;
+import io.github.up2jakarta.csv.ops.misc.Dummy2;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
+import java.io.IOException;
 
-import static io.github.up2jakarta.csv.ops.impl.SegmentType.*;
-import static io.github.up2jakarta.csv.test.Tests.*;
+import static io.github.up2jakarta.csv.impl.SegmentType.*;
+import static io.github.up2jakarta.csv.ops.misc.Tests.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -38,23 +32,23 @@ public class BuilderTests {
     }
 
     @Test
-    void testFastSeparator() throws BeanException {
+    void testFastSeparator() throws BeanException, IOException {
         // WHEN
-        final FastSeparator<Invoice1, GroupType, SegmentType> bean = factory.builder()
-                .fast(Invoice1.class)
+        final FastSeparator<Invoice, GroupType, SegmentType> bean = factory.builder()
+                .fast(Invoice.class)
                 .fast(S01)
                 .build();
         assertNotNull(bean);
         // THEN
         final String[] root = new String[]{"01", null, null, null, null, null};
-        bean.format(new Invoice1(), d -> assertArrayEquals(root, d));
+        bean.format(new Invoice(), d -> assertArrayEquals(root, d));
     }
 
     @Test
-    void testSimpleAggregator() throws BeanException {
+    void testSimpleAggregator() throws BeanException, IOException {
         // WHEN
-        final SimpleAggregator<Invoice1, GroupType, SegmentType> aggregator = factory.builder()
-                .fast(Invoice1.class)
+        final SimpleAggregator<Invoice, GroupType, SegmentType> aggregator = factory.builder()
+                .fast(Invoice.class)
                 .full(S01)
                 .build();
         assertNotNull(aggregator);
@@ -63,10 +57,10 @@ public class BuilderTests {
     }
 
     @Test
-    void testFastAggregator() throws BeanException {
+    void testFastAggregator() throws BeanException, IOException {
         // WHEN
-        final FastAggregator<Invoice1, GroupType, SegmentType, InputRowEntity, InputErrorEntity> aggregator = factory.builder()
-                .fast(Invoice1.class)
+        final FastAggregator<Invoice, GroupType, SegmentType, InputRowEntity, InputErrorEntity> aggregator = factory.builder()
+                .fast(Invoice.class)
                 .full(S01)
                 .build(creator);
         assertNotNull(aggregator);
@@ -75,90 +69,60 @@ public class BuilderTests {
     }
 
     @Test
-    void testFullSeparator1() throws BeanException {
+    void testFullSeparator() throws BeanException, IOException {
         // WHEN
-        final FullSeparator<Invoice3, GroupType, SegmentType> bean = factory.builder()
-                .full(Invoice3.class)
-                .fast(S21)
+        final FullSeparator<Invoice, GroupType, SegmentType> bean = factory.builder()
+                .full(Invoice.class)
+                .fast(S01)
                 .build();
         assertNotNull(bean);
         // THEN
-        final String[] root1 = new String[]{"00000001", "21", "TS3", null, null, null, null};
-        bean.format(new Invoice3("TS3"), new AtomicInteger(0), d -> assertArrayEquals(root1, d));
-        final String[] root2 = new String[]{"0000000000000001", "21", null, null, null, null, null};
-        bean.format(new Invoice3(), new AtomicLong(0), d -> assertArrayEquals(root2, d));
+        final String[] root1 = new String[]{"00000001", "01", null, null, null, null, null};
+        bean.format(new Invoice(), new Fixed08Generator(), d -> assertArrayEquals(root1, d));
+        final String[] root2 = new String[]{"0000000000000001", "01", null, null, null, null, null};
+        bean.format(new Invoice(), new Fixed16Generator(), d -> assertArrayEquals(root2, d));
     }
 
     @Test
-    void testFullSeparator2() throws BeanException {
+    void testFullAggregator() throws BeanException, IOException {
         // WHEN
-        final FullSeparator<Invoice3, GroupType, SegmentType> bean = factory.builder()
-                .full(Invoice3.class)
-                .full(S21)
-                .build();
-        assertNotNull(bean);
-        // THEN
-        final String[] root1 = new String[]{"00000001", "21", "TS3", null, null, null, null};
-        bean.format(new Invoice3("TS3"), new AtomicInteger(0), d -> assertArrayEquals(root1, d));
-        final String[] root2 = new String[]{"0000000000000001", "21", null, null, null, null, null};
-        bean.format(new Invoice3(), new AtomicLong(0), d -> assertArrayEquals(root2, d));
-    }
-
-    @Test
-    void testFullAggregator() throws BeanException {
-        // WHEN
-        final FullAggregator<Invoice3, GroupType, SegmentType, InputRowEntity, InputErrorEntity> aggregator = factory.builder()
-                .full(Invoice3.class)
-                .full(S21)
+        final FullAggregator<Invoice, GroupType, SegmentType, InputRowEntity, InputErrorEntity> aggregator = factory.builder()
+                .full(Invoice.class)
+                .full(S01)
                 .build(creator, (r) -> 0);
         assertNotNull(aggregator);
         // THEN
-        assertInvoice(aggregator, fullInvoice(S21));
+        assertInvoice(aggregator, fullInvoice(S01));
     }
 
     @Test
-    void testTyping1Exception() {
+    void testTypingException() {
         // WHEN
         final BeanException ex = assertThrows(
                 BeanException.class,
                 () -> factory.builder()
-                        .full(Invoice3.class)
+                        .full(Invoice.class)
                         .full(S11)
                         .build(creator, (r) -> 0)
         );
         assertNotNull(ex);
         // THEN
-        assertEquals("Invoice3[class] - Invalid business typing", ex.getMessage());
+        assertEquals("Invoice[class] - Invalid business typing", ex.getMessage());
     }
 
     @Test
-    void testTyping2Exception() {
+    void testRecursiveException() {
         // WHEN
         final BeanException ex = assertThrows(
                 BeanException.class,
                 () -> factory.builder()
-                        .fast(Invoice3.class)
-                        .full(S21)
-                        .build(creator)
-        );
-        assertNotNull(ex);
-        // THEN
-        assertEquals("Invoice3[class] - @Truncated[value] must be  equals to 2", ex.getMessage());
-    }
-
-    @Test
-    void testTyping3Exception() {
-        // WHEN
-        final BeanException ex = assertThrows(
-                BeanException.class,
-                () -> factory.builder()
-                        .full(Invoice2.class)
-                        .full(S11)
+                        .full(Dummy2.class)
+                        .full(S31)
                         .build(creator, (r) -> 0)
         );
         assertNotNull(ex);
         // THEN
-        assertEquals("Invoice2[class] - @Truncated[value] must be  equals to 3", ex.getMessage());
+        assertEquals("SegmentType[31] - cyclic segment is not allowed: Dummy2 > Item2 > Dummy2", ex.getMessage());
     }
 
 }

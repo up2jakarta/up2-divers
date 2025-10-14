@@ -52,14 +52,18 @@ public abstract class DataTypeResolver<D extends DataType<D>> {
         }
     }
 
-    public final DataTypeResolver<D> or(Optional<D> defaultValue) {
+    public final DataTypeResolver<D> or(D defaultValue) {
+        if (defaultValue == null) {
+            return this;
+        }
+        final Optional<D> dv = Optional.of(defaultValue);
         final DataTypeResolver<D> delegate = this;
         return new DataTypeResolver<>(type) {
             @Override
             public Optional<D> get(Stack<Class<? extends Segment>> stack, Field[] path, Field field) throws BeanException {
                 final Optional<D> value = delegate.get(stack, path, field);
                 if (value.isEmpty()) {
-                    return defaultValue;
+                    return dv;
                 }
                 return value;
             }

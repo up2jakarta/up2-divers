@@ -1,0 +1,67 @@
+package io.github.up2jakarta.csv.io;
+
+import io.github.up2jakarta.csv.api.ext.BeanContext;
+import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.MapperFactory;
+import io.github.up2jakarta.csv.data.DataTypeResolver;
+import io.github.up2jakarta.csv.io.impl.GroupType;
+import io.github.up2jakarta.csv.io.impl.InvoiceAggregator;
+import io.github.up2jakarta.csv.prc.TokenProcessor;
+import io.github.up2jakarta.csv.slv.DecimalResolver;
+import jakarta.validation.Validator;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.QuoteMode;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.Locale;
+import java.util.Set;
+
+@Configuration
+@ComponentScan(basePackageClasses = {MapperFactory.class, TokenProcessor.class, DecimalResolver.class})
+public class TUConfiguration {
+
+    @Bean
+    public Validator validator() {
+        return MapperFactory.validator(
+                new ParameterMessageInterpolator(
+                        Set.of(Locale.ENGLISH, Locale.FRENCH),
+                        Locale.ENGLISH,
+                        context -> Locale.ENGLISH,
+                        false
+                )
+        );
+    }
+
+    @Bean
+    public CSVFormat format() {
+        return CSVFormat.RFC4180.builder()
+                .setQuoteMode(QuoteMode.MINIMAL)
+                .setQuote('"')
+                .setDelimiter(';')
+                .setNullString("")
+                .setIgnoreEmptyLines(true)
+                .setTrim(true)
+                .setIgnoreSurroundingSpaces(true)
+                .get();
+    }
+
+    @Bean
+    public BeanContext beanContext(final ApplicationContext context) {
+        return context::getBean;
+    }
+
+    @Bean
+    DataTypeResolver<GroupType> resolver() {
+        return DataTypeResolver.empty(GroupType.class);
+    }
+
+    @Bean
+    public InvoiceAggregator invoiceAggregator(MapperFactory<GroupType> factory) throws BeanException {
+        return new InvoiceAggregator(factory);
+    }
+
+}

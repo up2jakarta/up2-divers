@@ -20,8 +20,10 @@ mvn clean install
 ## Maven Modules
 
 1. [Up2CSV Core](./up2csv-core/README.md) Framework for mapping, validating and parsing flat-data to JavaBeans.
-2. [Up2XML Core](./up2xml-core/README.md) Framework for validating, reading and writing XML documents.
-3. [Up2CII Format](./up2cii-format/README.md) Framework for validating, reading and writing CII e-invoices.
+2. [Up2XML Format](./up2csv-format/README.md) Framework for reading and writing business-objects to CSV like format.
+3. [Up2XML Core](./up2xml-core/README.md) Framework for validating, reading and writing XML documents.
+4. [Up2CII Format](./up2cii-format/README.md) Framework for validating, reading and writing CII e-invoicing format.
+5. [Up2Job Core](./up2job-core/README.md) Spring-batch extensions.
 
 ## License
 

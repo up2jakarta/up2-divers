@@ -7,7 +7,7 @@ package io.github.up2jakarta.csv.api.hdl;
  * @param <R> the input row type
  */
 @FunctionalInterface
-public interface IErrorRepository<R extends IRecordEntity<?>> {
+public interface IErrorRepository<R extends IRecordEntity<?, ?, ?>> {
 
     /**
      * Get and return the max key-order of existing errors related to the given input row.

@@ -28,6 +28,20 @@ import static io.github.up2jakarta.xml.clv.CodeListConverter.parse;
 @Singleton
 public final class CodeListResolver extends ConversionResolver<Up2CodeList> {
 
+    public static void checkUnique(Class<?> type, CodeList<?>[] values) throws BeanException {
+        for (var i = 0; i < values.length; i++) {
+            final CodeList<?> value = values[i];
+            if (value == null || value.getCode() == null) {
+                throw new BeanException(type, String.valueOf(i), "must be no null");
+            }
+            for (int j = i + 1; j < values.length; j++) {
+                if (value == values[j]) {
+                    throw new BeanException(type, value.getCode(), "must be unique");
+                }
+            }
+        }
+    }
+
     @Override
     public PropertyConverter<? extends CodeList<?>> forParsing(Up2CodeList config, Field property) throws BeanException {
         //noinspection unchecked
@@ -39,6 +53,7 @@ public final class CodeListResolver extends ConversionResolver<Up2CodeList> {
         if (types.length == 0 || clType != types[0]) {
             throw new BeanException(property, "type must implements CodeList<" + clType.getSimpleName() + ">");
         }
+        checkUnique(clType, clType.getEnumConstants());
         final Optional<Error> error = getError(property);
         final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);
         final String code = error.map(Error::value).orElse(Errors.ERROR_CODE_LIST);

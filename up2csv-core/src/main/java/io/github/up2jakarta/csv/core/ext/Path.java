@@ -1,6 +1,7 @@
 package io.github.up2jakarta.csv.core.ext;
 
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.data.Segment;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -36,6 +37,18 @@ public final class Path {
             return true;
         }
         return false;
+    }
+
+    public static <A extends Annotation> A getOverride(Class<? extends Segment> bean, Class<A> type) {
+        while (bean != Segment.class && Segment.class.isAssignableFrom(bean)) {
+            final A result = bean.getAnnotation(type);
+            if (result != null) {
+                return result;
+            }
+            //noinspection unchecked
+            bean = (Class<? extends Segment>) bean.getSuperclass();
+        }
+        return null;
     }
 
     public static <A extends Annotation> A getOverride(

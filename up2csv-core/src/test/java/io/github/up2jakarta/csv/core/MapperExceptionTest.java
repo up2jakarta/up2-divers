@@ -1,15 +1,14 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.impl.FastCollector;
-import io.github.up2jakarta.csv.impl.FastException;
-import io.github.up2jakarta.csv.impl.FatalException;
-import io.github.up2jakarta.csv.ops.impl.*;
-import io.github.up2jakarta.csv.test.Tests;
-import io.github.up2jakarta.csv.test.bean.converter.Test1Converter;
-import io.github.up2jakarta.csv.test.bean.mapper.Test1Exception;
-import io.github.up2jakarta.csv.test.bean.mapper.Test2Exception;
-import io.github.up2jakarta.csv.test.bean.processor.Test6Processor;
+import io.github.up2jakarta.csv.core.misc.DummyException;
+import io.github.up2jakarta.csv.core.misc.cvr.Test1Converter;
+import io.github.up2jakarta.csv.core.misc.ext.Dummy1Processor;
+import io.github.up2jakarta.csv.core.misc.ext.DummyConverter;
+import io.github.up2jakarta.csv.core.misc.map.Test1Exception;
+import io.github.up2jakarta.csv.core.misc.map.Test2Exception;
+import io.github.up2jakarta.csv.core.misc.prc.Test6Processor;
+import io.github.up2jakarta.csv.impl.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +22,14 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
+import static io.github.up2jakarta.csv.ops.misc.Tests.record;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
 public class MapperExceptionTest {
+
+    static final String DUMMY = DummyException.class.getName();
 
     private final SimpleCreator creator;
     private final MapperFactory<GroupType> factory;
@@ -59,9 +61,9 @@ public class MapperExceptionTest {
         // Given
         final Mapper<Test6Processor, ?> mapper = factory.build(Test6Processor.class);
         final List<String> expected = Arrays.asList(
-                "io.github.up2jakarta.csv.impl.FastException: io.github.up2jakarta.xml.clv.PropertyException: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
-                "Caused by: io.github.up2jakarta.xml.clv.PropertyException: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
-                "Caused by: io.github.up2jakarta.csv.test.ext.DummyException: dummy"
+                "io.github.up2jakarta.csv.impl.FastException: io.github.up2jakarta.xml.clv.PropertyException: " + DUMMY + ": dummy",
+                "Caused by: io.github.up2jakarta.xml.clv.PropertyException: " + DUMMY + ": dummy",
+                "Caused by: " + DUMMY + ": dummy"
         );
         // Then
         final FastException thrown = assertThrows(FastException.class, () -> mapper.map("dummy"));
@@ -113,13 +115,13 @@ public class MapperExceptionTest {
         // Given
         final Mapper<Test1Exception, GroupType> mapper = factory.build(Test1Exception.class);
         final List<String> expected = Arrays.asList(
-                "io.github.up2jakarta.csv.impl.FatalException: io.github.up2jakarta.xml.clv.PropertyException: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
-                "Caused by: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
+                "io.github.up2jakarta.csv.impl.FatalException: io.github.up2jakarta.xml.clv.PropertyException: " + DUMMY + ": dummy",
+                "Caused by: " + DUMMY + ": dummy",
                 "Multiple events have been occurred:",
                 "1) the data #[1] has warning: W001 - Unknown value [EURO] for CodeList[CountryCodeType]",
                 "2) the data #[2] has error: E002 - Unknown value [USA] for CodeList[CurrencyCodeType]"
         );
-        final InputRowEntity row = Tests.create(SegmentType.S00, "EURO", "USA", "dummy");
+        final InputRowEntity row = record(SegmentType.S00, "EURO", "USA", "dummy");
         final StackHandler handler = new StackHandler(row, creator);
         // Then
         final FatalException thrown = assertThrows(FatalException.class, () -> mapper.map(row, handler));
@@ -171,16 +173,16 @@ public class MapperExceptionTest {
         // Given
         final Mapper<Test2Exception, GroupType> mapper = factory.build(Test2Exception.class);
         final List<String> expected = Arrays.asList(
-                "io.github.up2jakarta.csv.impl.FatalException: io.github.up2jakarta.xml.clv.PropertyException: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
-                "Caused by: io.github.up2jakarta.xml.clv.PropertyException: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
-                "Caused by: io.github.up2jakarta.csv.test.ext.DummyException: dummy",
+                "io.github.up2jakarta.csv.impl.FatalException: io.github.up2jakarta.xml.clv.PropertyException: " + DUMMY + ": dummy",
+                "Caused by: io.github.up2jakarta.xml.clv.PropertyException: " + DUMMY + ": dummy",
+                "Caused by: " + DUMMY + ": dummy",
                 "Multiple events have been occurred:",
                 "1) the data #[0] has warning: W001 - java.lang.RuntimeException: EURO",
                 "java.lang.RuntimeException: EURO",
                 "2) the data #[1] has error: E002 - java.lang.RuntimeException: USA",
                 "java.lang.RuntimeException: USA"
         );
-        final InputRowEntity row = Tests.create(SegmentType.S00, "EURO", "USA", "dummy");
+        final InputRowEntity row = record(SegmentType.S00, "EURO", "USA", "dummy");
         final StackHandler handler = new StackHandler(row, creator);
         // Then
         final FatalException thrown = assertThrows(FatalException.class, () -> mapper.map(row, handler));
@@ -231,7 +233,7 @@ public class MapperExceptionTest {
     void testErrorTrace1() throws BeanException {
         // Given
         final Mapper<Test1Exception, GroupType> mapper = factory.build(Test1Exception.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "TN", "TND");
+        final InputRowEntity row = record(SegmentType.S00, "TN", "TND");
         final SimpleHandler handler = new SimpleHandler(row, creator);
         // Then
         mapper.map(row, handler);
@@ -240,9 +242,9 @@ public class MapperExceptionTest {
         final InputErrorEntity error = handler.toCollection().iterator().next();
         assertTrace(error.getTrace(),
                 "java.lang.NullPointerException: NPE",
-                "\tio.github.up2jakarta.csv.test.ext.Dummy1Processor.process(Dummy1Processor.java:17)",
-                "\tio.github.up2jakarta.csv.test.ext.Dummy1Processor.process(Dummy1Processor.java:29)",
-                "\tio.github.up2jakarta.csv.test.ext.Dummy1Processor.process(Dummy1Processor.java:9)"
+                "\t" + Dummy1Processor.class.getName() + ".process(Dummy1Processor.java:18)",
+                "\t" + Dummy1Processor.class.getName() + ".process(Dummy1Processor.java:30)",
+                "\t" + Dummy1Processor.class.getName() + ".process(Dummy1Processor.java:10)"
         );
 
     }
@@ -251,7 +253,7 @@ public class MapperExceptionTest {
     void testErrorTrace2() throws BeanException {
         // Given
         final Mapper<Test1Converter, GroupType> mapper = factory.build(Test1Converter.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "USD");
+        final InputRowEntity row = record(SegmentType.S00, "USD");
         final SimpleHandler handler = new SimpleHandler(row, creator);
         // Then
         mapper.map(row, handler);
@@ -267,7 +269,7 @@ public class MapperExceptionTest {
     void testErrorTrace3() throws BeanException {
         // Given
         final Mapper<Test1Converter, GroupType> mapper = factory.build(Test1Converter.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "TND", "dummy");
+        final InputRowEntity row = record(SegmentType.S00, "TND", "dummy");
         final SimpleHandler handler = new SimpleHandler(row, creator);
         // Then
         mapper.map(row, handler);
@@ -275,9 +277,9 @@ public class MapperExceptionTest {
         assertEquals(1, handler.toCollection().size());
         final InputErrorEntity error = handler.toCollection().iterator().next();
         assertTrace(error.getTrace(),
-                "io.github.up2jakarta.csv.test.ext.DummyException: Dummy message",
-                "\tio.github.up2jakarta.csv.test.ext.DummyConverter.parse(DummyConverter.java:23)",
-                "\tio.github.up2jakarta.csv.test.ext.DummyConverter.parse(DummyConverter.java:7)",
+                DUMMY + ": Dummy message",
+                "\t" + DummyConverter.class.getName() + ".parse(DummyConverter.java:24)",
+                "\t" + DummyConverter.class.getName() + ".parse(DummyConverter.java:8)",
                 "\tio.github.up2jakarta.csv.api.ext.PropertyConverter.lambda$of$0(PropertyConverter.java:42)",
                 "java.lang.RuntimeException: NPE"
         );

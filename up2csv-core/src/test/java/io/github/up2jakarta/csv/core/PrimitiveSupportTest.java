@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.ops.impl.GroupType;
-import io.github.up2jakarta.csv.test.bean.Test1Primitive;
-import io.github.up2jakarta.csv.test.bean.Test2Primitive;
-import io.github.up2jakarta.csv.test.bean.Test3Primitive;
+import io.github.up2jakarta.csv.core.misc.Test1Primitive;
+import io.github.up2jakarta.csv.core.misc.Test2Primitive;
+import io.github.up2jakarta.csv.core.misc.Test3Primitive;
+import io.github.up2jakarta.csv.impl.GroupType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

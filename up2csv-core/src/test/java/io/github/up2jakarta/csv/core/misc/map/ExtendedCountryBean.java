@@ -1,0 +1,18 @@
+package io.github.up2jakarta.csv.core.misc.map;
+
+import io.github.up2jakarta.csv.cfg.Position;
+
+@SuppressWarnings("unused")
+public final class ExtendedCountryBean extends CountryBean {
+
+    @Position(0)
+    private String currency;
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+}

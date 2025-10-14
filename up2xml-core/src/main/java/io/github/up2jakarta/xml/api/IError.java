@@ -1,9 +1,11 @@
 package io.github.up2jakarta.xml.api;
 
+import java.io.Serializable;
+
 /**
  * Contact interface for an input error.
  */
-public interface IError {
+public interface IError extends Serializable {
 
     /**
      * @return the error severity level

@@ -1,20 +1,19 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
+import io.github.up2jakarta.csv.core.misc.clv.CurrencyCodeType;
+import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
+import io.github.up2jakarta.csv.core.misc.cvr.SupportEntity;
+import io.github.up2jakarta.csv.core.misc.jpa.NoteEntity;
+import io.github.up2jakarta.csv.core.misc.map.*;
+import io.github.up2jakarta.csv.core.misc.map.oneshot.AbstractAddress;
+import io.github.up2jakarta.csv.core.misc.map.oneshot.ClientSegment;
+import io.github.up2jakarta.csv.core.misc.map.oneshot.ComplexAddress;
+import io.github.up2jakarta.csv.core.misc.map.oneshot.SimpleAddress;
+import io.github.up2jakarta.csv.core.misc.prc.ProcessorBean;
 import io.github.up2jakarta.csv.data.Collectable;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.ops.impl.*;
-import io.github.up2jakarta.csv.test.Tests;
-import io.github.up2jakarta.csv.test.bean.converter.SupportEntity;
-import io.github.up2jakarta.csv.test.bean.jpa.NoteEntity;
-import io.github.up2jakarta.csv.test.bean.mapper.*;
-import io.github.up2jakarta.csv.test.bean.mapper.oneshot.AbstractAddress;
-import io.github.up2jakarta.csv.test.bean.mapper.oneshot.ClientSegment;
-import io.github.up2jakarta.csv.test.bean.mapper.oneshot.ComplexAddress;
-import io.github.up2jakarta.csv.test.bean.mapper.oneshot.SimpleAddress;
-import io.github.up2jakarta.csv.test.bean.processor.ProcessorBean;
-import io.github.up2jakarta.csv.test.clv.CurrencyCodeType;
-import io.github.up2jakarta.csv.test.clv.CurrencyConverter;
+import io.github.up2jakarta.csv.impl.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.core.Errors.ERROR_VALIDATOR;
+import static io.github.up2jakarta.csv.ops.misc.Tests.record;
 import static io.github.up2jakarta.xml.api.SeverityType.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,7 +60,7 @@ class MapperTest {
         // Given
         final String[] data = null;
         final Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
-        final InputRowEntity row3 = Tests.create(SegmentType.S00, data);
+        final InputRowEntity row3 = record(SegmentType.S00, data);
         final SimpleHandler handler2 = new SimpleHandler(null, creator);
         final SimpleHandler handler3 = new SimpleHandler(row3, creator);
         // When
@@ -340,7 +340,7 @@ class MapperTest {
     void testValidatedAnnotation() throws BeanException {
         // Given
         final Mapper<Validator2Bean, GroupType> mapper = factory.build(Validator2Bean.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "\n\t");
+        final InputRowEntity row = record(SegmentType.S00, "\n\t");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Validator2Bean bean = mapper.map(row, handler);
@@ -366,7 +366,7 @@ class MapperTest {
     void testValidationGroupsAnnotation() throws BeanException {
         // Given
         final Mapper<ValidatedGroupsBean, GroupType> mapper = factory.build(ValidatedGroupsBean.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "\t\n");
+        final InputRowEntity row = record(SegmentType.S00, "\t\n");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final ValidatedGroupsBean bean = mapper.map(row, handler);
@@ -388,7 +388,7 @@ class MapperTest {
     void testValidAnnotation() throws BeanException {
         // Given
         final Mapper<Validator1Bean, GroupType> mapper = factory.build(Validator1Bean.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "eTND");
+        final InputRowEntity row = record(SegmentType.S00, "eTND");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Validator1Bean bean = mapper.map(row, handler);
@@ -492,12 +492,28 @@ class MapperTest {
 
     @Test
     void testMapValidRecord() {
-        // WHEN
+        // When
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(RecordBean.class));
         // THEN
         assertEquals(RecordBean.class, thrown.getSource());
         assertEquals("class", thrown.getLocator());
         assertEquals("RecordBean[class] - record class is not allowed", thrown.getMessage());
+    }
+
+    @Test
+    void testValidRecursive1() throws BeanException {
+        // When
+        final Mapper<TestRecursive7OverrideSegment, GroupType> mapper = factory.build(TestRecursive7OverrideSegment.class);
+        // THEN
+        assertEquals(2, mapper.toCollection().size());
+    }
+
+    @Test
+    void testValidRecursive2() throws BeanException {
+        // When
+        final Mapper<TestRecursive8OverrideSegment, GroupType> mapper = factory.build(TestRecursive8OverrideSegment.class);
+        // THEN
+        assertEquals(3, mapper.toCollection().size());
     }
 
     @Test

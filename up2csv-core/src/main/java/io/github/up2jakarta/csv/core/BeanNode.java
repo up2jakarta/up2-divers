@@ -110,7 +110,7 @@ abstract class BeanNode<S extends Segment, D extends DataType<D>> implements Col
                     final Error config = p.field.getAnnotation(Error.class);
                     handler.handleEvent(p.dataType, p.offset + offset, v, config);
                 } else {
-                    handler.handleEvent(null, Integer.MAX_VALUE, v, null);
+                    handler.handleEvent(null, -1, v, null);
                 }
             }
         }

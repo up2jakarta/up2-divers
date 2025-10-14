@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2-divers</artifactId>
-        <version>1.5.1</version>
+        <version>1.5.2</version>
     </parent>
 
     <artifactId>up2cii-format</artifactId>
@@ -13,19 +13,6 @@
     <description>Framework for validating, reading and writing CII e-invoices</description>
     <url>https://github.com/up2jakarta/up2-divers/tree/master/up2cii-format</url>
 
-    <developers>
-        <developer>
-            <name>A.ABBESSI</name>
-            <email>up2Abbessi[at]gmail.com</email>
-            <roles>
-                <role>Software engineer</role>
-                <role>Developer Lead</role>
-                <role>Technical Lead</role>
-                <role>Application Architect</role>
-            </roles>
-            <url>https://up2jakarta.github.io/</url>
-        </developer>
-    </developers>
     <dependencies>
         <dependency>
             <groupId>io.github.up2jakarta</groupId>

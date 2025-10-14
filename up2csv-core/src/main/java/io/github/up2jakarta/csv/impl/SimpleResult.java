@@ -1,11 +1,11 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.api.hdl.IErrorCause;
+import io.github.up2jakarta.csv.api.IError;
 import io.github.up2jakarta.csv.data.Segment;
 
 import java.util.List;
 
-public final class SimpleResult<T extends Segment, E extends IErrorCause<?, ?>> {
+public final class SimpleResult<T extends Segment, E extends IError<?>> {
 
     private final T bean;
     private final List<E> errors;

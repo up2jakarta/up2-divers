@@ -1,13 +1,12 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.ops.impl.*;
-import io.github.up2jakarta.csv.test.Tests;
-import io.github.up2jakarta.csv.test.bean.xml.*;
-import io.github.up2jakarta.csv.test.clv.CurrencyCodeType;
-import io.github.up2jakarta.csv.test.clv.CurrencyConverter;
-import io.github.up2jakarta.csv.test.clv.TestCodeList;
-import io.github.up2jakarta.csv.test.clv.TestCodeListConverter;
+import io.github.up2jakarta.csv.core.misc.clv.CurrencyCodeType;
+import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
+import io.github.up2jakarta.csv.core.misc.clv.TestCodeList;
+import io.github.up2jakarta.csv.core.misc.clv.TestCodeListConverter;
+import io.github.up2jakarta.csv.core.misc.xml.*;
+import io.github.up2jakarta.csv.impl.*;
 import io.github.up2jakarta.xml.api.SeverityType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.github.up2jakarta.csv.ops.misc.Tests.record;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -61,7 +61,7 @@ public class XmlExtensionTest {
     void testDefaultErrors() throws BeanException {
         // Given
         final Mapper<Test1Bean, GroupType> mapper = factory.build(Test1Bean.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "11", "2", "33", "ILS", "ANY");
+        final InputRowEntity row = record(SegmentType.S00, "11", "2", "33", "ILS", "ANY");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test1Bean bean = mapper.map(row, handler);
@@ -116,7 +116,7 @@ public class XmlExtensionTest {
     void testOverrideErrors() throws BeanException {
         // Given
         final Mapper<Test2Bean, GroupType> mapper = factory.build(Test2Bean.class);
-        final InputRowEntity row = Tests.create(SegmentType.S00, "11", "22", "ILS", "ANY");
+        final InputRowEntity row = record(SegmentType.S00, "11", "22", "ILS", "ANY");
         // When
         final SimpleHandler handler = new SimpleHandler(row, creator);
         final Test2Bean bean = mapper.map(row, handler);

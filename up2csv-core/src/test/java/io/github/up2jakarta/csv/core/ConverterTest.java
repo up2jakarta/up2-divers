@@ -1,11 +1,11 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.ops.impl.*;
-import io.github.up2jakarta.csv.test.bean.converter.*;
-import io.github.up2jakarta.csv.test.clv.CountryCodeType;
-import io.github.up2jakarta.csv.test.clv.CurrencyCodeType;
-import io.github.up2jakarta.csv.test.clv.MeasurementUnitCode;
+import io.github.up2jakarta.csv.core.misc.clv.CountryCodeType;
+import io.github.up2jakarta.csv.core.misc.clv.CurrencyCodeType;
+import io.github.up2jakarta.csv.core.misc.clv.MeasurementUnitCode;
+import io.github.up2jakarta.csv.core.misc.cvr.*;
+import io.github.up2jakarta.csv.impl.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

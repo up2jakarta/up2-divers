@@ -5,7 +5,6 @@ import io.github.up2jakarta.xml.XContext;
 import io.github.up2jakarta.xml.api.XConfigurationException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.PropertyException;
-import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,7 +30,6 @@ public final class CII {
     public static final String XML_SCHEMA_RAM_NAMESPACE_URL = "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100";
     // CII XML Configuration
     public static final QName CII_QNAME = new QName(XML_SCHEMA_RSM_NAMESPACE_URL, "CrossIndustryInvoice");
-    public static final CollapsedStringAdapter TOKEN_ADAPTER = new CollapsedStringAdapter();
     // Offset configuration
     private static final String OFFSET_PATTERN = "+HHMM";
     private static final String DEFAULT_OFFSET = "+0000";

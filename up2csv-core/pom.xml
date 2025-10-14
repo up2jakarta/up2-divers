@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2-divers</artifactId>
-        <version>1.5.1</version>
+        <version>1.5.2</version>
     </parent>
 
     <artifactId>up2csv-core</artifactId>
@@ -15,26 +15,6 @@
         It is fully compatible with Jakarta Enterprise Edition (JEE) and Spring with zero non-standard dependencies.
     </description>
     <url>https://github.com/up2jakarta/up2-divers/tree/master/up2csv-core</url>
-
-    <developers>
-        <developer>
-            <name>A.ABBESSI</name>
-            <email>up2Abbessi[at]gmail.com</email>
-            <roles>
-                <role>Software engineer</role>
-                <role>Developer Lead</role>
-                <role>Technical Lead</role>
-                <role>Application Architect</role>
-            </roles>
-            <url>https://up2jakarta.github.io/</url>
-        </developer>
-    </developers>
-
-    <scm>
-        <connection>scm:git:git://github.com/up2jakarta/up2-divers.git</connection>
-        <developerConnection>scm:git:ssh://github.com/up2jakarta/up2-divers.git</developerConnection>
-        <url>https://github.com/up2jakarta/up2-divers.git</url>
-    </scm>
 
     <dependencies>
         <!-- Required API Dependencies -->
