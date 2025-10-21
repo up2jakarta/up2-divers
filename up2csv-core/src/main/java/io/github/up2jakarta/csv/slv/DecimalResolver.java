@@ -23,15 +23,14 @@ public final class DecimalResolver extends ConversionResolver<Up2Decimal> {
     }
 
     @Override
-    public PropertyConverter<? extends Number> forParsing(Up2Decimal config, Field property) throws BeanException {
-        final Class<?> pType = property.getType();
-        if (pType == BigDecimal.class) {
+    public PropertyConverter<? extends Number> forParsing(Up2Decimal config, Field property, Class<?> type) throws BeanException {
+        if (type == BigDecimal.class) {
             return v -> round(new BigDecimal(v), config);
         }
-        if (pType == Double.class || pType == double.class) {
+        if (type == Double.class || type == double.class) {
             return v -> round(new BigDecimal(v), config).doubleValue();
         }
-        if (pType == Float.class || pType == float.class) {
+        if (type == Float.class || type == float.class) {
             return v -> round(new BigDecimal(v), config).floatValue();
         }
         throw new BeanException(property, "must not be annotated by @Up2Decimal");

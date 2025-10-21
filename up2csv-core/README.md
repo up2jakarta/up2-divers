@@ -3,10 +3,12 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2csv-core?style=for-the-badge&color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2csv-core)
 
 - `Up2CSV` is an open-source, light and modern framework that maps and validates easily flat-data to javaBeans.
-- `Up2CSV` helps developers to parse `business-object` in the case of data is spread over `several` segments (`CSV` records).
+- `Up2CSV` helps developers to parse `business-object` in the case of data is spread over `several` segments (`CSV`
+  records).
 - `Up2CSV` comes with pre-build tools that support persist-able objects (`JPA`) or exportable like (`XML` or `JSON`).
 
-Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready entities` in single pass within `less-code` approach.
+Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready entities` in single pass within `less-code`
+approach.
 
 # Features
 
@@ -27,9 +29,9 @@ Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready enti
     - Input API
     - Conversion Extension API
     - Bean Checker API
-    - BusinessData Resolver API
-- Business Aggregation for multi-segments mapping
-- Business Segregation for multi-segments unmapping
+    - Business Data Definition and Resolver API
+- Format API for multi-segments import and export
+- Stream API for batch processing support
 
 # Dependencies
 
@@ -37,7 +39,7 @@ Shortly, `Up2CSV` is able to map complex objects from `flat-data` to `ready enti
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.5.2</version>
+        <version>1.5.3</version>
     </dependency>
     <!-- Optional JSR-303 Validation Provider -->
     <!-- Optional JPA Provider -->
@@ -294,7 +296,7 @@ public Up2Segment implements Segment {
 }
 ```
 
-## @Extension API
+## @Extension and @Checker API
 
 Up2 @Extension allows the resolution of the conversion function for one or more type for third-party annotation.
 
@@ -513,17 +515,30 @@ public TestSegment implements Segment {
 
 See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/impl)
 
+## Data Definition and Resolver API
+
+## Contract
+
+- [DataType.java](./src/main/java/io/github/up2jakarta/csv/data/DataType.java) base interface
+- [DataTypeResolver.java](./src/main/java/io/github/up2jakarta/csv/data/DataTypeResolver.java) base resolver
+
+## Simple implementation
+
+- [@Definition](./src/main/java/io/github/up2jakarta/csv/cfg/Definition.java) annotation based definition
+- [DataTypeResolver.dynamic()](./src/main/java/io/github/up2jakarta/csv/data/DataTypeResolver.java) for `@Definition`
+- [DataTypeResolver.empty()](./src/main/java/io/github/up2jakarta/csv/data/DataTypeResolver.java) NoOP implementation
+
 # Mapping of flat-data
 
 - Without error collecting (fail-fast)
 
 ``` java
 @Inject
-private MapperFactory factory;
+private Up2Factory<?> factory;
 
 public void test() {
     // GIVEN Singleton
-    final Mapper<Up2Segment> mapper = factory.build(Up2Segment.class);
+    final Up2Mapper<Up2Segment, ?> mapper = factory.build(Up2Segment.class);
     // WHEN
     final Up2Segment bean = mapper.map("Data 1", "Data 2", "Data n");
     // THEN
@@ -535,22 +550,16 @@ public void test() {
 
 ``` java
 @Inject
-private MapperFactory factory;
+private Up2Factory<?> factory;
 
-@Inject
-private IRepository<InputRowImpl> repository;
-
-@Inject
-private EventCreator<InputRowImpl, ?, InputErrorImpl> creator;
-
-public void process(final InputRowImpl row) {
+public void process(final PathRecord<?> row) {
     // GIVEN Singletons
-    final Mapper<Up2Segment> mapper = factory.build(Up2Segment.class);
+    final Up2Mapper<Up2Segment, ?> mapper = factory.build(Up2Segment.class);
     // GIVEN Prototypes
-    final EventCollector<InputRowImpl, ?, InputErrorImpl> handler = new EventCollectorImpl<>(row, creator, repository) ;
+    final PathCollector<?, ?> handler = new PathCollector<>(row) ;
     // WHEN
     final Up2Segment bean = mapper.map(row, handler);
-    final Collection<InputErrorImpl> errors = handler.toCollection();
+    final Collection<PathError<?, ?>> errors = handler.toCollection();
     // THEN
     // Here the bean is full-filled automatically
     // Here the errors is full-filled automatically 
@@ -562,18 +571,19 @@ public void process(final InputRowImpl row) {
 
 During the unmapping of java-bean:
 
-- The `Processor API` are not supported for String properties except the annotation `@Up2Default` without modifying the source.
+- The `Processor API` are not supported for String properties except the annotation `@Up2Default` without modifying the
+  source.
 - The JSR-303 validation is not supported because default values maybe are not supplied.
 - The formatting of properties are done with the same annotations for mapping aka `Resolver API`
 - The annotation `@Truncated` is supported
 
 ``` java
 @Inject
-private MapperFactory factory;
+private Up2Factory<?> factory;
 
 public void test() {
     // GIVEN Singleton
-    final Mapper<Up2Segment> mapper = factory.build(Up2Segment.class);
+    final Up2Format<Up2Segment, ?> mapper = factory.format(Up2Segment.class);
     final Up2Segment bean ; // ... full-fill the bean
     // WHEN
     final String[] data = mapper.unmap(bean);
@@ -582,20 +592,21 @@ public void test() {
 }
 ```
 
-# Business Aggregation & Segregation
+# Format API
 
 The final goal of `Up2CSV` is to parse and format `business objects` in case of data is spread over several segments.
 
-## Sample Business Case
+## Business Case
 
-It's impossible to present an invoice in standard CSV format because invoice should contain several items and each item:
+For example, it's impossible to present an invoice in standard CSV format because invoice should contain several items
+and each item:
 
 - Should reference a product and this product may have several attributes
 - Should have several charges or allowances
 - Should have several notes
 - and more
 
-## Problem
+## Technical Problem
 
 It's impossible to present a `business-property` within `0..n` cardinality
 
@@ -607,7 +618,43 @@ It's impossible to present a `business-property` within `0..n` cardinality
   simplify the validation.
 - And more depending on the `business-logic`
 
-See [Business Tests](src/test/java/io/github/up2jakarta/csv/ops/BusinessInvoiceTests.java) for more details.
+## Business Aggregation & Segregation
+
+- [BusinessExporter.java](src/main/java/io/github/up2jakarta/csv/core/BusinessExporter.java) to segregate and export
+  java-bean to flat-data
+    1. [FullExporter.java](src/main/java/io/github/up2jakarta/csv/fmt/FullExporter.java) for `FULL` mode
+    2. [FastExporter.java](src/main/java/io/github/up2jakarta/csv/fmt/FastExporter.java) for `FAST` mode
+    3. [UnitExporter.java](src/main/java/io/github/up2jakarta/csv/fmt/UnitExporter.java) for `UNIT` mode
+- [BusinessImporter.java](src/main/java/io/github/up2jakarta/csv/core/BusinessImporter.java) to aggregate and import
+  java-bean from flat-data
+    1. [FullImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/FullImporter.java) for `FULL` mode
+    2. [FastImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/FastImporter.java) for `FAST` mode
+    3. [UnitImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/UnitImporter.java) for `UNIT`mode
+- Simple Implementations
+    1. [SimpleFullImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/SimpleFullImporter.java) for `FULL` mode
+    2. [SimpleFastImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/SimpleFastImporter.java) for `FAST` mode
+    3. [SimpleUnitImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/SimpleUnitImporter.java) for `UNIT`mode
+
+## Use cases
+
+1. See [BusinessFullTests](src/test/java/io/github/up2jakarta/csv/fmt/BusinessFullTests.java) for `FULL` mode.
+2. See [BusinessFastTests](src/test/java/io/github/up2jakarta/csv/fmt/BusinessFastTests.java) for `FAST` mode.
+3. See [BusinessUnitTests](src/test/java/io/github/up2jakarta/csv/fmt/BusinessUnitTests.java) for `UNIT` mode.
+
+# Stream API (Batch processing)
+
+- [BusinessReader.java](src/main/java/io/github/up2jakarta/csv/core/BusinessReader.java) for stream inputs
+- [BusinessWriter.java](src/main/java/io/github/up2jakarta/csv/core/BusinessWriter.java) for stream outputs
+    1. [FullWriter.java](src/main/java/io/github/up2jakarta/csv/fmt/FullWriter.java) for `FULL` mode
+    2. [FastWriter.java](src/main/java/io/github/up2jakarta/csv/fmt/FastWriter.java) for `FAST` mode
+
+> :warning: `ModeType.UNIT` is not supported for batch processing
+>
+> It's used only for unitary processing with Publish/Subscribe systems like JMS Queues or Kafka topics
+>
+> It's developed for best compacted data as an alternative of XML or JSON formats
+
+See [up2csv-format](../up2csv-format/README.md) for CSV files implementation.
 
 # Best practices
 

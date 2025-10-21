@@ -17,12 +17,11 @@ import java.time.temporal.TemporalAmount;
 public final class TemporalAmountResolver extends ConversionResolver<Up2TemporalAmount> {
 
     @Override
-    public PropertyConverter<? extends TemporalAmount> forParsing(Up2TemporalAmount config, Field property) throws BeanException {
-        final Class<?> fieldType = property.getType();
-        if (fieldType == Period.class) {
+    public PropertyConverter<? extends TemporalAmount> forParsing(Up2TemporalAmount config, Field property, Class<?> type) throws BeanException {
+        if (type == Period.class) {
             return Period::parse;
         }
-        if (fieldType == Duration.class) {
+        if (type == Duration.class) {
             return Duration::parse;
         }
         throw new BeanException(property, "must not be annotated by @Up2TemporalAmount");

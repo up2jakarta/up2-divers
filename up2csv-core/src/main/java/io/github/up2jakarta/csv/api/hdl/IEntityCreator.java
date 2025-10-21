@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.api.hdl;
 
-import io.github.up2jakarta.csv.core.Errors;
-import io.github.up2jakarta.csv.core.Mapper;
+import io.github.up2jakarta.csv.core.Up2Mapper;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.clv.PropertyException;
@@ -9,6 +8,8 @@ import io.github.up2jakarta.xml.clv.PropertyException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Optional;
+
+import static io.github.up2jakarta.csv.core.EventHandler.stackTrace;
 
 /**
  * Input Event {@link IErrorEntity} that is responsible for create the final Event to be collected during the mapping/parsing,
@@ -18,33 +19,29 @@ import java.util.Optional;
  * @param <D> the data type
  * @param <E> the error type
  */
-public interface IEntityCreator<R extends IRecordEntity<?, ?, ?>, D extends DataType<D>, E extends IErrorEntity<R, ?, D>> extends IErrorCreator<R, D, E> {
+public interface IEntityCreator<R extends IRecordEntity<?, ?, ?>, D extends DataType<D>, E extends IErrorEntity<R, ?, D>> {
 
     static Optional<String> trace(PropertyException cause) {
         return Optional.ofNullable(cause.getCause()).map(c -> {
             final StringWriter writer = new StringWriter();
-            Errors.stackTrace(c, Mapper.class, new PrintWriter(writer));
+            stackTrace(Up2Mapper.class, c, new PrintWriter(writer));
             return writer.toString().trim();
         });
-    }
-
-    @Override
-    default E create(R row, int offset, D type, PropertyException cause) {
-        return create(row, offset, type, cause.getSeverity(), cause.getCode(), cause.getMessage(), trace(cause));
     }
 
     /**
      * Create and return the input error that is being full-filled from the given arguments.
      *
-     * @param row     the input row source
-     * @param level   the error severity
-     * @param offset  the input index
-     * @param code    the error code
-     * @param message the error message
-     * @param trace   the stack trace of the cause exception
+     * @param row   the input row source
+     * @param order the error order
+     * @param type  the input data type
+     * @param index the input data index
+     * @param level the error severity
+     * @param code  the error code
+     * @param msg   the error message
+     * @param trace the stack trace of the cause exception
      * @return the full-filled input error
      */
-    E create(R row, int offset, D type, SeverityType level, String code, String message, Optional<String> trace);
-
+    E create(R row, int order, D type, int index, SeverityType level, String code, String msg, Optional<String> trace);
 
 }

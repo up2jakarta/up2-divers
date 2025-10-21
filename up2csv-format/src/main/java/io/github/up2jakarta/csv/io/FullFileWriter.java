@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.data.BusinessObject;
-import io.github.up2jakarta.csv.ops.FullAggregator;
-import io.github.up2jakarta.csv.ops.FullSeparator;
-import io.github.up2jakarta.csv.ops.FullWriter;
+import io.github.up2jakarta.csv.core.ModeType;
+import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.fmt.FullExporter;
+import io.github.up2jakarta.csv.fmt.FullWriter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -15,25 +15,19 @@ import java.util.function.Supplier;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Base CSV file {@link io.github.up2jakarta.csv.ops.ModeType#FULL} writer implementation.
+ * Base CSV file {@link ModeType#FULL} writer implementation.
  *
  * @param <T> the business object type
  */
-public class FullFileWriter<T extends BusinessObject> extends FullWriter<T> {
+public class FullFileWriter<T extends Referencable> extends FullWriter<T> {
 
     private final CSVFormat format;
 
     private CSVPrinter printer;
     private FileWriter writer;
 
-    protected FullFileWriter(FullAggregator<T, ?, ?, ?, ?> processor, CSVFormat format, Supplier<String> generator) {
-        super(processor, generator);
-        this.format = format;
-    }
-
-    @SuppressWarnings("unused")
-    protected FullFileWriter(FullSeparator<T, ?, ?> processor, CSVFormat format, Supplier<String> generator) {
-        super(processor, generator);
+    public FullFileWriter(FullExporter<T, ?, ?> exporter, CSVFormat format, Supplier<String> generator) {
+        super(exporter, generator);
         this.format = format;
     }
 

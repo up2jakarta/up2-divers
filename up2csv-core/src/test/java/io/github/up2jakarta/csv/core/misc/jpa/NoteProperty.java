@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.core.misc.jpa;
 
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.cfg.Required;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.clv.CodeList;
 import jakarta.persistence.Embeddable;
@@ -11,8 +10,7 @@ import jakarta.validation.constraints.NotNull;
 @SuppressWarnings("unused")
 public class NoteProperty<C extends CodeList<C>> implements Segment {
 
-    @Position(0)
-    @Required
+    @Position(value = 0, required = true)
     private String value;
 
     @Position(1)

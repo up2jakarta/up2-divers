@@ -13,37 +13,35 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collection;
 
-import static io.github.up2jakarta.csv.ops.misc.Tests.record;
+import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
 class ErrorCreatorTest {
 
-    private final SimpleCreator creator;
-    private final MapperFactory<GroupType> factory;
+    private final Up2Factory<GroupType> factory;
 
     @Autowired
-    ErrorCreatorTest(MapperFactory<GroupType> factory, SimpleCreator creator) {
+    ErrorCreatorTest(Up2Factory<GroupType> factory) {
         this.factory = factory;
-        this.creator = creator;
     }
 
     @Test
     void testOneShot() throws BeanException {
         // Given
-        final Mapper<Validator1Bean, GroupType> mapper = factory.build(Validator1Bean.class);
-        final InputRowEntity row = record(SegmentType.S00, "eTND");
+        final Up2Mapper<Validator1Bean, GroupType> mapper = factory.build(Validator1Bean.class);
+        final InputRecord row = record(SegmentType.S00, "eTND");
         // When
-        final SimpleHandler handler = new SimpleHandler(row, creator);
+        final InputCollector handler = new InputCollector(row);
         final Validator1Bean bean = mapper.map(row, handler);
-        final Collection<InputErrorEntity> errors = handler.toCollection();
+        final Collection<InputError> errors = handler.toCollection();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
         assertEquals(1, errors.size());
         // Then Error
-        final InputErrorEntity error = errors.iterator().next();
+        final InputError error = errors.iterator().next();
         assertSame(row, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
         assertEquals(SeverityType.ERROR, error.getSeverity());

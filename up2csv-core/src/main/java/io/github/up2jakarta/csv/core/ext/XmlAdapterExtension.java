@@ -3,7 +3,6 @@ package io.github.up2jakarta.csv.core.ext;
 import io.github.up2jakarta.csv.api.ext.*;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.Errors;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.clv.PropertyException;
@@ -18,8 +17,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
-import static io.github.up2jakarta.csv.core.Beans.getBean;
-import static io.github.up2jakarta.csv.core.Beans.getTypeArguments;
+import static io.github.up2jakarta.csv.core.EventHandler.ERROR_XML_ENUM;
+import static io.github.up2jakarta.csv.core.ext.Beans.getBean;
+import static io.github.up2jakarta.csv.core.ext.Beans.getTypeArguments;
 
 /**
  * {@link XmlType} extension that supports {@link XmlJavaTypeAdapter}.
@@ -76,7 +76,7 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
                 return adapter.marshal(v);
             } catch (Exception ex) {
                 final SeverityType severityType = error.map(Error::severity).orElse(SeverityType.ERROR);
-                final String code = error.map(Error::value).orElse(Errors.ERROR_XML_ENUM);
+                final String code = error.map(Error::value).orElse(ERROR_XML_ENUM);
                 throw PropertyException.of(severityType, code, ex);
             }
         };

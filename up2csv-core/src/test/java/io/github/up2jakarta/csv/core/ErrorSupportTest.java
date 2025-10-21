@@ -21,40 +21,38 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.Errors.*;
-import static io.github.up2jakarta.csv.core.MapperExceptionTest.DUMMY;
-import static io.github.up2jakarta.csv.ops.misc.Tests.ERROR_CODE;
-import static io.github.up2jakarta.csv.ops.misc.Tests.record;
+import static io.github.up2jakarta.csv.core.EventHandler.*;
+import static io.github.up2jakarta.csv.core.Up2ErrorTests.DUMMY;
+import static io.github.up2jakarta.csv.fmt.misc.Tests.ERROR_CODE;
+import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
 public class ErrorSupportTest {
 
-    private final SimpleCreator creator;
-    private final MapperFactory<GroupType> factory;
+    private final Up2Factory<GroupType> factory;
 
     @Autowired
-    ErrorSupportTest(MapperFactory<GroupType> factory, SimpleCreator creator) {
+    ErrorSupportTest(Up2Factory<GroupType> factory) {
         this.factory = factory;
-        this.creator = creator;
     }
 
     @Test
     void testProcessorWithoutError() throws BeanException {
         // Given
-        final Mapper<Test3Processor, GroupType> mapper = factory.build(Test3Processor.class);
-        final InputRowEntity row = record(SegmentType.S00, "property", "dummy");
+        final Up2Mapper<Test3Processor, GroupType> mapper = factory.build(Test3Processor.class);
+        final InputRecord row = record(SegmentType.S00, "property", "dummy");
         // When
-        final SimpleHandler handler = new SimpleHandler(row, creator);
+        final InputCollector handler = new InputCollector(row);
         final Test3Processor bean = mapper.map(row, handler);
-        final List<InputErrorEntity> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = new ArrayList<>(handler.toCollection());
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
         assertEquals(2, errors.size());
         {
-            final InputErrorEntity error = errors.getFirst();
+            final InputError error = errors.getFirst();
             assertSame(row, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
             assertEquals(0, error.getOffset());
@@ -64,7 +62,7 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(1);
+            final InputError error = errors.get(1);
             assertSame(row, error.getKey().getRecord());
             assertEquals(1, error.getKey().getOrder());
             assertEquals(1, error.getOffset());
@@ -78,18 +76,18 @@ public class ErrorSupportTest {
     @Test
     void testProcessorWithinError() throws BeanException {
         // Given
-        final Mapper<Test4Processor, GroupType> mapper = factory.build(Test4Processor.class);
-        final InputRowEntity row = record(SegmentType.S00, "property", "dummy");
+        final Up2Mapper<Test4Processor, GroupType> mapper = factory.build(Test4Processor.class);
+        final InputRecord row = record(SegmentType.S00, "property", "dummy");
         // When
-        final SimpleHandler handler = new SimpleHandler(row, creator);
+        final InputCollector handler = new InputCollector(row);
         final Test4Processor bean = mapper.map(row, handler);
-        final List<InputErrorEntity> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = new ArrayList<>(handler.toCollection());
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
         assertEquals(2, errors.size());
         {
-            final InputErrorEntity error = errors.getFirst();
+            final InputError error = errors.getFirst();
             assertSame(row, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
             assertEquals(0, error.getOffset());
@@ -99,7 +97,7 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(1);
+            final InputError error = errors.get(1);
             assertSame(row, error.getKey().getRecord());
             assertEquals(1, error.getKey().getOrder());
             assertEquals(1, error.getOffset());
@@ -113,18 +111,18 @@ public class ErrorSupportTest {
     @Test
     void testConverterWithoutError() throws BeanException {
         // Given
-        final Mapper<Test1Converter, GroupType> mapper = factory.build(Test1Converter.class);
-        final InputRowEntity row = record(SegmentType.S00, "ILS", "int");
+        final Up2Mapper<Test1Converter, GroupType> mapper = factory.build(Test1Converter.class);
+        final InputRecord row = record(SegmentType.S00, "ILS", "int");
         // When
-        final SimpleHandler handler = new SimpleHandler(row, creator);
+        final InputCollector handler = new InputCollector(row);
         final Test1Converter bean = mapper.map(row, handler);
-        final List<InputErrorEntity> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = new ArrayList<>(handler.toCollection());
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
         assertEquals(2, errors.size());
         {
-            final InputErrorEntity error = errors.getFirst();
+            final InputError error = errors.getFirst();
             assertSame(row, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
             assertEquals(0, error.getOffset());
@@ -134,7 +132,7 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(1);
+            final InputError error = errors.get(1);
             assertSame(row, error.getKey().getRecord());
             assertEquals(1, error.getKey().getOrder());
             assertEquals(1, error.getOffset());
@@ -148,18 +146,18 @@ public class ErrorSupportTest {
     @Test
     void testConverterWithinError() throws BeanException {
         // Given
-        final Mapper<Test2Converter, GroupType> mapper = factory.build(Test2Converter.class);
-        final InputRowEntity row = record(SegmentType.S00, "ILS", "int");
+        final Up2Mapper<Test2Converter, GroupType> mapper = factory.build(Test2Converter.class);
+        final InputRecord row = record(SegmentType.S00, "ILS", "int");
         // When
-        final SimpleHandler handler = new SimpleHandler(row, creator);
+        final InputCollector handler = new InputCollector(row);
         final Test2Converter bean = mapper.map(row, handler);
-        final List<InputErrorEntity> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = new ArrayList<>(handler.toCollection());
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
         assertEquals(2, errors.size());
         {
-            final InputErrorEntity error = errors.getFirst();
+            final InputError error = errors.getFirst();
             assertSame(row, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
             assertEquals(0, error.getOffset());
@@ -169,7 +167,7 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(1);
+            final InputError error = errors.get(1);
             assertSame(row, error.getKey().getRecord());
             assertEquals(1, error.getKey().getOrder());
             assertEquals(1, error.getOffset());
@@ -183,18 +181,18 @@ public class ErrorSupportTest {
     @Test
     void testResolverWithoutError() throws BeanException {
         // Given
-        final Mapper<Test1Resolver, GroupType> mapper = factory.build(Test1Resolver.class);
-        final InputRowEntity row = record(SegmentType.S00, "ISL", "XGM", "XPT24H");
+        final Up2Mapper<Test1Resolver, GroupType> mapper = factory.build(Test1Resolver.class);
+        final InputRecord row = record(SegmentType.S00, "ISL", "XGM", "XPT24H");
         // When
-        final SimpleHandler handler = new SimpleHandler(row, creator);
+        final InputCollector handler = new InputCollector(row);
         final Test1Resolver bean = mapper.map(row, handler);
-        final List<InputErrorEntity> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = new ArrayList<>(handler.toCollection());
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
         assertEquals(3, errors.size());
         {
-            final InputErrorEntity error = errors.getFirst();
+            final InputError error = errors.getFirst();
             assertSame(row, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
             assertEquals(0, error.getOffset());
@@ -204,7 +202,7 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(1);
+            final InputError error = errors.get(1);
             assertSame(row, error.getKey().getRecord());
             assertEquals(1, error.getKey().getOrder());
             assertEquals(1, error.getOffset());
@@ -214,7 +212,7 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(2);
+            final InputError error = errors.get(2);
             assertSame(row, error.getKey().getRecord());
             assertEquals(2, error.getKey().getOrder());
             assertEquals(2, error.getOffset());
@@ -228,18 +226,18 @@ public class ErrorSupportTest {
     @Test
     void testResolverWithinError() throws BeanException {
         // Given
-        final Mapper<Test2Resolver, GroupType> mapper = factory.build(Test2Resolver.class);
-        final InputRowEntity row = record(SegmentType.S00, "date", "duration");
+        final Up2Mapper<Test2Resolver, GroupType> mapper = factory.build(Test2Resolver.class);
+        final InputRecord row = record(SegmentType.S00, "date", "duration");
         // When
-        final SimpleHandler handler = new SimpleHandler(row, creator);
+        final InputCollector handler = new InputCollector(row);
         final Test2Resolver bean = mapper.map(row, handler);
-        final List<InputErrorEntity> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = new ArrayList<>(handler.toCollection());
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
         assertEquals(2, errors.size());
         {
-            final InputErrorEntity error = errors.getFirst();
+            final InputError error = errors.getFirst();
             assertSame(row, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
             assertEquals(0, error.getOffset());
@@ -249,7 +247,7 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(1);
+            final InputError error = errors.get(1);
             assertSame(row, error.getKey().getRecord());
             assertEquals(1, error.getKey().getOrder());
             assertEquals(1, error.getOffset());
@@ -263,21 +261,20 @@ public class ErrorSupportTest {
     @Test
     void testValidatorWithoutError() throws BeanException {
         // Given
-        final Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class);
-        final InputRowEntity row = record(SegmentType.S00, "+1", "101", "", null, "-1");
+        final Up2Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class);
+        final InputRecord row = record(SegmentType.S00, "+1", "101", "", null, "-1");
         // When
-        final SimpleHandler handler = new SimpleHandler(row, creator);
+        final InputCollector handler = new InputCollector(row);
         final Test1Validator bean = mapper.map(row, handler);
-        final List<InputErrorEntity> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = new ArrayList<>(handler.toCollection());
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
-        errors.sort(Comparator.comparingInt(InputErrorEntity::getOffset));
+        errors.sort(Comparator.comparingInt(InputError::getOffset));
         assertEquals(7, errors.size());
         {
-            final InputErrorEntity error = errors.getFirst();
+            final InputError error = errors.getFirst();
             assertSame(row, error.getKey().getRecord());
-            assertNotNull(error.getKey().getOrder());
             assertEquals(0, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getSeverity());
             assertEquals(ERROR_VALIDATOR, error.getCode());
@@ -285,9 +282,8 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(1);
+            final InputError error = errors.get(1);
             assertSame(row, error.getKey().getRecord());
-            assertNotNull(error.getKey().getOrder());
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(ERROR_VALIDATOR, error.getCode());
@@ -295,9 +291,8 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(2);
+            final InputError error = errors.get(2);
             assertSame(row, error.getKey().getRecord());
-            assertNotNull(error.getKey().getOrder());
             assertEquals(2, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(ERROR_VALIDATOR, error.getCode());
@@ -305,9 +300,8 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(3);
+            final InputError error = errors.get(3);
             assertSame(row, error.getKey().getRecord());
-            assertNotNull(error.getKey().getOrder());
             assertEquals(3, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(ERROR_VALIDATOR, error.getCode());
@@ -315,9 +309,8 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(4);
+            final InputError error = errors.get(4);
             assertSame(row, error.getKey().getRecord());
-            assertNotNull(error.getKey().getOrder());
             assertEquals(4, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Up2Warn.TU_P_011, error.getCode());
@@ -325,9 +318,8 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(5);
+            final InputError error = errors.get(5);
             assertSame(row, error.getKey().getRecord());
-            assertNotNull(error.getKey().getOrder());
             assertEquals(5, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(ERROR_CODE, error.getCode());
@@ -335,9 +327,8 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(6);
+            final InputError error = errors.get(6);
             assertSame(row, error.getKey().getRecord());
-            assertNotNull(error.getKey().getOrder());
             assertEquals(6, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Up2Warn.TU_P_011, error.getCode());
@@ -349,21 +340,20 @@ public class ErrorSupportTest {
     @Test
     void testValidatorWithinError() throws BeanException {
         // Given
-        final Mapper<Test2Validator, GroupType> mapper = factory.build(Test2Validator.class);
-        final InputRowEntity row = record(SegmentType.S00, "", null);
+        final Up2Mapper<Test2Validator, GroupType> mapper = factory.build(Test2Validator.class);
+        final InputRecord row = record(SegmentType.S00, "", null);
         // When
-        final SimpleHandler handler = new SimpleHandler(row, creator);
+        final InputCollector handler = new InputCollector(row);
         final Test2Validator bean = mapper.map(row, handler);
-        final List<InputErrorEntity> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = new ArrayList<>(handler.toCollection());
         // Then
         assertNotNull(errors);
-        errors.sort(Comparator.comparingInt(InputErrorEntity::getOffset));
+        errors.sort(Comparator.comparingInt(InputError::getOffset));
         assertNotNull(bean);
         assertEquals(3, errors.size());
         {
-            final InputErrorEntity error = errors.getFirst();
+            final InputError error = errors.getFirst();
             assertSame(row, error.getKey().getRecord());
-            assertNotNull(error.getKey().getOrder());
             assertEquals(0, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Test2Validator.TU_P_009, error.getCode());
@@ -371,9 +361,8 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(1);
+            final InputError error = errors.get(1);
             assertSame(row, error.getKey().getRecord());
-            assertNotNull(error.getKey().getOrder());
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Test2Validator.TU_P_010, error.getCode());
@@ -381,9 +370,8 @@ public class ErrorSupportTest {
             assertNull(error.getTrace());
         }
         {
-            final InputErrorEntity error = errors.get(2);
+            final InputError error = errors.get(2);
             assertSame(row, error.getKey().getRecord());
-            assertNotNull(error.getKey().getOrder());
             assertEquals(2, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getSeverity());
             assertEquals(Test2Validator.TU_P_021, error.getCode());

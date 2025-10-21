@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.io.dto;
 
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.cfg.Required;
 import io.github.up2jakarta.csv.cfg.Up2Number;
 import io.github.up2jakarta.csv.data.ParentId;
 import io.github.up2jakarta.csv.data.Segment;
@@ -23,9 +22,8 @@ public class Attribute implements Segment {
     @NotEmpty
     private String key;
 
-    @Position(2)
+    @Position(value = 2, required = true)
     @NotEmpty
-    @Required
     private String value;
 
     public String getKey() {

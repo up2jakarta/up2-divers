@@ -1,13 +1,16 @@
 package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.MapperFactory;
+import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.fmt.FullImporter;
+import io.github.up2jakarta.csv.fmt.hdl.Fixed08Generator;
+import io.github.up2jakarta.csv.fmt.hdl.PathSource;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
-import io.github.up2jakarta.csv.io.misc.*;
-import io.github.up2jakarta.csv.ops.Fixed08Generator;
-import io.github.up2jakarta.csv.ops.FullAggregator;
+import io.github.up2jakarta.csv.io.misc.AFullTests;
+import io.github.up2jakarta.csv.io.misc.InputError;
+import io.github.up2jakarta.csv.io.misc.InputRecord;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,32 +24,26 @@ import static io.github.up2jakarta.csv.io.impl.SegmentType.S01;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class FullInvoiceTests extends AFullTests<FullAggregator<Invoice, GroupType, SegmentType, InputRowEntity, InputErrorEntity>> {
+public class FullInvoiceTests extends AFullTests<InputRecord, FullImporter<Invoice, GroupType, SegmentType, InputRecord, InputError>> {
 
     @Autowired
-    FullInvoiceTests(MapperFactory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
-        super(factory.builder().full(Invoice.class).full(S01).build(InputHandler::create, (r) -> 0), format);
+    FullInvoiceTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
+        super(factory.builder().full(Invoice.class).build(S01).build(InputError::new, (r) -> 0), format);
     }
 
     @Override
-    protected FullFileWriter<Invoice> writer(FullAggregator<Invoice, GroupType, SegmentType, InputRowEntity, InputErrorEntity> aggregator, CSVFormat format) {
-        return new FullFileWriter<>(aggregator, format, new Fixed08Generator());
+    protected FullFileWriter<Invoice> writer(FullImporter<Invoice, GroupType, SegmentType, InputRecord, InputError> importer, CSVFormat format) throws BeanException {
+        return new FullFileWriter<>(importer.toExporter(), format, new Fixed08Generator());
     }
 
     @Override
-    protected FullFileReader<Invoice, GroupType, SegmentType, InputFileEntity, InputRowEntity, InputErrorEntity> reader(
-            FullAggregator<Invoice, GroupType, SegmentType, InputRowEntity, InputErrorEntity> aggregator, CSVFormat format
+    protected FullFileReader<Invoice, GroupType, SegmentType, PathSource, InputRecord, InputError> reader(
+            FullImporter<Invoice, GroupType, SegmentType, InputRecord, InputError> importer, CSVFormat format
     ) {
-        return new FullFileReader<>(aggregator, format, "-") {
+        return new FullFileReader<>(importer, format, "-") {
             @Override
-            protected InputRowEntity create(String recordId, SegmentType type, String beanId, String[] data) {
-                final InputRowEntity result = new InputRowEntity();
-                result.setReference(recordId);
-                result.setKey(new InputRowEntity.PKey());
-                result.setType(type);
-                result.setBusinessReference(beanId);
-                result.setColumns(data);
-                return result;
+            protected InputRecord create(long lineId, String recordId, SegmentType type, String beanId, String[] data) {
+                return new InputRecord(this.getSource(), lineId, recordId, type, beanId, data);
             }
         };
     }

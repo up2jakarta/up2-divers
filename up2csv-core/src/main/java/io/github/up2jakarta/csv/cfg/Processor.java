@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 public @interface Processor {
 
     /**
-     * The processor class must be à managed by {@link BeanContext}.
+     * The processor class must be managed by {@link BeanContext}.
      *
      * @return the class of the processor
      */

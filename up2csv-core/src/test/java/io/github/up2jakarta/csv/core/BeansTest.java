@@ -5,7 +5,7 @@ import io.github.up2jakarta.csv.core.misc.clv.CurrencyCodeType;
 import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
 import io.github.up2jakarta.csv.core.misc.cvr.SupportEntity;
 import io.github.up2jakarta.csv.data.Recordable;
-import io.github.up2jakarta.csv.impl.InputRowEntity;
+import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.xml.clv.CodeListConverter;
 import jakarta.persistence.AttributeConverter;
@@ -16,7 +16,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.Beans.getTypeArguments;
+import static io.github.up2jakarta.csv.core.ext.Beans.getTypeArguments;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -107,7 +107,7 @@ class BeansTest {
         final Type[] arguments = getTypeArguments(beanType, Recordable.class);
         // Then
         assertEquals(SegmentType.class, arguments[0]);
-        assertEquals(InputRowEntity.class, arguments[1]);
+        assertEquals(InputRecord.class, arguments[1]);
     }
 
     @Test

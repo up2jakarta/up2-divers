@@ -5,8 +5,6 @@ import io.github.up2jakarta.csv.data.DataType;
 @SuppressWarnings("unused")
 public enum GroupType implements DataType<GroupType> {
 
-    NONE("0000", "Dummy", 0, N),
-
     D001("0001", "Invoice", 1, 1),
     D002("0002", "Seller", 1, 1),
     D003("0003", "Buyer", 1, 1),

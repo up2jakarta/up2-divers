@@ -3,7 +3,6 @@ package io.github.up2jakarta.csv.core.ext;
 import io.github.up2jakarta.csv.api.ext.*;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.Errors;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.clv.PropertyException;
@@ -18,6 +17,7 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static io.github.up2jakarta.csv.core.EventHandler.ERROR_XML_ENUM;
 import static java.util.Arrays.stream;
 
 /**
@@ -104,7 +104,7 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
         check(property, enumType, Enum::name);
         final Optional<Error> error = ConversionResolver.getError(property);
         final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);
-        final String code = error.map(Error::value).orElse(Errors.ERROR_XML_ENUM);
+        final String code = error.map(Error::value).orElse(ERROR_XML_ENUM);
         if (EnumType.STRING == config.value()) {
             //noinspection unchecked
             return ofName(enumType, error, type, code);

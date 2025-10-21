@@ -26,19 +26,9 @@ public interface IRecordEntity<T extends IFullType<?, T>, S extends ISourceEntit
         Long getRecordNumber();
 
         /**
-         * @param order the record order in the related input source
-         */
-        void setRecordNumber(Long order);
-
-        /**
          * @return the related input source
          */
         F getSource();
-
-        /**
-         * @param source the input source
-         */
-        void setSource(F source);
 
     }
 

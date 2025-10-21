@@ -2,11 +2,12 @@ package io.github.up2jakarta.csv.core.misc.prc;
 
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.core.Errors;
 import io.github.up2jakarta.csv.core.misc.ext.Dummy1Processor;
 import io.github.up2jakarta.csv.core.misc.ext.Dummy3;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.api.SeverityType;
+
+import static io.github.up2jakarta.csv.core.EventHandler.ERROR_PROCESSOR;
 
 @SuppressWarnings("unused")
 public class Test3Processor implements Segment {
@@ -18,7 +19,7 @@ public class Test3Processor implements Segment {
 
     @Position(1)
     @Dummy3
-    @Error(value = Errors.ERROR_PROCESSOR, severity = SeverityType.WARNING)
+    @Error(value = ERROR_PROCESSOR, severity = SeverityType.WARNING)
     private String other;
 
     public String getTest() {

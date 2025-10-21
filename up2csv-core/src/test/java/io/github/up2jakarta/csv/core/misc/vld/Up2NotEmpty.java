@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.core.misc.vld;
 
 import io.github.up2jakarta.csv.cfg.Error;
-import io.github.up2jakarta.csv.ops.misc.Tests;
+import io.github.up2jakarta.csv.fmt.misc.Tests;
 import io.github.up2jakarta.xml.api.SeverityType;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

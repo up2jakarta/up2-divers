@@ -29,12 +29,7 @@ public interface IErrorEntity<R extends IRecordEntity<?, ?, ?>, K extends IKey<R
         /**
          * @return the computed order by record
          */
-        Integer getOrder();
-
-        /**
-         * @param order the error order in the list of errors related th the row
-         */
-        void setOrder(Integer order);
+        int getOrder();
 
         /**
          * @return the related input record

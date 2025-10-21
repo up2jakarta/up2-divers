@@ -1,5 +1,6 @@
 package io.github.up2jakarta.csv.data;
 
+import io.github.up2jakarta.csv.cfg.Definition;
 import io.github.up2jakarta.csv.core.BeanException;
 
 import java.lang.reflect.Field;
@@ -24,6 +25,19 @@ public abstract class DataTypeResolver<D extends DataType<D>> {
         return new DataTypeResolver<>(type) {
             @Override
             public Optional<D> get(Stack<Class<? extends Segment>> stack, Field[] path, Field field) {
+                return Optional.empty();
+            }
+        };
+    }
+
+    public static DataTypeResolver<DynamicType> dynamic() {
+        return new DataTypeResolver<>(DynamicType.class) {
+            @Override
+            public Optional<DynamicType> get(Stack<Class<? extends Segment>> stack, Field[] path, Field field) {
+                final Definition def = field.getAnnotation(Definition.class);
+                if (def != null) {
+                    return Optional.of(new DynamicType(def.code(), def.value()));
+                }
                 return Optional.empty();
             }
         };

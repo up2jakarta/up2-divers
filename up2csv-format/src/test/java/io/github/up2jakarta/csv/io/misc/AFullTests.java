@@ -1,13 +1,15 @@
 package io.github.up2jakarta.csv.io.misc;
 
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.ModeType;
+import io.github.up2jakarta.csv.fmt.FullImporter;
+import io.github.up2jakarta.csv.fmt.hdl.PathRecord;
+import io.github.up2jakarta.csv.fmt.hdl.PathSource;
 import io.github.up2jakarta.csv.io.FullFileReader;
 import io.github.up2jakarta.csv.io.FullFileWriter;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
-import io.github.up2jakarta.csv.ops.FullAggregator;
-import io.github.up2jakarta.csv.ops.ModeType;
 import org.apache.commons.csv.CSVFormat;
 
 import java.io.IOException;
@@ -16,27 +18,25 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public abstract class AFullTests<A extends FullAggregator<Invoice, GroupType, SegmentType, InputRowEntity, InputErrorEntity>> extends ABusinessTest<InputRowEntity> {
+public abstract class AFullTests<R extends PathRecord<SegmentType>, A extends FullImporter<Invoice, GroupType, SegmentType, R, ?>> extends ABusinessTest<R> {
 
     private final FullFileWriter<Invoice> writer;
-    private final FullFileReader<Invoice, GroupType, SegmentType, InputFileEntity, InputRowEntity, ?> reader1;
-    private final FullFileReader<Invoice, GroupType, SegmentType, InputFileEntity, InputRowEntity, ?> reader2;
+    private final FullFileReader<Invoice, GroupType, SegmentType, PathSource, R, ?> reader1;
+    private final FullFileReader<Invoice, GroupType, SegmentType, PathSource, R, ?> reader2;
 
-    protected AFullTests(A aggregator, CSVFormat format) throws IOException {
+    protected AFullTests(A importer, CSVFormat format) throws IOException, BeanException {
         super(ModeType.FULL, format);
-        this.reader1 = this.reader(aggregator, format);
-        this.reader2 = this.reader(aggregator, format);
-        this.writer = this.writer(aggregator, format);
+        this.reader1 = this.reader(importer, format);
+        this.reader2 = this.reader(importer, format);
+        this.writer = this.writer(importer, format);
     }
 
-    protected abstract FullFileWriter<Invoice> writer(A aggregator, CSVFormat format);
+    protected abstract FullFileWriter<Invoice> writer(A importer, CSVFormat format) throws BeanException;
 
-    protected abstract FullFileReader<Invoice, GroupType, SegmentType, InputFileEntity, InputRowEntity, InputErrorEntity> reader(
-            A aggregator, CSVFormat format
-    );
+    protected abstract FullFileReader<Invoice, GroupType, SegmentType, PathSource, R, ?> reader(A importer, CSVFormat format);
 
     @Override
-    final void assertRecord(InputRowEntity data, InputRowEntity source) {
+    final void assertRecord(R data, R source) {
         assertNotNull(source.getReference());
         assertNotNull(source.getKey());
         assertNotNull(source.getKey().getSource());
@@ -48,8 +48,8 @@ public abstract class AFullTests<A extends FullAggregator<Invoice, GroupType, Se
         // GIVEN
         final Path filePath = this.input(size);
         final Path copyPath = this.output(filePath);
-        final InputFileEntity fileSource = new InputFileEntity(filePath);
-        final InputFileEntity copySource = new InputFileEntity(copyPath);
+        final PathSource fileSource = new PathSource("TU", filePath);
+        final PathSource copySource = new PathSource("TU", copyPath);
         // WHEN
         reader1.open(filePath.toFile(), fileSource);
         writer.open(copyPath.toFile());

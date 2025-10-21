@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.io.misc;
 
-import io.github.up2jakarta.csv.ops.ModeType;
+import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.xml.adapters.KeyCoder;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -21,7 +21,7 @@ import java.util.Random;
 
 import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
 
-class TUGenerator {
+public class TUGenerator {
 
     private static final Random RANDOM = new Random();
 
@@ -34,10 +34,15 @@ class TUGenerator {
         this.format = format;
         this.mode = mode;
         this.template = new ClassPathResource("template.csv").getInputStream();
-        this.path = Path.of(".", "target", "_io_" + tester.getSimpleName());
+        this.path = path(tester);
+    }
+
+    public static Path path(Class<?> tester) throws IOException {
+        final Path path = Path.of(".", "target", "_io_" + tester.getSimpleName());
         if (!path.toFile().exists()) {
             Files.createDirectory(path);
         }
+        return path;
     }
 
     Path generate(String fileName, int size) throws IOException {

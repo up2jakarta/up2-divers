@@ -2,13 +2,13 @@ package io.github.up2jakarta.csv.io.misc;
 
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.impl.SimpleResult;
+import io.github.up2jakarta.csv.core.BusinessWriter;
+import io.github.up2jakarta.csv.core.ModeType;
+import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.csv.io.BaseFileReader;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
-import io.github.up2jakarta.csv.ops.BusinessWriter;
-import io.github.up2jakarta.csv.ops.ModeType;
 import org.apache.commons.csv.CSVFormat;
 import org.opentest4j.AssertionFailedError;
 
@@ -72,7 +72,7 @@ abstract class ABusinessTest<R extends IRecord<SegmentType>> {
 
     final void copy(BaseFileReader<Invoice, GroupType, SegmentType, R, ?> reader1, BusinessWriter<Invoice> writer) throws IOException, BeanException {
         while (reader1.hasNext()) {
-            final SimpleResult<Invoice, ?> item = reader1.read();
+            final Up2Result<Invoice, ?> item = reader1.read();
             assertEquals(0, item.getErrors().size());
             assertNotNull(item.getBean());
             writer.write(item.getBean());

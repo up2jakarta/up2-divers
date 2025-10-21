@@ -3,10 +3,10 @@ package io.github.up2jakarta.csv.io;
 import io.github.up2jakarta.csv.api.IError;
 import io.github.up2jakarta.csv.api.IFullType;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.data.BusinessObject;
+import io.github.up2jakarta.csv.core.BusinessImporter;
+import io.github.up2jakarta.csv.core.BusinessReader;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.ops.BusinessAggregator;
-import io.github.up2jakarta.csv.ops.BusinessReader;
+import io.github.up2jakarta.csv.data.Referencable;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -28,7 +28,7 @@ import static io.github.up2jakarta.csv.prc.TrimProcessor.trim;
  * @param <R> the record type
  * @param <E> the error type
  */
-public abstract class BaseFileReader<T extends BusinessObject, B extends DataType<B>, I extends IFullType<B, I>, R extends IRecord<I>, E extends IError<B>> extends BusinessReader<T, B, I, R, E> implements Closeable {
+public abstract class BaseFileReader<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>, R extends IRecord<I>, E extends IError<B>> extends BusinessReader<B, I, T, R, E> implements Closeable {
 
     private final CSVFormat format;
     private final String[] nullValues;
@@ -37,12 +37,18 @@ public abstract class BaseFileReader<T extends BusinessObject, B extends DataTyp
     private FileReader reader;
     private CSVParser parser;
 
-    BaseFileReader(BusinessAggregator<T, B, I, R, E> aggregator, CSVFormat format, String... nullValues) {
-        super(aggregator);
+    BaseFileReader(BusinessImporter<B, I, T, R, E> importer, CSVFormat format, String... nullValues) {
+        super(importer);
         this.format = format;
         this.nullValues = nullValues;
     }
 
+    /**
+     * Opens the given file-reader argument and initializes the reader.
+     *
+     * @param reader the file-reader to open
+     * @throws IOException if the file does not exist or for some other reason cannot be opened for reading.
+     */
     void open(final FileReader reader) throws IOException {
         this.parser = format.parse(reader);
         this.iterator = parser.iterator();

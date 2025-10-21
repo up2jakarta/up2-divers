@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.data;
 import java.lang.annotation.*;
 
 /**
- * Aggregation Annotation that indicates the identifier property in order match parent-child relationship.
+ * Up2 Aggregation Annotation that indicates the identifier property in order match parent-child relationship.
  *
  * <p>
  * Here is a business case of how annotations can be used:

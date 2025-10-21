@@ -12,7 +12,7 @@ public interface IError<D extends DataType<D>> extends io.github.up2jakarta.xml.
     /**
      * @return the data offset of the input record
      */
-    Integer getOffset();
+    int getOffset();
 
     /**
      * @return the business data type

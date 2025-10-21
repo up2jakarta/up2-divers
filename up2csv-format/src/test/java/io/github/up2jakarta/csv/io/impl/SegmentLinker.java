@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.io.impl;
 
 import io.github.up2jakarta.csv.api.BeanLinker;
 import io.github.up2jakarta.csv.api.fct.*;
-import io.github.up2jakarta.csv.core.Beans;
+import io.github.up2jakarta.csv.core.ext.Beans;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.io.dto.*;
 

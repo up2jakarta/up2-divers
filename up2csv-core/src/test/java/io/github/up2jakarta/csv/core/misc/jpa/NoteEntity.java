@@ -42,7 +42,7 @@ public class NoteEntity implements Segment {
     @Column(name = "NOTE_CONTENT", length = 1024, nullable = false)
     private String content;
 
-    @Fragment(2)
+    @Fragment(value = 2, nullable = true)
     @Embedded
     @Valid
     private NoteProperty<CountryCodeType> test1;

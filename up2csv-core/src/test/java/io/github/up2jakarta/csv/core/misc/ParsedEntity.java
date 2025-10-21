@@ -1,31 +1,30 @@
 package io.github.up2jakarta.csv.core.misc;
 
 import io.github.up2jakarta.csv.data.Recordable;
-import io.github.up2jakarta.csv.impl.InputRowEntity;
+import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.SegmentType;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 
 import java.io.Serializable;
 
 @MappedSuperclass
-public abstract class ParsedEntity<K extends Serializable> implements Recordable<SegmentType, InputRowEntity> {
+public abstract class ParsedEntity<K extends Serializable> implements Recordable<SegmentType, InputRecord> {
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private InputRowEntity row;
+    @Transient
+    private transient InputRecord row;
 
     public abstract K getKey();
 
     public abstract void setKey(K key);
 
     @Override
-    public final InputRowEntity getRecord() {
+    public final InputRecord getRecord() {
         return row;
     }
 
     @Override
-    public final void setRecord(InputRowEntity row) {
+    public final void setRecord(InputRecord row) {
         this.row = row;
     }
 

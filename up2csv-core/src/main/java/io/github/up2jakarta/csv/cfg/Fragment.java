@@ -20,8 +20,11 @@ public @interface Fragment {
     /**
      * Enabling the trim processing of embeddable fragments, by default is disabled.
      * <p>
-     * If <code>true</code> and all properties are <code>null</code>,
-     * then the mapper returns <code>null</code> instead of empty one.
+     * If <code>true</code> and all properties are <code>null</code>
+     * then the fragment value will be <code>null</code> instead of empty one.
+     * <p>
+     * If <code>true</code> and one property with {@link Position#required()} enabled is <code>null</code>
+     * then the fragment value will be <code>null</code>.
      *
      * @return the nullable flag
      */

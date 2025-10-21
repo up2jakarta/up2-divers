@@ -2,34 +2,34 @@ package io.github.up2jakarta.csv.io.misc;
 
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.ModeType;
+import io.github.up2jakarta.csv.fmt.FastImporter;
 import io.github.up2jakarta.csv.io.FastFileReader;
 import io.github.up2jakarta.csv.io.FastFileWriter;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
-import io.github.up2jakarta.csv.ops.FastAggregator;
-import io.github.up2jakarta.csv.ops.ModeType;
 import org.apache.commons.csv.CSVFormat;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-public abstract class AFastTests<R extends IRecord<SegmentType>, A extends FastAggregator<Invoice, GroupType, SegmentType, R, ?>> extends ABusinessTest<R> {
+public abstract class AFastTests<R extends IRecord<SegmentType>, A extends FastImporter<Invoice, GroupType, SegmentType, R, ?>> extends ABusinessTest<R> {
 
     private final FastFileWriter<Invoice> writer;
     private final FastFileReader<Invoice, GroupType, SegmentType, R, ?> reader1;
     private final FastFileReader<Invoice, GroupType, SegmentType, R, ?> reader2;
 
-    protected AFastTests(A aggregator, CSVFormat format) throws IOException {
+    protected AFastTests(A importer, CSVFormat format) throws IOException, BeanException {
         super(ModeType.FAST, format);
-        this.reader1 = this.reader(aggregator, format);
-        this.reader2 = this.reader(aggregator, format);
-        this.writer = this.writer(aggregator, format);
+        this.reader1 = this.reader(importer, format);
+        this.reader2 = this.reader(importer, format);
+        this.writer = this.writer(importer, format);
     }
 
-    protected abstract FastFileWriter<Invoice> writer(A aggregator, CSVFormat format);
+    protected abstract FastFileWriter<Invoice> writer(A importer, CSVFormat format) throws BeanException;
 
-    protected abstract FastFileReader<Invoice, GroupType, SegmentType, R, ?> reader(A aggregator, CSVFormat format);
+    protected abstract FastFileReader<Invoice, GroupType, SegmentType, R, ?> reader(A importer, CSVFormat format);
 
     @Override
     final void assertRecord(R data, R origin) {

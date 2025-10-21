@@ -2,10 +2,11 @@ package io.github.up2jakarta.csv.impl;
 
 import io.github.up2jakarta.csv.api.BeanLinker;
 import io.github.up2jakarta.csv.api.fct.*;
-import io.github.up2jakarta.csv.core.Beans;
+import io.github.up2jakarta.csv.core.ext.Beans;
+import io.github.up2jakarta.csv.core.misc.Parsable;
+import io.github.up2jakarta.csv.fmt.misc.CyclicInvoice;
+import io.github.up2jakarta.csv.fmt.misc.CyclicItem;
 import io.github.up2jakarta.csv.impl.dto.*;
-import io.github.up2jakarta.csv.ops.misc.Dummy2;
-import io.github.up2jakarta.csv.ops.misc.Dummy2.Item2;
 
 import java.util.function.BiConsumer;
 
@@ -79,12 +80,12 @@ public class SegmentLinker<P extends Parsable, T extends Parsable> extends BeanL
         return new SegmentLinker<>(type, Note.class, Invoice::getNotes, (i, n) -> i.setNotes(Beans.concat(i.getNotes(), n)));
     }
 
-    static SegmentLinker<Dummy2, Item2> cyclicItems() {
-        return new SegmentLinker<>(Dummy2.class, Item2.class, Dummy2::getItems, (i, l) -> i.getItems().add(l));
+    static SegmentLinker<CyclicInvoice, CyclicItem> cyclicItems() {
+        return new SegmentLinker<>(CyclicInvoice.class, CyclicItem.class, CyclicInvoice::getItems, (i, l) -> i.getItems().add(l));
     }
 
-    static SegmentLinker<Item2, Dummy2> cyclicInvoice() {
-        return new SegmentLinker<>(Item2.class, Dummy2.class, Item2::getInvoice, Item2::setInvoice);
+    static SegmentLinker<CyclicItem, CyclicInvoice> cyclicInvoice() {
+        return new SegmentLinker<>(CyclicItem.class, CyclicInvoice.class, CyclicItem::getInvoice, CyclicItem::setInvoice);
     }
 
 }

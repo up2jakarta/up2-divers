@@ -15,21 +15,20 @@ import java.math.BigInteger;
 public final class NumberResolver extends ConversionResolver<Up2Number> {
 
     @Override
-    public PropertyConverter<? extends Number> forParsing(Up2Number config, Field property) throws BeanException {
-        final Class<?> fieldType = property.getType();
-        if (fieldType == BigInteger.class) {
+    public PropertyConverter<? extends Number> forParsing(Up2Number config, Field property, Class<?> type) throws BeanException {
+        if (type == BigInteger.class) {
             return BigInteger::new;
         }
-        if (fieldType == Integer.class || fieldType == int.class) {
+        if (type == Integer.class || type == int.class) {
             return Integer::parseInt;
         }
-        if (fieldType == Long.class || fieldType == long.class) {
+        if (type == Long.class || type == long.class) {
             return Long::parseLong;
         }
-        if (fieldType == Short.class || fieldType == short.class) {
+        if (type == Short.class || type == short.class) {
             return Short::parseShort;
         }
-        if (fieldType == Byte.class || fieldType == byte.class) {
+        if (type == Byte.class || type == byte.class) {
             return Byte::parseByte;
         }
         throw new BeanException(property, "must not be annotated by @Up2Number");

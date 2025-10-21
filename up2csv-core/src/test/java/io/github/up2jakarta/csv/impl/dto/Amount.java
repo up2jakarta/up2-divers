@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.impl.dto;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
 import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.impl.Parsable;
+import io.github.up2jakarta.csv.core.misc.Parsable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

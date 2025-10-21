@@ -1,11 +1,17 @@
 package io.github.up2jakarta.csv;
 
 import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.MapperFactory;
-import io.github.up2jakarta.csv.impl.*;
+import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.fmt.*;
+import io.github.up2jakarta.csv.fmt.hdl.Fixed08Generator;
+import io.github.up2jakarta.csv.fmt.misc.CyclicInvoice;
+import io.github.up2jakarta.csv.fmt.misc.MyError;
+import io.github.up2jakarta.csv.fmt.misc.MyRecord;
+import io.github.up2jakarta.csv.impl.GroupType;
+import io.github.up2jakarta.csv.impl.InputError;
+import io.github.up2jakarta.csv.impl.InputRecord;
+import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
-import io.github.up2jakarta.csv.ops.*;
-import io.github.up2jakarta.csv.ops.misc.Dummy2;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,86 +19,130 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
+import static io.github.up2jakarta.csv.core.ModeType.FULL;
+import static io.github.up2jakarta.csv.fmt.misc.Tests.*;
 import static io.github.up2jakarta.csv.impl.SegmentType.*;
-import static io.github.up2jakarta.csv.ops.misc.Tests.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
 public class BuilderTests {
 
-    private final MapperFactory<GroupType> factory;
-    private final SimpleCreator creator;
+    private final Invoice INVOICE = new Invoice() {{
+        setReference("TU2025R0099");
+        setIssueDate(LocalDate.of(2025, 3, 12));
+        setGrossAmount(new BigDecimal(120));
+        setNetAmount(new BigDecimal(100));
+        setTaxAmount(new BigDecimal(20));
+    }};
+
+    private final Up2Factory<GroupType> factory;
 
     @Autowired
-    BuilderTests(MapperFactory<GroupType> factory, SimpleCreator creator) {
+    BuilderTests(Up2Factory<GroupType> factory) {
         this.factory = factory;
-        this.creator = creator;
     }
 
     @Test
-    void testFastSeparator() throws BeanException, IOException {
+    void testUnitExporter() throws BeanException, IOException {
         // WHEN
-        final FastSeparator<Invoice, GroupType, SegmentType> bean = factory.builder()
-                .fast(Invoice.class)
-                .fast(S01)
+        final UnitExporter<Invoice, GroupType, SegmentType> exporter = factory.builder()
+                .unit(Invoice.class)
+                .build(S01)
+                .format();
+        assertNotNull(exporter);
+        // THEN
+        final String[] root = UNIT_INVOICE[0];
+        exporter.format(INVOICE, d -> assertArrayEquals(root, d));
+    }
+
+    @Test
+    void testSimpleUnitImporter() throws BeanException, IOException {
+        // WHEN
+        final SimpleUnitImporter<Invoice, GroupType, SegmentType> importer = factory.builder()
+                .unit(Invoice.class)
+                .build(S01)
                 .build();
-        assertNotNull(bean);
+        assertNotNull(importer);
         // THEN
-        final String[] root = new String[]{"01", null, null, null, null, null};
-        bean.format(new Invoice(), d -> assertArrayEquals(root, d));
+        assertInvoice(importer, unitInvoice(S01));
     }
 
     @Test
-    void testSimpleAggregator() throws BeanException, IOException {
+    void testUnitImporter() throws BeanException, IOException {
         // WHEN
-        final SimpleAggregator<Invoice, GroupType, SegmentType> aggregator = factory.builder()
+        final UnitImporter<Invoice, GroupType, SegmentType, MyRecord, MyError> importer = factory.builder()
+                .unit(Invoice.class)
+                .build(S01)
+                .build(MyError::new);
+        assertNotNull(importer);
+        // THEN
+        assertInvoice(importer, unitInvoice(S01));
+    }
+
+    @Test
+    void testFastExporter() throws BeanException, IOException {
+        // WHEN
+        final FastExporter<Invoice, GroupType, SegmentType> exporter = factory.builder()
                 .fast(Invoice.class)
-                .full(S01)
+                .build(S01)
+                .format();
+        assertNotNull(exporter);
+        // THEN
+        final String[] root = FAST_INVOICE[0];
+        exporter.format(INVOICE, d -> assertArrayEquals(root, d));
+    }
+
+    @Test
+    void testSimpleFastImporter() throws BeanException, IOException {
+        // WHEN
+        final SimpleFastImporter<Invoice, GroupType, SegmentType> importer = factory.builder()
+                .fast(Invoice.class)
+                .build(S01)
                 .build();
-        assertNotNull(aggregator);
+        assertNotNull(importer);
         // THEN
-        assertInvoice(aggregator, fastInvoice(S01));
+        assertInvoice(importer, fastInvoice(S01));
     }
 
     @Test
-    void testFastAggregator() throws BeanException, IOException {
+    void testFastImporter() throws BeanException, IOException {
         // WHEN
-        final FastAggregator<Invoice, GroupType, SegmentType, InputRowEntity, InputErrorEntity> aggregator = factory.builder()
+        final FastImporter<Invoice, GroupType, SegmentType, MyRecord, MyError> importer = factory.builder()
                 .fast(Invoice.class)
-                .full(S01)
-                .build(creator);
-        assertNotNull(aggregator);
+                .build(S01)
+                .build(MyError::new);
+        assertNotNull(importer);
         // THEN
-        assertInvoice(aggregator, fullInvoice(S01));
+        assertInvoice(importer, fastInvoice(S01));
     }
 
     @Test
-    void testFullSeparator() throws BeanException, IOException {
+    void testFullExporter() throws BeanException, IOException {
         // WHEN
-        final FullSeparator<Invoice, GroupType, SegmentType> bean = factory.builder()
+        final FullExporter<Invoice, GroupType, SegmentType> exporter = factory.builder()
                 .full(Invoice.class)
-                .fast(S01)
-                .build();
-        assertNotNull(bean);
+                .build(S01)
+                .format();
+        assertNotNull(exporter);
         // THEN
-        final String[] root1 = new String[]{"00000001", "01", null, null, null, null, null};
-        bean.format(new Invoice(), new Fixed08Generator(), d -> assertArrayEquals(root1, d));
-        final String[] root2 = new String[]{"0000000000000001", "01", null, null, null, null, null};
-        bean.format(new Invoice(), new Fixed16Generator(), d -> assertArrayEquals(root2, d));
+        final String[] root = FULL_INVOICE[0];
+        exporter.format(INVOICE, new Fixed08Generator(), d -> assertArrayEquals(root, d));
     }
 
     @Test
-    void testFullAggregator() throws BeanException, IOException {
+    void testFullImporter() throws BeanException, IOException {
         // WHEN
-        final FullAggregator<Invoice, GroupType, SegmentType, InputRowEntity, InputErrorEntity> aggregator = factory.builder()
+        final FullImporter<Invoice, GroupType, SegmentType, InputRecord, InputError> importer = factory.builder()
                 .full(Invoice.class)
-                .full(S01)
-                .build(creator, (r) -> 0);
-        assertNotNull(aggregator);
+                .build(S01)
+                .build(InputError::new, (r) -> 0);
+        assertNotNull(importer);
         // THEN
-        assertInvoice(aggregator, fullInvoice(S01));
+        assertInvoice(importer, invoice(S01, FULL));
     }
 
     @Test
@@ -102,8 +152,8 @@ public class BuilderTests {
                 BeanException.class,
                 () -> factory.builder()
                         .full(Invoice.class)
-                        .full(S11)
-                        .build(creator, (r) -> 0)
+                        .build(S11)
+                        .build((r) -> 0)
         );
         assertNotNull(ex);
         // THEN
@@ -116,13 +166,13 @@ public class BuilderTests {
         final BeanException ex = assertThrows(
                 BeanException.class,
                 () -> factory.builder()
-                        .full(Dummy2.class)
-                        .full(S31)
-                        .build(creator, (r) -> 0)
+                        .full(CyclicInvoice.class)
+                        .build(S61)
+                        .build()
         );
         assertNotNull(ex);
         // THEN
-        assertEquals("SegmentType[31] - cyclic segment is not allowed: Dummy2 > Item2 > Dummy2", ex.getMessage());
+        assertEquals("SegmentType[61] - cyclic segment is not allowed: CyclicInvoice > CyclicItem > CyclicInvoice", ex.getMessage());
     }
 
 }

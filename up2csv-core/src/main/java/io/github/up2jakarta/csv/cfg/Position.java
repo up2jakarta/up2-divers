@@ -17,4 +17,43 @@ public @interface Position {
      */
     int value();
 
+    /**
+     * Flag indicates that this property is mandatory for declaring fragment.
+     * <p>
+     * If set to <code>true</code> and the property value is <code>null</code> and the declaring
+     * {@link Fragment#nullable()} is set to <code>true</code> then the fragment value will be <code>null</code>
+     * <p>
+     * Here is a business case of how annotations can be used:
+     * <blockquote><pre>
+     *         public class ThirdParty implements Segment {
+     *
+     *              &#064;BusinessId
+     *              &#064;Position(0)
+     *              private String key;
+     *
+     *              // ... other properties
+     *
+     *              &#064;Fragment(value = 1, nullable = true)
+     *              private final Contact contact;
+     *
+     *              // ... getters and setters
+     *         }
+     *
+     *         public class TradeContact implements Segment {
+     *
+     *              &#064;Position(0)
+     *              private String type;
+     *
+     *              &#064;Position(1)
+     *              &#064;Required // if null, contact should be null
+     *              private String value;
+     *
+     *              // ... getters and setters
+     *         }
+     * </pre></blockquote>
+     *
+     * @return the nullable flag
+     */
+    boolean required() default false;
+
 }

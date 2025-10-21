@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Contract interface for multi-segments record definition, useful for aggregation.
  *
  * @see io.github.up2jakarta.csv.api.IRecord
- * @see io.github.up2jakarta.csv.ops.CSVReader#next()
+ * @see Up2Aggregator#next()
  */
 public interface Separable extends Serializable {
 

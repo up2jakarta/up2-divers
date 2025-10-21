@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.api.IError;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.impl.FastException;
+import io.github.up2jakarta.csv.fmt.hdl.FastException;
 import io.github.up2jakarta.xml.api.SeverityType;
 import jakarta.validation.ConstraintViolation;
 
@@ -51,18 +51,18 @@ public class FastHandler<D extends DataType<D>> extends EventHandler<IRecord<?>,
 
     @Override
     public void handleEvent(D data, int offset, ConstraintViolation<?> violation, Error config) {
-        final SeverityType type = Errors.getSeverity(violation, config);
+        final SeverityType type = errorSeverity(violation, config);
         if (type.getLevel() >= level) {
-            final String code = Errors.getErrorCode(violation, config);
+            final String code = errorCode(violation, config);
             throw new FastException(data, offset, type, code, violation.getMessage());
         }
     }
 
     @Override
     public void handleEvent(D data, int offset, Exception exception, Error config) {
-        final SeverityType type = Errors.getSeverity(exception, config);
+        final SeverityType type = errorSeverity(exception, config);
         if (type.getLevel() >= level) {
-            final String code = Errors.getErrorCode(exception, config);
+            final String code = errorCode(exception, config);
             throw new FastException(data, offset, type, code, exception);
         }
     }

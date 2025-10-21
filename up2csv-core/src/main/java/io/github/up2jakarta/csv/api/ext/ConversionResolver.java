@@ -38,7 +38,7 @@ public abstract class ConversionResolver<A extends Annotation> {
      * @return the right conversion
      * @throws BeanException for any missing or wrong bean configuration
      */
-    public abstract PropertyConverter<?> forParsing(@NotNull A config, @NotNull Field property) throws BeanException;
+    public abstract PropertyConverter<?> forParsing(@NotNull A config, @NotNull Field property, @NotNull Class<?> type) throws BeanException;
 
     /**
      * Configures and returns the Format function {@link java.util.function.Function}.

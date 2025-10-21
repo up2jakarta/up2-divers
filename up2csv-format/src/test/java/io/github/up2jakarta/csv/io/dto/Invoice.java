@@ -5,8 +5,7 @@ import io.github.up2jakarta.csv.cfg.Up2Decimal;
 import io.github.up2jakarta.csv.cfg.Up2Temporal;
 import io.github.up2jakarta.csv.cfg.Up2Token;
 import io.github.up2jakarta.csv.data.BusinessId;
-import io.github.up2jakarta.csv.data.BusinessObject;
-import io.github.up2jakarta.csv.io.impl.SegmentType;
+import io.github.up2jakarta.csv.data.Referencable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -18,12 +17,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * {@link SegmentType#S01}
- */
 @Valid
 @SuppressWarnings("unused")
-public class Invoice implements BusinessObject {
+public class Invoice implements Referencable {
 
     @Position(0)
     @Up2Token
@@ -66,7 +62,6 @@ public class Invoice implements BusinessObject {
         return reference;
     }
 
-    @Override
     public void setReference(String reference) {
         this.reference = reference;
     }

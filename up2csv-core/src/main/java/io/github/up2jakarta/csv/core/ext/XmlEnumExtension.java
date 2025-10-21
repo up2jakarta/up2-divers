@@ -3,7 +3,6 @@ package io.github.up2jakarta.csv.core.ext;
 import io.github.up2jakarta.csv.api.ext.*;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.Errors;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.clv.PropertyException;
@@ -18,6 +17,8 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static io.github.up2jakarta.csv.core.EventHandler.ERROR_XML_ENUM;
 
 /**
  * {@link XmlType} extension that supports {@link XmlEnum}.
@@ -82,7 +83,7 @@ public final class XmlEnumExtension extends ConversionExtension<XmlType, XmlEnum
         final Map<String, Object> mapping = getConstants(enumType, property);
         final Optional<Error> error = ConversionResolver.getError(property);
         final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);
-        final String code = error.map(Error::value).orElse(Errors.ERROR_XML_ENUM);
+        final String code = error.map(Error::value).orElse(ERROR_XML_ENUM);
         final PropertyConverter<Object> p = v -> mapping.entrySet().stream().filter(e -> e.getKey().equals(v))
                 .map(Map.Entry::getValue)
                 .findAny()

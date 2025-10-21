@@ -6,7 +6,6 @@ import io.github.up2jakarta.csv.api.ext.PropertyFormatter;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Up2Boolean;
 import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.Errors;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.clv.PropertyException;
 import jakarta.inject.Named;
@@ -15,14 +14,15 @@ import jakarta.inject.Singleton;
 import java.lang.reflect.Field;
 import java.util.Optional;
 
+import static io.github.up2jakarta.csv.core.EventHandler.ERROR_BOOLEAN;
+
 @Named
 @Singleton
 public final class BooleanResolver extends ConversionResolver<Up2Boolean> {
 
     @Override
-    public PropertyConverter<? extends Boolean> forParsing(Up2Boolean config, Field property) throws BeanException {
-        final Class<?> fieldType = property.getType();
-        if (fieldType == Boolean.class || fieldType == boolean.class) {
+    public PropertyConverter<? extends Boolean> forParsing(Up2Boolean config, Field property, Class<?> type) throws BeanException {
+        if (type == Boolean.class || type == boolean.class) {
             return v -> {
                 if (config.trueValue().equals(v)) {
                     return true;
@@ -31,9 +31,9 @@ public final class BooleanResolver extends ConversionResolver<Up2Boolean> {
                     return false;
                 }
                 final Optional<Error> error = getError(property);
-                final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);
-                final String code = error.map(Error::value).orElse(Errors.ERROR_BOOLEAN);
-                throw new PropertyException(type, code, "Unknown value [" + v + "] for Boolean");
+                final SeverityType level = error.map(Error::severity).orElse(SeverityType.ERROR);
+                final String code = error.map(Error::value).orElse(ERROR_BOOLEAN);
+                throw new PropertyException(level, code, "Unknown value [" + v + "] for Boolean");
             };
         }
         throw new BeanException(property, "must not be annotated by @Up2Boolean");

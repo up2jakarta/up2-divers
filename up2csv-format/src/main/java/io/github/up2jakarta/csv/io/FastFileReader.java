@@ -3,9 +3,10 @@ package io.github.up2jakarta.csv.io;
 import io.github.up2jakarta.csv.api.IError;
 import io.github.up2jakarta.csv.api.IFullType;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.data.BusinessObject;
+import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.ops.FastAggregator;
+import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.fmt.FastImporter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
@@ -16,7 +17,7 @@ import java.io.IOException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Base CSV file {@link io.github.up2jakarta.csv.ops.ModeType#FAST} reader implementation.
+ * Base CSV file {@link ModeType#FAST} reader implementation.
  *
  * @param <T> the business object type
  * @param <B> the data type
@@ -24,10 +25,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @param <R> the record type
  * @param <E> the error type
  */
-public abstract class FastFileReader<T extends BusinessObject, B extends DataType<B>, I extends IFullType<B, I>, R extends IRecord<I>, E extends IError<B>> extends BaseFileReader<T, B, I, R, E> {
+public abstract class FastFileReader<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>, R extends IRecord<I>, E extends IError<B>> extends BaseFileReader<T, B, I, R, E> {
 
-    public FastFileReader(FastAggregator<T, B, I, R, E> aggregator, CSVFormat format, String... nullValues) {
-        super(aggregator, format, nullValues);
+    public FastFileReader(FastImporter<T, B, I, R, E> importer, CSVFormat format, String... nullValues) {
+        super(importer, format, nullValues);
     }
 
     /**
@@ -40,12 +41,7 @@ public abstract class FastFileReader<T extends BusinessObject, B extends DataTyp
         this.open(new FileReader(file, UTF_8));
     }
 
-    /**
-     * Opens the given file-reader argument and initializes the reader.
-     *
-     * @param reader the file-reader to open
-     * @throws IOException if the file does not exist or for some other reason cannot be opened for reading.
-     */
+    @Override
     public void open(final FileReader reader) throws IOException {
         super.open(reader);
     }

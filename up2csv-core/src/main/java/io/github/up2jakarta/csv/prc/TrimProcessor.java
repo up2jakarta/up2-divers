@@ -20,7 +20,7 @@ public final class TrimProcessor extends InputProcessor<Up2Trim> {
      * @param nullValues values looks like <code>null</code>
      */
     public static void trim(String[] values, String... nullValues) {
-        if (values == null || values.length == 0) {
+        if (values == null || values.length == 0 || nullValues.length == 0) {
             return;
         }
         for (var i = 0; i < values.length; i++) {

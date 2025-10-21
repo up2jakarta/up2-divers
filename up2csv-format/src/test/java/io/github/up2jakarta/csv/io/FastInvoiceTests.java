@@ -1,16 +1,15 @@
 package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.MapperFactory;
+import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.fmt.FastImporter;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
 import io.github.up2jakarta.csv.io.misc.AFastTests;
-import io.github.up2jakarta.csv.io.misc.InputErrorEntity;
-import io.github.up2jakarta.csv.io.misc.InputHandler;
-import io.github.up2jakarta.csv.io.misc.InputRowEntity;
-import io.github.up2jakarta.csv.ops.FastAggregator;
-import io.github.up2jakarta.csv.ops.Fixed08Generator;
+import io.github.up2jakarta.csv.io.misc.MyError;
+import io.github.up2jakarta.csv.io.misc.MyHandler;
+import io.github.up2jakarta.csv.io.misc.MyRecord;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,38 +21,31 @@ import java.io.IOException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class FastInvoiceTests extends AFastTests<InputRowEntity, FastAggregator<Invoice, GroupType, SegmentType, InputRowEntity, InputErrorEntity>> {
+public class FastInvoiceTests extends AFastTests<MyRecord, FastImporter<Invoice, GroupType, SegmentType, MyRecord, MyError>> {
 
     @Autowired
-    FastInvoiceTests(MapperFactory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
-        super(new FastAggregator<>(factory, Invoice.class, SegmentType.S01, SegmentType.values()) {
+    FastInvoiceTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
+        super(new FastImporter<>(factory, Invoice.class, SegmentType.S01, SegmentType.values()) {
             @Override
-            protected InputHandler create(InputRowEntity row) {
-                return new InputHandler(row);
+            protected MyHandler create(MyRecord row) {
+                return new MyHandler(row);
             }
         }, format);
     }
 
     @Override
-    protected FastFileWriter<Invoice> writer(FastAggregator<Invoice, GroupType, SegmentType, InputRowEntity, InputErrorEntity> aggregator, CSVFormat format) {
-        return new FastFileWriter<>(aggregator, format);
+    protected FastFileWriter<Invoice> writer(FastImporter<Invoice, GroupType, SegmentType, MyRecord, MyError> importer, CSVFormat format) throws BeanException {
+        return new FastFileWriter<>(importer.toExporter(), format);
     }
 
     @Override
-    protected FastFileReader<Invoice, GroupType, SegmentType, InputRowEntity, InputErrorEntity> reader(
-            FastAggregator<Invoice, GroupType, SegmentType, InputRowEntity, InputErrorEntity> aggregator, CSVFormat format
+    protected FastFileReader<Invoice, GroupType, SegmentType, MyRecord, MyError> reader(
+            FastImporter<Invoice, GroupType, SegmentType, MyRecord, MyError> importer, CSVFormat format
     ) {
-        final Fixed08Generator generator = new Fixed08Generator();
-        return new FastFileReader<>(aggregator, format, "-") {
+        return new FastFileReader<>(importer, format, "-") {
             @Override
-            protected InputRowEntity create(SegmentType type, String beanId, String[] data) {
-                final InputRowEntity result = new InputRowEntity();
-                result.setReference(generator.get());
-                result.setKey(new InputRowEntity.PKey());
-                result.setType(type);
-                result.setBusinessReference(beanId);
-                result.setColumns(data);
-                return result;
+            protected MyRecord create(SegmentType type, String invoiceNumber, String[] data) {
+                return new MyRecord(type, invoiceNumber, data);
             }
         };
     }

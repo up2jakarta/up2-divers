@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.data.BusinessObject;
-import io.github.up2jakarta.csv.ops.FastAggregator;
-import io.github.up2jakarta.csv.ops.FastSeparator;
-import io.github.up2jakarta.csv.ops.FastWriter;
+import io.github.up2jakarta.csv.core.ModeType;
+import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.fmt.FastExporter;
+import io.github.up2jakarta.csv.fmt.FastWriter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -14,25 +14,19 @@ import java.io.IOException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Base CSV file {@link io.github.up2jakarta.csv.ops.ModeType#FAST} writer implementation.
+ * Base CSV file {@link ModeType#FAST} writer implementation.
  *
  * @param <T> the business object type
  */
-public class FastFileWriter<T extends BusinessObject> extends FastWriter<T> {
+public class FastFileWriter<T extends Referencable> extends FastWriter<T> {
 
     private final CSVFormat format;
 
     private CSVPrinter printer;
     private FileWriter writer;
 
-    protected FastFileWriter(FastAggregator<T, ?, ?, ?, ?> processor, CSVFormat format) {
-        super(processor);
-        this.format = format;
-    }
-
-    @SuppressWarnings("unused")
-    protected FastFileWriter(FastSeparator<T, ?, ?> processor, CSVFormat format) {
-        super(processor);
+    public FastFileWriter(FastExporter<T, ?, ?> exporter, CSVFormat format) {
+        super(exporter);
         this.format = format;
     }
 

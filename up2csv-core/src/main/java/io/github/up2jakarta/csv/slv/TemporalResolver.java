@@ -16,33 +16,32 @@ import java.time.temporal.Temporal;
 public final class TemporalResolver extends ConversionResolver<Up2Temporal> {
 
     @Override
-    public PropertyConverter<? extends Temporal> forParsing(Up2Temporal config, Field property) throws BeanException {
-        final Class<?> fieldType = property.getType();
-        if (fieldType == LocalTime.class) {
+    public PropertyConverter<? extends Temporal> forParsing(Up2Temporal config, Field property, Class<?> type) throws BeanException {
+        if (type == LocalTime.class) {
             return LocalTime::parse;
         }
-        if (fieldType == LocalDate.class) {
+        if (type == LocalDate.class) {
             return LocalDate::parse;
         }
-        if (fieldType == LocalDateTime.class) {
+        if (type == LocalDateTime.class) {
             return LocalDateTime::parse;
         }
-        if (fieldType == OffsetTime.class) {
+        if (type == OffsetTime.class) {
             return OffsetTime::parse;
         }
-        if (fieldType == OffsetDateTime.class) {
+        if (type == OffsetDateTime.class) {
             return OffsetDateTime::parse;
         }
-        if (fieldType == ZonedDateTime.class) {
+        if (type == ZonedDateTime.class) {
             return ZonedDateTime::parse;
         }
-        if (fieldType == Year.class) {
+        if (type == Year.class) {
             return Year::parse;
         }
-        if (fieldType == YearMonth.class) {
+        if (type == YearMonth.class) {
             return Year::parse;
         }
-        if (fieldType == Instant.class) {
+        if (type == Instant.class) {
             return Year::parse;
         }
         throw new BeanException(property, "must not be annotated by @Up2Temporal");

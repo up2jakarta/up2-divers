@@ -7,8 +7,7 @@ import io.github.up2jakarta.csv.api.ext.PropertyFormatter;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Up2CodeList;
 import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.Beans;
-import io.github.up2jakarta.csv.core.Errors;
+import io.github.up2jakarta.csv.core.ext.Beans;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.clv.CodeList;
 import jakarta.inject.Named;
@@ -19,6 +18,7 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static io.github.up2jakarta.csv.core.EventHandler.ERROR_CODE_LIST;
 import static io.github.up2jakarta.xml.clv.CodeListConverter.parse;
 
 /**
@@ -43,9 +43,9 @@ public final class CodeListResolver extends ConversionResolver<Up2CodeList> {
     }
 
     @Override
-    public PropertyConverter<? extends CodeList<?>> forParsing(Up2CodeList config, Field property) throws BeanException {
+    public PropertyConverter<? extends CodeList<?>> forParsing(Up2CodeList config, Field property, Class<?> type) throws BeanException {
         //noinspection unchecked
-        final Class<CodeList<?>> clType = (Class<CodeList<?>>) property.getType();
+        final Class<CodeList<?>> clType = (Class<CodeList<?>>) type;
         if (!clType.isEnum()) {
             throw new BeanException(property, "type must be enum");
         }
@@ -55,9 +55,9 @@ public final class CodeListResolver extends ConversionResolver<Up2CodeList> {
         }
         checkUnique(clType, clType.getEnumConstants());
         final Optional<Error> error = getError(property);
-        final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);
-        final String code = error.map(Error::value).orElse(Errors.ERROR_CODE_LIST);
-        return v -> parse(v, clType, Stream.of(clType.getEnumConstants()), type, code);
+        final SeverityType level = error.map(Error::severity).orElse(SeverityType.ERROR);
+        final String code = error.map(Error::value).orElse(ERROR_CODE_LIST);
+        return v -> parse(v, clType, Stream.of(clType.getEnumConstants()), level, code);
     }
 
     @Override

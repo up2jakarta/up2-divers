@@ -4,9 +4,9 @@ import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
 import io.github.up2jakarta.csv.cfg.Up2Temporal;
 import io.github.up2jakarta.csv.cfg.Up2Token;
+import io.github.up2jakarta.csv.core.misc.Parsable;
 import io.github.up2jakarta.csv.data.BusinessId;
-import io.github.up2jakarta.csv.data.BusinessObject;
-import io.github.up2jakarta.csv.impl.Parsable;
+import io.github.up2jakarta.csv.data.Referencable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @Valid
 @SuppressWarnings("unused")
-public class Invoice extends Parsable implements BusinessObject {
+public class Invoice extends Parsable implements Referencable {
 
     @Position(0)
     @Up2Token
@@ -66,7 +66,6 @@ public class Invoice extends Parsable implements BusinessObject {
         return reference;
     }
 
-    @Override
     public void setReference(String reference) {
         this.reference = reference;
     }

@@ -11,7 +11,11 @@ import io.github.up2jakarta.csv.core.misc.ext.DummyConverter;
 import io.github.up2jakarta.csv.core.misc.map.ValidBean;
 import io.github.up2jakarta.csv.core.misc.prc.Test3Processor;
 import io.github.up2jakarta.csv.core.misc.vld.Up2Warn;
-import io.github.up2jakarta.csv.impl.*;
+import io.github.up2jakarta.csv.fmt.hdl.FastException;
+import io.github.up2jakarta.csv.impl.GroupType;
+import io.github.up2jakarta.csv.impl.InputError;
+import io.github.up2jakarta.csv.impl.InputRecord;
+import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.xml.clv.CodeListException;
 import io.github.up2jakarta.xml.clv.PropertyException;
 import org.junit.jupiter.api.Test;
@@ -22,10 +26,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.format.DateTimeParseException;
 
-import static io.github.up2jakarta.csv.core.Errors.*;
-import static io.github.up2jakarta.csv.core.MapperExceptionTest.DUMMY;
-import static io.github.up2jakarta.csv.ops.misc.Tests.ERROR_CODE;
-import static io.github.up2jakarta.csv.ops.misc.Tests.record;
+import static io.github.up2jakarta.csv.core.EventHandler.*;
+import static io.github.up2jakarta.csv.core.Up2ErrorTests.DUMMY;
+import static io.github.up2jakarta.csv.fmt.misc.Tests.ERROR_CODE;
+import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,20 +38,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 public class FastHandlerTest {
 
-    private final MapperFactory<GroupType> factory;
+    private final Up2Factory<GroupType> factory;
 
     @Autowired
-    FastHandlerTest(MapperFactory<GroupType> factory) {
+    FastHandlerTest(Up2Factory<GroupType> factory) {
         this.factory = factory;
     }
 
     @Test
     void testNull() throws BeanException {
         // Given
-        final Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
-        final InputRowEntity row = record(SegmentType.S00, "");
+        final Up2Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
+        final InputRecord row = record(SegmentType.S00, "");
         // When
-        final EventHandler<InputRowEntity, GroupType, InputErrorEntity> handler = null;
+        final EventHandler<InputRecord, GroupType, InputError> handler = null;
         final NullPointerException npe1 = assertThrows(NullPointerException.class, () -> mapper.map(row, null));
         final NullPointerException npe2 = assertThrows(NullPointerException.class, () -> mapper.map(handler, ""));
         // Then
@@ -61,11 +65,11 @@ public class FastHandlerTest {
     @Test
     void testValidator() throws BeanException {
         // Given
-        final Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class, GroupType.NONE);
-        final EventHandler<InputRowEntity, GroupType, InputErrorEntity> handler = FastHandler.of(WARNING);
+        final Up2Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class, GroupType.NONE);
+        final EventHandler<InputRecord, GroupType, InputError> handler = FastHandler.of(WARNING);
         {
             // When
-            final InputRowEntity row = record(SegmentType.S00, "+1", "1", "1", "1", "1", "1", "1");
+            final InputRecord row = record(SegmentType.S00, "+1", "1", "1", "1", "1", "1", "1");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -77,7 +81,7 @@ public class FastHandlerTest {
         }
         {
             // When
-            final InputRowEntity row = record(SegmentType.S00, "1", "101", "1", "1", "1", "1", "1");
+            final InputRecord row = record(SegmentType.S00, "1", "101", "1", "1", "1", "1", "1");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -88,7 +92,7 @@ public class FastHandlerTest {
         }
         {
             // When
-            final InputRowEntity row = record(SegmentType.S00, "1", "1", "", "1", "1", "1", "1");
+            final InputRecord row = record(SegmentType.S00, "1", "1", "", "1", "1", "1", "1");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -99,7 +103,7 @@ public class FastHandlerTest {
         }
         {
             // When
-            final InputRowEntity row = record(SegmentType.S00, "1", "1", "1", null, "1", "1", "1");
+            final InputRecord row = record(SegmentType.S00, "1", "1", "1", null, "1", "1", "1");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -111,7 +115,7 @@ public class FastHandlerTest {
         }
         {
             // When
-            final InputRowEntity row = record(SegmentType.S00, "1", "1", "1", "1", "-1", "1", "1");
+            final InputRecord row = record(SegmentType.S00, "1", "1", "1", "1", "-1", "1", "1");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -122,7 +126,7 @@ public class FastHandlerTest {
         }
         {
             // When
-            final InputRowEntity row = record(SegmentType.S00, "1", "1", "1", "1", "1", "", "1");
+            final InputRecord row = record(SegmentType.S00, "1", "1", "1", "1", "1", "", "1");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -133,7 +137,7 @@ public class FastHandlerTest {
         }
         {
             // When
-            final InputRowEntity row = record(SegmentType.S00, "1", "1", "1", "1", "1", "1", "");
+            final InputRecord row = record(SegmentType.S00, "1", "1", "1", "1", "1", "1", "");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -150,11 +154,11 @@ public class FastHandlerTest {
     @Test
     void testResolver() throws BeanException {
         // Given
-        final Mapper<Test1Resolver, GroupType> mapper = factory.build(Test1Resolver.class);
-        final EventHandler<InputRowEntity, GroupType, InputErrorEntity> handler = FastHandler.of(WARNING);
+        final Up2Mapper<Test1Resolver, GroupType> mapper = factory.build(Test1Resolver.class);
+        final EventHandler<InputRecord, GroupType, InputError> handler = FastHandler.of(WARNING);
         {
             // When
-            final InputRowEntity row = record(SegmentType.S00, "ISL", "KGM", "PT24H");
+            final InputRecord row = record(SegmentType.S00, "ISL", "KGM", "PT24H");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -165,7 +169,7 @@ public class FastHandlerTest {
             assertNull(error.getCause().getCause());
         }
         {
-            final InputRowEntity row = record(SegmentType.S00, "TND", "XGM", "PT24H");
+            final InputRecord row = record(SegmentType.S00, "TND", "XGM", "PT24H");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -176,7 +180,7 @@ public class FastHandlerTest {
             assertNull(error.getCause().getCause());
         }
         {
-            final InputRowEntity row = record(SegmentType.S00, "TND", "KGM", "XPT24H");
+            final InputRecord row = record(SegmentType.S00, "TND", "KGM", "XPT24H");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -194,10 +198,10 @@ public class FastHandlerTest {
     @Test
     void testConverter() throws BeanException {
         // Given
-        final Mapper<Test1Converter, GroupType> mapper = factory.build(Test1Converter.class);
-        final EventHandler<InputRowEntity, GroupType, InputErrorEntity> handler = FastHandler.of(WARNING);
+        final Up2Mapper<Test1Converter, GroupType> mapper = factory.build(Test1Converter.class);
+        final EventHandler<InputRecord, GroupType, InputError> handler = FastHandler.of(WARNING);
         {
-            final InputRowEntity row = record(SegmentType.S00, "ILS", "1");
+            final InputRecord row = record(SegmentType.S00, "ILS", "1");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -208,7 +212,7 @@ public class FastHandlerTest {
             assertNull(error.getCause().getCause());
         }
         {
-            final InputRowEntity row = record(SegmentType.S00, "TND", "int");
+            final InputRecord row = record(SegmentType.S00, "TND", "int");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -226,10 +230,10 @@ public class FastHandlerTest {
     @Test
     void testProcessor() throws BeanException {
         // Given
-        final Mapper<Test3Processor, GroupType> mapper = factory.build(Test3Processor.class);
-        final EventHandler<InputRowEntity, GroupType, InputErrorEntity> handler = FastHandler.of(WARNING);
+        final Up2Mapper<Test3Processor, GroupType> mapper = factory.build(Test3Processor.class);
+        final EventHandler<InputRecord, GroupType, InputError> handler = FastHandler.of(WARNING);
         {
-            final InputRowEntity row = record(SegmentType.S00, "property");
+            final InputRecord row = record(SegmentType.S00, "property");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
@@ -240,7 +244,7 @@ public class FastHandlerTest {
             assertNull(error.getCause().getCause());
         }
         {
-            final InputRowEntity row = record(SegmentType.S00, "dummy");
+            final InputRecord row = record(SegmentType.S00, "dummy");
             final FastException error = assertThrows(FastException.class, () -> mapper.map(row, handler));
             assertEquals(0, handler.toCollection().size());
             // Then
