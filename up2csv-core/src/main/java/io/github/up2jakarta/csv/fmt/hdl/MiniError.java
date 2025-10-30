@@ -44,4 +44,9 @@ public class MiniError<B extends DataType<B>, R extends MiniRecord<?>> implement
         return type;
     }
 
+    @Override
+    public final String toString() {
+        return this.getFormattedMessage();
+    }
+
 }

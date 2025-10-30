@@ -1,0 +1,15 @@
+01;${in};${cy}-03-12;120;100;20
+02;${in};SEL${ri};FR;Paris;75020;99 Rue Up2JS-${ri};Up2JS
+03;${in};BUY${ri};FR;Paris;75020;99 Rue Up2JB-${ri};Up2JB
+04;${in};1199;Software;2;120;100;20
+04;${in};2299;Hardware;1;600;500;100
+09;${in};1199;Support;Yes
+09;${in};1199;Duration;one year
+09;${in};2299;Type;Net
+09;${in};2299;Generation;5th
+06;${in};90;10.00;Delivery fees
+06;${in};99;10.00;Delivery discount
+05;${in};DD;Due date: 31/12/${cy}
+05;${in};ES;S.A. of capital 100.000$
+08;${in};PEE${ri};FR;Paris;75020;99 Rue Up2JE-${ri};Up2JE
+07;${in};PER${ri};FR;Paris;75020;99 Rue Up2JR-${ri};Up2JR

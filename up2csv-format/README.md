@@ -16,6 +16,8 @@
         - FastFileWriter
         - See [BusinessFastTests](src/test/java/io/github/up2jakarta/csv/io/BusinessFastTests.java)
           or [FastInvoiceTests](src/test/java/io/github/up2jakarta/csv/io/FastInvoiceTests.java) for more details.
+        - See [FastCopyJobITests.java](../up2job-core/src/test/java/io/github/up2jakarta/job/csv/FastCopyJobITests.java)
+          for sample import/export batch processing
     - Simple implementation of `ModeType.FAST`
         - SimpleFastReader
         - See [SimpleFastTests](src/test/java/io/github/up2jakarta/csv/io/SimpleFastTests.java) for more details.
@@ -24,6 +26,8 @@
         - FullFileWriter
         - See [FullInvoiceTests](src/test/java/io/github/up2jakarta/csv/io/FullInvoiceTests.java)
           or [BusinessFullTests](src/test/java/io/github/up2jakarta/csv/io/BusinessFullTests.java) for more details.
+        - See [FullCopyJobITests.java](../up2job-core/src/test/java/io/github/up2jakarta/job/csv/FullCopyJobITests.java)
+          for sample import/export batch processing
     - Simple implementation of `ModeType.FULL`
         - SimpleFullReader
         - See [SimpleFullTests](src/test/java/io/github/up2jakarta/csv/io/SimpleFullTests.java) for more details.

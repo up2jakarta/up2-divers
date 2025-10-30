@@ -7,7 +7,7 @@ public abstract class KeyCoder {
 
     private static final CollapsedStringAdapter TOKEN_ADAPTER = new CollapsedStringAdapter();
 
-    private static final int RADIX = 16;
+    private static final int RADIX = Character.MAX_RADIX;
     private static final int LONG_SIZE = encode(Long.MAX_VALUE).length();
     private static final int INT_SIZE = encode(Integer.MAX_VALUE).length();
 
@@ -16,28 +16,28 @@ public abstract class KeyCoder {
     }
 
     public static String encode(long value) {
-        return Long.toUnsignedString(value, RADIX);
+        return Long.toString(value, RADIX);
     }
 
     public static long decode(String value) {
-        return Long.parseUnsignedLong(value, RADIX);
+        return Long.valueOf(value, RADIX);
     }
 
     public static String encodeInt(int value) {
-        return Integer.toUnsignedString(value, RADIX);
+        return Integer.toString(value, RADIX);
     }
 
     public static int decodeInt(String value) {
-        return Integer.parseUnsignedInt(value, RADIX);
+        return Integer.valueOf(value, RADIX);
     }
 
     public static String fixed(long value) {
-        final String str = Long.toUnsignedString(value, RADIX);
+        final String str = Long.toString(value, RADIX);
         return pad(str, LONG_SIZE, '0');
     }
 
     public static String fixed(int value) {
-        final String str = Integer.toUnsignedString(value, RADIX);
+        final String str = Integer.toString(value, RADIX);
         return pad(str, INT_SIZE, '0');
     }
 

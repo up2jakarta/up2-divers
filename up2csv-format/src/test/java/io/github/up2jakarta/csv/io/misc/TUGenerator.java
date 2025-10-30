@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.io.misc;
 
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.xml.adapters.KeyCoder;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator.FV_SM;
 import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
 
 public class TUGenerator {
@@ -78,16 +78,16 @@ public class TUGenerator {
         return csv;
     }
 
-    private void fill(String[] tmpl, String[] data, String invoiceNumber, String currentYear, String randomInt, int lineNumber) {
+    private void fill(String[] tmpl, String[] data, String invoiceNumber, String year, String randomInt, int ln) {
         if (mode == ModeType.FULL) {
-            data[0] = "R" + KeyCoder.fixed(lineNumber);
+            data[0] = fixed(FV_SM + ln);
         }
         final int p = (mode == ModeType.FULL) ? 1 : 0;
         for (var i = 1; i < tmpl.length; i++) {
             if (tmpl[i] != null) {
                 data[i + p] = tmpl[i].replace("${in}", invoiceNumber)
                         .replace("${ri}", randomInt)
-                        .replace("${cy}", currentYear);
+                        .replace("${cy}", year);
             }
         }
     }

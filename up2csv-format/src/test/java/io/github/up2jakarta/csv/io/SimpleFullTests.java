@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.io;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.fmt.SimpleFullImporter;
-import io.github.up2jakarta.csv.fmt.hdl.Fixed08Generator;
+import io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator;
 import io.github.up2jakarta.csv.fmt.hdl.PathRecord;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
@@ -29,7 +29,7 @@ public class SimpleFullTests extends AFullTests<PathRecord<SegmentType>, SimpleF
 
     @Override
     protected FullFileWriter<Invoice> writer(SimpleFullImporter<Invoice, GroupType, SegmentType> importer, CSVFormat format) throws BeanException {
-        return new FullFileWriter<>(importer.toExporter(), format, new Fixed08Generator());
+        return new FullFileWriter<>(importer.toExporter(), format, new Fixed06Generator());
     }
 
     @Override

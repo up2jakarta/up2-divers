@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.io;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.fmt.FullImporter;
-import io.github.up2jakarta.csv.fmt.hdl.Fixed08Generator;
+import io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator;
 import io.github.up2jakarta.csv.fmt.hdl.PathSource;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
@@ -33,7 +33,7 @@ public class FullInvoiceTests extends AFullTests<InputRecord, FullImporter<Invoi
 
     @Override
     protected FullFileWriter<Invoice> writer(FullImporter<Invoice, GroupType, SegmentType, InputRecord, InputError> importer, CSVFormat format) throws BeanException {
-        return new FullFileWriter<>(importer.toExporter(), format, new Fixed08Generator());
+        return new FullFileWriter<>(importer.toExporter(), format, new Fixed06Generator());
     }
 
     @Override
@@ -43,7 +43,7 @@ public class FullInvoiceTests extends AFullTests<InputRecord, FullImporter<Invoi
         return new FullFileReader<>(importer, format, "-") {
             @Override
             protected InputRecord create(long lineId, String recordId, SegmentType type, String beanId, String[] data) {
-                return new InputRecord(this.getSource(), lineId, recordId, type, beanId, data);
+                return new InputRecord(source, lineId, recordId, type, beanId, data);
             }
         };
     }

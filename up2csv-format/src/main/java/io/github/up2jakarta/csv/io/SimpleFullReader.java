@@ -26,7 +26,7 @@ public final class SimpleFullReader<T extends Referencable, B extends DataType<B
 
     @Override
     protected PathRecord<I> create(long lineId, String recordKey, I type, String beanKey, String[] data) {
-        return new PathRecord<>(this.getSource(), lineId, recordKey, type, beanKey, data);
+        return new PathRecord<>(source, lineId, recordKey, type, beanKey, data);
     }
 
 }

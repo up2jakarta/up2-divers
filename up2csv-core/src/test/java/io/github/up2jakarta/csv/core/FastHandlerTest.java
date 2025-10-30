@@ -65,7 +65,7 @@ public class FastHandlerTest {
     @Test
     void testValidator() throws BeanException {
         // Given
-        final Up2Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class, GroupType.NONE);
+        final Up2Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class, factory.resolver.or(GroupType.NONE));
         final EventHandler<InputRecord, GroupType, InputError> handler = FastHandler.of(WARNING);
         {
             // When

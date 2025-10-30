@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
+import static io.github.up2jakarta.xml.adapters.KeyCoder.decodeInt;
 import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
 
 /**
@@ -15,27 +16,29 @@ import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
  *
  * @see FullExporter#format(io.github.up2jakarta.csv.data.Referencable, Supplier, SegmentWriter)
  */
-public final class Fixed08Generator implements IntSupplier, Supplier<String>, Resettable {
+public final class Fixed06Generator implements IntSupplier, Supplier<String>, Resettable {
+
+    public static final int FV_SM = decodeInt("up2v06");
 
     private final int firstValue;
     private final AtomicInteger generator;
 
-    public Fixed08Generator() {
-        this(1);
+    public Fixed06Generator() {
+        this(FV_SM);
     }
 
-    public Fixed08Generator(int firstValue) {
-        this(new AtomicInteger(firstValue));
-    }
-
-    public Fixed08Generator(AtomicInteger generator) {
-        this.generator = generator;
-        this.firstValue = generator.get();
+    public Fixed06Generator(int firstValue) {
+        this.firstValue = Math.max(firstValue, FV_SM);
+        this.generator = new AtomicInteger(this.firstValue);
     }
 
     @Override
     public String get() {
-        return fixed(generator.getAndIncrement());
+        final int i = generator.getAndIncrement();
+        if (generator.get() < 1) {
+            generator.set(1);
+        }
+        return fixed(i);
     }
 
     @Override

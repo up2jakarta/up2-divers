@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
+import static io.github.up2jakarta.xml.adapters.KeyCoder.decode;
 import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
 
 /**
@@ -15,27 +16,29 @@ import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
  *
  * @see FullExporter#format(io.github.up2jakarta.csv.data.Referencable, Supplier, SegmentWriter)
  */
-public final class Fixed16Generator implements LongSupplier, Supplier<String>, Resettable {
+public final class Fixed13Generator implements LongSupplier, Supplier<String>, Resettable {
+
+    public static final long FV_LG = decode("1up2jakarta13");
 
     private final long firstValue;
     private final AtomicLong generator;
 
-    public Fixed16Generator() {
-        this(1);
+    public Fixed13Generator() {
+        this(FV_LG);
     }
 
-    public Fixed16Generator(long firstValue) {
-        this(new AtomicLong(firstValue));
-    }
-
-    public Fixed16Generator(AtomicLong generator) {
-        this.generator = generator;
-        this.firstValue = generator.get();
+    public Fixed13Generator(long firstValue) {
+        this.firstValue = Math.max(firstValue, FV_LG);
+        this.generator = new AtomicLong(this.firstValue);
     }
 
     @Override
     public String get() {
-        return fixed(generator.getAndIncrement());
+        final long i = generator.getAndIncrement();
+        if (generator.get() < 1) {
+            generator.set(1);
+        }
+        return fixed(i);
     }
 
     @Override

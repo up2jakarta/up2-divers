@@ -29,7 +29,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public abstract class FullFileReader<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>, S extends ISourceEntity<?>, R extends IRecordEntity<I, S, ?>, E extends IErrorEntity<R, ?, B>> extends BaseFileReader<T, B, I, R, E> {
 
-    private S resource;
+    protected S source;
 
     public FullFileReader(FullImporter<T, B, I, R, E> importer, CSVFormat format, String... nullValues) {
         super(importer, format, nullValues);
@@ -55,19 +55,12 @@ public abstract class FullFileReader<T extends Referencable, B extends DataType<
      */
     public void open(final FileReader reader, S resource) throws IOException {
         super.open(reader);
-        this.resource = resource;
+        this.source = resource;
     }
 
     @Override
     final R create(CSVRecord source, I type, String beanId, String[] data) {
         return this.create(source.getRecordNumber(), source.values()[0], type, beanId, data);
-    }
-
-    /**
-     * @return the file source
-     */
-    protected final S getSource() {
-        return resource;
     }
 
     protected abstract R create(long lineId, String rowId, I type, String beanId, String[] data);

@@ -15,7 +15,7 @@ public class InvoiceFullReader extends FullFileReader<Invoice, GroupType, Segmen
 
     @Override
     protected InputRecord create(long lineId, String recordKey, SegmentType type, String beanKey, String[] data) {
-        return new InputRecord(this.getSource(), lineId, recordKey, type, beanKey, data);
+        return new InputRecord(source, lineId, recordKey, type, beanKey, data);
     }
 
 }

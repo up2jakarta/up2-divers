@@ -6,7 +6,8 @@ import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.fmt.FullExporter;
 import io.github.up2jakarta.csv.fmt.FullImporter;
-import io.github.up2jakarta.csv.fmt.hdl.Fixed08Generator;
+import io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator;
+import io.github.up2jakarta.csv.fmt.hdl.Fixed13Generator;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
@@ -35,7 +36,7 @@ public abstract class AFullTest<T extends Invoice, R extends IRecordEntity<Segme
         // Given
         final AtomicInteger count = new AtomicInteger(0);
         // When
-        exporter.format(null, new Fixed08Generator(), (r) -> count.incrementAndGet());
+        exporter.format(null, new Fixed13Generator(), (r) -> count.incrementAndGet());
         // Then
         assertEquals(0, count.get());
     }
@@ -62,7 +63,7 @@ public abstract class AFullTest<T extends Invoice, R extends IRecordEntity<Segme
         }
         // When Formating
         final AFullTester<R> tc = new AFullTester<>(invoice, rows);
-        exporter.format(invoice, new Fixed08Generator(), tc::assertExists);
+        exporter.format(invoice, new Fixed06Generator(), tc::assertExists);
         tc.assertEmpty();
     }
 

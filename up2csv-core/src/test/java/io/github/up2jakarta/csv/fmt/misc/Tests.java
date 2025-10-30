@@ -10,7 +10,7 @@ import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.fmt.FastImporter;
 import io.github.up2jakarta.csv.fmt.FullImporter;
 import io.github.up2jakarta.csv.fmt.UnitImporter;
-import io.github.up2jakarta.csv.fmt.hdl.Fixed08Generator;
+import io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.SegmentType;
@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import static io.github.up2jakarta.csv.core.ModeType.*;
+import static io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator.FV_SM;
 import static io.github.up2jakarta.csv.fmt.misc.ABusinessTest.assertValid;
 import static io.github.up2jakarta.csv.impl.GroupType.D001;
 import static io.github.up2jakarta.csv.impl.SegmentType.S01;
@@ -61,7 +62,7 @@ public final class Tests {
             final String[] source = FAST_INVOICE[i];
             final String[] target = FULL_INVOICE[i] = new String[source.length + 1];
             System.arraycopy(source, 0, target, 1, source.length);
-            target[0] = fixed(i + 1);
+            target[0] = fixed(FV_SM + i);
         }
 
         UNIT_INVOICE = new String[FAST_INVOICE.length][];
@@ -202,7 +203,7 @@ public final class Tests {
         final T invoice = aggregate(FULL, importer, rows);
         // When Formating
         final AFullTester<R> tc = new AFullTester<>(invoice, rows);
-        importer.toExporter().format(invoice, new Fixed08Generator(1), tc::assertExists);
+        importer.toExporter().format(invoice, new Fixed06Generator(), tc::assertExists);
         tc.assertEmpty();
     }
 

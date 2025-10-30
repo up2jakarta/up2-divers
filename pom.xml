@@ -4,7 +4,7 @@
 
     <groupId>io.github.up2jakarta</groupId>
     <artifactId>up2-divers</artifactId>
-    <version>1.5.3</version>
+    <version>1.5.4</version>
     <packaging>pom</packaging>
 
     <name>Up2Jakarta :: Divers</name>
@@ -53,7 +53,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring.boot.version>3.4.9</spring.boot.version>
+        <spring.boot.version>3.4.11</spring.boot.version>
         <apache.csv.version>1.14.1</apache.csv.version>
         <mockito.version>5.14.2</mockito.version>
     </properties>
@@ -64,27 +64,27 @@
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2cii-format</artifactId>
-                <version>1.5.3</version>
+                <version>1.5.4</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2csv-core</artifactId>
-                <version>1.5.3</version>
+                <version>1.5.4</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2csv-format</artifactId>
-                <version>1.5.3</version>
+                <version>1.5.4</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2job-core</artifactId>
-                <version>1.5.3</version>
+                <version>1.5.4</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2xml-core</artifactId>
-                <version>1.5.3</version>
+                <version>1.5.4</version>
             </dependency>
             <!-- Dependencies -->
             <dependency>
@@ -193,7 +193,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -204,7 +204,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <!-- mvn decrypt:decrypt -Prelease (target/pass.txt) -->
+                            <!-- mvn decrypt:decrypt -N -P release (target/pass.txt) -->
                             <!-- gpg-connect-agent -v -->
                             <keyname>${gpg.key.name}</keyname>
                         </configuration>

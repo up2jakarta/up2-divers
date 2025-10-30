@@ -1,7 +1,25 @@
 package io.github.up2jakarta.job.core;
 
+import java.util.function.Function;
+
 @SuppressWarnings("unused")
 public interface SafeUtil {
+
+    static void call(Function<Exception, ? extends RuntimeException> creator, Callable... ops) {
+        RuntimeException error = null;
+        for (final Callable operator : ops) {
+            try {
+                operator.apply();
+            } catch (Exception ex) {
+                if (error == null) {
+                    error = creator.apply(ex);
+                }
+            }
+        }
+        if (error != null) {
+            throw error;
+        }
+    }
 
     static void safe(Callable operator) {
         try {

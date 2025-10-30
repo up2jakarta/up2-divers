@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.fmt.*;
-import io.github.up2jakarta.csv.fmt.hdl.Fixed08Generator;
+import io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator;
 import io.github.up2jakarta.csv.fmt.misc.CyclicInvoice;
 import io.github.up2jakarta.csv.fmt.misc.MyError;
 import io.github.up2jakarta.csv.fmt.misc.MyRecord;
@@ -130,7 +130,7 @@ public class BuilderTests {
         assertNotNull(exporter);
         // THEN
         final String[] root = FULL_INVOICE[0];
-        exporter.format(INVOICE, new Fixed08Generator(), d -> assertArrayEquals(root, d));
+        exporter.format(INVOICE, new Fixed06Generator(), d -> assertArrayEquals(root, d));
     }
 
     @Test

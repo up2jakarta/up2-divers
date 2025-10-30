@@ -71,7 +71,7 @@ public abstract class BusinessExporter<B extends DataType<B>, I extends IType<B,
         if (source instanceof Up2Mapper<Segment, B> bm) {
             return bm.toFormat();
         }
-        return factory.format(type.getClassType(), type.getBusinessType());
+        return factory.format(type.getClassType(), factory.resolver.or(type.getBusinessType()));
     }
 
     @Override

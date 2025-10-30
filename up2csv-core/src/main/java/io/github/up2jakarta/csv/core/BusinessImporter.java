@@ -99,7 +99,7 @@ public abstract class BusinessImporter<B extends DataType<B>, I extends IFullTyp
         if (source instanceof Up2Format<Segment, B> bf) {
             return bf.toMapper();
         }
-        return factory.build(type.getClassType(), type.getBusinessType());
+        return factory.build(type.getClassType(), factory.resolver.or(type.getBusinessType()));
     }
 
     @Override
@@ -123,7 +123,9 @@ public abstract class BusinessImporter<B extends DataType<B>, I extends IFullTyp
      * @throws BeanException for any problem when setting fields from input record
      */
     public final <C> C parse(Collection<R> records, BusinessCreator<C, T, E> creator) throws BeanException {
-        if (records == null || records.isEmpty()) {
+        if (records == null) {
+            return null;
+        } else if (records.isEmpty()) {
             return creator.apply(null, List.of());
         }
         final List<BSEntry<I, R, B, E>> roots = new ArrayList<>(1);
