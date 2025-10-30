@@ -3,8 +3,7 @@ package io.github.up2jakarta.csv.io.misc;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.fmt.FullImporter;
-import io.github.up2jakarta.csv.fmt.hdl.PathRecord;
-import io.github.up2jakarta.csv.fmt.hdl.PathSource;
+import io.github.up2jakarta.csv.fmt.hdl.InputRecord;
 import io.github.up2jakarta.csv.io.FullFileReader;
 import io.github.up2jakarta.csv.io.FullFileWriter;
 import io.github.up2jakarta.csv.io.dto.Invoice;
@@ -18,11 +17,11 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public abstract class AFullTests<R extends PathRecord<SegmentType>, A extends FullImporter<Invoice, GroupType, SegmentType, R, ?>> extends ABusinessTest<R> {
+public abstract class AFullTests<R extends InputRecord<SegmentType, ?>, A extends FullImporter<Invoice, GroupType, SegmentType, R, ?>> extends AbstractTests<R> {
 
     private final FullFileWriter<Invoice> writer;
-    private final FullFileReader<Invoice, GroupType, SegmentType, PathSource, R, ?> reader1;
-    private final FullFileReader<Invoice, GroupType, SegmentType, PathSource, R, ?> reader2;
+    private final FullFileReader<Invoice, GroupType, SegmentType, R, ?> reader1;
+    private final FullFileReader<Invoice, GroupType, SegmentType, R, ?> reader2;
 
     protected AFullTests(A importer, CSVFormat format) throws IOException, BeanException {
         super(ModeType.FULL, format);
@@ -33,7 +32,7 @@ public abstract class AFullTests<R extends PathRecord<SegmentType>, A extends Fu
 
     protected abstract FullFileWriter<Invoice> writer(A importer, CSVFormat format) throws BeanException;
 
-    protected abstract FullFileReader<Invoice, GroupType, SegmentType, PathSource, R, ?> reader(A importer, CSVFormat format);
+    protected abstract FullFileReader<Invoice, GroupType, SegmentType, R, ?> reader(A importer, CSVFormat format);
 
     @Override
     final void assertRecord(R data, R source) {
@@ -48,15 +47,13 @@ public abstract class AFullTests<R extends PathRecord<SegmentType>, A extends Fu
         // GIVEN
         final Path filePath = this.input(size);
         final Path copyPath = this.output(filePath);
-        final PathSource fileSource = new PathSource("TU", filePath);
-        final PathSource copySource = new PathSource("TU", copyPath);
         // WHEN
-        reader1.open(filePath.toFile(), fileSource);
+        reader1.open(filePath.toFile());
         writer.open(copyPath.toFile());
         this.copy(reader1, writer);
         // THEN
-        reader1.open(filePath.toFile(), fileSource);
-        reader2.open(copyPath.toFile(), copySource);
+        reader1.open(filePath.toFile());
+        reader2.open(copyPath.toFile());
         this.assertFiles(reader1, reader2);
     }
 

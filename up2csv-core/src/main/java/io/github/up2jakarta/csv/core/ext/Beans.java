@@ -10,7 +10,6 @@ import java.util.Stack;
 
 import static java.util.Arrays.stream;
 
-@SuppressWarnings("unused")
 public final class Beans {
 
     public static final Type[] NO_TYPES = {};
@@ -59,7 +58,7 @@ public final class Beans {
         return getClassArguments(superType, finalType, typeArguments);
     }
 
-    private static Type[] resolveArguments(Class<?> type, ParameterizedType pType, Type[] typeArguments) {
+    public static Type[] resolveArguments(Class<?> type, ParameterizedType pType, Type[] typeArguments) {
         final Type[] typeParameters = type.getTypeParameters();
         var actualArguments = pType.getActualTypeArguments();
         final Type[] result = new Type[actualArguments.length];
@@ -77,6 +76,60 @@ public final class Beans {
             }
         }
         return result;
+    }
+
+    public static Class<?> getPropertyClass(AccessibleObject property, Type type) {
+        if (type instanceof Class<?> fc) {
+            return fc;
+        }
+        if ((type instanceof ParameterizedType tv) && tv.getRawType() instanceof Class<?> fc) {
+            return fc;
+        }
+        if (property instanceof Field field) {
+            return field.getType();
+        } else if (property instanceof Method getter) {
+            return getter.getReturnType();
+        }
+        return void.class;
+    }
+
+    public static Type getPropertyType(AccessibleObject property, Type... typeArguments) {
+        final Type propertyType;
+        final Class<?> propertyClass;
+        final Class<?> defaultClass;
+        if (property instanceof Field field) {
+            propertyClass = field.getDeclaringClass();
+            propertyType = field.getGenericType();
+            defaultClass = field.getType();
+        } else if (property instanceof Method getter) {
+            propertyClass = getter.getDeclaringClass();
+            propertyType = getter.getGenericReturnType();
+            defaultClass = getter.getReturnType();
+        } else {
+            return void.class;
+        }
+        if (propertyType instanceof TypeVariable<?>) {
+            final Type[] typeParameters = propertyClass.getTypeParameters();
+            for (var i = 0; i < typeParameters.length; i++) {
+                if (typeParameters[i] == propertyType) {
+                    return typeArguments[i];
+                }
+            }
+        }
+        return defaultClass;
+    }
+
+    public static Type[] getPropertyArguments(AccessibleObject property, Type[] arguments) {
+        if (property instanceof Field field) {
+            if (field.getGenericType() instanceof ParameterizedType type) {
+                return resolveArguments(field.getDeclaringClass(), type, arguments);
+            }
+        } else if (property instanceof Method getter) {
+            if (getter.getGenericReturnType() instanceof ParameterizedType type) {
+                return resolveArguments(getter.getDeclaringClass(), type, arguments);
+            }
+        }
+        return NO_TYPES;
     }
 
     public static Class<? extends Segment> getSegmentType(Stack<Class<? extends Segment>> stack) {
@@ -105,19 +158,6 @@ public final class Beans {
         return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
     }
 
-    public static Class<?> getFieldType(Field field, Type[] typeArguments) {
-        final Type fieldType = field.getGenericType();
-        if (fieldType instanceof TypeVariable<?>) {
-            final Type[] typeParameters = field.getDeclaringClass().getTypeParameters();
-            for (var i = 0; i < typeParameters.length; i++) {
-                if (typeParameters[i] == fieldType) {
-                    return (Class<?>) typeArguments[i];
-                }
-            }
-        }
-        return field.getType();
-    }
-
     public static Type[] getTypeArguments(Class<?> beanType, Class<?> finalType) throws BeanException {
         if (finalType.getTypeParameters().length == 0 || beanType == Object.class) {
             return NO_TYPES;
@@ -138,59 +178,91 @@ public final class Beans {
         return NO_TYPES;
     }
 
-    public static Method getMethod(Class<?> type, String mName, String attr, String desc, Class<?>... pTypes) throws BeanException {
+    public static Method getMethod(Class<?> type, String name, String attr, String desc, Class<?>... types) throws BeanException {
         try {
-            final Method getter = type.getMethod(mName, pTypes);
-            if (!Modifier.isPublic(getter.getModifiers())) {
-                throw new BeanException(type, attr, desc + " must be public");
-            }
-            return getter;
+            final Method method = type.getDeclaredMethod(name, types);
+            setAccessible(method);
+            return method;
+        } catch (Exception ignore) {
+        }
+        try {
+            final Method method = type.getMethod(name, types);
+            setAccessible(method);
+            return method;
         } catch (Exception ex) {
             throw new BeanException(type, attr, desc + " not found");
         }
     }
 
-    public static <T> T getBean(BeanContext context, Class<T> beanType) throws BeanException {
+    public static <T> T getBean(BeanContext context, Class<?> beanType) throws BeanException {
         try {
-            return context.getBean(beanType);
+            //noinspection unchecked
+            return (T) context.getBean(beanType);
         } catch (Exception e) {
             throw new BeanException(beanType, "qualified bean must be found");
         }
     }
 
-    public static Method getAccessibleSetter(Field field) throws BeanException {
-        final String pName = capitalize(field.getName());
-        return getMethod(field.getDeclaringClass(), "set" + pName, pName, "setter", field.getType());
-    }
-
-    public static Method getAccessibleGetter(Field field) throws BeanException {
-        return getAccessibleGetter(field.getDeclaringClass(), field);
-    }
-
-    public static Method getAccessibleGetter(Class<?> type, Field field) throws BeanException {
-        final String pName = capitalize(field.getName());
-        final Class<?> ft = field.getType();
-        if (ft == Boolean.class || ft == boolean.class) {
-            return getMethod(type, "is" + pName, pName, "getter");
+    public static Method getAccessibleSetter(Class<?> type, Field field, Class<?> ft) throws BeanException {
+        final String fn = field.getName();
+        final String pName = capitalize(fn);
+        try {
+            return getMethod(type, "set" + pName, fn, "setter", ft);
+        } catch (BeanException ignore) {
+            return getMethod(type, "set" + pName, fn, "setter", field.getType());
         }
-        return getMethod(type, "get" + pName, pName, "getter");
+    }
+
+    public static Method getAccessibleGetter(Class<?> type, Field field, Class<?> ft) throws BeanException {
+        final String fn = field.getName();
+        if (type.isRecord()) {
+            return getMethod(type, fn, fn, "getter");
+        }
+        final String pName = capitalize(fn);
+        if (ft == Boolean.class || ft == boolean.class) {
+            try {
+                return getMethod(type, "is" + pName, fn, "getter");
+            } catch (BeanException ignore) {
+            }
+        }
+        return getMethod(type, "get" + pName, fn, "getter");
     }
 
     public static <T> Constructor<T> getDefaultConstructor(Class<T> type) throws BeanException {
         try {
-            final Constructor<T> constructor = type.getDeclaredConstructor();
-            if (!Modifier.isPublic(constructor.getModifiers())) {
-                throw new BeanException(type, "default constructor must be public");
+            final Constructor<T> constructor;
+            if (type.isRecord()) {
+                final Field[] fields = type.getDeclaredFields();
+                final Class<?>[] types = new Class<?>[fields.length];
+                for (var i = 0; i < fields.length; i++) {
+                    types[i] = fields[i].getType();
+                }
+                constructor = type.getDeclaredConstructor(types);
+            } else {
+                constructor = type.getDeclaredConstructor();
             }
+            setAccessible(constructor);
             return constructor;
         } catch (Exception e) {
             throw new BeanException(type, e.getMessage());
         }
     }
 
-    public static <T> T newInstance(Constructor<T> constructor) throws BeanException {
+    public static void setAccessible(Executable executable) {
+        if (!Modifier.isPublic(executable.getModifiers())) {
+            executable.setAccessible(true);
+        }
+    }
+
+    public static void setAccessible(Field field) {
+        if (!Modifier.isPublic(field.getModifiers())) {
+            field.setAccessible(true);
+        }
+    }
+
+    public static <T> T newInstance(Constructor<T> constructor, Object... arguments) throws BeanException {
         try {
-            return constructor.newInstance();
+            return constructor.newInstance(arguments);
         } catch (Exception ex) {
             throw new BeanException(constructor.getDeclaringClass(), ex.getMessage());
         }
@@ -204,11 +276,29 @@ public final class Beans {
         }
     }
 
-    public static Object getValue(Object bean, Method getter) throws BeanException {
+    @SuppressWarnings("unchecked")
+    public static <V> V getValue(Object bean, Method getter) throws BeanException {
         try {
-            return getter.invoke(bean);
+            return (V) getter.invoke(bean);
         } catch (Exception ex) {
             throw new BeanException(bean.getClass(), getter, ex.getMessage());
+        }
+    }
+
+    public static <V> void setValue(Object bean, V value, Field field) throws BeanException {
+        try {
+            field.set(bean, value);
+        } catch (Exception ex) {
+            throw new BeanException(bean.getClass(), field, ex.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <V> V getValue(Object bean, Field field) throws BeanException {
+        try {
+            return (V) field.get(bean);
+        } catch (Exception ex) {
+            throw new BeanException(bean.getClass(), field, ex.getMessage());
         }
     }
 

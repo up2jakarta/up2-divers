@@ -1,12 +1,12 @@
 package io.github.up2jakarta.csv.fmt.hdl;
 
-import io.github.up2jakarta.csv.api.IError;
+import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.api.hdl.IErrorCreator;
-import io.github.up2jakarta.csv.core.Up2Collector;
+import io.github.up2jakarta.csv.api.hdl.ICreator;
+import io.github.up2jakarta.csv.core.hdl.EventCollector;
 import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.xml.api.PropertyException;
 import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.clv.PropertyException;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -21,10 +21,10 @@ import static io.github.up2jakarta.csv.BusinessBuilder.DEFAULT_LEVEL;
  * @param <D> the data type
  * @param <E> the error type
  */
-public class FastCollector<R extends IRecord<?>, D extends DataType<D>, E extends IError<D>> extends Up2Collector<R, D, E> {
+public class FastCollector<R extends IRecord<?>, D extends DataType<D>, E extends IEvent<D>> extends EventCollector<R, D, E, PropertyException> {
 
     private final Set<E> errors = new LinkedHashSet<>();
-    private final IErrorCreator<R, D, E> creator;
+    private final ICreator<R, D, E> creator;
     private final int failLevel;
 
     /**
@@ -33,7 +33,7 @@ public class FastCollector<R extends IRecord<?>, D extends DataType<D>, E extend
      * @param row     the input segment
      * @param creator the error creator
      */
-    public FastCollector(R row, IErrorCreator<R, D, E> creator) {
+    public FastCollector(R row, ICreator<R, D, E> creator) {
         this(row, creator, DEFAULT_LEVEL);
     }
 
@@ -44,18 +44,18 @@ public class FastCollector<R extends IRecord<?>, D extends DataType<D>, E extend
      * @param creator the error creator
      * @param fatal   the severity level for failure
      */
-    public FastCollector(R row, IErrorCreator<R, D, E> creator, SeverityType fatal) {
-        super(row);
+    public FastCollector(R row, ICreator<R, D, E> creator, SeverityType fatal) {
+        super(row, EXCEPTION_TYPE);
         this.creator = creator;
         this.failLevel = fatal.getLevel();
     }
 
     @Override
-    protected void accept(D data, int offset, SeverityType type, String code, PropertyException cause) {
-        if (type.getLevel() < failLevel) {
-            errors.add(creator.create(row, offset, data, cause));
+    protected void accept(D type, int offset, PropertyException cause) {
+        if (cause.getSeverity().getLevel() < failLevel) {
+            errors.add(creator.create(row, offset, type, cause));
         } else {
-            throw new FatalException(data, offset, type, code, cause, new ArrayList<>(errors));
+            throw new FatalException(type, offset, cause, new ArrayList<>(errors));
         }
     }
 

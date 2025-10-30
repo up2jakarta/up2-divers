@@ -6,9 +6,9 @@ import java.io.Serializable;
  * Contract interface for identifiable bean, useful for entity persistence .
  *
  * @param <K> the unique key type
- * @see io.github.up2jakarta.csv.api.hdl.IRecordEntity
- * @see io.github.up2jakarta.csv.api.hdl.IErrorEntity
- * @see io.github.up2jakarta.csv.api.hdl.ISourceEntity
+ * @see io.github.up2jakarta.csv.api.hdl.IFullRecord
+ * @see io.github.up2jakarta.csv.api.hdl.IFullError
+ * @see io.github.up2jakarta.csv.api.hdl.IFullSource
  */
 public interface Identifiable<K> extends Serializable {
 

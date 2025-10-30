@@ -6,7 +6,7 @@ import io.github.up2jakarta.xml.clv.TypeConverter;
 
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_CODE_LIST;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_CODE_LIST;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 
 /**

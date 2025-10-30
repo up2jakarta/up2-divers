@@ -1,8 +1,7 @@
 package io.github.up2jakarta.csv.fmt.misc;
 
-import io.github.up2jakarta.csv.api.IError;
+import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.api.hdl.IRecordEntity;
 import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.BusinessImporter;
@@ -196,7 +195,7 @@ public final class Tests {
         tc.assertEmpty();
     }
 
-    public static <T extends Invoice, R extends IRecordEntity<SegmentType, ?, ?>> void assertInvoice(
+    public static <T extends Invoice, R extends IRecord<SegmentType>> void assertInvoice(
             FullImporter<T, GroupType, SegmentType, R, ?> importer, R[] rows
     ) throws BeanException, IOException {
         // When Parsing
@@ -207,7 +206,7 @@ public final class Tests {
         tc.assertEmpty();
     }
 
-    public static <T extends Invoice, R extends IRecord<SegmentType>, E extends IError<GroupType>> void assertInvoice(
+    public static <T extends Invoice, R extends IRecord<SegmentType>, E extends IEvent<GroupType>> void assertInvoice(
             UnitImporter<T, GroupType, SegmentType, R, E> importer, R[] rows
     ) throws BeanException, IOException {
         // When Parsing

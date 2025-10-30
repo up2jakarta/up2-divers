@@ -79,24 +79,40 @@ public class TUGenerator {
     }
 
     private void fill(String[] tmpl, String[] data, String invoiceNumber, String year, String randomInt, int ln) {
+        final int s, p;
         if (mode == ModeType.FULL) {
             data[0] = fixed(FV_SM + ln);
-        }
-        final int p = (mode == ModeType.FULL) ? 1 : 0;
-        for (var i = 1; i < tmpl.length; i++) {
-            if (tmpl[i] != null) {
-                data[i + p] = tmpl[i].replace("${in}", invoiceNumber)
-                        .replace("${ri}", randomInt)
-                        .replace("${cy}", year);
+            p = s = 1;
+        } else {
+            if (mode == ModeType.UNIT && !"01".equals(tmpl[0])) {
+                data[0] = tmpl[0];
+                s = 2;
+                p = -1;
+            } else {
+                s = 1;
+                p = 0;
             }
         }
+        for (var i = s; i < tmpl.length; i++) {
+            data[i + p] = this.replace(tmpl[i], invoiceNumber, year, randomInt);
+        }
+    }
+
+    private String replace(String value, String invoiceNumber, String year, String randomInt) {
+        if (value == null) {
+            return null;
+        }
+        return value.replace("${in}", invoiceNumber)
+                .replace("${ri}", randomInt)
+                .replace("${cy}", year);
     }
 
     private List<String[]> clone(List<String[]> tmpl) {
         final int p = (mode == ModeType.FULL) ? 1 : 0;
         final List<String[]> data = new ArrayList<>(tmpl.size());
         for (final String[] segment : tmpl) {
-            final String[] copy = new String[segment.length + p];
+            final int s = (mode == ModeType.UNIT && !"01".equals(segment[0])) ? 1 : 0;
+            final String[] copy = new String[segment.length + p - s];
             copy[p] = segment[0];
             data.add(copy);
         }

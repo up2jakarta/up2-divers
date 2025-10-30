@@ -24,9 +24,8 @@ import static java.util.Objects.requireNonNull;
 
 public class ErrorWriter extends ConditionalWriter<Up2Result<Invoice, InputError>> {
 
-    private final SingleWriter<InputError, DynamicType> delegate;
-
     private static final Logger LOG = LoggerFactory.getLogger(ErrorWriter.class);
+    private final SingleWriter<InputError, DynamicType> delegate;
 
     public ErrorWriter(Up2Format<InputError, DynamicType> mapper, CSVFormat format) {
         this.delegate = new SingleWriter<>(mapper, format);

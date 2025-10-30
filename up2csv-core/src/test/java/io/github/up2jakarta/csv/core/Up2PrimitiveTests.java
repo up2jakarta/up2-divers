@@ -4,6 +4,7 @@ import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.core.misc.Test1Primitive;
 import io.github.up2jakarta.csv.core.misc.Test2Primitive;
 import io.github.up2jakarta.csv.core.misc.Test3Primitive;
+import io.github.up2jakarta.csv.core.misc.Test4Primitive;
 import io.github.up2jakarta.csv.impl.GroupType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,6 +57,17 @@ public class Up2PrimitiveTests {
         assertEquals(4L, bean.getALong());
         assertEquals(5.56F, bean.getAFloat());
         assertEquals(6.6667D, bean.getADouble());
+    }
+
+    @Test
+    void testKeepDefault() throws BeanException {
+        // Given
+        final Up2Mapper<Test4Primitive, GroupType> mapper = factory.build(Test4Primitive.class);
+        // When
+        final Test4Primitive bean = mapper.map();
+        // Then
+        assertEquals(1.0F, bean.getAFloat());
+        assertEquals(2.0D, bean.getADouble());
     }
 
     @Test

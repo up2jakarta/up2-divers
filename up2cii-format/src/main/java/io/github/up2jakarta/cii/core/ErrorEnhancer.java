@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.core;
 
 import io.github.up2jakarta.cii.CII;
-import io.github.up2jakarta.xml.clv.PropertyException;
+import io.github.up2jakarta.xml.api.PropertyException;
 
 import java.util.Map;
 

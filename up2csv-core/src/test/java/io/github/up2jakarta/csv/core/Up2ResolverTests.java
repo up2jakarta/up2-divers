@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_CODE_LIST;
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_CONVERTER;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_CODE_LIST;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_CONVERTER;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -35,9 +35,9 @@ class Up2ResolverTests {
         final Up2Mapper<Test1Definition, DynamicType> mapper = factory.build(Test1Definition.class);
         final FastException error = assertThrows(FastException.class, () -> mapper.map("TON", "PT24H"));
         // Then
-        assertNotNull(error.getDataType());
-        assertNotNull(error.getDataType().getName());
-        assertEquals(Test1Definition.D01, error.getDataType().getCode());
+        assertNotNull(error.getType());
+        assertNotNull(error.getType().getName());
+        assertEquals(Test1Definition.D01, error.getType().getCode());
         assertEquals(0, error.getOffset());
         assertEquals(SeverityType.ERROR, error.getSeverity());
         assertEquals(ERROR_CODE_LIST, error.getCode());
@@ -51,9 +51,9 @@ class Up2ResolverTests {
         final Up2Mapper<Test1Definition, DynamicType> mapper = factory.build(Test1Definition.class);
         final FastException error = assertThrows(FastException.class, () -> mapper.map("KGM", "24H"));
         // Then
-        assertNotNull(error.getDataType());
-        assertNotNull(error.getDataType().getName());
-        assertEquals(Test1Definition.D02, error.getDataType().getCode());
+        assertNotNull(error.getType());
+        assertNotNull(error.getType().getName());
+        assertEquals(Test1Definition.D02, error.getType().getCode());
         assertEquals(1, error.getOffset());
         assertEquals(SeverityType.ERROR, error.getSeverity());
         assertEquals(ERROR_CONVERTER, error.getCode());

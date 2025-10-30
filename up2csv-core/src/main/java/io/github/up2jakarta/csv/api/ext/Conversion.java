@@ -1,6 +1,7 @@
 package io.github.up2jakarta.csv.api.ext;
 
 import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.xml.clv.TypeConverter;
 
 import java.util.Optional;
 
@@ -39,6 +40,23 @@ public final class Conversion<R> {
     public Conversion(PropertyConverter<R> converter, PropertyFormatter<R> formatter) {
         this.converter = converter;
         this.formatter = formatter;
+    }
+
+    /**
+     * Creates Property conversion from {@link TypeConverter}
+     *
+     * @param cvr   the type converter
+     * @param error the configuration of errors
+     * @param <T>   the type of property
+     * @return new preconfigured conversion
+     */
+    public static <T> Conversion<T> of(TypeConverter<T> cvr, Error error) {
+        if (error == null) {
+            final PropertyConverter<T> p = PropertyConverter.of(cvr::parse, cvr.getErrorSeverity(), cvr.getErrorCode());
+            final PropertyFormatter<T> f = PropertyFormatter.of(cvr::format, cvr.getErrorSeverity(), cvr.getErrorCode());
+            return new Conversion<>(p, f);
+        }
+        return new Conversion<>(cvr::parse, cvr::format, error);
     }
 
     public PropertyConverter<R> converter() {

@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.fmt;
 
-import io.github.up2jakarta.csv.api.IError;
+import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IFullType;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.BeanException;
@@ -20,7 +20,7 @@ import io.github.up2jakarta.csv.data.Referencable;
  * @param <E> the error type
  * @see SimpleFastImporter
  */
-public abstract class FastImporter<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>, R extends IRecord<I>, E extends IError<B>> extends BusinessImporter<B, I, T, R, E> {
+public abstract class FastImporter<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>, R extends IRecord<I>, E extends IEvent<B>> extends BusinessImporter<B, I, T, R, E> {
 
     protected FastImporter(Up2Factory<B> factory, Class<T> type, I rootNode, I[] nodes) throws BeanException {
         super(factory, ModeType.FAST, type, rootNode, nodes);

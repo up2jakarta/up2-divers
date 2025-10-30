@@ -2,19 +2,24 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.api.ext.BeanContext;
-import io.github.up2jakarta.csv.cfg.Up2Default;
-import io.github.up2jakarta.csv.cfg.Up2Token;
+import io.github.up2jakarta.csv.api.ext.Conversion;
+import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Trim;
-import io.github.up2jakarta.csv.core.PProperty.WProcessor;
+import io.github.up2jakarta.csv.core.hdl.PAccessor;
+import io.github.up2jakarta.csv.core.hdl.PProcessor;
+import io.github.up2jakarta.csv.core.hdl.PProperty;
+import io.github.up2jakarta.csv.core.hdl.PProperty.POProperty;
+import io.github.up2jakarta.csv.core.hdl.PProperty.PSProperty;
+import io.github.up2jakarta.csv.core.hdl.Properties;
+import io.github.up2jakarta.csv.core.misc.DummyException;
 import io.github.up2jakarta.csv.core.misc.ext.Dummy4;
 import io.github.up2jakarta.csv.core.misc.prc.Test2Processor;
 import io.github.up2jakarta.csv.core.misc.prc.Test5Processor;
 import io.github.up2jakarta.csv.core.misc.prc.Test6Processor;
+import io.github.up2jakarta.csv.core.misc.prc.Test7Processor;
 import io.github.up2jakarta.csv.fmt.hdl.FastException;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.prc.TrimProcessor;
-import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.clv.PropertyException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +27,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
-import static io.github.up2jakarta.csv.core.BeanScanner.getProcessors;
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_PROCESSOR;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_PROCESSOR;
 import static io.github.up2jakarta.csv.core.Up2ErrorTests.DUMMY;
+import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
+import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -40,6 +45,21 @@ public class Up2ProcessorTests {
     Up2ProcessorTests(BeanContext context, Up2Factory<GroupType> factory) {
         this.context = context;
         this.factory = factory;
+    }
+
+    private PProperty<?, ?> property(String property) throws Exception {
+        final Field field = Test7Processor.class.getDeclaredField(property);
+        final Position position = field.getAnnotation(Position.class);
+        final PProcessor<?> processor = BSBuilder.build(context, field, position);
+        if (field.getType() == String.class) {
+            final PAccessor<?, String> va = Properties.wo(String.class, field);
+            return new PSProperty<>(va, null, 0, position, processor);
+        } else if (field.getType() == Integer.class) {
+            final PAccessor<?, Integer> va = Properties.wo(Integer.class, field);
+            final Conversion<Integer> cvr = new Conversion<>(Integer::parseInt, Object::toString);
+            return new POProperty<>(va, null, 0, position, processor, cvr);
+        }
+        throw new UnsupportedOperationException();
     }
 
     @Test
@@ -71,59 +91,84 @@ public class Up2ProcessorTests {
     void testProcessor1() throws Exception {
         //Given
         class TestProcessor {
+            @Position(0)
             @Up2Trim({"", "-", "+"})
             String attribute;
         }
         final Field field = TestProcessor.class.getDeclaredField("attribute");
         // When
-        final List<WProcessor<?, GroupType>> processors = getProcessors(context, field);
-        assertEquals(1, processors.size());
-        final WProcessor<?, ?> processor = processors.getFirst();
+        final PProcessor<?> processor = BSBuilder.build(context, field, field.getAnnotation(Position.class));
         // Then
-        assertNull(processor.process(null));
-        assertNull(processor.process(""));
-        assertNull(processor.process("-"));
-        assertNull(processor.process("+"));
+        assertNull(processor.process(null, 0, null, null));
+        assertNull(processor.process("", 0, null, null));
+        assertNull(processor.process("-", 0, null, null));
+        assertNull(processor.process("+", 0, null, null));
     }
 
     @Test
     void testProcessor2() throws Exception {
         //Given
         class TestProcessor {
+            @Position(0)
             @Up2Trim({"", "-"})
             String attribute;
         }
         final Field field = TestProcessor.class.getDeclaredField("attribute");
         // When
-        final List<WProcessor<?, GroupType>> processors = getProcessors(context, field);
-        assertEquals(1, processors.size());
-        final WProcessor<?, GroupType> processor = processors.getFirst();
+        final PProcessor<?> processor = BSBuilder.build(context, field, field.getAnnotation(Position.class));
         // Then
-        assertNull(processor.process(null));
-        assertNull(processor.process(""));
-        assertNull(processor.process("-"));
-        assertEquals("+", processor.process("+"));
+        assertNull(processor.process(null, 0, null, null));
+        assertNull(processor.process("", 0, null, null));
+        assertNull(processor.process("-", 0, null, null));
+        assertEquals("+", processor.process("+", 0, null, null));
     }
 
     @Test
-    void testOneShot() throws Exception {
+    void testSDefaultValue() throws Exception {
         //Given
-        class TestProcessor {
-            @Up2Token
-            @Up2Trim("undefined")
-            @Up2Default("default")
-            String p;
+        final PProperty<?, ?> property = property("value");
+        {
+            // When null
+            final Object value = property.get(null, 0, of(ERROR));
+            // Then
+            assertEquals("default", value);
         }
-        final Field field = TestProcessor.class.getDeclaredField("p");
-        // When
-        final List<WProcessor<?, GroupType>> processors = getProcessors(context, field);
-        assertEquals(3, processors.size());
-        // Then
-        var value = "\t\nundefined\t\n";
-        for (var processor : processors) {
-            value = processor.process(value);
+        {
+            // When
+            final Object value = property.get("value", 0, of(ERROR));
+            // Then
+            assertEquals("value", value);
         }
-        assertEquals("default", value);
+        {
+            // When undefined (don't set)
+            final Object value = property.get("\t\nundefined\t\n", 0, of(ERROR));
+            // Then
+            assertNull(value);
+        }
+    }
+
+    @Test
+    void testODefaultValue() throws Exception {
+        //Given
+        final PProperty<?, ?> property = property("number");
+        {
+            // When null
+            final Object value = property.get(null, 0, of(ERROR));
+            // Then
+            assertEquals(99, value);
+        }
+        {
+            // When
+            final Object value = property.get("11", 0, of(ERROR));
+            // Then
+            assertEquals(11, value);
+        }
+        {
+            // When undefined (don't set)
+            final Object value = property.get("undefined", 0, of(ERROR));
+            // Then
+            assertNull(value);
+        }
     }
 
     @Test
@@ -135,31 +180,29 @@ public class Up2ProcessorTests {
             final FastException thrown = assertThrows(FastException.class, () -> mapper.map("dummy"));
             // THEN
             assertNotNull(thrown.getCause());
-            assertInstanceOf(PropertyException.class, thrown.getCause());
-            assertEquals(SeverityType.ERROR, thrown.getSeverity());
+            assertInstanceOf(DummyException.class, thrown.getCause());
+            assertEquals(ERROR, thrown.getSeverity());
             assertEquals(ERROR_PROCESSOR, thrown.getCode());
             assertEquals(1, thrown.getOffset());
-            assertEquals(DUMMY + ": dummy", thrown.getCause().getMessage());
+            assertEquals(DUMMY + ": dummy message", thrown.getMessage());
         }
         {
             // When
             final FastException thrown = assertThrows(FastException.class, () -> mapper.map(""));
             // THEN
             assertEquals(ERROR_PROCESSOR, thrown.getCode());
-            assertEquals(SeverityType.ERROR, thrown.getSeverity());
-            assertInstanceOf(PropertyException.class, thrown.getCause());
-            assertInstanceOf(NullPointerException.class, thrown.getCause().getCause());
-            assertEquals("#[1] throws ERROR[UP2-P001] : java.lang.NullPointerException: NPE", thrown.getFormattedMessage());
+            assertEquals(ERROR, thrown.getSeverity());
+            assertInstanceOf(NullPointerException.class, thrown.getCause());
+            assertEquals("#[1] throws ERROR[UP2-P001] : java.lang.NullPointerException: null message", thrown.getFormattedMessage());
         }
         {
             // When
             final FastException thrown = assertThrows(FastException.class, () -> mapper.map("other"));
             // THEN
             assertEquals(ERROR_PROCESSOR, thrown.getCode());
-            assertEquals(SeverityType.ERROR, thrown.getSeverity());
-            assertInstanceOf(PropertyException.class, thrown.getCause());
-            assertInstanceOf(RuntimeException.class, thrown.getCause().getCause());
-            assertEquals("#[1] throws ERROR[UP2-P001] : java.lang.RuntimeException: other", thrown.getFormattedMessage());
+            assertEquals(ERROR, thrown.getSeverity());
+            assertInstanceOf(RuntimeException.class, thrown.getCause());
+            assertEquals("#[1] throws ERROR[UP2-P001] : java.lang.RuntimeException: other message", thrown.getFormattedMessage());
         }
     }
 

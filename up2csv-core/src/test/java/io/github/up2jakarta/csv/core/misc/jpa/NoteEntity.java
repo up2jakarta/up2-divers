@@ -11,7 +11,7 @@ import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
 import io.github.up2jakarta.csv.data.Segment;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -36,7 +36,7 @@ public class NoteEntity implements Segment {
     @Position(0)
     private String subjectCode;
 
-    @NotBlank
+    @NotEmpty
     @Size(max = 1024)
     @Position(1)
     @Column(name = "NOTE_CONTENT", length = 1024, nullable = false)

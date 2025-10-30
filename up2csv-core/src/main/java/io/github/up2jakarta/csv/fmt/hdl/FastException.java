@@ -1,11 +1,13 @@
 package io.github.up2jakarta.csv.fmt.hdl;
 
+import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.xml.api.MessageFormatter;
+import io.github.up2jakarta.xml.api.PropertyException;
 import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.clv.PropertyException;
 
-public class FastException extends PropertyException {
+@SuppressWarnings("rawtypes")
+public class FastException extends PropertyException implements IEvent {
 
     protected static final String FORMAT = "#[%s] throws %s";
 
@@ -18,16 +20,18 @@ public class FastException extends PropertyException {
         this.dataType = type;
     }
 
-    public FastException(DataType<?> type, int offset, SeverityType level, String code, Exception cause) {
-        super(level, code, cause);
+    public FastException(DataType<?> type, int offset, SeverityType level, String code, Throwable cause) {
+        super(level, code, cause.toString(), cause);
         this.offset = offset;
         this.dataType = type;
     }
 
-    public final DataType<?> getDataType() {
+    @Override
+    public final DataType<?> getType() {
         return dataType;
     }
 
+    @Override
     public final int getOffset() {
         return offset;
     }

@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.fmt.misc;
 
-import io.github.up2jakarta.csv.api.hdl.IErrorEntity;
-import io.github.up2jakarta.csv.api.hdl.IRecordEntity;
+import io.github.up2jakarta.csv.api.IEvent;
+import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.fmt.FullExporter;
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.assertInvoice;
 import static org.junit.jupiter.api.Assertions.*;
 
-public abstract class AFullTest<T extends Invoice, R extends IRecordEntity<SegmentType, ?, ?>, E extends IErrorEntity<R, ?, GroupType>> extends ABusinessTest<T, R, E> {
+public abstract class AFullTest<T extends Invoice, R extends IRecord<SegmentType>, E extends IEvent<GroupType>> extends ABusinessTest<T, R, E> {
 
     protected final FullImporter<T, GroupType, SegmentType, R, E> importer;
     protected final FullExporter<T, GroupType, SegmentType> exporter;

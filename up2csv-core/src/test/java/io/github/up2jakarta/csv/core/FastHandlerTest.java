@@ -1,6 +1,9 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
+import io.github.up2jakarta.csv.core.hdl.EventHandler;
+import io.github.up2jakarta.csv.core.hdl.FastHandler;
+import io.github.up2jakarta.csv.core.misc.DummyException;
 import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
 import io.github.up2jakarta.csv.core.misc.clv.MeasurementUnitConverter;
 import io.github.up2jakarta.csv.core.misc.cvr.Test1Converter;
@@ -16,8 +19,8 @@ import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.SegmentType;
+import io.github.up2jakarta.xml.api.PropertyException;
 import io.github.up2jakarta.xml.clv.CodeListException;
-import io.github.up2jakarta.xml.clv.PropertyException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +29,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.format.DateTimeParseException;
 
-import static io.github.up2jakarta.csv.core.EventHandler.*;
+import static io.github.up2jakarta.csv.api.IEvent.*;
 import static io.github.up2jakarta.csv.core.Up2ErrorTests.DUMMY;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.ERROR_CODE;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
+import static io.github.up2jakarta.csv.impl.GroupType.NONE;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,7 +69,7 @@ public class FastHandlerTest {
     @Test
     void testValidator() throws BeanException {
         // Given
-        final Up2Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class, factory.resolver.or(GroupType.NONE));
+        final Up2Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class, factory.resolver.or(NONE));
         final EventHandler<InputRecord, GroupType, InputError> handler = FastHandler.of(WARNING);
         {
             // When
@@ -77,7 +81,7 @@ public class FastHandlerTest {
             assertEquals(ERROR, error.getSeverity());
             assertNull(error.getCause());
             assertEquals("size must be between 0 and 1", error.getMessage());
-            assertEquals(GroupType.NONE, error.getDataType());
+            assertEquals(NONE, error.getType());
         }
         {
             // When
@@ -240,7 +244,7 @@ public class FastHandlerTest {
             assertEquals(Dummy1Processor.TU_P_001, error.getCode());
             assertEquals(WARNING, error.getSeverity());
             assertInstanceOf(PropertyException.class, error.getCause());
-            assertEquals("property", error.getCause().getMessage());
+            assertEquals("property message", error.getCause().getMessage());
             assertNull(error.getCause().getCause());
         }
         {
@@ -250,9 +254,9 @@ public class FastHandlerTest {
             // Then
             assertEquals(Dummy1Processor.TU_P_001, error.getCode());
             assertEquals(WARNING, error.getSeverity());
-            assertInstanceOf(PropertyException.class, error.getCause());
-            assertEquals(DUMMY + ": dummy", error.getCause().getMessage());
-            assertNotNull(error.getCause().getCause());
+            assertInstanceOf(DummyException.class, error.getCause());
+            assertEquals(DUMMY + ": dummy message", error.getMessage());
+            assertNotNull(error.getCause());
         }
     }
 

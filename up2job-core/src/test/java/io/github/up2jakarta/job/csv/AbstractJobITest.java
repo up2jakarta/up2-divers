@@ -44,19 +44,6 @@ public abstract class AbstractJobITest {
         this.generator = new TUGenerator(mode, this.getClass(), format);
     }
 
-    private String file(File inputFile, String target) {
-        return inputFile.getAbsolutePath().replace("import_", target + "_");
-    }
-
-    protected final JobParameters input(int size) throws IOException {
-        final File input = generator.generate("import_" + size + ".csv", size).toFile();
-        return new JobParametersBuilder()
-                .addString(INPUT_FILE, input.getAbsolutePath())
-                .addString(OUTPUT_FILE, this.file(input, "export"))
-                .addString(ERR_FILE, this.file(input, "error"))
-                .toJobParameters();
-    }
-
     protected static void assertSteps(JobExecution job) {
         assertEquals(1, job.getStepExecutions().size());
         job.getStepExecutions().forEach(step -> {
@@ -77,6 +64,19 @@ public abstract class AbstractJobITest {
         assertEquals(BatchStatus.COMPLETED, job.getStatus());
         assertEquals(ExitStatus.COMPLETED, job.getExitStatus());
         assertEquals(0, job.getAllFailureExceptions().size());
+    }
+
+    private String file(File inputFile, String target) {
+        return inputFile.getAbsolutePath().replace("import_", target + "_");
+    }
+
+    protected final JobParameters input(int size) throws IOException {
+        final File input = generator.generate("import_" + size + ".csv", size).toFile();
+        return new JobParametersBuilder()
+                .addString(INPUT_FILE, input.getAbsolutePath())
+                .addString(OUTPUT_FILE, this.file(input, "export"))
+                .addString(ERR_FILE, this.file(input, "error"))
+                .toJobParameters();
     }
 
     private static class TUGenerator {
@@ -157,15 +157,25 @@ public abstract class AbstractJobITest {
             return csv;
         }
 
-        private boolean fill(String[] tp, String[] data, String key, String year, String ri, int ln) {
+        private boolean fill(String[] tmpl, String[] data, String invoiceNumber, String year, String randomInt, int ln) {
+            final int s, p;
             if (mode == ModeType.FULL) {
                 data[0] = fixed(FV_SM + ln);
+                p = s = 1;
+            } else {
+                if (mode == ModeType.UNIT && !"01".equals(tmpl[0])) {
+                    data[0] = tmpl[0];
+                    s = 2;
+                    p = -1;
+                } else {
+                    s = 1;
+                    p = 0;
+                }
             }
             var count = 0;
-            final int p = (mode == ModeType.FULL) ? 1 : 0;
-            final int rs = RANDOM.nextInt(tp.length * 100) + mode.getLength() + 1;
-            for (var i = 1; i < tp.length; i++) {
-                data[i + p] = tp[i].replace("${in}", key).replace("${ri}", ri).replace("${cy}", year);
+            final int rs = RANDOM.nextInt(tmpl.length * 100) + mode.getLength() + 1;
+            for (var i = s; i < tmpl.length; i++) {
+                data[i + p] = this.replace(tmpl[i], invoiceNumber, year, randomInt);
                 // Error simulation ->
                 if (rs == i + p) {
                     count++;
@@ -176,11 +186,21 @@ public abstract class AbstractJobITest {
             return count != 0;
         }
 
+        private String replace(String value, String invoiceNumber, String year, String randomInt) {
+            if (value == null) {
+                return null;
+            }
+            return value.replace("${in}", invoiceNumber)
+                    .replace("${ri}", randomInt)
+                    .replace("${cy}", year);
+        }
+
         private List<String[]> clone(List<String[]> tmpl) {
             final int p = (mode == ModeType.FULL) ? 1 : 0;
             final List<String[]> data = new ArrayList<>(tmpl.size());
             for (final String[] segment : tmpl) {
-                final String[] copy = new String[segment.length + p];
+                final int s = (mode == ModeType.UNIT && !"01".equals(segment[0])) ? 1 : 0;
+                final String[] copy = new String[segment.length + p - s];
                 copy[p] = segment[0];
                 data.add(copy);
             }

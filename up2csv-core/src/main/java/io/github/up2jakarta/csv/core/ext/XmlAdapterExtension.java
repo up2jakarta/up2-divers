@@ -4,8 +4,8 @@ import io.github.up2jakarta.csv.api.ext.*;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.xml.api.PropertyException;
 import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.clv.PropertyException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -17,7 +17,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_XML_ENUM;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_XML_ENUM;
 import static io.github.up2jakarta.csv.core.ext.Beans.getBean;
 import static io.github.up2jakarta.csv.core.ext.Beans.getTypeArguments;
 
@@ -68,7 +68,7 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
     @Override
     public Conversion<?> resolve(Field property, Class<?> type, XmlJavaTypeAdapter config) throws BeanException {
         //noinspection unchecked
-        final Class<? extends XmlAdapter<String, Object>> adapterType = (Class<? extends XmlAdapter<String, Object>>) config.value();
+        final Class<XmlAdapter<String, Object>> adapterType = (Class<XmlAdapter<String, Object>>) config.value();
         final Optional<Error> error = ConversionResolver.getError(property);
         final XmlAdapter<String, Object> adapter = getBean(context, adapterType);
         final PropertyFormatter<Object> f = v -> {

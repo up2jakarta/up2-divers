@@ -6,9 +6,14 @@ import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.clv.CodeList;
 
 /**
- * Contact marker for segment type definition.
+ * Contact interface for segment type definition, used to segregate business-objects to multiple segments in one-shot.
+ *
+ * @param <B> the input data type
+ * @param <I> self-type implementation
+ * @see io.github.up2jakarta.csv.core.BusinessExporter
+ * @see io.github.up2jakarta.csv.core.BusinessWriter
  */
-public interface IType<B extends DataType<B>, T extends IType<B, T>> extends CodeList<T> {
+public interface IType<B extends DataType<B>, I extends IType<B, I>> extends CodeList<I> {
 
     /**
      * @return the segment class-type
@@ -48,7 +53,7 @@ public interface IType<B extends DataType<B>, T extends IType<B, T>> extends Cod
      * @param type the child type
      * @return <code>true</code> if the given type is a valid child
      */
-    default boolean holds(T type) {
+    default boolean holds(I type) {
         return type != this && type.joiner().getParentType() == this.joiner().getClassType();
     }
 

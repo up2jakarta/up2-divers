@@ -41,7 +41,7 @@ public abstract class ConversionExtension<A extends Annotation, C extends Annota
     /**
      * Returns the optional configuration annotation, if the given field is annotated with.
      *
-     * @param segmentType the segment type
+     * @param segmentType the segment type declaring the property
      * @param last        the property that is being converted automatically
      * @param fieldType   the type of the property
      * @param paths       the path of the property from the root segment

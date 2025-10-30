@@ -3,13 +3,13 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.core.misc.cvr.SupportEntity;
-import io.github.up2jakarta.csv.core.misc.map.DefaultBean;
-import io.github.up2jakarta.csv.core.misc.map.ValidBean;
+import io.github.up2jakarta.csv.core.misc.map.*;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;
+import io.github.up2jakarta.xml.api.PropertyException;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,9 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Optional;
-
 import static io.github.up2jakarta.csv.impl.GroupType.D001;
+import static io.github.up2jakarta.csv.impl.GroupType.NONE;
 import static io.github.up2jakarta.csv.impl.SegmentType.S11;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -44,7 +43,7 @@ class Up2FormatTests {
         final InputRecord row = new InputRecord("R0099", S11, "I2025", "");
         final String msg = "Text cannot be parsed to a LocalDate";
         final String trace = "java.time.format.DateTimeParseException: " + msg + " ...";
-        final InputError error = new InputError(row, 99, D001, 3, ERROR, "CSV-DT", msg, Optional.of(trace));
+        final InputError error = new InputError(row, 99, D001, 3, new PropertyException(ERROR, "CSV-DT", msg), trace);
         // When
         final Up2Format<InputError, GroupType> format = factory.format(InputError.class);
         final String[] export = format.unmap(error);
@@ -101,10 +100,10 @@ class Up2FormatTests {
     }
 
     @Test
-    void testDefault() throws BeanException {
+    void testDefault1() throws BeanException {
         // Given
-        final DefaultBean bean = new DefaultBean();
-        final Up2Format<DefaultBean, GroupType> mapper = factory.format(DefaultBean.class);
+        final Default1Bean bean = new Default1Bean();
+        final Up2Format<Default1Bean, GroupType> mapper = factory.format(Default1Bean.class);
         // When
         final String[] out = mapper.unmap(bean);
         // Then Bean
@@ -116,6 +115,78 @@ class Up2FormatTests {
         for (String s : out) {
             assertEquals("*", s);
         }
+    }
+
+    @Test
+    void testDefault2Nullable() throws BeanException {
+        // Given
+        final Up2Format<Default2Bean, GroupType> mapper = factory.format(Default2Bean.class);
+        // When
+        final String[] out = mapper.unmap(new Default2Bean());
+        // Then Bean
+        // Then Unmapping
+        assertNotNull(out);
+        assertEquals(3, out.length);
+        assertArrayEquals(new String[]{"*", null, null}, out);
+    }
+
+    @Test
+    void testDefault3Values() throws BeanException {
+        // Given
+        final Default3Bean src = new Default3Bean();
+        final Up2Format<Default3Bean, GroupType> mapper = factory.format(Default3Bean.class);
+        // When
+        final String[] out = mapper.unmap(src);
+        // Then
+        assertNotNull(out);
+        assertNull(src.getBean());
+        assertEquals(5, out.length);
+        assertArrayEquals(new String[]{null, "0", "Up2J", "Up2J", "Java"}, out);
+        {
+            // When Again
+            final String[] out2 = mapper.toMapper().toFormat().unmap(src);
+            // Then
+            assertNotNull(out2);
+            assertNull(src.getBean());
+            assertEquals(5, out2.length);
+            assertArrayEquals(new String[]{null, "0", "Up2J", "Up2J", "Java"}, out2);
+        }
+    }
+
+    @Test
+    void testDefault4Values() throws BeanException {
+        // Given
+        final Up2Format<Default4Bean, GroupType> mapper = factory.format(Default4Bean.class);
+        // When
+        final String[] out = mapper.unmap(new Default4Bean());
+        // Then
+        assertNotNull(out);
+        assertEquals(3, out.length);
+        assertArrayEquals(new String[]{null, "21", "Up2J"}, out);
+    }
+
+    @Test
+    void testDefault5Values() throws BeanException {
+        // Given
+        final Up2Format<Default5Bean, GroupType> mapper = factory.format(Default5Bean.class);
+        // When
+        final String[] out = mapper.unmap(new Default5Bean());
+        // Then
+        assertNotNull(out);
+        assertEquals(6, out.length);
+        assertArrayEquals(new String[]{null, "21", "Up2J", "0", "Up2J-1", "Up2J-2"}, out);
+    }
+
+    @Test
+    void testDefault6PathError() throws BeanException {
+        // Given
+        final Up2Format<InputError, GroupType> mapper = factory.format(InputError.class);
+        // When
+        final String[] out = mapper.unmap(new InputError(null, 0, NONE, 9, new PropertyException(ERROR, "CSV", "Test"), "Error"));
+        // Then
+        assertNotNull(out);
+        assertEquals(9, out.length);
+        assertArrayEquals(new String[]{null, null, null, "0000", "9", "E", "CSV", "Test", "Error"}, out);
     }
 
     @Test

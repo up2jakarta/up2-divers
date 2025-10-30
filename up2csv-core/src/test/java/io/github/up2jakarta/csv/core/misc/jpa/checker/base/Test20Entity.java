@@ -7,6 +7,7 @@ import io.github.up2jakarta.csv.core.misc.ParsedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -18,7 +19,8 @@ public class Test20Entity extends ParsedEntity<String> {
 
     @Position(0)
     @Size(min = 8, max = 8)
-    @Column(name = "TU_KEY", length = 8)
+    @NotEmpty
+    @Column(name = "TU_KEY", length = 8, nullable = false)
     private String key;
 
     public String getKey() {

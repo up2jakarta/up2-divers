@@ -14,7 +14,7 @@ import org.apache.commons.csv.CSVFormat;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public abstract class AFastTests<R extends IRecord<SegmentType>, A extends FastImporter<Invoice, GroupType, SegmentType, R, ?>> extends ABusinessTest<R> {
+public abstract class AFastTests<R extends IRecord<SegmentType>, A extends FastImporter<Invoice, GroupType, SegmentType, R, ?>> extends AbstractTests<R> {
 
     private final FastFileWriter<Invoice> writer;
     private final FastFileReader<Invoice, GroupType, SegmentType, R, ?> reader1;

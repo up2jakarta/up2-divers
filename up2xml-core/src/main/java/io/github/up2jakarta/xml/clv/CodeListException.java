@@ -1,5 +1,6 @@
 package io.github.up2jakarta.xml.clv;
 
+import io.github.up2jakarta.xml.api.PropertyException;
 import io.github.up2jakarta.xml.api.SeverityType;
 
 /**

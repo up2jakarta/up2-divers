@@ -37,7 +37,7 @@ public final class DecimalResolver extends ConversionResolver<Up2Decimal> {
     }
 
     @Override
-    public PropertyFormatter<? extends Number> forFormatting(Up2Decimal config, Field property) {
+    public PropertyFormatter<? extends Number> forFormatting(Up2Decimal config, Field property, Class<?> type) {
         return v -> {
             final BigDecimal n = switch (v) {
                 case BigDecimal bd -> bd;

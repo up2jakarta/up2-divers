@@ -3,33 +3,36 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.api.ext.*;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.*;
-import io.github.up2jakarta.csv.core.PProperty.WProcessor;
-import io.github.up2jakarta.csv.core.Property.Accessor;
+import io.github.up2jakarta.csv.core.BSNode.*;
 import io.github.up2jakarta.csv.core.ext.Path;
+import io.github.up2jakarta.csv.core.hdl.*;
+import io.github.up2jakarta.csv.core.hdl.PProperty.POProperty;
+import io.github.up2jakarta.csv.core.hdl.PProperty.PSProperty;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.clv.TypeConverter;
-import jakarta.validation.Validator;
+import jakarta.persistence.AccessType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.*;
 
-import static io.github.up2jakarta.csv.core.BeanScanner.getAnnotationsByType;
 import static io.github.up2jakarta.csv.core.ext.Beans.*;
 import static io.github.up2jakarta.csv.core.ext.Path.addOverride;
 import static io.github.up2jakarta.csv.core.ext.Path.getOverride;
+import static io.github.up2jakarta.csv.core.hdl.PAMode.RO;
+import static io.github.up2jakarta.csv.core.hdl.PAMode.WO;
+import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
+import static jakarta.persistence.AccessType.PROPERTY;
+import static java.lang.reflect.Modifier.isFinal;
+import static java.util.Collections.unmodifiableList;
 
+/**
+ * Internal business context.
+ */
 final class BSContext<D extends DataType<D>> {
-
-    final BeanChecker checker;
-    final io.github.up2jakarta.csv.api.ext.BeanContext context;
-    final Type[] arguments;
-    final int offset;
 
     private final Map<Path, PositionOverride> positions = new LinkedHashMap<>();
     private final Map<Path, FragmentOverride> fragments = new LinkedHashMap<>();
@@ -39,54 +42,54 @@ final class BSContext<D extends DataType<D>> {
     private final LinkedList<Field> path = new LinkedList<>();
     private final Class<? extends Segment> type;
     private final DataTypeResolver<D> resolver;
-    private final BeanContext validation;
-    private final Validator validator;
-    private final boolean readOnly;
-    private final BSContext<D> p;
+    private final Optional<AccessType> access;
+    private final BSBuilder.WChecker checker;
+    private final Up2Factory<?> factory;
+    private final VContext context;
+    private final Type[] arguments;
+    private final PAMode mode;
+    private final int offset;
 
-    public BSContext(io.github.up2jakarta.csv.api.ext.BeanContext c, Class<? extends Segment> t, boolean r, DataTypeResolver<D> d, BeanContext v, Validator l) throws BeanException {
+    private BSContext(Up2Factory<?> f, Class<? extends Segment> t, PAMode m, DataTypeResolver<D> d) throws BeanException {
         addOverride(PositionOverride.class, t, this.positions::put, PositionOverride::path);
         addOverride(FragmentOverride.class, t, this.fragments::put, FragmentOverride::path);
         addOverride(ValidOverride.class, t, this.validations::put, ValidOverride::path);
-        this.extensions = getExtensions(t, c);
-        this.checker = BeanChecker.of(t, c);
-        this.checker.afterSegment();
+        this.access = BSBuilder.getAccessType(Optional.empty(), t);
+        this.checker = BSBuilder.WChecker.of(t, f.context);
+        this.extensions = ext(t, f.context);
+        this.context = VContext.from(t);
         this.arguments = NO_TYPES;
-        this.validation = v;
-        this.validator = l;
         this.resolver = d;
-        this.readOnly = r;
-        this.context = c;
+        this.factory = f;
         this.offset = 0;
+        this.mode = m;
         this.type = t;
-        this.p = null;
     }
 
-    private BSContext(BSContext<D> origin, int offset, Class<?> type, Type... arguments) throws BeanException {
+    private BSContext(BSContext<D> origin, int offset, Class<? extends Segment> type, Type... arguments) throws BeanException {
         addOverride(PositionOverride.class, type, this.positions::put, PositionOverride::path);
         addOverride(FragmentOverride.class, type, this.fragments::put, FragmentOverride::path);
         addOverride(ValidOverride.class, type, this.validations::put, ValidOverride::path);
-        origin.stack.forEach(this.stack::push);
+        this.access = BSBuilder.getAccessType(origin.access, type);
         origin.path.forEach(this.path::addLast);
+        origin.stack.forEach(this.stack::push);
         this.extensions = origin.extensions;
-        this.validation = origin.validation;
-        this.validator = origin.validator;
         this.resolver = origin.resolver;
-        this.readOnly = origin.readOnly;
-        this.checker = origin.checker;
         this.context = origin.context;
+        this.checker = origin.checker;
+        this.factory = origin.factory;
         this.arguments = arguments;
         this.type = origin.type;
+        this.mode = origin.mode;
         this.offset = offset;
-        this.p = origin;
     }
 
-    private static ConversionExtension<?, Annotation>[] getExtensions(Class<? extends Segment> type, io.github.up2jakarta.csv.api.ext.BeanContext context) throws BeanException {
-        final Extension[] extensions = getAnnotationsByType(Extension.class, type).toArray(Extension[]::new);
+    private static ConversionExtension<?, Annotation>[] ext(Class<? extends Segment> st, BeanContext bc) throws BeanException {
+        final Extension[] extensions = BSBuilder.getAnnotationsByType(Extension.class, st).toArray(Extension[]::new);
         final List<ConversionExtension<?, ? extends Annotation>> result = new LinkedList<>();
         for (final Extension extension : extensions) {
-            final ConversionExtension<?, ?> bean = getBean(context, extension.value());
-            if (bean.isActivated(type)) {
+            final ConversionExtension<?, ?> bean = getBean(bc, extension.value());
+            if (bean.isActivated(st)) {
                 result.add(bean);
             }
         }
@@ -94,22 +97,24 @@ final class BSContext<D extends DataType<D>> {
         return (ConversionExtension<?, Annotation>[]) result.toArray(ConversionExtension<?, ?>[]::new);
     }
 
-    private Class<?> fieldType(Field field, TypeVariable<?> tv) {
-        final Type[] parameters = field.getDeclaringClass().getTypeParameters();
-        for (var i = 0; i < parameters.length; i++) {
-            if (parameters[i] == tv) {
-                if (i < arguments.length) {
-                    if (arguments[i] instanceof Class<?> ft) {
-                        return ft;
-                    }
-                    if (arguments[i] instanceof TypeVariable<?> av) {
-                        final Field sf = path.getLast();
-                        return p.fieldType(sf, av);
-                    }
-                }
-            }
+    static <D extends DataType<D>, S extends Segment> BPNode<S, D, ?> build(Class<S> t, Up2Factory<?> f, DataTypeResolver<D> r) throws BeanException {
+        final BSContext<D> mc = new BSContext<>(f, t, WO, r);
+        if (t.isRecord()) {
+            return new BRNode<>(t, f.validator, mc.context, mc.build());
         }
-        return field.getClass();
+        return new BMNode<>(t, f.validator, mc.context, mc.build());
+    }
+
+    static <D extends DataType<D>, S extends Segment> BFNode<S, D> format(Class<S> t, Up2Factory<?> f, DataTypeResolver<D> r) throws BeanException {
+        final BSContext<D> mc = new BSContext<>(f, t, RO, r);
+        return new BFNode<>(f.validator, mc.context, mc.build());
+    }
+
+    private List<Property<?, D>> build() throws BeanException {
+        this.checker.beforeSegment(type);
+        final List<Property<?, D>> ps = BSBuilder.build(type, this);
+        this.checker.afterSegment();
+        return unmodifiableList(ps);
     }
 
     private D dataType(Field field) throws BeanException {
@@ -125,30 +130,25 @@ final class BSContext<D extends DataType<D>> {
     }
 
     @SuppressWarnings("unchecked")
-    private Conversion<?> conversion(Field field, Class<?> type) throws BeanException {
+    private Conversion<?> conversion(Field field, Class<?> type, Position position) throws BeanException {
         final Up2Converter converter = field.getAnnotation(Up2Converter.class);
         final Error error = field.getAnnotation(Error.class);
         if (converter != null) {
-            final TypeConverter<Object> tConverter = (TypeConverter<Object>) getBean(context, converter.value());
+            final TypeConverter<Object> tConverter = getBean(factory.context, converter.value());
             if (!tConverter.getSupportedType().isAssignableFrom(field.getType())) {
                 throw new BeanException(field, "@Converter[value] does not support " + field.getType().getSimpleName());
             }
-            if (error == null) {
-                var p = PropertyConverter.of(tConverter::parse, tConverter.getErrorSeverity(), tConverter.getErrorCode());
-                var f = PropertyFormatter.of(tConverter::format, tConverter.getErrorSeverity(), tConverter.getErrorCode());
-                return new Conversion<>(p, f);
-            }
-            return new Conversion<>(tConverter::parse, tConverter::format, error);
+            return Conversion.of(tConverter, error);
         }
-        for (final Annotation annotation : field.getAnnotations()) {
-            final Resolver resolver = annotation.annotationType().getAnnotation(Resolver.class);
+        for (final Annotation config : field.getAnnotations()) {
+            final Resolver resolver = config.annotationType().getAnnotation(Resolver.class);
             if (resolver != null) {
-                var cResolver = (ConversionResolver<Annotation>) getBean(context, resolver.value());
-                final PropertyFormatter<Object> f = (PropertyFormatter<Object>) cResolver.forFormatting(annotation, field);
-                if (readOnly && !field.isAnnotationPresent(Up2Default.class)) {
+                final ConversionResolver<Annotation> cr = getBean(factory.context, resolver.value());
+                final PropertyFormatter<Object> f = (PropertyFormatter<Object>) cr.forFormatting(config, field, type);
+                if (mode == RO && isFinal(field.getModifiers()) && undefined(position)) {
                     return new Conversion<>(null, f, error);
                 }
-                final PropertyConverter<Object> p = (PropertyConverter<Object>) cResolver.forParsing(annotation, field, type);
+                final PropertyConverter<Object> p = (PropertyConverter<Object>) cr.forParsing(config, field, type);
                 return new Conversion<>(p, f, error);
             }
         }
@@ -171,8 +171,14 @@ final class BSContext<D extends DataType<D>> {
         return false;
     }
 
-    BSContext<D> with(Field field, int offset, Class<? extends Segment> segmentType) throws BeanException {
-        final Type[] arguments = getTypeArguments(field.getGenericType());
+    void end() throws BeanException {
+        checker.afterSuperSegment(stack.peek());
+    }
+
+    BSContext<D> with(Field field, Fragment fragment, Class<? extends Segment> segmentType) throws BeanException {
+        checker.beforeFragmentProperty(field, segmentType);
+        final int offset = this.offset + fragment.value();
+        final Type[] arguments = getPropertyArguments(field, this.arguments);
         final BSContext<D> result = new BSContext<>(this, offset, segmentType, arguments);
         result.path.addLast(field);
         final String name = field.getName();
@@ -186,11 +192,16 @@ final class BSContext<D extends DataType<D>> {
     }
 
     BSContext<D> with(Class<? extends Segment> superType, Type... arguments) throws BeanException {
+        checker.beforeSuperSegment(superType);
         final BSContext<D> result = new BSContext<>(this, this.offset, superType, arguments);
         result.positions.putAll(positions);
         result.fragments.putAll(fragments);
         result.validations.putAll(validations);
         return result;
+    }
+
+    void unknown(Field fp, Class<?> type) throws BeanException {
+        checker.unknownProperty(fp, type);
     }
 
     Position position(Field field) {
@@ -201,38 +212,42 @@ final class BSContext<D extends DataType<D>> {
         return getOverride(Fragment.class, fragments, field, FragmentOverride::value, p -> p.value() >= 0);
     }
 
-    <S extends Segment> PFProperty<S, D> node(Class<S> ft, Field ff, int fo, boolean nl, List<Property<?, D>> ps) throws BeanException {
+    <S extends Segment> PFProperty<S, D> node(Class<S> ft, Field ff, Fragment fr, List<Property<?, D>> ps) throws BeanException {
+        checker.afterFragmentProperty(ff, ft);
         final ValidOverride override = getOverride(ValidOverride.class, validations, ff, ValidOverride::path);
-        final BeanContext vc = validation.build(ff, override);
-        final Accessor<S> va = Accessor.of(readOnly, ft, ff);
-        if (readOnly) {
-            final Up2Format.Node<S, D> node = new Up2Format.Node<>(validator, vc, nl, ps);
-            return new PFProperty<>(node, va, this.dataType(ff), fo);
+        final VContext vc = context.build(ff, override);
+        final PAccessor<?, S> va = this.accessor(ft, ff);
+        if (mode == RO) {
+            final BFNode<S, D> node = new BFNode<>(ft, factory.validator, vc, fr, ps);
+            return new PFProperty<>(node, va, this.dataType(ff), offset, fr);
+        } else if (ft.isRecord()) {
+            final BRNode<S, D> node = new BRNode<>(ft, factory.validator, vc, fr, ps);
+            return new PFProperty<>(node, va, this.dataType(ff), offset, fr);
         }
-        final Up2Mapper.Node<S, D> node = new Up2Mapper.Node<>(ft, validator, vc, nl, ps);
-        return new PFProperty<>(node, va, this.dataType(ff), fo);
+        final BPNode<S, D, ?> node = new BMNode<>(ft, factory.validator, vc, fr, ps);
+        return new PFProperty<>(node, va, this.dataType(ff), offset, fr);
     }
 
-    <V> PProperty<?, D> leaf(Class<V> pt, Field pf, int po, boolean pr) throws BeanException {
-        final List<WProcessor<?, D>> processors = BeanScanner.getProcessors(context, pf);
+    <V> PProperty<?, D> property(Class<V> pt, Field pf, Position position) throws BeanException {
+        checker.positionProperty(pf, pt, offset + position.value());
+        final PProcessor<D> ps = BSBuilder.build(factory.context, pf, position);
         final D dataType = this.dataType(pf);
         if (CharSequence.class == pt || pt == String.class) {
-            return new PProperty.PSProperty<>(Accessor.of(readOnly, String.class, pf), dataType, po, pr, processors);
+            return new PSProperty<>(this.accessor(String.class, pf), dataType, offset, position, ps);
         } else {
-            final Conversion<?> conversion = this.conversion(pf, pt);
-            return new PProperty.POProperty<>(Accessor.of(readOnly, pt, pf), dataType, po, pr, processors, conversion);
+            final Conversion<?> cv = this.conversion(pf, pt, position);
+            return new POProperty<>(this.accessor(pt, pf), dataType, offset, position, ps, cv);
         }
     }
 
-    Class<?> fieldType(Field field) {
-        final Type type = field.getGenericType();
-        if (type instanceof TypeVariable<?> tv) {
-            return this.fieldType(field, tv);
-        }
-        if (type instanceof ParameterizedType pt) {
-            return (Class<?>) pt.getRawType();
-        }
-        return field.getType();
+    <V> PAccessor<Field, V> accessor(Class<V> type, Field field) throws BeanException {
+        final Class<? extends Segment> container = getSegmentType(stack);
+        final AccessType access = BSBuilder.getAccessType(field, this.access).orElse(PROPERTY);
+        return mode.of(access, container, field, type);
+    }
+
+    Type fieldType(Field field) {
+        return getPropertyType(field, arguments);
     }
 
 }

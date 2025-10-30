@@ -35,8 +35,8 @@ public interface SegmentListener {
      * @param context the checker context
      * @throws BeanException for any missing or wrong bean configuration
      */
-    @SuppressWarnings("ALL")
     default void afterSegment(CheckerContext context) throws BeanException {
+        context.close();
     }
 
 }

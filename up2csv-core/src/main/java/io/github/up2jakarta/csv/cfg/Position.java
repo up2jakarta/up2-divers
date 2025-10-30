@@ -1,5 +1,7 @@
 package io.github.up2jakarta.csv.cfg;
 
+import io.github.up2jakarta.csv.prc.DefaultProcessor;
+
 import java.lang.annotation.*;
 
 /**
@@ -8,6 +10,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
+@Processor(DefaultProcessor.class)
 public @interface Position {
 
     /**
@@ -16,6 +19,12 @@ public @interface Position {
      * @return the column offset
      */
     int value();
+
+    /**
+     * @return the default value, by default is <code>null</code>
+     * @see DefaultProcessor
+     */
+    String defaultValue() default "";
 
     /**
      * Flag indicates that this property is mandatory for declaring fragment.

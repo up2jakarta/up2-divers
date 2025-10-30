@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_VALIDATOR;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
 import static io.github.up2jakarta.csv.impl.SegmentType.S00;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
@@ -193,7 +193,7 @@ class Up2ConverterTests {
         // THEN
         assertEquals(DefaultBean.class, error.getSource());
         assertEquals("key", error.getLocator());
-        assertEquals("DefaultBean[key] - @Up2Default[value] cannot be converted", error.getMessage());
+        assertEquals("DefaultBean[key] - @Position[defaultValue] cannot be parsed", error.getMessage());
     }
 
     @Test

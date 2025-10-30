@@ -1,20 +1,20 @@
 package io.github.up2jakarta.csv.core.ext;
 
 import io.github.up2jakarta.csv.api.ext.CheckerContext;
+import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
-import io.github.up2jakarta.csv.cfg.Up2Default;
 import io.github.up2jakarta.csv.cfg.Up2Number;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Map;
 
 import static io.github.up2jakarta.csv.core.ext.JpaTableChecker.checkName;
+import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
 
 final class JpaColumnContext implements CheckerContext {
 
@@ -83,20 +83,20 @@ final class JpaColumnContext implements CheckerContext {
         if (size.max() < 0) {
             throw new BeanException(field, "@Size[max] must be positive");
         }
+        if (size.min() < 0) {
+            throw new BeanException(field, "@Size[min] must be positive");
+        }
         if (column.length() < size.max()) {
             throw new BeanException(field, "@Size[max] must be less than or equals @Column[length]");
         }
-        if (column.nullable() && size.min() > 0) {
-            throw new BeanException(field, "@Size[min] does not match with @Column[nullable]");
-        }
-        if (size.min() == 0 && column.nullable() == field.isAnnotationPresent(NotBlank.class)) {
-            final Up2Default def = field.getAnnotation(Up2Default.class);
-            if (def != null) {
-                if (def.value().trim().isEmpty()) {
-                    throw new BeanException(field, "@Up2Default[value] does not match with @Column[nullable]");
+        final Position position = field.getAnnotation(Position.class);
+        if (!column.nullable() && (position == null || undefined(position))) {
+            if (field.isAnnotationPresent(NotEmpty.class)) {
+                if (field.isAnnotationPresent(NotBlank.class)) {
+                    throw new BeanException(field, "must not be annotated by @NotBlank in favor of @NotEmpty");
                 }
-            } else {
-                throw new BeanException(field, "@NotBlank does not match with @Column[nullable]");
+            } else if (!field.isAnnotationPresent(NotBlank.class)) {
+                throw new BeanException(field, "must be annotated @NotEmpty or @NotBlank when @Column[nullable] is false");
             }
         }
     }
@@ -114,7 +114,7 @@ final class JpaColumnContext implements CheckerContext {
             if (column.nullable() == field.isAnnotationPresent(NotNull.class)) {
                 throw new BeanException(field, "@NotNull does not match with @Column[nullable]");
             }
-            if (size != null && !fieldType.isArray()) {
+            if (size != null && !(fieldType.isArray() || Collection.class.isAssignableFrom(fieldType) || Map.class.isAssignableFrom(fieldType))) {
                 throw new BeanException(field, "must not be annotated with @Size");
             }
         }
@@ -141,7 +141,7 @@ final class JpaColumnContext implements CheckerContext {
     }
 
     @Override
-    public void beforePositionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
+    public void positionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
         final Column column = property.getAnnotation(Column.class);
         if (column != null) {
             checkColumn(property, propertyType, column);

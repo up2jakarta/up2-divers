@@ -6,7 +6,7 @@ import io.github.up2jakarta.xml.clv.CodeList;
  * Contract interface for business data types.
  *
  * @param <T> the concrete data-type
- * @see io.github.up2jakarta.csv.api.IError#getType()
+ * @see io.github.up2jakarta.csv.api.IEvent#getType()
  */
 public interface DataType<T extends DataType<T>> extends CodeList<T> {
 

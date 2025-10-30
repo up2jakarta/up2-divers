@@ -32,28 +32,6 @@ public interface CheckerContext {
     }
 
     /**
-     * Listener callback before scanning a field annotated by {@link io.github.up2jakarta.csv.cfg.Position}.
-     *
-     * @param property     the field annotated by {@link io.github.up2jakarta.csv.cfg.Position}
-     * @param propertyType the property type
-     * @param offset       the position index
-     * @throws BeanException for any missing or wrong bean configuration
-     */
-    default void beforePositionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
-    }
-
-    /**
-     * Listener callback after scanning a field annotated by {@link io.github.up2jakarta.csv.cfg.Position}.
-     *
-     * @param property     the field annotated by {@link io.github.up2jakarta.csv.cfg.Position}
-     * @param propertyType the property type
-     * @param offset       the position index
-     * @throws BeanException for any missing or wrong bean configuration
-     */
-    default void afterPositionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
-    }
-
-    /**
      * Listener callback before scanning a segment annotated by {@link io.github.up2jakarta.csv.cfg.Fragment}.
      * Before super-class segment handler or listener.
      *
@@ -75,6 +53,17 @@ public interface CheckerContext {
     }
 
     /**
+     * Listener callback before scanning a field annotated by {@link io.github.up2jakarta.csv.cfg.Position}.
+     *
+     * @param property     the field annotated by {@link io.github.up2jakarta.csv.cfg.Position}
+     * @param propertyType the property type
+     * @param offset       the position index
+     * @throws BeanException for any missing or wrong bean configuration
+     */
+    default void positionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
+    }
+
+    /**
      * Listener callback after scanning an unknown property the not annotated by <code>Position</code> and <code>Fragment</code>.
      *
      * @param property     the unknown field
@@ -82,6 +71,12 @@ public interface CheckerContext {
      * @throws BeanException for any missing or wrong bean configuration
      */
     default void unknownProperty(Field property, Class<?> propertyType) throws BeanException {
+    }
+
+    /**
+     * Listener callback after the end of scanning the <code>segment</code>.
+     */
+    default void close() throws BeanException {
     }
 
 }

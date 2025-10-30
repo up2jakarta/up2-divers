@@ -7,7 +7,7 @@ import io.github.up2jakarta.csv.core.misc.ext.Dummy3;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.api.SeverityType;
 
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_PROCESSOR;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_PROCESSOR;
 
 @SuppressWarnings("unused")
 public class Test3Processor implements Segment {

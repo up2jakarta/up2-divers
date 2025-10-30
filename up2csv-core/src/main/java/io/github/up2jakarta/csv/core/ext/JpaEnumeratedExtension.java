@@ -4,8 +4,8 @@ import io.github.up2jakarta.csv.api.ext.*;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.xml.api.PropertyException;
 import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.clv.PropertyException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.persistence.Column;
@@ -17,7 +17,7 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_XML_ENUM;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_XML_ENUM;
 import static java.util.Arrays.stream;
 
 /**

@@ -2,9 +2,14 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.data.Segment;
 
-import static io.github.up2jakarta.csv.core.FastHandler.of;
+import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 
+/**
+ * Base reader for mono-segment format, that's able to read segments from input stream.
+ *
+ * @param <S> the segment type
+ */
 public abstract class Up2Reader<S extends Segment> {
 
     private final Up2Mapper<S, ?> mapper;

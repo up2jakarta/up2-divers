@@ -4,10 +4,12 @@ import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
 
 /**
- * Extension of {@link IType} that's able to aggregate multiple segments in one-shot.
+ * Extension of {@link IType}, used to aggregate multiple segments to business-objects in one-shot.
  *
- * @param <B> the business type
- * @param <I> the input type
+ * @param <B> the input data type
+ * @param <I> the self-type implementation
+ * @see io.github.up2jakarta.csv.core.BusinessImporter
+ * @see io.github.up2jakarta.csv.core.BusinessReader
  */
 public interface IFullType<B extends DataType<B>, I extends IFullType<B, I>> extends IType<B, I> {
 

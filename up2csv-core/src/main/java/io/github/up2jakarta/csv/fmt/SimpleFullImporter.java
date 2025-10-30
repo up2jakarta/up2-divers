@@ -7,10 +7,9 @@ import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Referencable;
-import io.github.up2jakarta.csv.fmt.hdl.PathCollector;
-import io.github.up2jakarta.csv.fmt.hdl.PathError;
-import io.github.up2jakarta.csv.fmt.hdl.PathRecord;
-import io.github.up2jakarta.csv.fmt.hdl.PathSource;
+import io.github.up2jakarta.csv.fmt.hdl.InputCollector;
+import io.github.up2jakarta.csv.fmt.hdl.InputError;
+import io.github.up2jakarta.csv.fmt.hdl.InputRecord;
 import io.github.up2jakarta.xml.clv.CodeListException;
 
 /**
@@ -19,10 +18,10 @@ import io.github.up2jakarta.xml.clv.CodeListException;
  * @param <T> the business object type
  * @param <B> the data type
  * @param <I> the segment type
- * @see PathRecord
- * @see PathError
+ * @see InputRecord
+ * @see InputError
  */
-public class SimpleFullImporter<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>> extends FullImporter<T, B, I, PathRecord<I>, PathError<B, PathRecord<I>>> {
+public class SimpleFullImporter<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>> extends FullImporter<T, B, I, InputRecord<I, ?>, InputError<B, InputRecord<I, ?>>> {
 
     public <E extends Enum<E> & IType<B, I>> SimpleFullImporter(Up2Factory<B> mf, Class<T> type, E rootNode) throws BeanException {
         //noinspection unchecked
@@ -38,8 +37,8 @@ public class SimpleFullImporter<T extends Referencable, B extends DataType<B>, I
     }
 
     @Override
-    protected PathCollector<B, PathRecord<I>> create(PathRecord<I> row) {
-        return new PathCollector<>(row);
+    protected InputCollector<B, InputRecord<I, ?>> create(InputRecord<I, ?> row) {
+        return new InputCollector<>(row);
     }
 
     /**
@@ -51,12 +50,12 @@ public class SimpleFullImporter<T extends Referencable, B extends DataType<B>, I
      * @return new record
      * @throws CodeListException if type is unknown
      */
-    public final PathRecord<I> record(PathSource source, long lineId, String... row) throws CodeListException {
+    public final <S extends Comparable<S>> InputRecord<I, S> record(S source, long lineId, String... row) throws CodeListException {
         final I type = typing.type(row);
         final String[] data = typing.truncate(type, row);
         final String recordId = row[mode.getRowKeyIndex()];
         final String businessKey = row[mode.getBeanIdIndex()];
-        return new PathRecord<>(source, lineId, recordId, type, businessKey, data);
+        return new InputRecord<>(source, lineId, recordId, type, businessKey, data);
     }
 
 }

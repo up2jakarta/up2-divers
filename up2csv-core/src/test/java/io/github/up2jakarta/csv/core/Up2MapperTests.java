@@ -1,6 +1,9 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
+import io.github.up2jakarta.csv.core.hdl.PFProperty;
+import io.github.up2jakarta.csv.core.hdl.Properties;
+import io.github.up2jakarta.csv.core.hdl.Property;
 import io.github.up2jakarta.csv.core.misc.clv.CountryCodeType;
 import io.github.up2jakarta.csv.core.misc.clv.CurrencyCodeType;
 import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
@@ -22,7 +25,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Collection;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_VALIDATOR;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
+import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
 import static io.github.up2jakarta.xml.api.SeverityType.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -109,6 +113,32 @@ class Up2MapperTests {
         final Up2Format<ClientSegment, GroupType> format = factory.format(ClientSegment.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
+    }
+
+    @Test
+    void testDefault1() throws BeanException {
+        // Given
+        final Up2Mapper<Default1Bean, GroupType> mapper = factory.build(Default1Bean.class);
+        // When
+        final Default1Bean bean = mapper.map();
+        // Then Bean
+        assertNotNull(bean);
+        assertEquals("*", bean.getCode());
+        assertNotNull(bean.getReference());
+        assertEquals("*", bean.getReference().getCode());
+        assertEquals("*", bean.getReference().getValue());
+    }
+
+    @Test
+    void testDefault2Nullable() throws BeanException {
+        // Given
+        final Up2Mapper<Default2Bean, GroupType> mapper = factory.build(Default2Bean.class);
+        // When
+        final Default2Bean bean = mapper.map();
+        // Then Bean
+        assertNotNull(bean);
+        assertEquals("*", bean.getCode());
+        assertNull(bean.getReference());
     }
 
     @Test
@@ -432,21 +462,11 @@ class Up2MapperTests {
     }
 
     @Test
-    void testMapValidRecord() {
-        // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(RecordBean.class));
-        // THEN
-        assertEquals(RecordBean.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("RecordBean[class] - record class is not allowed", thrown.getMessage());
-    }
-
-    @Test
     void testValidRecursive1() throws BeanException {
         // When
         final Up2Mapper<TestRecursive7OverrideSegment, GroupType> mapper = factory.build(TestRecursive7OverrideSegment.class);
         // THEN
-        assertEquals(2, mapper.toList().size());
+        assertEquals(2, mapper.node.properties.size());
     }
 
     @Test
@@ -454,7 +474,7 @@ class Up2MapperTests {
         // When
         final Up2Mapper<TestRecursive8OverrideSegment, GroupType> mapper = factory.build(TestRecursive8OverrideSegment.class);
         // THEN
-        assertEquals(3, mapper.toList().size());
+        assertEquals(3, mapper.node.properties.size());
     }
 
     @Test
@@ -508,16 +528,6 @@ class Up2MapperTests {
     }
 
     @Test
-    void testFieldVisibility() {
-        // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test5Segment.class));
-        // THEN
-        assertEquals(Test5Segment.class, thrown.getSource());
-        assertEquals("publicField", thrown.getLocator());
-        assertEquals("Test5Segment[publicField] - must not be public", thrown.getMessage());
-    }
-
-    @Test
     void testFieldFinal() {
         // WHEN
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test6Segment.class));
@@ -542,7 +552,7 @@ class Up2MapperTests {
     void testValidRecursive() throws BeanException {
         // When
         final Up2Mapper<TestRecursive6Segment, GroupType> mapper = factory.build(TestRecursive6Segment.class);
-        final List<Property<?, GroupType>> fields = mapper.toList();
+        final List<Property<?, GroupType>> fields = mapper.node.properties;
         // THEN
         assertEquals(3, fields.size());
         {
@@ -560,7 +570,7 @@ class Up2MapperTests {
             assertEquals("fragment", fragment.getName());
             assertEquals(2, fragment.offset);
             assertInstanceOf(PFProperty.class, fragment);
-            final List<Property<?, GroupType>> fProperties = ((PFProperty<?, GroupType>) fragment).toList();
+            final List<Property<?, GroupType>> fProperties = ((PFProperty<?, GroupType>) fragment).node.properties;
             assertEquals(2, fProperties.size());
             {
                 final Property<?, GroupType> property = fProperties.getFirst();
@@ -576,78 +586,51 @@ class Up2MapperTests {
     }
 
     @Test
-    void testMappingBean() throws BeanException, IllegalAccessException {
+    void testMappingBean() throws Exception {
         // GIVEN
         final String id = "V";
         final String name = "V";
         final Up2Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
         // WHEN
         final ValidBean bean = mapper.map(id, name);
-        final List<Property<?, GroupType>> fields = mapper.toList();
+        final List<Property<?, GroupType>> fields = mapper.node.properties;
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.getFirst().getName());
         assertEquals("name", fields.get(1).getName());
-        for (final Property<?, GroupType> p : fields) {
-            assertInstanceOf(PProperty.PSProperty.class, p);
-            final PProperty.PSProperty<GroupType> sp = (PProperty.PSProperty<GroupType>) p;
-            sp.getField().setAccessible(true);
-            assertEquals("V", sp.getField().get(bean));
-            // When
-            sp.parse(bean, "Test", 0, FastHandler.of(WARNING));
-            // Then
-            assertEquals("Test", sp.getField().get(bean));
-        }
+        Properties.assertBean(bean, fields);
     }
 
     @Test
-    void testMappingNoOrderBean() throws BeanException, IllegalAccessException {
+    void testMappingNoOrderBean() throws Exception {
         // GIVEN
         final String id = "V";
         final String name = "V";
         final Up2Mapper<NoOrderBean, GroupType> mapper = factory.build(NoOrderBean.class);
         // WHEN
         final NoOrderBean bean = mapper.map(id, name);
-        final List<Property<?, GroupType>> fields = mapper.toList();
+        final List<Property<?, GroupType>> fields = mapper.node.properties;
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.getFirst().getName());
         assertEquals("name", fields.get(1).getName());
-        for (final Property<?, GroupType> p : fields) {
-            assertInstanceOf(PProperty.PSProperty.class, p);
-            final PProperty.PSProperty<GroupType> sp = (PProperty.PSProperty<GroupType>) p;
-            sp.getField().setAccessible(true);
-            assertEquals("V", sp.getField().get(bean));
-            // When
-            sp.parse(bean, "Test", 0, FastHandler.of(WARNING));
-            // Then
-            assertEquals("Test", sp.getField().get(bean));
-        }
+        Properties.assertBean(bean, fields);
     }
 
     @Test
-    void testMappingNoPositionBean() throws BeanException, IllegalAccessException {
+    void testMappingNoPositionBean() throws Exception {
         // GIVEN
         final String id = "V";
         final String name = "V";
         final Up2Mapper<NoPositionBean, GroupType> mapper = factory.build(NoPositionBean.class);
         // WHEN
         final NoPositionBean bean = mapper.map(id, name);
-        final List<Property<?, GroupType>> fields = mapper.toList();
+        final List<Property<?, GroupType>> fields = mapper.node.properties;
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.getFirst().getName());
         assertEquals("name", fields.get(1).getName());
-        for (final Property<?, GroupType> p : fields) {
-            assertInstanceOf(PProperty.PSProperty.class, p);
-            final PProperty.PSProperty<GroupType> sp = (PProperty.PSProperty<GroupType>) p;
-            sp.getField().setAccessible(true);
-            assertEquals("V", sp.getField().get(bean));
-            // When
-            sp.parse(bean, "Test", 0, FastHandler.of(WARNING));
-            // Then
-            assertEquals("Test", sp.getField().get(bean));
-        }
+        Properties.assertBean(bean, fields);
     }
 
     @Test
@@ -657,6 +640,7 @@ class Up2MapperTests {
         final String[] data = new String[]{"ZZZ", "Content", null, "???", "T2", "EUR"};
         // When
         final NoteEntity segment = mapper.map(data);
+        mapper.toFormat().validate(segment, of(WARNING));
         // Then
         assertNotNull(segment);
         assertEquals("ZZZ", segment.getSubjectCode());

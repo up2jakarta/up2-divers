@@ -45,6 +45,8 @@ public final class JpaTableChecker implements SegmentListener {
                 result.add(type);
             } else if (parameter.getBounds()[0] instanceof ParameterizedType pt && pt.getActualTypeArguments().length == 1) {
                 result.add((Class<?>) pt.getActualTypeArguments()[0]);
+            } else if ((argument instanceof ParameterizedType pt) && pt.getRawType() instanceof Class<?> rc) {
+                result.add(rc);
             } else {
                 throw new BeanException(field, "must be checked");
             }

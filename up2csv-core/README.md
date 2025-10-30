@@ -2,7 +2,8 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2csv-core?style=for-the-badge&color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2csv-core)
 
-- `Up2CSV` is an open-source, light and modern framework that maps and validates easily flat-data to javaBeans.
+- `Up2CSV` is an open-source, light and modern framework that maps and validates easily flat-data to javaBeans and also
+  export java-beans to flat-data.
 - `Up2CSV` helps developers to parse `business-object` in the case of data is spread over `several` segments (`CSV`
   records).
 - `Up2CSV` comes with pre-build tools that support persist-able objects (`JPA`) or exportable like (`XML` or `JSON`).
@@ -20,6 +21,7 @@ approach.
 - Support of IoC container like CDI (Contexts and Dependency Injection) provider or Spring or whatever
 - Configuration based on @Annotation
 - Support of Java OOP (Object-Oriented Programming)
+- Support of Java `Record`
 - Mapping from flat-data to java-bean
 - Unmapping from java-bean to flat data
 - Extensions
@@ -39,7 +41,7 @@ approach.
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.5.3</version>
+        <version>1.5.4</version>
     </dependency>
     <!-- Optional JSR-303 Validation Provider -->
     <!-- Optional JPA Provider -->
@@ -101,15 +103,14 @@ Up2 Processor API is useful to create configurable processor activated by annota
 
 Up2 Core comes with 3 built-in shortcut annotations:
 
-### @Up2Default
+### @Position.defaultValue
 
 Setting the default value
 
 ``` java
 public Up2Segment implements Segment {
 
-    @Position(0)
-    @Up2Default("null")
+    @Position(value = 0, defaultValue = "*")
     private String code;
 }
 ```
@@ -141,10 +142,9 @@ public Up2Segment implements Segment {
 ``` java
 public Up2Segment implements Segment {
 
-    @Position(0)
+    @Position(value = 0, defaultValue = "*") 
     @Up2Trim({"", "-", "null", "undefined"}) // 1st order
     @Up2Token // 2nd order
-    @Up2Default("UP2") // 3rd order
     private String code;
 }
 ```
@@ -195,8 +195,7 @@ This annotation allows the automatic conversion of non-decimal `Number` and thei
 ``` java
 public Up2Segment implements Segment {
 
-    @Position(0)
-    @Up2Default("0")
+    @Position(value = 0, defaultValue = "-1")
     @Up2Number
     private int anInt;
     
@@ -224,8 +223,7 @@ public Up2Segment implements Segment {
     private BigDecimal aDecimal;
     
     @Position(2)
-    @Up2Default("0")
-     @Up2Decimal(value = 4)
+    @Up2Decimal(value = 4)
     private double aDouble;
     
     // ...
@@ -497,10 +495,61 @@ Tells the engine that the given input data is already truncated, it allows overr
 
 ``` java
 @Truncated(4) // The first 4 columns are truncated
-public TestSegment implements Segment {
-    ...
+public MySegment implements Segment {
+    // ...
 }
 ```
+
+# Support of JPA AccessMode
+
+## Field based access
+
+``` java
+public class MyBean implements Segment {
+
+    @Position(0)
+    @Access(AccessType.FIELD)
+    private String code;
+
+    // No getters neither setters
+
+}
+```
+
+## Property based access (Default Mode)
+
+``` java
+@Access(AccessType.PROPERTY)
+public class MyBean extends implements Segment {
+
+    @Position(1)
+    @Up2Boolean
+    protected String code;
+    
+    // ...
+
+    protected String getCode() {
+        return code;
+    }
+
+    protected void setCode(String code) {
+        this.code = code;
+    }
+}
+```
+
+## Support of Java Record access
+
+```
+@Access(AccessType.PROPERTY)
+public record MyRecord(long id, @Position(0) String code, @Position(1) String label, Object src) implements Segment {
+}
+```
+
+- In this special case, the writing of properties is done with constructor whatever the access mode (Property/Field).
+- Primitive properties are set with default values when are not mapped or the input data is null, so be careful with
+  validation and export
+- When primitive property is managed by the framework, its value is exported by `Up2Format`
 
 ## Input API
 
@@ -508,7 +557,7 @@ public TestSegment implements Segment {
 
 - `BeanJoiner`: Bean getter for segregation processing only.
 - `BeanLinker`: Bean linker for aggregation/segregation processing.
-- `IError`: Input error representation (model) tor error handling.
+- `IEvent`: Input event representation (model) for errors or exceptions.
 - `IRecord`: Input record representation (model)
 - `IType`: Segment definition for segregation processing only.
 - `IFullType`: Segment definition for aggregation/segregation processing.
@@ -645,14 +694,6 @@ It's impossible to present a `business-property` within `0..n` cardinality
 
 - [BusinessReader.java](src/main/java/io/github/up2jakarta/csv/core/BusinessReader.java) for stream inputs
 - [BusinessWriter.java](src/main/java/io/github/up2jakarta/csv/core/BusinessWriter.java) for stream outputs
-    1. [FullWriter.java](src/main/java/io/github/up2jakarta/csv/fmt/FullWriter.java) for `FULL` mode
-    2. [FastWriter.java](src/main/java/io/github/up2jakarta/csv/fmt/FastWriter.java) for `FAST` mode
-
-> :warning: `ModeType.UNIT` is not supported for batch processing
->
-> It's used only for unitary processing with Publish/Subscribe systems like JMS Queues or Kafka topics
->
-> It's developed for best compacted data as an alternative of XML or JSON formats
 
 See [up2csv-format](../up2csv-format/README.md) for CSV files implementation.
 

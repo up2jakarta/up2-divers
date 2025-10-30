@@ -2,14 +2,13 @@ package io.github.up2jakarta.csv.core.misc;
 
 import io.github.up2jakarta.csv.data.Recordable;
 import io.github.up2jakarta.csv.impl.InputRecord;
-import io.github.up2jakarta.csv.impl.SegmentType;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 
 import java.io.Serializable;
 
 @MappedSuperclass
-public abstract class ParsedEntity<K extends Serializable> implements Recordable<SegmentType, InputRecord> {
+public abstract class ParsedEntity<K extends Serializable> implements Recordable<InputRecord> {
 
     @Transient
     private transient InputRecord row;

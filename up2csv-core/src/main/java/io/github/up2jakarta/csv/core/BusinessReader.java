@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.api.IError;
+import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IFullType;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.data.*;
@@ -9,22 +9,22 @@ import io.github.up2jakarta.csv.data.*;
  * Base business reader for multi-segments format, that's able to read business-objects from input stream.
  *
  * @param <T> the business object type
- * @param <B> the data type
- * @param <I> the segment type
- * @param <R> the record type
- * @param <E> the error type
+ * @param <B> the input data type
+ * @param <I> the input type
+ * @param <R> the input record type
+ * @param <E> the input error type
  */
-public abstract class BusinessReader<B extends DataType<B>, I extends IFullType<B, I>, T extends Referencable, R extends IRecord<I>, E extends IError<B>> extends Up2Aggregator<R> {
+public abstract class BusinessReader<B extends DataType<B>, I extends IFullType<B, I>, T extends Referencable, R extends IRecord<I>, E extends IEvent<B>> extends Up2Aggregator<R> {
 
-    protected final int beanIdIndex;
-    protected final int typeIdIndex;
+    protected final I root;
+    protected final ModeType mode;
     protected final BusinessImporter<B, I, T, ?, ?>.BusinessTyping typing;
     private final BusinessImporter<B, I, T, R, E> exporter;
 
     protected BusinessReader(BusinessImporter<B, I, T, R, E> exporter) {
-        this.beanIdIndex = exporter.mode.beanIdIndex;
-        this.typeIdIndex = exporter.mode.typeIdIndex;
         this.typing = exporter.typing;
+        this.mode = exporter.mode;
+        this.root = exporter.root;
         this.exporter = exporter;
     }
 

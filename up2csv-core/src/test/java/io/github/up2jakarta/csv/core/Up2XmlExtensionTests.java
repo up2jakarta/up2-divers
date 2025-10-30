@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_XML_ENUM;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_XML_ENUM;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
 import static org.junit.jupiter.api.Assertions.*;
 

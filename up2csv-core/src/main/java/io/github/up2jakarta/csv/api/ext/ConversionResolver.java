@@ -35,6 +35,7 @@ public abstract class ConversionResolver<A extends Annotation> {
      *
      * @param config   the annotation that activate the resolution
      * @param property the segment property
+     * @param type     the computed property type
      * @return the right conversion
      * @throws BeanException for any missing or wrong bean configuration
      */
@@ -45,9 +46,10 @@ public abstract class ConversionResolver<A extends Annotation> {
      *
      * @param config   the annotation that activate the resolution
      * @param property the segment property
+     * @param type     the computed property type
      * @return the right conversion
      */
-    public PropertyFormatter<?> forFormatting(@NotNull A config, @NotNull Field property) {
+    public PropertyFormatter<?> forFormatting(@NotNull A config, @NotNull Field property, @NotNull Class<?> type) {
         return Object::toString;
     }
 

@@ -27,7 +27,7 @@ public final class UniqueOffsetChecker implements SegmentListener {
         private final List<Integer> offsets = new LinkedList<>();
 
         @Override
-        public void beforePositionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
+        public void positionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
             if (!offsets.add(offset)) {
                 throw new BeanException(property, "@Position[value] must be unique");
             }

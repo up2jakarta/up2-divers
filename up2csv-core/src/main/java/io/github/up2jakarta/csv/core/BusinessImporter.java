@@ -1,11 +1,10 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.api.IError;
+import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IFullType;
 import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.core.hdl.EventCollector;
 import io.github.up2jakarta.csv.data.*;
-import io.github.up2jakarta.csv.fmt.FastImporter;
-import io.github.up2jakarta.csv.fmt.FullImporter;
 import io.github.up2jakarta.xml.clv.CodeListException;
 
 import java.util.*;
@@ -20,14 +19,15 @@ import static java.util.Collections.unmodifiableList;
  * Base Processor that's able to aggregate and import java-bean from flat-data.
  *
  * @param <T> the business object type
- * @param <B> the data type
- * @param <I> the segment type
- * @param <R> the record type
- * @param <E> the error type
- * @see FastImporter
- * @see FullImporter
+ * @param <B> the input data type
+ * @param <I> the input type
+ * @param <R> the input record type
+ * @param <E> the input error type
+ * @see io.github.up2jakarta.csv.fmt.FastImporter
+ * @see io.github.up2jakarta.csv.fmt.FullImporter
+ * @see io.github.up2jakarta.csv.fmt.UnitImporter
  */
-public abstract class BusinessImporter<B extends DataType<B>, I extends IFullType<B, I>, T extends Referencable, R extends IRecord<I>, E extends IError<B>> extends BusinessProcessor<B, I, Up2Mapper<Segment, B>> {
+public abstract non-sealed class BusinessImporter<B extends DataType<B>, I extends IFullType<B, I>, T extends Referencable, R extends IRecord<I>, E extends IEvent<B>> extends BSOperator<B, I, Up2Mapper<Segment, B>, Up2Format<Segment, B>> {
 
     protected final BusinessTyping typing;
 
@@ -41,11 +41,11 @@ public abstract class BusinessImporter<B extends DataType<B>, I extends IFullTyp
         this.typing = new BusinessTyping(super.nodes);
     }
 
-    private void link(BSEntry<I, R, B, E> parent, List<BSEntry<I, R, B, E>> nodes) throws BeanException {
-        for (final I type : this.getJoins(parent.type())) {
+    private void link(Entry<I, R, B, E> parent, List<Entry<I, R, B, E>> nodes) throws BeanException {
+        for (final I type : this.getJoins(parent.type)) {
             // Finding Children
-            final List<BSEntry<I, R, B, E>> children = new LinkedList<>();
-            for (final BSEntry<I, R, B, E> node : nodes) {
+            final List<Entry<I, R, B, E>> children = new LinkedList<>();
+            for (final Entry<I, R, B, E> node : nodes) {
                 if (node.link(parent, type)) {
                     children.add(node);
                 }
@@ -60,44 +60,44 @@ public abstract class BusinessImporter<B extends DataType<B>, I extends IFullTyp
                 }
             }
             // Linking Children
-            for (final BSEntry<I, R, B, E> child : children) {
+            for (final Entry<I, R, B, E> child : children) {
                 nodes.remove(child);
+                type.linker().link(parent.bean(), child.bean());
                 if (this.hasJoins(type)) {
                     this.link(child, nodes);
                 }
-                type.linker().link(parent.bean(), child.bean());
             }
         }
     }
 
-    private List<BSEntry<I, R, B, E>> map(Collection<R> rows, Consumer<BSEntry<I, R, B, E>> root, Consumer<BSEntry<I, R, B, E>> node) throws BeanException {
-        final List<BSEntry<I, R, B, E>> result = new ArrayList<>(rows.size());
+    private List<Entry<I, R, B, E>> map(Collection<R> rows, Consumer<Entry<I, R, B, E>> root, Consumer<Entry<I, R, B, E>> node) throws BeanException {
+        final List<Entry<I, R, B, E>> result = new ArrayList<>(rows.size());
         for (final R row : rows) {
             final I type = row.getType();
             final boolean isNode = this.root != type;
             final Up2Mapper<Segment, B> mapper = this.get(type);
-            final Up2Collector<R, B, E> handler = this.create(row);
+            final EventCollector<R, B, E, ?> handler = this.create(row);
             final Segment bean;
             if (mapper != null) {
-                bean = mapper.map(row, (isNode) ? mode.length : this.offset, isNode, handler);
+                bean = mapper.node.map(row, (isNode) ? mode.length : offset, isNode, handler);
             } else {
                 bean = null;
             }
-            final BSEntry<I, R, B, E> record = new BSEntry<>(mapper, type, bean, handler);
+            final Entry<I, R, B, E> record = new Entry<>(mapper, type, bean, handler);
+            result.add(record);
             if (isNode) {
                 node.accept(record);
             } else {
                 root.accept(record);
             }
-            result.add(record);
         }
         return unmodifiableList(result);
     }
 
     @Override
-    final Up2Mapper<Segment, B> build(Up2Factory<B> factory, I type, BeanValidator<Segment, B> source) throws BeanException {
-        if (source instanceof Up2Format<Segment, B> bf) {
-            return bf.toMapper();
+    final Up2Mapper<Segment, B> build(Up2Factory<B> factory, I type, Up2Format<Segment, B> source) throws BeanException {
+        if (source != null) {
+            return source.toMapper();
         }
         return factory.build(type.getClassType(), factory.resolver.or(type.getBusinessType()));
     }
@@ -111,7 +111,7 @@ public abstract class BusinessImporter<B extends DataType<B>, I extends IFullTyp
             final Class<?> type = parent.type;
             throw new BeanException(type, "must have one property annotated by @BusinessId to link with #[" + name + ']');
         }
-        child.parentId.checkType(child.type, parent.businessId);
+        child.parentId.check(child.type, parent.businessId);
     }
 
     /**
@@ -128,18 +128,18 @@ public abstract class BusinessImporter<B extends DataType<B>, I extends IFullTyp
         } else if (records.isEmpty()) {
             return creator.apply(null, List.of());
         }
-        final List<BSEntry<I, R, B, E>> roots = new ArrayList<>(1);
-        final List<BSEntry<I, R, B, E>> nodes = new ArrayList<>(records.size() - 1);
-        final List<BSEntry<I, R, B, E>> store = this.map(records, roots::add, nodes::add);
+        final List<Entry<I, R, B, E>> roots = new ArrayList<>(1);
+        final List<Entry<I, R, B, E>> nodes = new ArrayList<>(records.size() - 1);
+        final List<Entry<I, R, B, E>> store = this.map(records, roots::add, nodes::add);
         final T invoice = switch (roots.size()) {
             case 1:
-                final BSEntry<I, R, B, E> root = roots.getFirst();
+                final Entry<I, R, B, E> root = roots.getFirst();
                 root.validate(this.offset);
                 this.link(root, nodes);
-                nodes.forEach(r -> r.handle(r.type(), 0, DataType.DETACHED));
+                nodes.forEach(r -> r.handle(r.type, 0, DataType.DETACHED));
                 yield root.bean();
             case 0:
-                nodes.forEach(r -> r.handle(r.type(), 0, DataType.DETACHED));
+                nodes.forEach(r -> r.handle(r.type, 0, DataType.DETACHED));
                 yield null;
             default:
                 roots.forEach(r -> r.handle(this.root, mode.typeIdIndex, message(this.root.getBusinessType())));
@@ -159,8 +159,8 @@ public abstract class BusinessImporter<B extends DataType<B>, I extends IFullTyp
      * @throws BeanException for any problem when setting fields from input record
      */
     public final <C> C parse(R[] records, BusinessCreator<C, T, E> creator) throws BeanException {
-        if (records == null || records.length == 0) {
-            return creator.apply(null, List.of());
+        if (records == null) {
+            return null;
         }
         return this.parse(Arrays.asList(records), creator);
     }
@@ -193,7 +193,7 @@ public abstract class BusinessImporter<B extends DataType<B>, I extends IFullTyp
      * @param record the input record
      * @return new instance error-collector, must not be <code>null</code>
      */
-    protected abstract Up2Collector<R, B, E> create(R record);
+    protected abstract EventCollector<R, B, E, ?> create(R record);
 
     public class BusinessTyping {
 

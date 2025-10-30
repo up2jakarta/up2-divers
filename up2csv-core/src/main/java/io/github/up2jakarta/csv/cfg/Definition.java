@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 /**
  * Up2 Annotation that supports the {@link io.github.up2jakarta.csv.data.DataType} resolution.
  *
- * @see io.github.up2jakarta.csv.api.IError#getType()
+ * @see io.github.up2jakarta.csv.api.IEvent#getType()
  * @see Up2Writer#header()
  */
 @Documented

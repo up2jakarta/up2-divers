@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_CODE_LIST;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_CODE_LIST;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.fastInvoice;
 import static io.github.up2jakarta.csv.impl.SegmentType.*;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;

@@ -16,8 +16,8 @@ import jakarta.validation.constraints.Size;
 @SuppressWarnings("unused")
 public class Test17Entity extends ParsedEntity<String> {
 
-    @Position(0)
-    @Size(min = 1, max = 8)
+    @Position(value = 0, defaultValue = "*")
+    @Size(max = 8)
     @Column(name = "TU_KEY", length = 8, nullable = false)
     private String key;
 

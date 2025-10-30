@@ -6,15 +6,15 @@ import io.github.up2jakarta.csv.api.ext.PropertyFormatter;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Up2Boolean;
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.xml.api.PropertyException;
 import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.clv.PropertyException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
 
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_BOOLEAN;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_BOOLEAN;
 
 @Named
 @Singleton
@@ -40,7 +40,7 @@ public final class BooleanResolver extends ConversionResolver<Up2Boolean> {
     }
 
     @Override
-    public PropertyFormatter<Boolean> forFormatting(Up2Boolean config, Field property) {
+    public PropertyFormatter<Boolean> forFormatting(Up2Boolean config, Field property, Class<?> type) {
         return v -> {
             if (v) {
                 return config.trueValue();

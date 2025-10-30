@@ -1,43 +1,39 @@
 package io.github.up2jakarta.csv.core.misc;
 
-import io.github.up2jakarta.csv.cfg.*;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.cfg.Up2Boolean;
+import io.github.up2jakarta.csv.cfg.Up2Decimal;
+import io.github.up2jakarta.csv.cfg.Up2Number;
 import io.github.up2jakarta.csv.data.Segment;
 
 @SuppressWarnings("unused")
 public class Test1Primitive implements Segment {
 
-    @Position(0)
-    @Up2Default("false")
+    @Position(value = 0, defaultValue = "false")
     @Up2Boolean
     private boolean aBoolean;
 
-    @Position(1)
-    @Up2Default("1")
+    @Position(value = 1, defaultValue = "1")
     @Up2Number
     private byte aByte;
 
-    @Position(2)
-    @Up2Default("2")
+    @Position(value = 2, defaultValue = "2")
     @Up2Number
     private short aShort;
 
-    @Position(3)
-    @Up2Default("3")
+    @Position(value = 3, defaultValue = "3")
     @Up2Number
     private int anInt;
 
-    @Position(4)
-    @Up2Default("4")
+    @Position(value = 4, defaultValue = "4")
     @Up2Number
     private long aLong;
 
-    @Position(5)
-    @Up2Default("5.555")
+    @Position(value = 5, defaultValue = "5.555")
     @Up2Decimal(2)
     private float aFloat;
 
-    @Position(6)
-    @Up2Default("6.66666")
+    @Position(value = 6, defaultValue = "6.66666")
     @Up2Decimal(4)
     private double aDouble;
 

@@ -195,17 +195,17 @@ class Up2JpaCheckerTests {
         // THEN
         assertEquals(Test16Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
-        assertEquals("Test16Entity[key] - @NotBlank does not match with @Column[nullable]", error.getMessage());
+        assertEquals("Test16Entity[key] - must be annotated @NotEmpty or @NotBlank when @Column[nullable] is false", error.getMessage());
     }
 
     @Test
-    void testColumnNullableEmptyEntity() {
+    void testColumnManyNullableEntity() {
         // GIVEN
         final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test19Entity.class));
         // THEN
         assertEquals(Test19Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
-        assertEquals("Test19Entity[key] - @Up2Default[value] does not match with @Column[nullable]", error.getMessage());
+        assertEquals("Test19Entity[key] - must not be annotated by @NotBlank in favor of @NotEmpty", error.getMessage());
     }
 
     @Test
@@ -219,13 +219,11 @@ class Up2JpaCheckerTests {
     }
 
     @Test
-    void testSizeMinBean() {
+    void testSizeMinBean() throws BeanException {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test20Entity.class));
+        final Up2Mapper<Test20Entity, GroupType> mapper = factory.build(Test20Entity.class);
         // THEN
-        assertEquals(Test20Entity.class, error.getSource());
-        assertEquals("key", error.getLocator());
-        assertEquals("Test20Entity[key] - @Size[min] does not match with @Column[nullable]", error.getMessage());
+        assertNotNull(mapper);
     }
 
     @Test

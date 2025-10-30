@@ -11,7 +11,7 @@ import java.util.Stack;
  * The business resolver data type.
  *
  * @param <D> the business data type
- * @see io.github.up2jakarta.csv.api.IError#getType()
+ * @see io.github.up2jakarta.csv.api.IEvent#getType()
  */
 public abstract class DataTypeResolver<D extends DataType<D>> {
 

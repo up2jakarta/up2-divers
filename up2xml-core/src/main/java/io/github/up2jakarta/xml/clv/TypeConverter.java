@@ -1,5 +1,6 @@
 package io.github.up2jakarta.xml.clv;
 
+import io.github.up2jakarta.xml.api.PropertyException;
 import io.github.up2jakarta.xml.api.SeverityType;
 import jakarta.persistence.AttributeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;

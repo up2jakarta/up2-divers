@@ -51,9 +51,7 @@ public final class Path {
         return null;
     }
 
-    public static <A extends Annotation> A getOverride(
-            Class<A> type, AnnotatedElement origin, Function<A, String[]> mapper
-    ) throws BeanException {
+    public static <A extends Annotation> A getOverride(Class<A> type, AnnotatedElement origin, Function<A, String[]> mapper) throws BeanException {
         final List<A> overrides = stream(origin.getAnnotationsByType(type))
                 .filter(o -> mapper.apply(o).length == 0)
                 .toList();
@@ -66,9 +64,7 @@ public final class Path {
         throw of(origin, "multiple @" + type.getSimpleName() + "(path = {})");
     }
 
-    public static <A extends Annotation> A getOverride(
-            Class<A> type, Map<Path, A> overrides, Field field, Function<A, String[]> mapper
-    ) throws BeanException {
+    public static <A extends Annotation> A getOverride(Class<A> type, Map<Path, A> overrides, Field field, Function<A, String[]> mapper) throws BeanException {
         return overrides.entrySet().stream()
                 .filter(e -> e.getKey().equals(field))
                 .map(Entry::getValue)
@@ -76,9 +72,7 @@ public final class Path {
                 .orElse(getOverride(type, field, mapper));
     }
 
-    public static <O extends Annotation, A extends Annotation> A getOverride(
-            Class<A> type, Map<Path, O> overrides, Field field, Function<O, A> mapper, Predicate<A> exclude
-    ) {
+    public static <O extends Annotation, A extends Annotation> A getOverride(Class<A> type, Map<Path, O> overrides, Field field, Function<O, A> mapper, Predicate<A> exclude) {
         final Optional<O> override = overrides.entrySet().stream()
                 .filter(e -> e.getKey().equals(field))
                 .map(Entry::getValue)
@@ -90,22 +84,14 @@ public final class Path {
         return field.getAnnotation(type);
     }
 
-    public static <A extends Annotation> void addOverride(
-            Path path, A override, String property, BiConsumer<Path, A> collector
-    ) {
+    public static <A extends Annotation> void addOverride(Path path, A override, String property, BiConsumer<Path, A> collector) {
         final String[] paths = path.path;
-        if (paths.length > 0 && paths[0].equals(property)) {
-            if (paths.length == 1) {
-                collector.accept(path, override);
-            } else {
-                collector.accept(path.next(), override);
-            }
+        if (paths.length > 1 && paths[0].equals(property)) {
+            collector.accept(path.next(), override);
         }
     }
 
-    public static <A extends Annotation> void addOverride(
-            Class<A> type, AnnotatedElement origin, BiConsumer<Path, A> collector, Function<A, String[]> mapper
-    ) throws BeanException {
+    public static <A extends Annotation> void addOverride(Class<A> type, AnnotatedElement origin, BiConsumer<Path, A> collector, Function<A, String[]> mapper) throws BeanException {
         final A[] overrides = origin.getAnnotationsByType(type);
         for (int i = 0; i < overrides.length; i++) {
             final A override = overrides[i];

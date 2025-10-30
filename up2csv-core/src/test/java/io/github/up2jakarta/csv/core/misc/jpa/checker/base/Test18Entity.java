@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.core.misc.jpa.checker.base;
 
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.cfg.Up2Default;
 import io.github.up2jakarta.csv.cfg.Up2EnableJPA;
 import io.github.up2jakarta.csv.core.ext.Prefix;
 import io.github.up2jakarta.csv.core.misc.ParsedEntity;
@@ -17,9 +16,8 @@ import jakarta.validation.constraints.Size;
 @SuppressWarnings("unused")
 public class Test18Entity extends ParsedEntity<String> {
 
-    @Position(0)
+    @Position(value = 0, defaultValue = "ZZZ")
     @Size(max = 8)
-    @Up2Default("ZZZ")
     @Column(name = "TU_KEY", length = 8, nullable = false)
     private String key;
 

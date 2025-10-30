@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
- * Up2 Bean Exception for {@link Up2Factory#build(Class)}.
+ * Up2 Bean Exception for {@link Up2Factory#build(Class)} wraps missing configuration or bean access.
  */
 public class BeanException extends Exception implements MessageFormatter {
 

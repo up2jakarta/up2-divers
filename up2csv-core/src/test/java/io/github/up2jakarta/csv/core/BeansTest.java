@@ -6,7 +6,6 @@ import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
 import io.github.up2jakarta.csv.core.misc.cvr.SupportEntity;
 import io.github.up2jakarta.csv.data.Recordable;
 import io.github.up2jakarta.csv.impl.InputRecord;
-import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.xml.clv.CodeListConverter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -102,18 +101,17 @@ class BeansTest {
     @Test
     void testGetParsedArguments() throws BeanException {
         // Given
-        final Class<? extends Recordable<?, ?>> beanType = SupportEntity.class;
+        final Class<? extends Recordable<?>> beanType = SupportEntity.class;
         // When
         final Type[] arguments = getTypeArguments(beanType, Recordable.class);
         // Then
-        assertEquals(SegmentType.class, arguments[0]);
-        assertEquals(InputRecord.class, arguments[1]);
+        assertEquals(InputRecord.class, arguments[0]);
     }
 
     @Test
     void testGetObjectArguments() throws BeanException {
         // Given
-        final Class<? extends Recordable<?, ?>> beanType = SupportEntity.class;
+        final Class<? extends Recordable<?>> beanType = SupportEntity.class;
         // When
         final Type[] arguments = getTypeArguments(beanType, Object.class);
         // Then

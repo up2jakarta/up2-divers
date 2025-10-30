@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.fmt.hdl;
 
-import io.github.up2jakarta.csv.api.hdl.IErrorCause;
+import io.github.up2jakarta.csv.api.hdl.ICause;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.xml.clv.PropertyException;
+import io.github.up2jakarta.xml.api.PropertyException;
 
 /**
  * Simple implementation of error for {@link io.github.up2jakarta.csv.core.ModeType#FAST}.
@@ -10,7 +10,7 @@ import io.github.up2jakarta.xml.clv.PropertyException;
  * @param <B> the business data type
  * @param <R> the record type
  */
-public class MiniError<B extends DataType<B>, R extends MiniRecord<?>> implements IErrorCause<R, B> {
+public class MiniError<B extends DataType<B>, R extends MiniRecord<?>> implements ICause<R, B> {
 
     private final PropertyException cause;
     private final R record;

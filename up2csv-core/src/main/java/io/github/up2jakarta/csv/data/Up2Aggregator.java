@@ -30,7 +30,7 @@ public abstract class Up2Aggregator<R extends Separable> implements Iterator<Lis
         do {
             records.add(current);
             current = this.record();
-        } while (current != null && bid.equals(current.getBusinessReference()));
+        } while (current != null && this.next(bid, current));
         return records;
     }
 
@@ -38,6 +38,15 @@ public abstract class Up2Aggregator<R extends Separable> implements Iterator<Lis
     public final boolean hasNext() {
         return current != null;
     }
+
+    /**
+     * Returns <code>true</code> when the specified record is a part of the bean segments.
+     *
+     * @param beanId the business key
+     * @param record the current record
+     * @return <code>true</code> to continue the aggregation, else break it.
+     */
+    protected abstract boolean next(String beanId, R record);
 
     /**
      * Returns the next record in the stream.

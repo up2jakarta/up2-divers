@@ -13,13 +13,13 @@ public interface IError extends Serializable {
     SeverityType getSeverity();
 
     /**
-     * @return the error code for known exception
-     */
-    String getCode();
-
-    /**
      * @return the error message
      */
     String getMessage();
+
+    /**
+     * @return the error code
+     */
+    String getCode();
 
 }

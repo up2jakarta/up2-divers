@@ -21,7 +21,7 @@ public class DummyConverter extends TypeConverter<Integer> {
             try {
                 Dummy1Processor.process("NPE");
             } catch (RuntimeException ex) {
-                throw new DummyException("Dummy message", ex);
+                throw new DummyException("dummy wrapped message", ex);
             }
         }
         return Integer.parseInt(value);

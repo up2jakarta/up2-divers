@@ -1,12 +1,12 @@
 package io.github.up2jakarta.csv.fmt.hdl;
 
-import io.github.up2jakarta.csv.api.IError;
-import io.github.up2jakarta.csv.api.hdl.IEntityCreator;
-import io.github.up2jakarta.csv.api.hdl.IErrorCause;
-import io.github.up2jakarta.csv.api.hdl.IErrorEntity;
+import io.github.up2jakarta.csv.api.IEvent;
+import io.github.up2jakarta.csv.api.hdl.ICause;
+import io.github.up2jakarta.csv.api.hdl.IFullError;
+import io.github.up2jakarta.csv.core.hdl.EventType;
 import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.xml.api.PropertyException;
 import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.clv.PropertyException;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -17,28 +17,28 @@ public class FatalException extends FastException {
 
     private static final String ERROR = "%s) the data #[%s] has %s: %s - %s";
 
-    private final List<? extends IError<?>> causes;
+    private final List<? extends IEvent<?>> causes;
 
-    public FatalException(DataType<?> type, int offset, SeverityType level, String code, PropertyException cause, List<? extends IError<?>> causes) {
-        super(type, offset, level, code, cause);
+    public FatalException(DataType<?> type, int offset, PropertyException cause, List<? extends IEvent<?>> causes) {
+        super(type, offset, cause.getSeverity(), cause.getCode(), cause);
         this.causes = List.copyOf(causes);
     }
 
     private void print(Consumer<String> println) {
         println.accept("Multiple events have been occurred:");
         var i = 0;
-        for (final IError<?> event : causes) {
+        for (final IEvent<?> event : causes) {
             final String type = (event.getSeverity() == SeverityType.WARNING) ? "warning" : "error";
             println.accept(String.format(ERROR, ++i, event.getOffset(), type, event.getCode(), event.getMessage()));
-            if (event instanceof IErrorEntity<?, ?, ?> t && t.getTrace() != null) {
+            if (event instanceof IFullError<?, ?, ?> t && t.getTrace() != null) {
                 println.accept(t.getTrace());
-            } else if (event instanceof IErrorCause<?, ?> c) {
-                IEntityCreator.trace(c.getCause()).ifPresent(println);
+            } else if (event instanceof ICause<?, ?> c) {
+                EventType.trace(c.getCause()).ifPresent(println);
             }
         }
     }
 
-    public final List<? extends IError<?>> getCauses() {
+    public final List<? extends IEvent<?>> getCauses() {
         return causes;
     }
 

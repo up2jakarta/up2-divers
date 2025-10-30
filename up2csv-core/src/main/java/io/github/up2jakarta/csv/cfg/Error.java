@@ -5,10 +5,10 @@ import io.github.up2jakarta.xml.api.SeverityType;
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports {@link io.github.up2jakarta.csv.api.IError#getSeverity()}
- * and {@link io.github.up2jakarta.csv.api.IError#getCode()}.
+ * Up2 Annotation that supports {@link io.github.up2jakarta.csv.api.IEvent#getSeverity()}
+ * and {@link io.github.up2jakarta.csv.api.IEvent#getCode()}.
  *
- * @see io.github.up2jakarta.csv.api.hdl.IErrorCreator
+ * @see io.github.up2jakarta.csv.api.IEvent ;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

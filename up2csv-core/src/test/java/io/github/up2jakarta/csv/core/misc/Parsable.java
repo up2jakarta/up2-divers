@@ -5,7 +5,7 @@ import io.github.up2jakarta.csv.data.Recordable;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import jakarta.persistence.Transient;
 
-public abstract class Parsable implements Recordable<SegmentType, IRecord<SegmentType>> {
+public abstract class Parsable implements Recordable<IRecord<SegmentType>> {
 
     @Transient
     private transient IRecord<SegmentType> origin;

@@ -6,10 +6,11 @@ import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Format;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
-import io.github.up2jakarta.csv.fmt.hdl.PathError;
-import io.github.up2jakarta.csv.fmt.hdl.PathRecord;
+import io.github.up2jakarta.csv.fmt.hdl.InputError;
+import io.github.up2jakarta.csv.fmt.hdl.InputRecord;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
 import io.github.up2jakarta.csv.io.misc.TUGenerator;
+import io.github.up2jakarta.xml.api.PropertyException;
 import jakarta.validation.Validator;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -23,8 +24,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Iterator;
-import java.util.Optional;
 
 import static io.github.up2jakarta.csv.io.impl.SegmentType.S01;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
@@ -114,13 +115,13 @@ public class SingleErrorTests {
         assertEquals(MAX, i - 1);
     }
 
-    public static class MyError extends PathError<DynamicType, MyRecord> {
+    public static class MyError extends InputError<DynamicType, MyRecord> {
         public MyError(MyRecord row, int order, String code) {
-            super(row, order, null, 3, ERROR, code, MSG, Optional.of(TRACE));
+            super(row, order, null, 3, new PropertyException(ERROR, code, MSG), TRACE);
         }
     }
 
-    public static class MyRecord extends PathRecord<SegmentType> {
+    public static class MyRecord extends InputRecord<SegmentType, Path> {
         public MyRecord(String rowKey, SegmentType type, String invoiceKey, String... data) {
             super(null, rowKey, type, invoiceKey, data);
         }

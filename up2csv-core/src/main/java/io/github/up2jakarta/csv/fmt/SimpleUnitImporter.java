@@ -13,7 +13,6 @@ import io.github.up2jakarta.csv.fmt.hdl.MiniError;
 import io.github.up2jakarta.csv.fmt.hdl.MiniRecord;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.clv.CodeListException;
-import io.github.up2jakarta.xml.clv.PropertyException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,9 +79,9 @@ public class SimpleUnitImporter<T extends Referencable, B extends DataType<B>, I
      * @param rows the records source
      * @return the parsed business-object with all collected errors
      * @throws BeanException     for any problem when setting fields from input record
-     * @throws PropertyException if type of one record is unknown
+     * @throws CodeListException if type of one record is unknown
      */
-    public final Up2Result<T, MiniError<B, MiniRecord<I>>> parse(List<String[]> rows) throws BeanException, PropertyException {
+    public final Up2Result<T, MiniError<B, MiniRecord<I>>> parse(List<String[]> rows) throws BeanException {
         final List<MiniRecord<I>> records = new ArrayList<>(rows.size());
         for (final String[] row : rows) {
             if (row == null || row.length <= mode.getTypeIdIndex()) {

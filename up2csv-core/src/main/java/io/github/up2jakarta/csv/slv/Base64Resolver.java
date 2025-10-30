@@ -27,7 +27,7 @@ public final class Base64Resolver extends ConversionResolver<Up2Base64> {
     }
 
     @Override
-    public PropertyFormatter<byte[]> forFormatting(Up2Base64 config, Field property) {
+    public PropertyFormatter<byte[]> forFormatting(Up2Base64 config, Field property, Class<?> type) {
         return ENCODER::encodeToString;
     }
 

@@ -18,7 +18,7 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static io.github.up2jakarta.csv.core.EventHandler.ERROR_CODE_LIST;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_CODE_LIST;
 import static io.github.up2jakarta.xml.clv.CodeListConverter.parse;
 
 /**
@@ -61,7 +61,7 @@ public final class CodeListResolver extends ConversionResolver<Up2CodeList> {
     }
 
     @Override
-    public PropertyFormatter<? extends CodeList<?>> forFormatting(Up2CodeList config, Field property) {
+    public PropertyFormatter<? extends CodeList<?>> forFormatting(Up2CodeList config, Field property, Class<?> type) {
         return CodeList::getCode;
     }
 

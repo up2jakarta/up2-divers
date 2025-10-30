@@ -10,12 +10,10 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.validation.*;
 
-import java.util.List;
-
 /**
  * Up2 Configurable Factory for {@link Up2Mapper} and {@link Up2Format}.
  *
- * @param <D> The business data-type
+ * @param <D> The input data type
  */
 @Named
 @Singleton
@@ -64,34 +62,23 @@ public final class Up2Factory<D extends DataType<D>> {
         }
     }
 
-    private <S extends Segment, B extends DataType<B>> Up2Format.Node<S, B> fmt(Class<S> t, DataTypeResolver<B> r) throws BeanException {
-        final io.github.up2jakarta.csv.core.BeanContext vc = io.github.up2jakarta.csv.core.BeanContext.from(t);
-        final BSContext<B> mc = new BSContext<>(context, t, true, r, vc, validator);
-        final List<Property<?, B>> properties = new BeanScanner<>(mc).build(t);
-        return new Up2Format.Node<>(validator, vc, false, properties);
-    }
-
-    private <S extends Segment, B extends DataType<B>> Up2Mapper.Node<S, B> mpr(Class<S> t, DataTypeResolver<B> r) throws BeanException {
-        final io.github.up2jakarta.csv.core.BeanContext vc = io.github.up2jakarta.csv.core.BeanContext.from(t);
-        final BSContext<B> mc = new BSContext<>(context, t, false, r, vc, validator);
-        final List<Property<?, B>> properties = new BeanScanner<>(mc).build(t);
-        return new Up2Mapper.Node<>(t, validator, vc, false, properties);
-    }
-
     /**
-     * Build a preconfigured CSV Mapper that is able to map flat-data to bean-segment.
+     * Build a preconfigured CSV Mapper that is able to map flat-data to bean-segment with default resolver.
      *
      * @param type the type of segment that is being mapped
      * @param <S>  The class of segment
      * @return the CSV mapper
      * @throws BeanException for any missing or wrong bean configuration
+     * @see Up2Factory#format(Class, DataTypeResolver)
      */
     public <S extends Segment> Up2Mapper<S, D> build(final Class<S> type) throws BeanException {
-        return this.build(type, resolver);
+        return new Up2Mapper<>(type, BSContext.build(type, this, resolver));
     }
 
     /**
      * Build a preconfigured CSV Mapper that is able to map flat-data to bean-segment.
+     * <p>
+     * If the bean is already scanned for mapping, {@link Up2Format#toMapper()} is much faster
      *
      * @param type the type of segment that is being mapped
      * @param dtr  the {@link DataType} resolver
@@ -100,23 +87,26 @@ public final class Up2Factory<D extends DataType<D>> {
      * @throws BeanException for any missing or wrong bean configuration
      */
     <S extends Segment, B extends DataType<B>> Up2Mapper<S, B> build(Class<S> type, DataTypeResolver<B> dtr) throws BeanException {
-        return new Up2Mapper<>(type, this.mpr(type, dtr));
+        return new Up2Mapper<>(type, BSContext.build(type, this, dtr));
     }
 
     /**
-     * Build a preconfigured CSV Format that is able to map bean-segment to flat-data.
+     * Build a preconfigured CSV Format that is able to map bean-segment to flat-data with default resolver.
      *
      * @param type the type of segment that is being mapped
      * @param <S>  The class of segment
      * @return the CSV Format
      * @throws BeanException for any missing or wrong bean configuration
+     * @see Up2Factory#format(Class, DataTypeResolver)
      */
     public <S extends Segment> Up2Format<S, D> format(final Class<S> type) throws BeanException {
-        return this.format(type, resolver);
+        return new Up2Format<>(type, BSContext.format(type, this, resolver));
     }
 
     /**
      * Build a preconfigured CSV Format that is able to map bean-segment to flat-data.
+     * <p>
+     * If the bean is already scanned for mapping, {@link Up2Mapper#toFormat()} is much faster
      *
      * @param type the type of segment that is being mapped
      * @param dtr  the {@link DataType} resolver
@@ -125,13 +115,15 @@ public final class Up2Factory<D extends DataType<D>> {
      * @throws BeanException for any missing or wrong bean configuration
      */
     public <S extends Segment, B extends DataType<B>> Up2Format<S, B> format(Class<S> type, DataTypeResolver<B> dtr) throws BeanException {
-        return new Up2Format<>(type, this.fmt(type, dtr));
+        return new Up2Format<>(type, BSContext.format(type, this, dtr));
     }
 
     /**
-     * Creates and returns new business builder.
+     * Creates and returns new business builder that's able to build multi-segments format processors.
      *
      * @return new instance of business-builder
+     * @see BusinessExporter
+     * @see BusinessImporter
      */
     public BusinessBuilder<D> builder() {
         return new BusinessBuilder<>(this);

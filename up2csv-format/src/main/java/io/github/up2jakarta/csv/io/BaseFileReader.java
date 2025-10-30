@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.api.IError;
+import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IFullType;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.BusinessImporter;
@@ -12,12 +12,14 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import static io.github.up2jakarta.csv.prc.TrimProcessor.trim;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Base CSV file reader implementation.
@@ -28,19 +30,32 @@ import static io.github.up2jakarta.csv.prc.TrimProcessor.trim;
  * @param <R> the record type
  * @param <E> the error type
  */
-public abstract class BaseFileReader<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>, R extends IRecord<I>, E extends IError<B>> extends BusinessReader<B, I, T, R, E> implements Closeable {
+public abstract class BaseFileReader<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>, R extends IRecord<I>, E extends IEvent<B>> extends BusinessReader<B, I, T, R, E> implements Closeable {
 
+    private final int length;
     private final CSVFormat format;
     private final String[] nullValues;
 
     private Iterator<CSVRecord> iterator;
     private FileReader reader;
     private CSVParser parser;
+    private File source;
 
     BaseFileReader(BusinessImporter<B, I, T, R, E> importer, CSVFormat format, String... nullValues) {
         super(importer);
         this.format = format;
         this.nullValues = nullValues;
+        this.length = mode.getLength();
+    }
+
+    /**
+     * Opens the given file argument and initializes the reader.
+     *
+     * @param file the file to open
+     * @throws IOException if the file does not exist or for some other reason cannot be opened for reading.
+     */
+    public final void open(final File file) throws IOException {
+        this.open(new FileReader(file, UTF_8), file);
     }
 
     /**
@@ -49,32 +64,38 @@ public abstract class BaseFileReader<T extends Referencable, B extends DataType<
      * @param reader the file-reader to open
      * @throws IOException if the file does not exist or for some other reason cannot be opened for reading.
      */
-    void open(final FileReader reader) throws IOException {
+    public final void open(final FileReader reader, File source) throws IOException {
         this.parser = format.parse(reader);
         this.iterator = parser.iterator();
         this.reader = reader;
+        this.source = source;
         this.init();
+    }
+
+    /**
+     * @return the source file
+     */
+    protected final File getSource() {
+        return source;
     }
 
     @Override
     protected final R record() {
         CSVRecord record;
-        String[] values;
         do {
             try {
                 record = this.iterator.next();
-                values = record.values();
             } catch (NoSuchElementException ex) {
                 return null;
             }
-        } while (values.length <= beanIdIndex);
-        trim(values, nullValues);
+        } while (record.size() <= length);
+        final String[] values = trim(record.values(), nullValues);
         final I type = typing.type(values);
         final String[] data = typing.truncate(type, values);
-        return this.create(record, type, values[beanIdIndex], data);
+        return this.create(record, type, data);
     }
 
-    abstract R create(CSVRecord source, I type, String beanId, String[] data);
+    abstract R create(CSVRecord source, I type, String[] data);
 
     @Override
     public final void close() throws IOException {
