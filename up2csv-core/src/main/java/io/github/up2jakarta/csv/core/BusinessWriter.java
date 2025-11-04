@@ -2,9 +2,6 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.data.Referencable;
 import io.github.up2jakarta.csv.data.Resettable;
-import io.github.up2jakarta.csv.fmt.FastExporter;
-import io.github.up2jakarta.csv.fmt.FullExporter;
-import io.github.up2jakarta.csv.fmt.UnitExporter;
 
 import java.io.Closeable;
 import java.io.Flushable;
@@ -21,17 +18,17 @@ public abstract class BusinessWriter<T extends Referencable> implements Closeabl
     private final Supplier<String> generator;
     private final BusinessExporter<?, ?, T> exporter;
 
-    protected BusinessWriter(FullExporter<T, ?, ?> exporter, Supplier<String> generator) {
+    protected BusinessWriter(FullExporter<?, ?, T> exporter, Supplier<String> generator) {
         this.generator = generator;
         this.exporter = exporter;
     }
 
-    protected BusinessWriter(FastExporter<T, ?, ?> exporter) {
+    protected BusinessWriter(FastExporter<?, ?, T> exporter) {
         this.exporter = exporter;
         this.generator = () -> null;
     }
 
-    protected BusinessWriter(UnitExporter<T, ?, ?> exporter) {
+    protected BusinessWriter(UnitExporter<?, ?, T> exporter) {
         this.exporter = exporter;
         this.generator = () -> null;
     }

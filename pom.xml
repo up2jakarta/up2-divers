@@ -4,7 +4,7 @@
 
     <groupId>io.github.up2jakarta</groupId>
     <artifactId>up2-divers</artifactId>
-    <version>1.5.4</version>
+    <version>1.5.5</version>
     <packaging>pom</packaging>
 
     <name>Up2Jakarta :: Divers</name>
@@ -64,27 +64,27 @@
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2cii-format</artifactId>
-                <version>1.5.4</version>
+                <version>1.5.5</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2csv-core</artifactId>
-                <version>1.5.4</version>
+                <version>1.5.5</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2csv-format</artifactId>
-                <version>1.5.4</version>
+                <version>1.5.5</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2job-core</artifactId>
-                <version>1.5.4</version>
+                <version>1.5.5</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2xml-core</artifactId>
-                <version>1.5.4</version>
+                <version>1.5.5</version>
             </dependency>
             <!-- Dependencies -->
             <dependency>
@@ -205,7 +205,12 @@
                         </executions>
                         <configuration>
                             <!-- mvn decrypt:decrypt -N -P release (target/pass.txt) -->
-                            <!-- gpg-connect-agent -v -->
+                            <!--
+                                gpg-agent - -daemon
+                                gpg-connect-agent killagent /bye
+                                gpg-connect-agent /bye
+                                gpg-agent -v
+                             -->
                             <keyname>${gpg.key.name}</keyname>
                         </configuration>
                     </plugin>
@@ -221,7 +226,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.5.0</version>
+                        <version>0.9.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>ossrh</publishingServerId>

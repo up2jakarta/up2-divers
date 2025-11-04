@@ -1,12 +1,12 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.api.IFullType;
+import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.fmt.MiniError;
+import io.github.up2jakarta.csv.fmt.MiniRecord;
 import io.github.up2jakarta.csv.fmt.SimpleFastImporter;
-import io.github.up2jakarta.csv.fmt.hdl.MiniError;
-import io.github.up2jakarta.csv.fmt.hdl.MiniRecord;
 import org.apache.commons.csv.CSVFormat;
 
 /**
@@ -17,7 +17,7 @@ import org.apache.commons.csv.CSVFormat;
  * @param <I> the segment type
  * @see SimpleFastImporter
  */
-public final class SimpleFastReader<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>> extends FastFileReader<T, B, I, MiniRecord<I>, MiniError<B, MiniRecord<I>>> {
+public final class SimpleFastReader<T extends Referencable, B extends DataType<B>, I extends IType<B, I>> extends FastFileReader<T, B, I, MiniRecord<I>, MiniError<B, MiniRecord<I>>> {
 
     public SimpleFastReader(SimpleFastImporter<T, B, I> importer, CSVFormat format, String... nullValues) {
         super(importer, format, nullValues);

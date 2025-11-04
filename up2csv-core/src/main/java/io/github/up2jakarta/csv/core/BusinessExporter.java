@@ -16,30 +16,27 @@ import java.util.function.Supplier;
  * @param <T> the business object type
  * @param <B> the input data type
  * @param <I> the input type
- * @see io.github.up2jakarta.csv.fmt.FastExporter
- * @see io.github.up2jakarta.csv.fmt.FullExporter
- * @see io.github.up2jakarta.csv.fmt.UnitExporter
+ * @see FastExporter
+ * @see FullExporter
+ * @see UnitExporter
  */
-public abstract non-sealed class BusinessExporter<B extends DataType<B>, I extends IType<B, I>, T extends Referencable> extends BSOperator<B, I, Up2Format<Segment, B>, Up2Mapper<Segment, B>> {
+public abstract sealed class BusinessExporter<B extends DataType<B>, I extends IType<B, I>, T extends Referencable>
+        extends BSOperator<B, I, Up2Format<Segment, B>, Up2Mapper<Segment, B>>
+        permits UnitExporter, FastExporter, FullExporter {
 
-    private final BPFiller filler;
-
-    protected BusinessExporter(Up2Factory<B> factory, ModeType mode, Class<T> type, I root, I[] nodes) throws BeanException {
+    BusinessExporter(Up2Factory<B> factory, ModeType mode, Class<T> type, I root, I[] nodes) throws BeanException {
         super(factory, type, mode, root, nodes);
-        this.filler = BPFiller.of(mode);
     }
 
-    @SuppressWarnings("ClassEscapesDefinedScope")
-    protected BusinessExporter(BSOperator<B, I, Up2Mapper<Segment, B>, Up2Format<Segment, B>> importer) throws BeanException {
+    BusinessExporter(BusinessImporter<B, I, T, ?, ?> importer) throws BeanException {
         super(importer);
-        this.filler = BPFiller.of(importer.mode);
     }
 
-    private void format(Segment bean, int offset, I type, MDFiller<I> consumer) throws BeanException, IOException {
+    private void format(Segment bean, int offset, I type, Filler<I> consumer) throws BeanException, IOException {
         final String[] data = this.get(type).unmap(bean, offset);
         consumer.accept(bean, type, data);
         for (final I node : this.getJoins(type)) {
-            final Collection<Segment> values = node.joiner().joins(bean);
+            final Collection<Segment> values = node.getJoinLinker().from(bean);
             if (values == null) {
                 continue;
             }
@@ -54,8 +51,7 @@ public abstract non-sealed class BusinessExporter<B extends DataType<B>, I exten
             return;
         }
         this.format(bean, this.offset, root, (s, t, d) -> {
-            final String reference = bean.getReference();
-            this.filler.accept(d, rowId, t, reference);
+            this.fill(d, rowId, t, bean);
             callback.accept(d);
         });
     }
@@ -72,22 +68,11 @@ public abstract non-sealed class BusinessExporter<B extends DataType<B>, I exten
     final void check(String name, Up2Format<Segment, B> node, Up2Format<Segment, B> parent) {
     }
 
+    abstract void fill(String[] target, Supplier<String> rowId, IType<?, ?> type, Referencable bean);
+
     @FunctionalInterface
-    private interface MDFiller<I extends IType<?, I>> {
+    private interface Filler<I extends IType<?, I>> {
         void accept(Segment source, I type, String[] data) throws IOException;
-    }
-
-    @FunctionalInterface
-    private interface BPFiller {
-        static BPFiller of(ModeType mode) {
-            return switch (mode) {
-                case UNIT -> mode::unit;
-                case FAST -> mode::fast;
-                default -> mode::full;
-            };
-        }
-
-        void accept(String[] target, Supplier<String> rowId, IType<?, ?> type, String reference);
     }
 
 }

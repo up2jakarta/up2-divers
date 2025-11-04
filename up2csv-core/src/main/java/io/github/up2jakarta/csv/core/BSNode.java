@@ -23,7 +23,7 @@ import static io.github.up2jakarta.csv.core.ext.Beans.getDefaultConstructor;
 import static io.github.up2jakarta.csv.core.ext.Beans.newInstance;
 import static io.github.up2jakarta.csv.core.ext.Defaults.EMPTY;
 import static io.github.up2jakarta.csv.core.ext.Defaults.prototype;
-import static io.github.up2jakarta.csv.core.ext.Path.getOverride;
+import static io.github.up2jakarta.csv.core.ext.PPath.getOverride;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 
@@ -37,9 +37,9 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
     final Validator validator;
     final boolean prototype;
     final boolean nullable;
-    final VContext context;
+    final BVContext context;
 
-    BSNode(Validator validator, VContext context, boolean nullable, boolean prototype, List<Property<?, D>> properties) {
+    BSNode(Validator validator, BVContext context, boolean nullable, boolean prototype, List<Property<?, D>> properties) {
         this.properties = properties;
         this.validator = validator;
         this.prototype = prototype;
@@ -116,15 +116,15 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
     /**
      * Internal Context for JSR-303 validation.
      */
-    static class VContext {
+    static class BVContext {
 
-        public static final VContext DISABLED = new VContext(false);
-        public static final VContext DEFAULT = new VContext(true);
+        public static final BVContext DISABLED = new BVContext(false);
+        public static final BVContext DEFAULT = new BVContext(true);
 
         final boolean enabled;
         final Class<?>[] groups;
 
-        private VContext(boolean enabled, Class<?>... groups) {
+        private BVContext(boolean enabled, Class<?>... groups) {
             this.enabled = enabled;
             this.groups = groups;
         }
@@ -147,7 +147,7 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
          * @return the validation context
          * @throws BeanException if wrong configuration
          */
-        static VContext from(Class<? extends Segment> type) throws BeanException {
+        static BVContext from(Class<? extends Segment> type) throws BeanException {
             while (type != Segment.class && Segment.class.isAssignableFrom(type)) {
                 final ValidOverride override = getOverride(ValidOverride.class, type, ValidOverride::path);
                 if (override != null) {
@@ -158,7 +158,7 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
                         return DEFAULT;
                     }
                     checkGroups(override, type);
-                    return new VContext(true, override.groups());
+                    return new BVContext(true, override.groups());
                 }
                 if (type.isAnnotationPresent(Valid.class)) {
                     return DEFAULT;
@@ -169,10 +169,10 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
             return DISABLED;
         }
 
-        VContext build(Field field, ValidOverride override) throws BeanException {
+        BVContext build(Field field, ValidOverride override) throws BeanException {
             if (enabled && override != null && !override.disable()) {
                 checkGroups(override, field);
-                return new VContext(true, override.groups());
+                return new BVContext(true, override.groups());
             }
             return DISABLED;
         }
@@ -186,7 +186,7 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
         private final String[] values;
         private final int index;
 
-        BFNode(Class<S> type, Validator validator, VContext context, Fragment fragment, List<Property<?, D>> ps) throws BeanException {
+        BFNode(Class<S> type, Validator validator, BVContext context, Fragment fragment, List<Property<?, D>> ps) throws BeanException {
             super(validator, context, fragment.nullable(), fragment.defaultValues(), ps);
             if (nullable) {
                 this.index = -1;
@@ -197,7 +197,7 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
             }
         }
 
-        BFNode(Validator validator, VContext context, List<Property<?, D>> ps) {
+        BFNode(Validator validator, BVContext context, List<Property<?, D>> ps) {
             super(validator, context, false, false, ps);
             this.values = EMPTY;
             this.index = -1;
@@ -272,12 +272,12 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
     static abstract sealed class BPNode<S extends Segment, D extends DataType<D>, C> extends BSNode<S, D> permits BMNode, BRNode {
         protected final Constructor<S> constructor;
 
-        BPNode(Class<S> type, Validator validator, VContext context, Fragment fragment, List<Property<?, D>> ps) throws BeanException {
+        BPNode(Class<S> type, Validator validator, BVContext context, Fragment fragment, List<Property<?, D>> ps) throws BeanException {
             super(validator, context, fragment.nullable(), fragment.defaultValues(), ps);
             this.constructor = getDefaultConstructor(type);
         }
 
-        BPNode(Class<S> type, Validator validator, VContext context, List<Property<?, D>> ps) throws BeanException {
+        BPNode(Class<S> type, Validator validator, BVContext context, List<Property<?, D>> ps) throws BeanException {
             super(validator, context, false, false, ps);
             this.constructor = getDefaultConstructor(type);
         }
@@ -365,11 +365,11 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
      */
     static final class BMNode<S extends Segment, D extends DataType<D>> extends BPNode<S, D, S> {
 
-        BMNode(Class<S> type, Validator validator, VContext context, Fragment fragment, List<Property<?, D>> ps) throws BeanException {
+        BMNode(Class<S> type, Validator validator, BVContext context, Fragment fragment, List<Property<?, D>> ps) throws BeanException {
             super(type, validator, context, fragment, ps);
         }
 
-        BMNode(Class<S> type, Validator validator, VContext context, List<Property<?, D>> ps) throws BeanException {
+        BMNode(Class<S> type, Validator validator, BVContext context, List<Property<?, D>> ps) throws BeanException {
             super(type, validator, context, ps);
         }
 
@@ -400,13 +400,13 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
         private final Map<Property<?, D>, Integer> indexes;
         private final Object[] prototype;
 
-        BRNode(Class<S> type, Validator validator, VContext context, Fragment fragment, List<Property<?, D>> ps) throws BeanException {
+        BRNode(Class<S> type, Validator validator, BVContext context, Fragment fragment, List<Property<?, D>> ps) throws BeanException {
             super(type, validator, context, fragment, ps);
             this.prototype = prototype(constructor);
             this.indexes = this.indexes(type);
         }
 
-        BRNode(Class<S> type, Validator validator, VContext context, List<Property<?, D>> ps) throws BeanException {
+        BRNode(Class<S> type, Validator validator, BVContext context, List<Property<?, D>> ps) throws BeanException {
             super(type, validator, context, ps);
             this.prototype = prototype(constructor);
             this.indexes = this.indexes(type);

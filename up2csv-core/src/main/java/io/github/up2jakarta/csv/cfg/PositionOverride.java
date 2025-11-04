@@ -12,7 +12,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({FIELD, TYPE})
 @Documented
-@Repeatable(value = PositionOverrides.class)
+@Repeatable(value = PositionOverride.List.class)
 public @interface PositionOverride {
 
     /**
@@ -27,4 +27,15 @@ public @interface PositionOverride {
      */
     String[] path();
 
+    /**
+     * Up2 Annotation that supports {@link Repeatable} {@link PositionOverride}.
+     */
+    @Retention(RUNTIME)
+    @Target({FIELD, TYPE})
+    @Documented
+    @interface List {
+
+        PositionOverride[] value();
+
+    }
 }

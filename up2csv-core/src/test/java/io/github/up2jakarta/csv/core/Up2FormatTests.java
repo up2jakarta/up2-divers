@@ -49,7 +49,7 @@ class Up2FormatTests {
         final String[] export = format.unmap(error);
         // Then
         assertEquals(9, export.length);
-        assertArrayEquals(new String[]{"R0099", "11", "I2025", "0001", "3", "E", "CSV-DT", msg, trace}, export);
+        assertArrayEquals(new String[]{"R0099", "I2025", "11", "0001", "3", "E", "CSV-DT", msg, trace}, export);
     }
 
     @Test
@@ -62,7 +62,7 @@ class Up2FormatTests {
         // Then
         assertNotNull(export);
         assertEquals(3, export.length);
-        assertArrayEquals(new String[]{"R0099", "11", "I2025"}, export);
+        assertArrayEquals(new String[]{"R0099", "I2025", "11"}, export);
     }
 
     @Test
@@ -84,7 +84,7 @@ class Up2FormatTests {
         final String[] export = format.header();
         // Then
         assertEquals(9, export.length);
-        assertArrayEquals(new String[]{"Record", "Segment", "Object", "Data", "Offset", "Severity", "Code", "Message", "Stack"}, export);
+        assertArrayEquals(new String[]{"Record", "Pivot", "Type", "Data", "Offset", "Severity", "Code", "Message", "Stack"}, export);
     }
 
     @Test

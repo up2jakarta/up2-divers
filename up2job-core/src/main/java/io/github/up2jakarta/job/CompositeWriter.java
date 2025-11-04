@@ -1,5 +1,7 @@
 package io.github.up2jakarta.job;
 
+import io.github.up2jakarta.job.core.SafeUtil;
+import io.github.up2jakarta.job.core.SafeWrapper;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -33,21 +35,26 @@ public class CompositeWriter<T> implements ItemWriter<T>, StepExecutionListener 
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
+        final SafeWrapper<RuntimeException> wrapper = new SafeWrapper<>();
         for (final ItemWriter<? super T> writer : delegates) {
             if (writer instanceof StepExecutionListener se) {
-                se.beforeStep(stepExecution);
+                SafeUtil.safe(wrapper, se::beforeStep, stepExecution);
             }
         }
+        wrapper.closeAndPropagate(delegates);
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
+        ExitStatus status = null;
+        final SafeWrapper<RuntimeException> wrapper = new SafeWrapper<>();
         for (final ItemWriter<? super T> writer : delegates) {
             if (writer instanceof StepExecutionListener se) {
-                se.afterStep(stepExecution);
+                status = SafeUtil.safe(wrapper, status, se::afterStep, stepExecution);
             }
         }
-        return null;
+        wrapper.closeAndPropagate(delegates);
+        return status;
     }
 
 }

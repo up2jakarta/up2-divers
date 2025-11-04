@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.io.misc;
 
-import io.github.up2jakarta.csv.fmt.hdl.MiniRecord;
+import io.github.up2jakarta.csv.fmt.MiniRecord;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
 
 public class MyRecord extends MiniRecord<SegmentType> {

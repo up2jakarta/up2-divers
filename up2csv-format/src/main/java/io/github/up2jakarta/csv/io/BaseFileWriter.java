@@ -1,11 +1,7 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.core.BusinessWriter;
-import io.github.up2jakarta.csv.core.ModeType;
+import io.github.up2jakarta.csv.core.*;
 import io.github.up2jakarta.csv.data.Referencable;
-import io.github.up2jakarta.csv.fmt.FastExporter;
-import io.github.up2jakarta.csv.fmt.FullExporter;
-import io.github.up2jakarta.csv.fmt.UnitExporter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -28,17 +24,17 @@ public abstract class BaseFileWriter<T extends Referencable> extends BusinessWri
     private CSVPrinter printer;
     private FileWriter writer;
 
-    BaseFileWriter(FullExporter<T, ?, ?> exporter, Supplier<String> generator, CSVFormat format) {
+    BaseFileWriter(FullExporter<?, ?, T> exporter, Supplier<String> generator, CSVFormat format) {
         super(exporter, generator);
         this.format = format;
     }
 
-    BaseFileWriter(FastExporter<T, ?, ?> exporter, CSVFormat format) {
+    BaseFileWriter(FastExporter<?, ?, T> exporter, CSVFormat format) {
         super(exporter);
         this.format = format;
     }
 
-    BaseFileWriter(UnitExporter<T, ?, ?> exporter, CSVFormat format) {
+    BaseFileWriter(UnitExporter<?, ?, T> exporter, CSVFormat format) {
         super(exporter);
         this.format = format;
     }

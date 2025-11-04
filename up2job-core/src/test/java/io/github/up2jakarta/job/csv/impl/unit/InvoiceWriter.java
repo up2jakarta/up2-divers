@@ -3,6 +3,8 @@ package io.github.up2jakarta.job.csv.impl.unit;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.csv.io.UnitFileWriter;
+import io.github.up2jakarta.job.core.SafeTranslator;
+import io.github.up2jakarta.job.core.SafeUtil;
 import io.github.up2jakarta.job.csv.dto.Invoice;
 import org.apache.commons.csv.CSVFormat;
 import org.slf4j.Logger;
@@ -19,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
-import static io.github.up2jakarta.job.core.SafeUtil.call;
 import static io.github.up2jakarta.job.csv.AbstractJobITest.OUTPUT_FILE;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static java.util.Objects.requireNonNull;
@@ -63,7 +64,7 @@ public class InvoiceWriter extends UnitFileWriter<Invoice> implements ItemWriter
 
     @Override
     public ExitStatus afterStep(StepExecution context) {
-        call(ItemStreamException::new, super::flush, super::close);
+        SafeUtil.safe(new SafeTranslator<>(ItemStreamException::new), super::flush, super::close).propagate();
         return null;
     }
 

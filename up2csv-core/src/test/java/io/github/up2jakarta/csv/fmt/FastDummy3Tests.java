@@ -3,8 +3,6 @@ package io.github.up2jakarta.csv.fmt;
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.fmt.hdl.MiniError;
-import io.github.up2jakarta.csv.fmt.hdl.MiniRecord;
 import io.github.up2jakarta.csv.fmt.misc.AFastTest;
 import io.github.up2jakarta.csv.fmt.misc.Dummy3Invoice;
 import io.github.up2jakarta.csv.impl.GroupType;
@@ -35,7 +33,7 @@ class FastDummy3Tests extends AFastTest<Dummy3Invoice, MiniRecord<SegmentType>, 
     }
 
     private MiniRecord<SegmentType> record(String... row) throws CodeListException {
-        return fastImporter.record(row);
+        return fastImporter.transform(row);
     }
 
     @Test

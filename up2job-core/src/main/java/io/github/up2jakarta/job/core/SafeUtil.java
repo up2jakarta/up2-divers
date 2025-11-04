@@ -1,24 +1,56 @@
 package io.github.up2jakarta.job.core;
 
+import java.io.Closeable;
+import java.io.Flushable;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public interface SafeUtil {
 
-    static void call(Function<Exception, ? extends RuntimeException> creator, Callable... ops) {
-        RuntimeException error = null;
-        for (final Callable operator : ops) {
-            try {
-                operator.apply();
-            } catch (Exception ex) {
-                if (error == null) {
-                    error = creator.apply(ex);
-                }
+    static void close(List<?> resources) {
+        for (var resource : resources) {
+            if (resource instanceof Flushable io) {
+                safe(io::flush);
+            }
+            if (resource instanceof Closeable io) {
+                safe(io::close);
             }
         }
-        if (error != null) {
-            throw error;
+    }
+
+    static <V> void safe(SafeWrapper<RuntimeException> wrapper, Consumer<V> operator, V argument) {
+        try {
+            operator.accept(argument);
+        } catch (RuntimeException ex) {
+            wrapper.accept(ex);
         }
+    }
+
+    static <R, V> R safe(SafeWrapper<RuntimeException> wrapper, R defaultValue, Function<V, R> operator, V argument) {
+        try {
+            return operator.apply(argument);
+        } catch (RuntimeException ex) {
+            wrapper.accept(ex);
+            return defaultValue;
+        }
+    }
+
+    static SafeTranslator<?> safe(SafeTranslator<?> translator, Callable operator) {
+        try {
+            operator.apply();
+        } catch (Exception ex) {
+            translator.accept(ex);
+        }
+        return translator;
+    }
+
+    static SafeTranslator<?> safe(SafeTranslator<?> translator, Callable... operators) {
+        for (final Callable operator : operators) {
+            safe(translator, operator);
+        }
+        return translator;
     }
 
     static void safe(Callable operator) {

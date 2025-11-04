@@ -19,6 +19,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class SingleReader<S extends Segment> extends Up2Reader<S> implements Closeable {
 
+    private final int minLength;
     private final CSVFormat format;
     private final String[] nullValues;
 
@@ -27,8 +28,13 @@ public final class SingleReader<S extends Segment> extends Up2Reader<S> implemen
     private CSVParser parser;
 
     public SingleReader(Up2Mapper<S, ?> mapper, CSVFormat format, String... nullValues) {
+        this(mapper, format, 0, nullValues);
+    }
+
+    public SingleReader(Up2Mapper<S, ?> mapper, CSVFormat format, int minLength, String... nullValues) {
         super(mapper);
         this.format = format;
+        this.minLength = minLength;
         this.nullValues = nullValues;
     }
 
@@ -67,12 +73,11 @@ public final class SingleReader<S extends Segment> extends Up2Reader<S> implemen
         do {
             try {
                 final CSVRecord record = this.iterator.next();
-                values = record.values();
-                trim(values, nullValues);
+                values = trim(record.values(), nullValues);
             } catch (NoSuchElementException ex) {
                 return null;
             }
-        } while (values.length == 1 && values[0] == null);
+        } while (values.length < minLength);
         return values;
     }
 

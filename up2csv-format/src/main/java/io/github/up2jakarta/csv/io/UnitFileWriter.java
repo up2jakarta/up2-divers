@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.core.ModeType;
+import io.github.up2jakarta.csv.core.UnitExporter;
 import io.github.up2jakarta.csv.data.Referencable;
-import io.github.up2jakarta.csv.fmt.UnitExporter;
 import org.apache.commons.csv.CSVFormat;
 
 /**
@@ -12,7 +12,7 @@ import org.apache.commons.csv.CSVFormat;
  */
 public class UnitFileWriter<T extends Referencable> extends BaseFileWriter<T> {
 
-    public UnitFileWriter(UnitExporter<T, ?, ?> exporter, CSVFormat format) {
+    public UnitFileWriter(UnitExporter<?, ?, T> exporter, CSVFormat format) {
         super(exporter, format);
     }
 

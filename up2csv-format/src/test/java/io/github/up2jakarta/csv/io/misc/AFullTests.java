@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.io.misc;
 
+import io.github.up2jakarta.csv.api.IFullRecord;
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.FullImporter;
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.fmt.FullImporter;
-import io.github.up2jakarta.csv.fmt.hdl.InputRecord;
 import io.github.up2jakarta.csv.io.FullFileReader;
 import io.github.up2jakarta.csv.io.FullFileWriter;
 import io.github.up2jakarta.csv.io.dto.Invoice;
@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public abstract class AFullTests<R extends InputRecord<SegmentType, ?>, A extends FullImporter<Invoice, GroupType, SegmentType, R, ?>> extends AbstractTests<R> {
+public abstract class AFullTests<R extends IFullRecord<SegmentType>, A extends FullImporter<GroupType, SegmentType, Invoice, R, ?>> extends AbstractTests<R> {
 
     private final FullFileWriter<Invoice> writer;
     private final FullFileReader<Invoice, GroupType, SegmentType, R, ?> reader1;
@@ -37,10 +37,7 @@ public abstract class AFullTests<R extends InputRecord<SegmentType, ?>, A extend
     @Override
     final void assertRecord(R data, R source) {
         assertNotNull(source.getReference());
-        assertNotNull(source.getKey());
-        assertNotNull(source.getKey().getSource());
-        assertNotNull(source.getKey().getRecordNumber());
-        assertEquals(source.getBusinessReference(), data.getBusinessReference());
+        assertEquals(source.getPivot(), data.getPivot());
     }
 
     protected final void testFile(int size) throws IOException, BeanException {

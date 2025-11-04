@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
-@Repeatable(Checkers.class)
+@Repeatable(Checker.List.class)
 public @interface Checker {
 
     /**
@@ -18,4 +18,18 @@ public @interface Checker {
      */
     Class<? extends SegmentListener> value();
 
+    /**
+     * Up2 Annotation that supports {@link Repeatable} {@link Checker}.
+     */
+    @Documented
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.ANNOTATION_TYPE)
+    @interface List {
+
+        /**
+         * @return the segment checkers list
+         */
+        Checker[] value();
+
+    }
 }

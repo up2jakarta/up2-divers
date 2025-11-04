@@ -18,7 +18,7 @@ public interface ArrayJoin<P, T> extends Function<P, T[]> {
      *
      * @return a valid relation-ship.
      */
-    default IJoin<P, T> values() {
+    default CollectionJoin<P, T> values() {
         return (p) -> {
             final T[] values = this.apply(p);
             if (values == null) {

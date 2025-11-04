@@ -2,9 +2,9 @@ package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.fmt.Fixed06Generator;
+import io.github.up2jakarta.csv.fmt.InputRecord;
 import io.github.up2jakarta.csv.fmt.SimpleFullImporter;
-import io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator;
-import io.github.up2jakarta.csv.fmt.hdl.InputRecord;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
@@ -20,7 +20,7 @@ import java.io.IOException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class SimpleFullTests extends AFullTests<InputRecord<SegmentType, ?>, SimpleFullImporter<Invoice, GroupType, SegmentType>> {
+public class SimpleFullTests extends AFullTests<InputRecord<SegmentType>, SimpleFullImporter<Invoice, GroupType, SegmentType>> {
 
     @Autowired
     SimpleFullTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {

@@ -1,14 +1,16 @@
 package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.api.IEvent;
-import io.github.up2jakarta.csv.api.IFullType;
-import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.IFullRecord;
+import io.github.up2jakarta.csv.api.IType;
+import io.github.up2jakarta.csv.core.FullImporter;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Referencable;
-import io.github.up2jakarta.csv.fmt.FullImporter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+
+import java.util.Objects;
 
 /**
  * Base CSV file {@link ModeType#FULL} reader implementation.
@@ -19,9 +21,9 @@ import org.apache.commons.csv.CSVRecord;
  * @param <R> the record type
  * @param <E> the error type
  */
-public abstract class FullFileReader<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>, R extends IRecord<I>, E extends IEvent<B>> extends BaseFileReader<T, B, I, R, E> {
+public abstract class FullFileReader<T extends Referencable, B extends DataType<B>, I extends IType<B, I>, R extends IFullRecord<I>, E extends IEvent<B>> extends BaseFileReader<T, B, I, R, E> {
 
-    protected FullFileReader(FullImporter<T, B, I, R, E> importer, CSVFormat format, String... nullValues) {
+    protected FullFileReader(FullImporter<B, I, T, R, E> importer, CSVFormat format, String... nullValues) {
         super(importer, format, nullValues);
     }
 
@@ -32,8 +34,8 @@ public abstract class FullFileReader<T extends Referencable, B extends DataType<
     }
 
     @Override
-    protected final boolean next(String beanId, R record) {
-        return beanId.equals(record.getBusinessReference());
+    protected final boolean next(R pivot, R record) {
+        return Objects.equals(pivot.getPivot(), record.getPivot());
     }
 
     protected abstract R create(long lineId, String rowId, I type, String beanId, String[] data);

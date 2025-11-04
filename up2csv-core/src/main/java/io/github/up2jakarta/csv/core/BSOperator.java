@@ -15,10 +15,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
 import static io.github.up2jakarta.csv.core.ext.Beans.concat;
-import static io.github.up2jakarta.csv.core.ext.Path.getOverride;
+import static io.github.up2jakarta.csv.core.ext.PPath.getOverride;
 import static io.github.up2jakarta.csv.slv.CodeListResolver.checkUnique;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static java.util.Collections.unmodifiableMap;
@@ -97,7 +98,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
         for (final I node : nodes) {
             if (rn.holds(node)) {
                 if (cp.contains(node)) {
-                    final String p = cp.stream().map(i -> i.joiner().toString()).collect(joining(" > "));
+                    final String p = cp.stream().map(i -> i.getClassType().getSimpleName()).collect(joining(" > "));
                     throw new BeanException(node.getClass(), node.getCode(), "cyclic segment is not allowed: " + p);
                 }
                 children.add(node);
@@ -200,18 +201,15 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             return (B) bean;
         }
 
-        void validate(int offset) {
+        void validate(int offset, BiConsumer<BusinessObject, R> setter) {
             if ((bean instanceof BusinessObject bo) && bo.getReference() == null) {
-                bo.setReference(handler.row.getBusinessReference());
+                setter.accept(bo, handler.row);
             }
             mapper.node.validate(bean, offset, handler);
         }
 
-        boolean link(Entry<T, R, D, E> parent, IType<D, T> childType) throws BeanException {
-            if (childType != this.type) {
-                return false;
-            }
-            if (!Objects.equals(parent.handler.row.getBusinessReference(), handler.row.getBusinessReference())) {
+        boolean link(Entry<T, R, D, E> parent, IType<D, T> childType, BiPredicate<R, R> filter) throws BeanException {
+            if (childType != this.type || !filter.test(parent.handler.row, handler.row)) {
                 return false;
             }
             if (mapper.parentId.exists()) {

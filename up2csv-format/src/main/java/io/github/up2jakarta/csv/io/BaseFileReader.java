@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.api.IEvent;
-import io.github.up2jakarta.csv.api.IFullType;
 import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.BusinessImporter;
 import io.github.up2jakarta.csv.core.BusinessReader;
 import io.github.up2jakarta.csv.data.DataType;
@@ -30,7 +30,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @param <R> the record type
  * @param <E> the error type
  */
-public abstract class BaseFileReader<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>, R extends IRecord<I>, E extends IEvent<B>> extends BusinessReader<B, I, T, R, E> implements Closeable {
+public abstract class BaseFileReader<T extends Referencable, B extends DataType<B>, I extends IType<B, I>, R extends IRecord<I>, E extends IEvent<B>> extends BusinessReader<B, I, T, R, E> implements Closeable {
 
     private final int length;
     private final CSVFormat format;
@@ -39,7 +39,6 @@ public abstract class BaseFileReader<T extends Referencable, B extends DataType<
     private Iterator<CSVRecord> iterator;
     private FileReader reader;
     private CSVParser parser;
-    private File source;
 
     BaseFileReader(BusinessImporter<B, I, T, R, E> importer, CSVFormat format, String... nullValues) {
         super(importer);
@@ -55,7 +54,7 @@ public abstract class BaseFileReader<T extends Referencable, B extends DataType<
      * @throws IOException if the file does not exist or for some other reason cannot be opened for reading.
      */
     public final void open(final File file) throws IOException {
-        this.open(new FileReader(file, UTF_8), file);
+        this.open(new FileReader(file, UTF_8));
     }
 
     /**
@@ -64,19 +63,11 @@ public abstract class BaseFileReader<T extends Referencable, B extends DataType<
      * @param reader the file-reader to open
      * @throws IOException if the file does not exist or for some other reason cannot be opened for reading.
      */
-    public final void open(final FileReader reader, File source) throws IOException {
+    public final void open(final FileReader reader) throws IOException {
         this.parser = format.parse(reader);
         this.iterator = parser.iterator();
         this.reader = reader;
-        this.source = source;
         this.init();
-    }
-
-    /**
-     * @return the source file
-     */
-    protected final File getSource() {
-        return source;
     }
 
     @Override

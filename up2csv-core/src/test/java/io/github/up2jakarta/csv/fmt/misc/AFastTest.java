@@ -1,11 +1,11 @@
 package io.github.up2jakarta.csv.fmt.misc;
 
 import io.github.up2jakarta.csv.api.IEvent;
-import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.IFastRecord;
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.FastExporter;
+import io.github.up2jakarta.csv.core.FastImporter;
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.fmt.FastExporter;
-import io.github.up2jakarta.csv.fmt.FastImporter;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
@@ -18,12 +18,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.assertInvoice;
 import static org.junit.jupiter.api.Assertions.*;
 
-public abstract class AFastTest<T extends Invoice, R extends IRecord<SegmentType>, E extends IEvent<GroupType>> extends ABusinessTest<T, R, E> {
+public abstract class AFastTest<T extends Invoice, R extends IFastRecord<SegmentType>, E extends IEvent<GroupType>> extends ABusinessTest<T, R, E> {
 
-    protected final FastImporter<T, GroupType, SegmentType, R, E> importer;
-    protected final FastExporter<T, GroupType, SegmentType> exporter;
+    protected final FastImporter<GroupType, SegmentType, T, R, E> importer;
+    protected final FastExporter<GroupType, SegmentType, T> exporter;
 
-    protected AFastTest(FastImporter<T, GroupType, SegmentType, R, E> importer) throws BeanException {
+    protected AFastTest(FastImporter<GroupType, SegmentType, T, R, E> importer) throws BeanException {
         super(ModeType.FAST, importer);
         this.importer = importer;
         this.exporter = importer.toExporter();

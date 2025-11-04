@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.core.misc.cvr;
 
-import io.github.up2jakarta.csv.cfg.Definition;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2CodeList;
 import io.github.up2jakarta.csv.cfg.Up2TemporalAmount;
 import io.github.up2jakarta.csv.core.misc.clv.MeasurementUnitCode;
+import io.github.up2jakarta.csv.data.Definition;
 import io.github.up2jakarta.csv.data.Segment;
 
 import java.time.Duration;

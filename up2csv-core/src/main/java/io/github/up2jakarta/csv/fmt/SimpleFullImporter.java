@@ -1,15 +1,13 @@
 package io.github.up2jakarta.csv.fmt;
 
-import io.github.up2jakarta.csv.api.IFullType;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.FullImporter;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.RecordTransformer;
 import io.github.up2jakarta.csv.data.Referencable;
-import io.github.up2jakarta.csv.fmt.hdl.InputCollector;
-import io.github.up2jakarta.csv.fmt.hdl.InputError;
-import io.github.up2jakarta.csv.fmt.hdl.InputRecord;
 import io.github.up2jakarta.xml.clv.CodeListException;
 
 /**
@@ -21,7 +19,9 @@ import io.github.up2jakarta.xml.clv.CodeListException;
  * @see InputRecord
  * @see InputError
  */
-public class SimpleFullImporter<T extends Referencable, B extends DataType<B>, I extends IFullType<B, I>> extends FullImporter<T, B, I, InputRecord<I, ?>, InputError<B, InputRecord<I, ?>>> {
+public final class SimpleFullImporter<T extends Referencable, B extends DataType<B>, I extends IType<B, I>>
+        extends FullImporter<B, I, T, InputRecord<I>, InputError<B, InputRecord<I>>>
+        implements RecordTransformer<InputRecord<I>> {
 
     public <E extends Enum<E> & IType<B, I>> SimpleFullImporter(Up2Factory<B> mf, Class<T> type, E rootNode) throws BeanException {
         //noinspection unchecked
@@ -32,30 +32,27 @@ public class SimpleFullImporter<T extends Referencable, B extends DataType<B>, I
         super(mf, type, rootNode, nodes);
     }
 
-    public SimpleFullImporter(FullExporter<T, B, I> source) throws BeanException {
+    public SimpleFullImporter(SimpleFullExporter<T, B, I> source) throws BeanException {
         super(source);
     }
 
     @Override
-    protected InputCollector<B, InputRecord<I, ?>> create(InputRecord<I, ?> row) {
+    protected InputCollector<B, InputRecord<I>> create(InputRecord<I> row) {
         return new InputCollector<>(row);
     }
 
-    /**
-     * Creates and returns new record from the given record source.
-     *
-     * @param row    the record source data
-     * @param source the record source
-     * @param lineId the record number
-     * @return new record
-     * @throws CodeListException if type is unknown
-     */
-    public final <S extends Comparable<S>> InputRecord<I, S> record(S source, long lineId, String... row) throws CodeListException {
-        final I type = typing.type(row);
-        final String[] data = typing.truncate(type, row);
-        final String recordId = row[mode.getRowKeyIndex()];
-        final String businessKey = row[mode.getBeanIdIndex()];
-        return new InputRecord<>(source, lineId, recordId, type, businessKey, data);
+    @Override
+    public InputRecord<I> transform(String... source) throws CodeListException {
+        final I type = typing.type(source);
+        final String[] data = typing.truncate(type, source);
+        final String recordId = source[mode.getRowKeyIndex()];
+        final String businessKey = source[mode.getBeanIdIndex()];
+        return new InputRecord<>(recordId, type, businessKey, data);
+    }
+
+    @Override
+    public SimpleFullExporter<T, B, I> toExporter() throws BeanException {
+        return new SimpleFullExporter<>(this);
     }
 
 }

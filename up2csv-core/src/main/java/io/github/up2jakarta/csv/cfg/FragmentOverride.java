@@ -12,7 +12,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({FIELD, TYPE})
 @Documented
-@Repeatable(value = FragmentOverrides.class)
+@Repeatable(value = FragmentOverride.List.class)
 public @interface FragmentOverride {
 
     /**
@@ -27,4 +27,15 @@ public @interface FragmentOverride {
      */
     String[] path();
 
+    /**
+     * Up2 Annotation that supports {@link Repeatable} {@link FragmentOverride}.
+     */
+    @Retention(RUNTIME)
+    @Target({FIELD, TYPE})
+    @Documented
+    @interface List {
+
+        FragmentOverride[] value();
+
+    }
 }

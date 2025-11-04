@@ -17,7 +17,7 @@ public interface SingleJoin<P, T> extends Function<P, T> {
      *
      * @return a valid relation-ship.
      */
-    default IJoin<P, T> many() {
+    default CollectionJoin<P, T> many() {
         return (p) -> {
             final T value = this.apply(p);
             if (value == null) {

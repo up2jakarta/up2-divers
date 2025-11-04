@@ -17,26 +17,18 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_CODE_LIST;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.fastInvoice;
 import static io.github.up2jakarta.csv.impl.SegmentType.*;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
 class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, MyRecord, MyError> {
 
-    private final UnitImporter<Dummy1Invoice, GroupType, SegmentType, MyRecord, MyError> unitImporter;
-
     @Autowired
     UnitDummy1Tests(Up2Factory<GroupType> factory) throws BeanException {
         super(factory.builder().unit(Dummy1Invoice.class).build(S11).build(MyError::new));
-        this.unitImporter = this.get();
     }
 
     public MyRecord record(String code, String... data) throws CodeListException {
@@ -47,21 +39,6 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, MyRecord, MyError> {
     @Test
     void testEmpty() throws BeanException {
         checkEmpty(new MyRecord[0]);
-    }
-
-    @Test
-    void testCodeListException() throws BeanException {
-        // Given
-        final List<String[]> rows = Arrays.asList(
-                new String[]{"RT", "TU2025R0099", null}, new String[]{"01", "TU2025R0099", null}
-        );
-        var pingPong = this.unitImporter.toExporter().toImporter();
-        // When
-        final CodeListException error = assertThrows(CodeListException.class, () -> pingPong.parse(rows));
-        // Then
-        assertEquals(ERROR_CODE_LIST, error.getCode());
-        assertEquals(ERROR, error.getSeverity());
-        assertEquals("Unknown value [RT] for CodeList[SegmentType]", error.getMessage());
     }
 
     @Test

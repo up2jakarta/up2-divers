@@ -3,8 +3,6 @@ package io.github.up2jakarta.csv.fmt;
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.fmt.hdl.MiniError;
-import io.github.up2jakarta.csv.fmt.hdl.MiniRecord;
 import io.github.up2jakarta.csv.fmt.misc.AUnitTest;
 import io.github.up2jakarta.csv.fmt.misc.Dummy5Invoice;
 import io.github.up2jakarta.csv.impl.GroupType;
@@ -17,14 +15,20 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_CODE_LIST;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.unitInvoice;
 import static io.github.up2jakarta.csv.impl.SegmentType.*;
+import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, MiniRecord<SegmentType>, MiniError<GroupType, MiniRecord<SegmentType>>> {
+class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, UnitRecord<SegmentType>, MiniError<GroupType, UnitRecord<SegmentType>>> {
 
     private final SimpleUnitImporter<Dummy5Invoice, GroupType, SegmentType> unitImporter;
 
@@ -34,8 +38,23 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, MiniRecord<SegmentType>, 
         this.unitImporter = this.get();
     }
 
-    private MiniRecord<SegmentType> record(String... row) throws CodeListException {
-        return unitImporter.record(row);
+    private UnitRecord<SegmentType> record(String... row) throws CodeListException {
+        return unitImporter.transform(row);
+    }
+
+    @Test
+    void testCodeListException() throws BeanException {
+        // Given
+        final List<String[]> rows = Arrays.asList(
+                new String[]{"RT", "TU2025R0099", null}, new String[]{"01", "TU2025R0099", null}
+        );
+        var pingPong = this.unitImporter.toExporter().toImporter();
+        // When
+        final CodeListException error = assertThrows(CodeListException.class, () -> pingPong.parse(rows));
+        // Then
+        assertEquals(ERROR_CODE_LIST, error.getCode());
+        assertEquals(ERROR, error.getSeverity());
+        assertEquals("Unknown value [RT] for CodeList[SegmentType]", error.getMessage());
     }
 
     @Test
@@ -46,7 +65,7 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, MiniRecord<SegmentType>, 
     @Test
     void testCardinality1() {
         // Given
-        final MiniRecord<SegmentType>[] rows = new MiniRecord[]{
+        final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("51", null, "2025-03-12", "120", "100", "20"),
                 record("51", null, "2025-03-12", "120", "100", "20"),
         };
@@ -57,7 +76,7 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, MiniRecord<SegmentType>, 
     @Test
     void testCardinality2() throws BeanException {
         // Given
-        final MiniRecord<SegmentType>[] rows = new MiniRecord[]{
+        final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("51", null, "2025-03-12", "120", "100", "20")
         };
         // When & Then
@@ -67,7 +86,7 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, MiniRecord<SegmentType>, 
     @Test
     void testCardinality3() throws BeanException {
         // Given
-        final MiniRecord<SegmentType>[] rows = new MiniRecord[]{
+        final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("51", null, "2025-03-12", "120", "100", "20"),
                 record("52", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record("52", "SEL0088", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
@@ -81,7 +100,7 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, MiniRecord<SegmentType>, 
     @Test
     void testCardinality4() throws BeanException {
         // Given
-        final MiniRecord<SegmentType>[] rows = new MiniRecord[]{
+        final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("51", null, "2025-03-12", "120", "100", "20"),
                 record("52", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record("53", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
@@ -93,8 +112,8 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, MiniRecord<SegmentType>, 
     @Test
     void testDetached() throws BeanException {
         // Given
-        final MiniRecord<SegmentType> detached = record("90", "9999", "Warning", "Detached");
-        final MiniRecord<SegmentType>[] rows = new MiniRecord[]{
+        final UnitRecord<SegmentType> detached = record("90", "9999", "Warning", "Detached");
+        final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("51", null, "2025-03-12", "120", "100", "20"),
                 record("52", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record("53", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
@@ -108,7 +127,7 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, MiniRecord<SegmentType>, 
     @Test
     void testValid1() throws BeanException, IOException {
         // Given
-        final MiniRecord<SegmentType>[] rows = unitInvoice(S54);
+        final UnitRecord<SegmentType>[] rows = unitInvoice(S54, UnitRecord::new);
         // When & Then
         checkValid1(rows);
     }
@@ -116,7 +135,7 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, MiniRecord<SegmentType>, 
     @Test
     void testValid2() throws BeanException, IOException {
         // Given
-        final MiniRecord<SegmentType>[] rows = new MiniRecord[]{
+        final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("51", null, "2025-03-12", "120", "100", "20"),
                 record("52", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record("53", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
@@ -130,8 +149,8 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, MiniRecord<SegmentType>, 
     @Test
     void testValidation() throws BeanException {
         // Given
-        final MiniRecord<SegmentType> invalid = record("90", "1199", "Support", null);
-        final MiniRecord<SegmentType>[] rows = new MiniRecord[]{
+        final UnitRecord<SegmentType> invalid = record("90", "1199", "Support", null);
+        final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("51", null, "2025-03-12", "120", "100", "20"),
                 record("52", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record("53", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),

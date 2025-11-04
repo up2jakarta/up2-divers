@@ -1,15 +1,13 @@
 package io.github.up2jakarta.csv.fmt.misc;
 
 import io.github.up2jakarta.csv.api.IEvent;
+import io.github.up2jakarta.csv.api.IFastRecord;
+import io.github.up2jakarta.csv.api.IFullRecord;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.cfg.Truncated;
-import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.BusinessImporter;
-import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.fmt.FastImporter;
-import io.github.up2jakarta.csv.fmt.FullImporter;
-import io.github.up2jakarta.csv.fmt.UnitImporter;
-import io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator;
+import io.github.up2jakarta.csv.core.*;
+import io.github.up2jakarta.csv.fmt.Fixed06Generator;
+import io.github.up2jakarta.csv.fmt.UnitRecord;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.SegmentType;
@@ -17,10 +15,12 @@ import io.github.up2jakarta.csv.impl.dto.Invoice;
 import io.github.up2jakarta.csv.impl.dto.Item;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.function.BiFunction;
 
 import static io.github.up2jakarta.csv.core.ModeType.*;
-import static io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator.FV_SM;
+import static io.github.up2jakarta.csv.fmt.Fixed06Generator.FV_SM;
 import static io.github.up2jakarta.csv.fmt.misc.ABusinessTest.assertValid;
 import static io.github.up2jakarta.csv.impl.GroupType.D001;
 import static io.github.up2jakarta.csv.impl.SegmentType.S01;
@@ -119,17 +119,21 @@ public final class Tests {
         if (mode == ModeType.UNIT) {
             if (invoice instanceof Dummy4Invoice || invoice instanceof Dummy5Invoice) {
                 assertNull(invoice.getReference());
-                assertNull(invoice.getRecord().getBusinessReference());
+                assertFalse(invoice.getRecord() instanceof IFastRecord<?>);
             } else if (invoice instanceof Dummy1Invoice) {
-                assertNotNull(invoice.getReference()); // BusinessObject#setReference
-                assertNotNull(invoice.getRecord().getBusinessReference()); // manual setting
+                // Manual setting : BusinessObject#setReference(String)
+                assertNotNull(invoice.getReference());
+                assertInstanceOf(IFastRecord.class, invoice.getRecord());
+                assertEquals(((IFastRecord<?>) invoice.getRecord()).getPivot(), invoice.getReference());
             } else {
                 assertNotNull(invoice.getReference());
-                assertNull(invoice.getRecord().getBusinessReference());
+                assertInstanceOf(IFastRecord.class, invoice.getRecord());
+                assertNull(((IFastRecord<?>) invoice.getRecord()).getPivot());
             }
         } else {
-            assertEquals(invoice.getRecord().getBusinessReference(), invoice.getReference());
             assertNotNull(invoice.getReference());
+            assertInstanceOf(IFastRecord.class, invoice.getRecord());
+            assertEquals(((IFastRecord<?>) invoice.getRecord()).getPivot(), invoice.getReference());
         }
     }
 
@@ -146,12 +150,14 @@ public final class Tests {
         return new InputRecord(reference, type, "TU2025R0099", data);
     }
 
-    public static MyRecord[] unitInvoice(SegmentType target) {
-        final MyRecord[] result = new MyRecord[UNIT_INVOICE.length];
+    @SuppressWarnings("unchecked")
+    public static <R extends UnitRecord<SegmentType>> R[] unitInvoice(SegmentType target, BiFunction<SegmentType, String[], R> creator) {
+        final Class<R> classType = (Class<R>) creator.apply(SegmentType.S00, new String[0]).getClass();
+        final R[] result = (R[]) Array.newInstance(classType, UNIT_INVOICE.length);
         for (var i = 0; i < UNIT_INVOICE.length; i++) {
             final String[] data = UNIT_INVOICE[i];
             final SegmentType type = type(data[UNIT.getTypeIdIndex()], target);
-            result[i] = new MyRecord(type, null, columns(UNIT, type, data));
+            result[i] = creator.apply(type, columns(UNIT, type, data));
         }
         return result;
     }
@@ -184,8 +190,8 @@ public final class Tests {
         return result;
     }
 
-    public static <T extends Invoice, R extends IRecord<SegmentType>> void assertInvoice(
-            FastImporter<T, GroupType, SegmentType, R, ?> importer, R[] rows
+    public static <T extends Invoice, R extends IFastRecord<SegmentType>> void assertInvoice(
+            FastImporter<GroupType, SegmentType, T, R, ?> importer, R[] rows
     ) throws BeanException, IOException {
         // When Parsing
         final T invoice = aggregate(FAST, importer, rows);
@@ -195,8 +201,8 @@ public final class Tests {
         tc.assertEmpty();
     }
 
-    public static <T extends Invoice, R extends IRecord<SegmentType>> void assertInvoice(
-            FullImporter<T, GroupType, SegmentType, R, ?> importer, R[] rows
+    public static <T extends Invoice, R extends IFullRecord<SegmentType>> void assertInvoice(
+            FullImporter<GroupType, SegmentType, T, R, ?> importer, R[] rows
     ) throws BeanException, IOException {
         // When Parsing
         final T invoice = aggregate(FULL, importer, rows);
@@ -207,7 +213,7 @@ public final class Tests {
     }
 
     public static <T extends Invoice, R extends IRecord<SegmentType>, E extends IEvent<GroupType>> void assertInvoice(
-            UnitImporter<T, GroupType, SegmentType, R, E> importer, R[] rows
+            UnitImporter<GroupType, SegmentType, T, R, E> importer, R[] rows
     ) throws BeanException, IOException {
         // When Parsing
         final T invoice = aggregate(UNIT, importer, rows);

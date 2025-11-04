@@ -2,8 +2,6 @@ package io.github.up2jakarta.csv.core.hdl;
 
 import io.github.up2jakarta.csv.core.BSNode;
 import io.github.up2jakarta.csv.core.Up2Mapper;
-import io.github.up2jakarta.csv.fmt.hdl.FastCollector;
-import io.github.up2jakarta.csv.fmt.hdl.FullCollector;
 import io.github.up2jakarta.xml.api.IException;
 import io.github.up2jakarta.xml.api.SeverityType;
 
@@ -30,8 +28,7 @@ public abstract sealed class EventType<E extends IException> permits EventExcept
                         // Handlers
                         FastHandler.class.getName(),
                         EventHandler.class.getName(),
-                        FastCollector.class.getName(),
-                        FullCollector.class.getName(),
+                        FatalCollector.class.getName(),
                         EventCollector.class.getName(),
                         // Properties
                         Property.class.getName(),

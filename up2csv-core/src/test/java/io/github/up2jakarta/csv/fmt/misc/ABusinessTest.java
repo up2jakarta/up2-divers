@@ -2,12 +2,12 @@ package io.github.up2jakarta.csv.fmt.misc;
 
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.api.hdl.ICause;
-import io.github.up2jakarta.csv.api.hdl.IFullError;
+import io.github.up2jakarta.csv.api.hdl.ICauseEvent;
+import io.github.up2jakarta.csv.api.hdl.ITraceEvent;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.BusinessImporter;
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.fmt.hdl.FatalException;
+import io.github.up2jakarta.csv.core.hdl.FatalException;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.*;
@@ -179,11 +179,11 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertEquals(2, errors.size());
         // Then
         for (final E e : errors) {
-            if (e instanceof IFullError<?, ?, ?> t) {
+            if (e instanceof ITraceEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertNotNull(t.getKey());
                 assertNotNull(t.getKey().getRecord());
-            } else if (e instanceof ICause<?, ?> c) {
+            } else if (e instanceof ICauseEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
             }
             assertEquals(mode.getTypeIdIndex(), e.getOffset());
@@ -207,9 +207,9 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertNull(invoice.getBuyer());
         assertEquals(3, errors.size());
         for (var e : errors) {
-            if (e instanceof IFullError<?, ?, ?> t) {
+            if (e instanceof ITraceEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
-            } else if (e instanceof ICause<?, ?> c) {
+            } else if (e instanceof ICauseEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
             }
             assertEquals(0, e.getOffset());
@@ -238,10 +238,10 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertNotNull(invoice.getBuyer());
         assertEquals(2, errors.size());
         for (var e : errors) {
-            if (e instanceof IFullError<?, ?, ?> t) {
+            if (e instanceof ITraceEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertEquals(type, t.getKey().getRecord().getType());
-            } else if (e instanceof ICause<?, ?> c) {
+            } else if (e instanceof ICauseEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
                 assertEquals(type, c.getRecord().getType());
             }
@@ -267,10 +267,10 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertNotNull(invoice.getBuyer());
         assertEquals(1, errors.size());
         for (var e : errors) {
-            if (e instanceof IFullError<?, ?, ?> t) {
+            if (e instanceof ITraceEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertEquals(origin, t.getKey().getRecord().getType());
-            } else if (e instanceof ICause<?, ?> c) {
+            } else if (e instanceof ICauseEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
                 assertEquals(origin, c.getRecord().getType());
             }
@@ -302,11 +302,11 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertEquals(1, errors.size());
         {
             final E e = errors.getFirst();
-            if (e instanceof IFullError<?, ?, ?> t) {
+            if (e instanceof ITraceEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertNotNull(t.getKey());
                 assertEquals(detached, t.getKey().getRecord());
-            } else if (e instanceof ICause<?, ?> c) {
+            } else if (e instanceof ICauseEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
             }
             assertEquals(0, e.getOffset());
@@ -340,11 +340,11 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertEquals(1, errors.size());
         {
             final E e = errors.getFirst();
-            if (e instanceof IFullError<?, ?, ?> t) {
+            if (e instanceof ITraceEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertNotNull(t.getKey());
                 assertEquals(invalid, t.getKey().getRecord());
-            } else if (e instanceof ICause<?, ?> c) {
+            } else if (e instanceof ICauseEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
             }
             assertEquals(mode.getLength() + 2, e.getOffset());

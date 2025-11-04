@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.io.impl;
 
 import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator;
+import io.github.up2jakarta.csv.fmt.Fixed06Generator;
 import io.github.up2jakarta.csv.io.FullFileWriter;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import org.apache.commons.csv.CSVFormat;

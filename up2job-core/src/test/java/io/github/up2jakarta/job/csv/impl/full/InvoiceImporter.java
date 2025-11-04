@@ -1,15 +1,15 @@
 package io.github.up2jakarta.job.csv.impl.full;
 
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.FullImporter;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.fmt.FullImporter;
 import io.github.up2jakarta.job.csv.dto.Invoice;
 import io.github.up2jakarta.job.csv.impl.GroupType;
 import io.github.up2jakarta.job.csv.impl.SegmentType;
 
 import static io.github.up2jakarta.job.csv.impl.SegmentType.S01;
 
-public class InvoiceImporter extends FullImporter<Invoice, GroupType, SegmentType, InputRecord, InputError> {
+public class InvoiceImporter extends FullImporter<GroupType, SegmentType, Invoice, InputRecord, InputError> {
 
     public InvoiceImporter(Up2Factory<GroupType> factory) throws BeanException {
         super(factory, Invoice.class, S01, SegmentType.values());

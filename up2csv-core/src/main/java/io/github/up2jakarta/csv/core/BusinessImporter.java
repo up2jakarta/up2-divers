@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.api.IEvent;
-import io.github.up2jakarta.csv.api.IFullType;
 import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.hdl.EventCollector;
 import io.github.up2jakarta.csv.data.*;
 import io.github.up2jakarta.xml.clv.CodeListException;
@@ -23,20 +23,22 @@ import static java.util.Collections.unmodifiableList;
  * @param <I> the input type
  * @param <R> the input record type
  * @param <E> the input error type
- * @see io.github.up2jakarta.csv.fmt.FastImporter
- * @see io.github.up2jakarta.csv.fmt.FullImporter
- * @see io.github.up2jakarta.csv.fmt.UnitImporter
+ * @see FastImporter
+ * @see FullImporter
+ * @see UnitImporter
  */
-public abstract non-sealed class BusinessImporter<B extends DataType<B>, I extends IFullType<B, I>, T extends Referencable, R extends IRecord<I>, E extends IEvent<B>> extends BSOperator<B, I, Up2Mapper<Segment, B>, Up2Format<Segment, B>> {
+public abstract sealed class BusinessImporter<B extends DataType<B>, I extends IType<B, I>, T extends Referencable, R extends IRecord<I>, E extends IEvent<B>>
+        extends BSOperator<B, I, Up2Mapper<Segment, B>, Up2Format<Segment, B>>
+        permits UnitImporter, FastImporter, FullImporter {
 
     protected final BusinessTyping typing;
 
-    protected BusinessImporter(Up2Factory<B> factory, ModeType mode, Class<T> type, I rootNode, I[] nodes) throws BeanException {
+    BusinessImporter(Up2Factory<B> factory, ModeType mode, Class<T> type, I rootNode, I[] nodes) throws BeanException {
         super(factory, type, mode, rootNode, nodes);
         this.typing = new BusinessTyping(List.of(nodes));
     }
 
-    protected BusinessImporter(BusinessExporter<B, I, T> exporter) throws BeanException {
+    BusinessImporter(BusinessExporter<B, I, T> exporter) throws BeanException {
         super(exporter);
         this.typing = new BusinessTyping(super.nodes);
     }
@@ -46,7 +48,7 @@ public abstract non-sealed class BusinessImporter<B extends DataType<B>, I exten
             // Finding Children
             final List<Entry<I, R, B, E>> children = new LinkedList<>();
             for (final Entry<I, R, B, E> node : nodes) {
-                if (node.link(parent, type)) {
+                if (node.link(parent, type, this::testPivot)) {
                     children.add(node);
                 }
             }
@@ -62,7 +64,7 @@ public abstract non-sealed class BusinessImporter<B extends DataType<B>, I exten
             // Linking Children
             for (final Entry<I, R, B, E> child : children) {
                 nodes.remove(child);
-                type.linker().link(parent.bean(), child.bean());
+                type.getJoinLinker().link(parent.bean(), child.bean());
                 if (this.hasJoins(type)) {
                     this.link(child, nodes);
                 }
@@ -134,7 +136,7 @@ public abstract non-sealed class BusinessImporter<B extends DataType<B>, I exten
         final T invoice = switch (roots.size()) {
             case 1:
                 final Entry<I, R, B, E> root = roots.getFirst();
-                root.validate(this.offset);
+                root.validate(this.offset, this::reference);
                 this.link(root, nodes);
                 nodes.forEach(r -> r.handle(r.type, 0, DataType.DETACHED));
                 yield root.bean();
@@ -194,6 +196,10 @@ public abstract non-sealed class BusinessImporter<B extends DataType<B>, I exten
      * @return new instance error-collector, must not be <code>null</code>
      */
     protected abstract EventCollector<R, B, E, ?> create(R record);
+
+    abstract void reference(BusinessObject bean, R record);
+
+    abstract boolean testPivot(R root, R record);
 
     public class BusinessTyping {
 

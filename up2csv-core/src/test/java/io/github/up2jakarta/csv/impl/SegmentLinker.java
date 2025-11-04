@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.api.BeanLinker;
 import io.github.up2jakarta.csv.api.fct.*;
+import io.github.up2jakarta.csv.core.BeanLinker;
 import io.github.up2jakarta.csv.core.ext.Beans;
 import io.github.up2jakarta.csv.core.misc.Parsable;
 import io.github.up2jakarta.csv.fmt.misc.CyclicInvoice;
@@ -12,7 +12,7 @@ import java.util.function.BiConsumer;
 
 public class SegmentLinker<P extends Parsable, T extends Parsable> extends BeanLinker<T, P> {
 
-    private SegmentLinker(Class<P> parentType, Class<T> type, IJoin<P, T> getter, BiConsumer<P, T> linker) {
+    private SegmentLinker(Class<P> parentType, Class<T> type, CollectionJoin<P, T> getter, BiConsumer<P, T> linker) {
         super(parentType, type, getter, linker);
     }
 
@@ -37,7 +37,7 @@ public class SegmentLinker<P extends Parsable, T extends Parsable> extends BeanL
     }
 
     static <S extends Parsable> SegmentLinker<S, S> none(Class<S> type) {
-        return new SegmentLinker<>(type, type, IJoin.empty(), (p, s) -> {
+        return new SegmentLinker<>(type, type, CollectionJoin.empty(), (p, s) -> {
         });
     }
 

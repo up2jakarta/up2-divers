@@ -41,9 +41,13 @@ approach.
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.5.4</version>
+        <version>1.5.5</version>
     </dependency>
-    <!-- Optional JSR-303 Validation Provider -->
+    <!-- Required JSR-303 Validation Provider -->
+    <dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator</artifactId>
+    </dependency>
     <!-- Optional JPA Provider -->
     <!-- Optional CDI Provider -->
 ```
@@ -573,7 +577,7 @@ See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/impl)
 
 ## Simple implementation
 
-- [@Definition](./src/main/java/io/github/up2jakarta/csv/cfg/Definition.java) annotation based definition
+- [@Definition](./src/main/java/io/github/up2jakarta/csv/data/Definition.java) annotation based definition
 - [DataTypeResolver.dynamic()](./src/main/java/io/github/up2jakarta/csv/data/DataTypeResolver.java) for `@Definition`
 - [DataTypeResolver.empty()](./src/main/java/io/github/up2jakarta/csv/data/DataTypeResolver.java) NoOP implementation
 
@@ -605,10 +609,10 @@ public void process(final PathRecord<?> row) {
     // GIVEN Singletons
     final Up2Mapper<Up2Segment, ?> mapper = factory.build(Up2Segment.class);
     // GIVEN Prototypes
-    final PathCollector<?, ?> handler = new PathCollector<>(row) ;
+    final InputCollector<?, ?> handler = new InputCollector<>(row) ;
     // WHEN
     final Up2Segment bean = mapper.map(row, handler);
-    final Collection<PathError<?, ?>> errors = handler.toCollection();
+    final Collection<InputError<?, ?>> errors = handler.toCollection();
     // THEN
     // Here the bean is full-filled automatically
     // Here the errors is full-filled automatically 
@@ -671,14 +675,14 @@ It's impossible to present a `business-property` within `0..n` cardinality
 
 - [BusinessExporter.java](src/main/java/io/github/up2jakarta/csv/core/BusinessExporter.java) to segregate and export
   java-bean to flat-data
-    1. [FullExporter.java](src/main/java/io/github/up2jakarta/csv/fmt/FullExporter.java) for `FULL` mode
-    2. [FastExporter.java](src/main/java/io/github/up2jakarta/csv/fmt/FastExporter.java) for `FAST` mode
-    3. [UnitExporter.java](src/main/java/io/github/up2jakarta/csv/fmt/UnitExporter.java) for `UNIT` mode
+    1. [FullExporter.java](src/main/java/io/github/up2jakarta/csv/core/FullExporter.java) for `FULL` mode
+    2. [FastExporter.java](src/main/java/io/github/up2jakarta/csv/core/FastExporter.java) for `FAST` mode
+    3. [UnitExporter.java](src/main/java/io/github/up2jakarta/csv/core/UnitExporter.java) for `UNIT` mode
 - [BusinessImporter.java](src/main/java/io/github/up2jakarta/csv/core/BusinessImporter.java) to aggregate and import
   java-bean from flat-data
-    1. [FullImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/FullImporter.java) for `FULL` mode
-    2. [FastImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/FastImporter.java) for `FAST` mode
-    3. [UnitImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/UnitImporter.java) for `UNIT`mode
+    1. [FullImporter.java](src/main/java/io/github/up2jakarta/csv/core/FullImporter.java) for `FULL` mode
+    2. [FastImporter.java](src/main/java/io/github/up2jakarta/csv/core/FastImporter.java) for `FAST` mode
+    3. [UnitImporter.java](src/main/java/io/github/up2jakarta/csv/core/UnitImporter.java) for `UNIT`mode
 - Simple Implementations
     1. [SimpleFullImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/SimpleFullImporter.java) for `FULL` mode
     2. [SimpleFastImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/SimpleFastImporter.java) for `FAST` mode

@@ -4,8 +4,8 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.fmt.UnitExporter;
-import io.github.up2jakarta.csv.fmt.UnitImporter;
+import io.github.up2jakarta.csv.core.UnitExporter;
+import io.github.up2jakarta.csv.core.UnitImporter;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
@@ -20,10 +20,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AUnitTest<T extends Invoice, R extends IRecord<SegmentType>, E extends IEvent<GroupType>> extends ABusinessTest<T, R, E> {
 
-    protected final UnitImporter<T, GroupType, SegmentType, R, E> importer;
-    protected final UnitExporter<T, GroupType, SegmentType> exporter;
+    protected final UnitImporter<GroupType, SegmentType, T, R, E> importer;
+    protected final UnitExporter<GroupType, SegmentType, T> exporter;
 
-    protected AUnitTest(UnitImporter<T, GroupType, SegmentType, R, E> importer) throws BeanException {
+    protected AUnitTest(UnitImporter<GroupType, SegmentType, T, R, E> importer) throws BeanException {
         super(ModeType.UNIT, importer);
         this.importer = importer;
         this.exporter = importer.toExporter();

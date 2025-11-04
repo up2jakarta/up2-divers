@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.fmt.misc;
 
-import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.IFullRecord;
 import io.github.up2jakarta.csv.data.Referencable;
 import io.github.up2jakarta.csv.impl.SegmentType;
 
@@ -8,7 +8,7 @@ import static io.github.up2jakarta.csv.core.ModeType.FULL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public final class AFullTester<R extends IRecord<SegmentType>> extends AUnitTester<R> {
+public final class AFullTester<R extends IFullRecord<SegmentType>> extends AUnitTester<R> {
 
     private final String key;
 
@@ -19,9 +19,9 @@ public final class AFullTester<R extends IRecord<SegmentType>> extends AUnitTest
 
     protected void assertFound(final R row, final String[] data) {
         assertEquals(key, data[mode.getBeanIdIndex()]);
-        assertNotNull(data[FULL.getRowKeyIndex()]);
-        assertEquals(row.getType().getCode(), data[FULL.getTypeIdIndex()]);
-        assertEquals(row.getBusinessReference(), data[FULL.getBeanIdIndex()]);
+        assertEquals(key, row.getPivot());
+        assertNotNull(data[mode.getRowKeyIndex()]);
+        assertEquals(row.getType().getCode(), data[mode.getTypeIdIndex()]);
     }
 
 }

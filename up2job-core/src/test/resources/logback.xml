@@ -8,6 +8,6 @@
     <root level="WARN">
         <appender-ref ref="CONSOLE"/>
     </root>
-    <logger name="io.github.up2jakarta.job.csv" level="INFO"/>
+    <logger name="io.github.up2jakarta.job.csv" level="ERROR"/>
 
 </configuration>

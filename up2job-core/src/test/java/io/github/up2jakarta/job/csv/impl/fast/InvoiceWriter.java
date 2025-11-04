@@ -3,6 +3,8 @@ package io.github.up2jakarta.job.csv.impl.fast;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.csv.io.FastFileWriter;
+import io.github.up2jakarta.job.core.SafeTranslator;
+import io.github.up2jakarta.job.core.SafeUtil;
 import io.github.up2jakarta.job.csv.dto.Invoice;
 import org.apache.commons.csv.CSVFormat;
 import org.slf4j.Logger;
@@ -18,7 +20,6 @@ import org.springframework.batch.item.ItemWriter;
 import java.io.File;
 import java.io.IOException;
 
-import static io.github.up2jakarta.job.core.SafeUtil.call;
 import static io.github.up2jakarta.job.csv.AbstractJobITest.OUTPUT_FILE;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static java.util.Objects.requireNonNull;
@@ -49,7 +50,7 @@ public class InvoiceWriter extends FastFileWriter<Invoice> implements ItemWriter
                 LOG.info("#Invoice[{}] has been imported with ({}) warnings", item.getBean().getReference(), warnings);
                 this.write(item.getBean());
             } else {
-                final String invoiceNumber = item.getErrors().getFirst().getRecord().getBusinessReference();
+                final String invoiceNumber = item.getErrors().getFirst().getRecord().getPivot();
                 LOG.error("#Invoice[{}] has ({}) errors", invoiceNumber, item.getErrors().size());
                 var i = 1;
                 for (final InputError e : item.getErrors()) {
@@ -62,7 +63,7 @@ public class InvoiceWriter extends FastFileWriter<Invoice> implements ItemWriter
 
     @Override
     public ExitStatus afterStep(StepExecution context) {
-        call(ItemStreamException::new, super::flush, super::close);
+        SafeUtil.safe(new SafeTranslator<>(ItemStreamException::new), super::flush, super::close).propagate();
         return null;
     }
 

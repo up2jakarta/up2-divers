@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.FastImporter;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.fmt.FastImporter;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
@@ -21,7 +21,7 @@ import java.io.IOException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class FastInvoiceTests extends AFastTests<MyRecord, FastImporter<Invoice, GroupType, SegmentType, MyRecord, MyError>> {
+public class FastInvoiceTests extends AFastTests<MyRecord, FastImporter<GroupType, SegmentType, Invoice, MyRecord, MyError>> {
 
     @Autowired
     FastInvoiceTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
@@ -34,13 +34,13 @@ public class FastInvoiceTests extends AFastTests<MyRecord, FastImporter<Invoice,
     }
 
     @Override
-    protected FastFileWriter<Invoice> writer(FastImporter<Invoice, GroupType, SegmentType, MyRecord, MyError> importer, CSVFormat format) throws BeanException {
+    protected FastFileWriter<Invoice> writer(FastImporter<GroupType, SegmentType, Invoice, MyRecord, MyError> importer, CSVFormat format) throws BeanException {
         return new FastFileWriter<>(importer.toExporter(), format);
     }
 
     @Override
     protected FastFileReader<Invoice, GroupType, SegmentType, MyRecord, MyError> reader(
-            FastImporter<Invoice, GroupType, SegmentType, MyRecord, MyError> importer, CSVFormat format
+            FastImporter<GroupType, SegmentType, Invoice, MyRecord, MyError> importer, CSVFormat format
     ) {
         return new FastFileReader<>(importer, format, "-") {
             @Override

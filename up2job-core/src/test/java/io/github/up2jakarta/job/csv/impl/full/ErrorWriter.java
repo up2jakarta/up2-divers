@@ -6,6 +6,8 @@ import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.csv.io.SingleWriter;
 import io.github.up2jakarta.job.ConditionalWriter;
+import io.github.up2jakarta.job.core.SafeTranslator;
+import io.github.up2jakarta.job.core.SafeUtil;
 import io.github.up2jakarta.job.csv.dto.Invoice;
 import org.apache.commons.csv.CSVFormat;
 import org.slf4j.Logger;
@@ -18,7 +20,6 @@ import org.springframework.batch.item.ItemStreamException;
 import java.io.File;
 import java.io.IOException;
 
-import static io.github.up2jakarta.job.core.SafeUtil.call;
 import static io.github.up2jakarta.job.csv.AbstractJobITest.ERR_FILE;
 import static java.util.Objects.requireNonNull;
 
@@ -48,14 +49,14 @@ public class ErrorWriter extends ConditionalWriter<Up2Result<Invoice, InputError
 
     @Override
     public void write(Up2Result<Invoice, InputError> item) throws IOException, BeanException {
-        final String invoiceNumber = item.getErrors().getFirst().getKey().getRecord().getBusinessReference();
+        final String invoiceNumber = item.getErrors().getFirst().getKey().getRecord().getPivot();
         LOG.warn("#Invoice[{}] has ({}) errors", invoiceNumber, item.getErrors().size());
         delegate.write(item.getErrors());
     }
 
     @Override
     public ExitStatus afterStep(StepExecution context) {
-        call(ItemStreamException::new, delegate::flush, delegate::close);
+        SafeUtil.safe(new SafeTranslator<>(ItemStreamException::new), delegate::flush, delegate::close).propagate();
         return null;
     }
 

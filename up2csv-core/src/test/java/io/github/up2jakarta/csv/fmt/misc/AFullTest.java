@@ -1,13 +1,13 @@
 package io.github.up2jakarta.csv.fmt.misc;
 
 import io.github.up2jakarta.csv.api.IEvent;
-import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.IFullRecord;
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.FullExporter;
+import io.github.up2jakarta.csv.core.FullImporter;
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.fmt.FullExporter;
-import io.github.up2jakarta.csv.fmt.FullImporter;
-import io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator;
-import io.github.up2jakarta.csv.fmt.hdl.Fixed13Generator;
+import io.github.up2jakarta.csv.fmt.Fixed06Generator;
+import io.github.up2jakarta.csv.fmt.Fixed13Generator;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
@@ -20,12 +20,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.assertInvoice;
 import static org.junit.jupiter.api.Assertions.*;
 
-public abstract class AFullTest<T extends Invoice, R extends IRecord<SegmentType>, E extends IEvent<GroupType>> extends ABusinessTest<T, R, E> {
+public abstract class AFullTest<T extends Invoice, R extends IFullRecord<SegmentType>, E extends IEvent<GroupType>> extends ABusinessTest<T, R, E> {
 
-    protected final FullImporter<T, GroupType, SegmentType, R, E> importer;
-    protected final FullExporter<T, GroupType, SegmentType> exporter;
+    protected final FullImporter<GroupType, SegmentType, T, R, E> importer;
+    protected final FullExporter<GroupType, SegmentType, T> exporter;
 
-    protected AFullTest(FullImporter<T, GroupType, SegmentType, R, E> importer) throws BeanException {
+    protected AFullTest(FullImporter<GroupType, SegmentType, T, R, E> importer) throws BeanException {
         super(ModeType.FULL, importer);
         this.importer = importer;
         this.exporter = importer.toExporter();

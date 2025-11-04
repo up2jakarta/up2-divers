@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.io;
 
+import io.github.up2jakarta.csv.core.FullExporter;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.data.Referencable;
-import io.github.up2jakarta.csv.fmt.FullExporter;
 import org.apache.commons.csv.CSVFormat;
 
 import java.util.function.Supplier;
@@ -14,7 +14,7 @@ import java.util.function.Supplier;
  */
 public class FullFileWriter<T extends Referencable> extends BaseFileWriter<T> {
 
-    public FullFileWriter(FullExporter<T, ?, ?> exporter, CSVFormat format, Supplier<String> generator) {
+    public FullFileWriter(FullExporter<?, ?, T> exporter, CSVFormat format, Supplier<String> generator) {
         super(exporter, generator, format);
     }
 

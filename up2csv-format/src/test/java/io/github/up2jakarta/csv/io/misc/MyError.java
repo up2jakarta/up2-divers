@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.io.misc;
 
-import io.github.up2jakarta.csv.fmt.hdl.MiniError;
+import io.github.up2jakarta.csv.fmt.MiniError;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.xml.api.PropertyException;
 

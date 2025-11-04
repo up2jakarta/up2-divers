@@ -28,7 +28,7 @@ public final class Up2Format<S extends Segment, D extends DataType<D>> extends P
      *
      * @return the header record
      * @see io.github.up2jakarta.csv.data.DataTypeResolver
-     * @see io.github.up2jakarta.csv.cfg.Definition
+     * @see io.github.up2jakarta.csv.data.Definition
      */
     public String[] header() {
         return this.header(offset);
@@ -40,7 +40,7 @@ public final class Up2Format<S extends Segment, D extends DataType<D>> extends P
      * @param offset the number of columns reserved {@link Truncated#value()}
      * @return the header record
      * @see io.github.up2jakarta.csv.data.DataTypeResolver
-     * @see io.github.up2jakarta.csv.cfg.Definition
+     * @see io.github.up2jakarta.csv.data.Definition
      */
     public String[] header(int offset) {
         final String[] result = new String[length + offset];

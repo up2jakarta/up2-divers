@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.io;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.fmt.SimpleUnitImporter;
-import io.github.up2jakarta.csv.fmt.hdl.MiniRecord;
+import io.github.up2jakarta.csv.fmt.UnitRecord;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
@@ -19,7 +19,7 @@ import java.io.IOException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class SimpleUnitTests extends AUnitTests<MiniRecord<SegmentType>, SimpleUnitImporter<Invoice, GroupType, SegmentType>> {
+public class SimpleUnitTests extends AUnitTests<UnitRecord<SegmentType>, SimpleUnitImporter<Invoice, GroupType, SegmentType>> {
 
     @Autowired
     SimpleUnitTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
@@ -32,7 +32,7 @@ public class SimpleUnitTests extends AUnitTests<MiniRecord<SegmentType>, SimpleU
     }
 
     @Override
-    protected UnitFileReader<Invoice, GroupType, SegmentType, MiniRecord<SegmentType>, ?> reader(
+    protected UnitFileReader<Invoice, GroupType, SegmentType, UnitRecord<SegmentType>, ?> reader(
             SimpleUnitImporter<Invoice, GroupType, SegmentType> importer, CSVFormat format
     ) {
         return new SimpleUnitReader<>(importer, format);

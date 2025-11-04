@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator.FV_SM;
+import static io.github.up2jakarta.csv.fmt.Fixed06Generator.FV_SM;
 import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
 
 public class TUGenerator {

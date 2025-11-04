@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.io.misc;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.fmt.UnitImporter;
+import io.github.up2jakarta.csv.core.UnitImporter;
 import io.github.up2jakarta.csv.io.UnitFileReader;
 import io.github.up2jakarta.csv.io.UnitFileWriter;
 import io.github.up2jakarta.csv.io.dto.Invoice;
@@ -14,7 +14,7 @@ import org.apache.commons.csv.CSVFormat;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public abstract class AUnitTests<R extends IRecord<SegmentType>, A extends UnitImporter<Invoice, GroupType, SegmentType, R, ?>> extends AbstractTests<R> {
+public abstract class AUnitTests<R extends IRecord<SegmentType>, A extends UnitImporter<GroupType, SegmentType, Invoice, R, ?>> extends AbstractTests<R> {
 
     private final UnitFileWriter<Invoice> writer;
     private final UnitFileReader<Invoice, GroupType, SegmentType, R, ?> reader1;

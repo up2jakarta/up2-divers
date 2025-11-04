@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @param <R> the record type
  */
-public abstract class Up2Aggregator<R extends Separable> implements Iterator<List<R>> {
+public abstract class Up2Aggregator<R extends Segment> implements Iterator<List<R>> {
 
     private R current;
 
@@ -26,11 +26,11 @@ public abstract class Up2Aggregator<R extends Separable> implements Iterator<Lis
             return null;
         }
         final List<R> records = new LinkedList<>();
-        final String bid = current.getBusinessReference();
+        final R pivot = current;
         do {
             records.add(current);
             current = this.record();
-        } while (current != null && this.next(bid, current));
+        } while (current != null && this.next(pivot, current));
         return records;
     }
 
@@ -42,11 +42,11 @@ public abstract class Up2Aggregator<R extends Separable> implements Iterator<Lis
     /**
      * Returns <code>true</code> when the specified record is a part of the bean segments.
      *
-     * @param beanId the business key
+     * @param pivot  the first record
      * @param record the current record
      * @return <code>true</code> to continue the aggregation, else break it.
      */
-    protected abstract boolean next(String beanId, R record);
+    protected abstract boolean next(R pivot, R record);
 
     /**
      * Returns the next record in the stream.

@@ -1,9 +1,5 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.api.IType;
-
-import java.util.function.Supplier;
-
 /**
  * Multi-segment format mode for meta-data columns.
  */
@@ -50,22 +46,6 @@ public enum ModeType {
 
     public int getLength() {
         return length;
-    }
-
-    void full(String[] target, Supplier<String> rowId, IType<?, ?> type, String reference) {
-        target[0] = rowId.get();
-        target[beanIdIndex] = reference;
-        target[typeIdIndex] = type.getCode();
-    }
-
-    void fast(String[] target, Supplier<String> ignore, IType<?, ?> type, String reference) {
-        target[beanIdIndex] = reference;
-        target[typeIdIndex] = type.getCode();
-    }
-
-    @SuppressWarnings("unused")
-    void unit(String[] target, Supplier<String> ignore, IType<?, ?> type, String reference) {
-        target[typeIdIndex] = type.getCode();
     }
 
 }

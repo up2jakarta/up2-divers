@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.io.impl;
 
-import io.github.up2jakarta.csv.api.BeanLinker;
-import io.github.up2jakarta.csv.api.IFullType;
+import io.github.up2jakarta.csv.api.IType;
+import io.github.up2jakarta.csv.core.BeanLinker;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.api.SeverityType;
 
@@ -10,7 +10,7 @@ import static io.github.up2jakarta.csv.io.impl.SegmentLinker.*;
 import static io.github.up2jakarta.xml.api.SeverityType.*;
 
 @SuppressWarnings("unused")
-public enum SegmentType implements IFullType<GroupType, SegmentType> {
+public enum SegmentType implements IType<GroupType, SegmentType> {
 
     S01("01", invoice(), D001, FATAL),
     S02("02", seller(), D002, ERROR),
@@ -62,7 +62,7 @@ public enum SegmentType implements IFullType<GroupType, SegmentType> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public BeanLinker<?, ?> linker() {
+    public BeanLinker<?, ?> getJoinLinker() {
         return linker;
     }
 

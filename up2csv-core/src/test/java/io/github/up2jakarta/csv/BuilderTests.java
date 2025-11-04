@@ -1,10 +1,9 @@
 package io.github.up2jakarta.csv;
 
-import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.core.*;
 import io.github.up2jakarta.csv.fmt.*;
-import io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator;
 import io.github.up2jakarta.csv.fmt.misc.CyclicInvoice;
+import io.github.up2jakarta.csv.fmt.misc.Dummy4Invoice;
 import io.github.up2jakarta.csv.fmt.misc.MyError;
 import io.github.up2jakarta.csv.fmt.misc.MyRecord;
 import io.github.up2jakarta.csv.impl.GroupType;
@@ -22,7 +21,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import static io.github.up2jakarta.csv.core.ModeType.FULL;
+import static io.github.up2jakarta.csv.core.ModeType.*;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.*;
 import static io.github.up2jakarta.csv.impl.SegmentType.*;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
@@ -48,9 +47,9 @@ public class BuilderTests {
     }
 
     @Test
-    void testUnitExporter() throws BeanException, IOException {
+    void testSimpleUnitExporter() throws BeanException, IOException {
         // WHEN
-        final UnitExporter<Invoice, GroupType, SegmentType> exporter = factory.builder()
+        final SimpleUnitExporter<Invoice, GroupType, SegmentType> exporter = factory.builder()
                 .unit(Invoice.class)
                 .build(S01)
                 .format();
@@ -63,31 +62,43 @@ public class BuilderTests {
     @Test
     void testSimpleUnitImporter() throws BeanException, IOException {
         // WHEN
-        final SimpleUnitImporter<Invoice, GroupType, SegmentType> importer = factory.builder()
-                .unit(Invoice.class)
-                .build(S01)
+        final SimpleUnitImporter<Dummy4Invoice, GroupType, SegmentType> importer = factory.builder()
+                .unit(Dummy4Invoice.class)
+                .build(S41)
                 .build();
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, unitInvoice(S01));
+        assertInvoice(importer, unitInvoice(S41, UnitRecord::new));
     }
 
     @Test
-    void testUnitImporter() throws BeanException, IOException {
+    void testUnit1Importer() throws BeanException, IOException {
         // WHEN
-        final UnitImporter<Invoice, GroupType, SegmentType, MyRecord, MyError> importer = factory.builder()
+        final UnitImporter<GroupType, SegmentType, Invoice, MyRecord, MyError> importer = factory.builder()
                 .unit(Invoice.class)
                 .build(S01)
                 .build(MyError::new);
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, unitInvoice(S01));
+        assertInvoice(importer, unitInvoice(S01, MyRecord::new));
     }
 
     @Test
-    void testFastExporter() throws BeanException, IOException {
+    void testUnit2Importer() throws BeanException, IOException {
         // WHEN
-        final FastExporter<Invoice, GroupType, SegmentType> exporter = factory.builder()
+        final UnitImporter<GroupType, SegmentType, Invoice, InputRecord, InputError> importer = factory.builder()
+                .unit(Invoice.class)
+                .build(S01)
+                .build(InputError::new, (r) -> 0);
+        assertNotNull(importer);
+        // THEN
+        assertInvoice(importer, invoice(S01, UNIT));
+    }
+
+    @Test
+    void testSimpleFastExporter() throws BeanException, IOException {
+        // WHEN
+        final SimpleFastExporter<Invoice, GroupType, SegmentType> exporter = factory.builder()
                 .fast(Invoice.class)
                 .build(S01)
                 .format();
@@ -112,7 +123,7 @@ public class BuilderTests {
     @Test
     void testFast1Importer() throws BeanException, IOException {
         // WHEN
-        final FastImporter<Invoice, GroupType, SegmentType, MyRecord, MyError> importer = factory.builder()
+        final FastImporter<GroupType, SegmentType, Invoice, MyRecord, MyError> importer = factory.builder()
                 .fast(Invoice.class)
                 .build(S01)
                 .build(MyError::new);
@@ -124,7 +135,7 @@ public class BuilderTests {
     @Test
     void testFast2Importer() throws BeanException, IOException {
         // WHEN
-        final FastImporter<Invoice, GroupType, SegmentType, MyRecord, MyError> importer = factory.builder()
+        final FastImporter<GroupType, SegmentType, Invoice, MyRecord, MyError> importer = factory.builder()
                 .fast(Invoice.class)
                 .build(S01)
                 .build(MyError::new, ERROR);
@@ -134,9 +145,21 @@ public class BuilderTests {
     }
 
     @Test
-    void testFullExporter() throws BeanException, IOException {
+    void testFast3Importer() throws BeanException, IOException {
         // WHEN
-        final FullExporter<Invoice, GroupType, SegmentType> exporter = factory.builder()
+        final FastImporter<GroupType, SegmentType, Invoice, InputRecord, InputError> importer = factory.builder()
+                .fast(Invoice.class)
+                .build(S01)
+                .build(InputError::new, (r) -> 0);
+        assertNotNull(importer);
+        // THEN
+        assertInvoice(importer, invoice(S01, FAST));
+    }
+
+    @Test
+    void testSimpleFullExporter() throws BeanException, IOException {
+        // WHEN
+        final SimpleFullExporter<Invoice, GroupType, SegmentType> exporter = factory.builder()
                 .full(Invoice.class)
                 .build(S01)
                 .format();
@@ -149,7 +172,7 @@ public class BuilderTests {
     @Test
     void testFull1Importer() throws BeanException, IOException {
         // WHEN
-        final FullImporter<Invoice, GroupType, SegmentType, InputRecord, InputError> importer = factory.builder()
+        final FullImporter<GroupType, SegmentType, Invoice, InputRecord, InputError> importer = factory.builder()
                 .full(Invoice.class)
                 .build(S01)
                 .build(InputError::new, (r) -> 0);
@@ -161,7 +184,7 @@ public class BuilderTests {
     @Test
     void testFull2Importer() throws BeanException, IOException {
         // WHEN
-        final FullImporter<Invoice, GroupType, SegmentType, MyRecord, MyError> importer = factory.builder()
+        final FullImporter<GroupType, SegmentType, Invoice, MyRecord, MyError> importer = factory.builder()
                 .full(Invoice.class)
                 .build(S01)
                 .build(MyError::new, ERROR);
@@ -173,7 +196,7 @@ public class BuilderTests {
     @Test
     void testFull3Importer() throws BeanException, IOException {
         // WHEN
-        final FullImporter<Invoice, GroupType, SegmentType, MyRecord, MyError> importer = factory.builder()
+        final FullImporter<GroupType, SegmentType, Invoice, MyRecord, MyError> importer = factory.builder()
                 .full(Invoice.class)
                 .build(S01)
                 .build(MyError::new);

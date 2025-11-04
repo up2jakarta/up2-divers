@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
-@Repeatable(Extensions.class)
+@Repeatable(Extension.List.class)
 public @interface Extension {
 
     /**
@@ -19,4 +19,18 @@ public @interface Extension {
      */
     Class<? extends ConversionExtension<?, ?>> value();
 
+    /**
+     * Up2 Annotation that supports {@link Repeatable} {@link Extension}.
+     */
+    @Documented
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.ANNOTATION_TYPE)
+    @interface List {
+
+        /**
+         * @return the extensions
+         */
+        Extension[] value();
+
+    }
 }

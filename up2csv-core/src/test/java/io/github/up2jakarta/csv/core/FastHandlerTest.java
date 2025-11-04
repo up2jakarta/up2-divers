@@ -2,6 +2,7 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
+import io.github.up2jakarta.csv.core.hdl.FastException;
 import io.github.up2jakarta.csv.core.hdl.FastHandler;
 import io.github.up2jakarta.csv.core.misc.DummyException;
 import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
@@ -14,7 +15,6 @@ import io.github.up2jakarta.csv.core.misc.ext.DummyConverter;
 import io.github.up2jakarta.csv.core.misc.map.ValidBean;
 import io.github.up2jakarta.csv.core.misc.prc.Test3Processor;
 import io.github.up2jakarta.csv.core.misc.vld.Up2Warn;
-import io.github.up2jakarta.csv.fmt.hdl.FastException;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;

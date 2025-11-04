@@ -18,7 +18,7 @@ public interface MapKeyJoin<P, T> extends Function<P, Map<T, ?>> {
      *
      * @return a valid relation-ship.
      */
-    default IJoin<P, T> keys() {
+    default CollectionJoin<P, T> keys() {
         return (p) -> {
             final Map<T, ?> value = this.apply(p);
             if (value == null) {

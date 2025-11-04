@@ -6,8 +6,8 @@ import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Format;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
-import io.github.up2jakarta.csv.fmt.hdl.InputError;
-import io.github.up2jakarta.csv.fmt.hdl.InputRecord;
+import io.github.up2jakarta.csv.fmt.InputError;
+import io.github.up2jakarta.csv.fmt.InputRecord;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
 import io.github.up2jakarta.csv.io.misc.TUGenerator;
 import io.github.up2jakarta.xml.api.PropertyException;
@@ -24,7 +24,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Iterator;
 
 import static io.github.up2jakarta.csv.io.impl.SegmentType.S01;
@@ -72,8 +71,8 @@ public class SingleErrorTests {
     private void assertError(int i, String[] error) {
         assertEquals(9, error.length);
         assertEquals("R" + i, error[0]);
-        assertEquals("01", error[1]);
-        assertEquals("I2025N" + i, error[2]);
+        assertEquals("I2025N" + i, error[1]);
+        assertEquals("01", error[2]);
         assertNull(error[3]);
         assertEquals("3", error[4]);
         assertEquals("E", error[5]);
@@ -110,7 +109,7 @@ public class SingleErrorTests {
         // WHEN Generating file
         this.write(file);
         // THEN
-        var i = read(file, "Record", "Segment", "Object", "Data", "Offset", "Severity", "Code", "Message", "Stack");
+        var i = read(file, "Record", "Pivot", "Type", "Data", "Offset", "Severity", "Code", "Message", "Stack");
         // Checking number of record
         assertEquals(MAX, i - 1);
     }
@@ -121,9 +120,9 @@ public class SingleErrorTests {
         }
     }
 
-    public static class MyRecord extends InputRecord<SegmentType, Path> {
+    public static class MyRecord extends InputRecord<SegmentType> {
         public MyRecord(String rowKey, SegmentType type, String invoiceKey, String... data) {
-            super(null, rowKey, type, invoiceKey, data);
+            super(rowKey, type, invoiceKey, data);
         }
     }
 

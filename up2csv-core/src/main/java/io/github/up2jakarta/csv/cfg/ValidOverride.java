@@ -4,6 +4,7 @@ import java.lang.annotation.*;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Up2 Shortcut Annotation of JSR-303 {@link jakarta.validation.Valid} that validation activation and groups.
@@ -13,7 +14,7 @@ import static java.lang.annotation.ElementType.TYPE;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({TYPE, FIELD})
-@Repeatable(value = ValidOverrides.class)
+@Repeatable(value = ValidOverride.List.class)
 public @interface ValidOverride {
 
     /**
@@ -33,4 +34,15 @@ public @interface ValidOverride {
      */
     Class<?>[] groups() default {};
 
+    /**
+     * Up2 Annotation that supports {@link Repeatable} {@link ValidOverride}.
+     */
+    @Retention(RUNTIME)
+    @Target({FIELD, TYPE})
+    @Documented
+    @interface List {
+
+        ValidOverride[] value();
+
+    }
 }

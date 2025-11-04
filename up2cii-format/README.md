@@ -4,6 +4,16 @@
 
 `Up2CII` is an open-source framework for validating, reading and writing CII e-invoices.
 
+# Dependencies
+
+``` xml
+    <dependency>
+        <groupId>io.github.up2jakarta</groupId>
+        <artifactId>up2cii-format/artifactId>
+        <version>1.5.5</version>
+    </dependency>
+```
+
 # Features
 
 - CII D22B [Cross Industry Invoice](https://unece.org/trade/uncefact/xml-schemas)

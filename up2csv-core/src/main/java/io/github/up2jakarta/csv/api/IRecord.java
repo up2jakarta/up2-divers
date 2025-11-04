@@ -1,13 +1,13 @@
 package io.github.up2jakarta.csv.api;
 
-import io.github.up2jakarta.csv.data.Separable;
+import io.github.up2jakarta.csv.data.Segment;
 
 /**
- * Contact interface for an input record.
+ * Contact interface for an input record, it is compatible with {@link io.github.up2jakarta.csv.core.ModeType#UNIT}.
  *
  * @param <I> the input type implementation
  */
-public interface IRecord<I extends IType<?, I>> extends Separable {
+public interface IRecord<I extends IType<?, I>> extends Segment {
 
     /**
      * @return the input type

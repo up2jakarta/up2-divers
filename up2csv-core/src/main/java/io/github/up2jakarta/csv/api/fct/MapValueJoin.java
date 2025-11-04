@@ -18,7 +18,7 @@ public interface MapValueJoin<P, T> extends Function<P, Map<?, T>> {
      *
      * @return a valid relation-ship.
      */
-    default IJoin<P, T> values() {
+    default CollectionJoin<P, T> values() {
         return (p) -> {
             final Map<?, T> value = this.apply(p);
             if (value == null) {

@@ -2,10 +2,10 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.api.ext.BeanContext;
+import io.github.up2jakarta.csv.core.hdl.FastException;
 import io.github.up2jakarta.csv.core.misc.cvr.Test1Definition;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
-import io.github.up2jakarta.csv.fmt.hdl.FastException;
 import io.github.up2jakarta.xml.api.SeverityType;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;

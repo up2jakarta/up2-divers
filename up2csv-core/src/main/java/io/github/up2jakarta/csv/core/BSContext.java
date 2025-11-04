@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.api.ext.*;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.*;
 import io.github.up2jakarta.csv.core.BSNode.*;
-import io.github.up2jakarta.csv.core.ext.Path;
+import io.github.up2jakarta.csv.core.ext.PPath;
 import io.github.up2jakarta.csv.core.hdl.*;
 import io.github.up2jakarta.csv.core.hdl.PProperty.POProperty;
 import io.github.up2jakarta.csv.core.hdl.PProperty.PSProperty;
@@ -20,8 +20,8 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 import static io.github.up2jakarta.csv.core.ext.Beans.*;
-import static io.github.up2jakarta.csv.core.ext.Path.addOverride;
-import static io.github.up2jakarta.csv.core.ext.Path.getOverride;
+import static io.github.up2jakarta.csv.core.ext.PPath.addOverride;
+import static io.github.up2jakarta.csv.core.ext.PPath.getOverride;
 import static io.github.up2jakarta.csv.core.hdl.PAMode.RO;
 import static io.github.up2jakarta.csv.core.hdl.PAMode.WO;
 import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
@@ -34,9 +34,9 @@ import static java.util.Collections.unmodifiableList;
  */
 final class BSContext<D extends DataType<D>> {
 
-    private final Map<Path, PositionOverride> positions = new LinkedHashMap<>();
-    private final Map<Path, FragmentOverride> fragments = new LinkedHashMap<>();
-    private final Map<Path, ValidOverride> validations = new LinkedHashMap<>();
+    private final Map<PPath, PositionOverride> positions = new LinkedHashMap<>();
+    private final Map<PPath, FragmentOverride> fragments = new LinkedHashMap<>();
+    private final Map<PPath, ValidOverride> validations = new LinkedHashMap<>();
     private final Stack<Class<? extends Segment>> stack = new Stack<>();
     private final ConversionExtension<?, Annotation>[] extensions;
     private final LinkedList<Field> path = new LinkedList<>();
@@ -45,7 +45,7 @@ final class BSContext<D extends DataType<D>> {
     private final Optional<AccessType> access;
     private final BSBuilder.WChecker checker;
     private final Up2Factory<?> factory;
-    private final VContext context;
+    private final BVContext context;
     private final Type[] arguments;
     private final PAMode mode;
     private final int offset;
@@ -57,7 +57,7 @@ final class BSContext<D extends DataType<D>> {
         this.access = BSBuilder.getAccessType(Optional.empty(), t);
         this.checker = BSBuilder.WChecker.of(t, f.context);
         this.extensions = ext(t, f.context);
-        this.context = VContext.from(t);
+        this.context = BVContext.from(t);
         this.arguments = NO_TYPES;
         this.resolver = d;
         this.factory = f;
@@ -215,7 +215,7 @@ final class BSContext<D extends DataType<D>> {
     <S extends Segment> PFProperty<S, D> node(Class<S> ft, Field ff, Fragment fr, List<Property<?, D>> ps) throws BeanException {
         checker.afterFragmentProperty(ff, ft);
         final ValidOverride override = getOverride(ValidOverride.class, validations, ff, ValidOverride::path);
-        final VContext vc = context.build(ff, override);
+        final BVContext vc = context.build(ff, override);
         final PAccessor<?, S> va = this.accessor(ft, ff);
         if (mode == RO) {
             final BFNode<S, D> node = new BFNode<>(ft, factory.validator, vc, fr, ps);

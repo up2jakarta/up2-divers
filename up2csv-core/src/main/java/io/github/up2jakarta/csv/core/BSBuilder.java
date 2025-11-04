@@ -25,6 +25,7 @@ import java.util.*;
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_PROCESSOR;
 import static io.github.up2jakarta.csv.core.ext.Beans.getBean;
 import static io.github.up2jakarta.csv.core.ext.Beans.getPropertyClass;
+import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
 import static java.util.Collections.unmodifiableList;
@@ -49,12 +50,17 @@ final class BSBuilder {
 
     static <D extends DataType<D>> PProcessor<D> build(BeanContext ctx, Field pf, Position pc) throws BeanException {
         final List<PWrapper<?, D>> result = new LinkedList<>();
-        result.addFirst(build(ctx, pc));
+        if (!undefined(pc)) {
+            result.addFirst(build(ctx, pc));
+        }
         for (final Annotation ppa : pf.getAnnotations()) {
             final Class<? extends Annotation> type = ppa.annotationType();
             if (type.isAnnotationPresent(Processor.class) && type != Position.class) {
                 result.addLast(build(ctx, ppa));
             }
+        }
+        if (result.isEmpty()) {
+            return (v, o, p, h) -> v;
         }
         if (result.size() == 1) {
             return result.getFirst();

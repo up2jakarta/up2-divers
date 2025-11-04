@@ -1,6 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
+import io.github.up2jakarta.csv.core.hdl.FastException;
+import io.github.up2jakarta.csv.core.hdl.FatalException;
 import io.github.up2jakarta.csv.core.misc.DummyException;
 import io.github.up2jakarta.csv.core.misc.cvr.Test1Converter;
 import io.github.up2jakarta.csv.core.misc.ext.Dummy1Processor;
@@ -8,8 +10,6 @@ import io.github.up2jakarta.csv.core.misc.ext.DummyConverter;
 import io.github.up2jakarta.csv.core.misc.map.Test1Exception;
 import io.github.up2jakarta.csv.core.misc.map.Test2Exception;
 import io.github.up2jakarta.csv.core.misc.prc.Test6Processor;
-import io.github.up2jakarta.csv.fmt.hdl.FastException;
-import io.github.up2jakarta.csv.fmt.hdl.FatalException;
 import io.github.up2jakarta.csv.fmt.misc.MyCollector;
 import io.github.up2jakarta.csv.fmt.misc.MyRecord;
 import io.github.up2jakarta.csv.impl.GroupType;

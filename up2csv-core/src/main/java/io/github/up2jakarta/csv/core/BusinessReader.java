@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.api.IEvent;
-import io.github.up2jakarta.csv.api.IFullType;
 import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.data.*;
 
 /**
@@ -14,7 +14,7 @@ import io.github.up2jakarta.csv.data.*;
  * @param <R> the input record type
  * @param <E> the input error type
  */
-public abstract class BusinessReader<B extends DataType<B>, I extends IFullType<B, I>, T extends Referencable, R extends IRecord<I>, E extends IEvent<B>> extends Up2Aggregator<R> {
+public abstract class BusinessReader<B extends DataType<B>, I extends IType<B, I>, T extends Referencable, R extends IRecord<I>, E extends IEvent<B>> extends Up2Aggregator<R> {
 
     protected final I root;
     protected final ModeType mode;

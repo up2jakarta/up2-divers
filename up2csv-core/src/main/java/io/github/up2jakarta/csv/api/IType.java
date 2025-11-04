@@ -1,5 +1,6 @@
 package io.github.up2jakarta.csv.api;
 
+import io.github.up2jakarta.csv.core.BeanLinker;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.api.SeverityType;
@@ -14,14 +15,6 @@ import io.github.up2jakarta.xml.clv.CodeList;
  * @see io.github.up2jakarta.csv.core.BusinessWriter
  */
 public interface IType<B extends DataType<B>, I extends IType<B, I>> extends CodeList<I> {
-
-    /**
-     * @return the segment class-type
-     */
-    default <C extends Segment> Class<C> getClassType() {
-        //noinspection unchecked
-        return (Class<C>) this.joiner().getClassType();
-    }
 
     /**
      * @return the segment business-type
@@ -39,22 +32,38 @@ public interface IType<B extends DataType<B>, I extends IType<B, I>> extends Cod
     SeverityType getErrorLevel();
 
     /**
-     * Gets and returns the getter accessor of current type.
-     *
-     * @param <C> the child type
-     * @param <P> the parent type
-     * @return non-null accessor
-     */
-    <C extends Segment, P extends Segment> BeanJoiner<C, P> joiner();
-
-    /**
      * Check if the given segment-type is a membership.
      *
      * @param type the child type
      * @return <code>true</code> if the given type is a valid child
      */
     default boolean holds(I type) {
-        return type != this && type.joiner().getParentType() == this.joiner().getClassType();
+        return type != this && type.getParentType() == this.getClassType();
     }
+
+    /**
+     * @return the segment class-type
+     */
+    default <C extends Segment> Class<C> getClassType() {
+        //noinspection unchecked
+        return (Class<C>) this.getJoinLinker().classType;
+    }
+
+    /**
+     * @return the segment class-type
+     */
+    default <C extends Segment> Class<C> getParentType() {
+        //noinspection unchecked
+        return (Class<C>) this.getJoinLinker().parentType;
+    }
+
+    /**
+     * Gets and returns the bean linker of current type.
+     *
+     * @param <C> the child type
+     * @param <P> the parent type
+     * @return non-null accessor
+     */
+    <C extends Segment, P extends Segment> BeanLinker<C, P> getJoinLinker();
 
 }

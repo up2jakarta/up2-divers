@@ -4,14 +4,18 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.fmt.hdl.FastException;
 import io.github.up2jakarta.xml.api.SeverityType;
 import jakarta.validation.ConstraintViolation;
 
 import java.util.List;
 
 /**
- * Internal fail-fast implementation.
+ * Input events handler that implements fail-fast technique.
+ * It's fails at the first error having severity equals or greater than {@link FastHandler#level}
+ * <p>
+ * It's similar to {@link io.github.up2jakarta.csv.core.hdl.FatalCollector} but does not collect events.
+ * <p>
+ * this collector is the default mode for {@link io.github.up2jakarta.csv.core.Up2Mapper} when working flat-data.
  */
 public final class FastHandler<D extends DataType<D>> extends EventHandler<IRecord<?>, D, IEvent<D>> {
 

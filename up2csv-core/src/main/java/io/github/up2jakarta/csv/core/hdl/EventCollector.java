@@ -48,7 +48,7 @@ public abstract non-sealed class EventCollector<R extends IRecord<?>, D extends 
 
     @Override
     public final void handle(D data, int offset, ConstraintViolation<?> violation, Error config) {
-        if (offset != -1 || !offsets.contains(offset)) {
+        if (offset == -1 || !offsets.contains(offset)) {
             //avoid collecting violations on property having parsing error
             final SeverityType level = level(violation, config);
             final String code = code(violation, config);

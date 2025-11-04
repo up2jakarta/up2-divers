@@ -1,11 +1,9 @@
 package io.github.up2jakarta.csv.fmt;
 
-import io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator;
-import io.github.up2jakarta.csv.fmt.hdl.Fixed13Generator;
 import org.junit.jupiter.api.Test;
 
-import static io.github.up2jakarta.csv.fmt.hdl.Fixed06Generator.FV_SM;
-import static io.github.up2jakarta.csv.fmt.hdl.Fixed13Generator.FV_LG;
+import static io.github.up2jakarta.csv.fmt.Fixed06Generator.FV_SM;
+import static io.github.up2jakarta.csv.fmt.Fixed13Generator.FV_LG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FixedGeneratorTests {

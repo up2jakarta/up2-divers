@@ -25,6 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Collection;
 import java.util.List;
 
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_CONVERTER;
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
 import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
@@ -353,6 +354,28 @@ class Up2MapperTests {
         assertEquals(WARNING, error.getSeverity());
         assertEquals(ERROR_VALIDATOR, error.getCode());
         assertEquals("size must be between 1 and 3", error.getMessage());
+    }
+
+    @Test
+    void testValidationUniqueError() throws BeanException {
+        // Given
+        final Up2Mapper<Validator3Bean, GroupType> mapper = factory.build(Validator3Bean.class);
+        final InputRecord row = record(SegmentType.S00, "NaN");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator3Bean bean = mapper.map(row, handler);
+        final Collection<InputError> errors = handler.toCollection();
+        // Then
+        assertNotNull(errors);
+        assertNotNull(bean);
+        assertEquals(1, errors.size());
+        // Then Error
+        final InputError error = errors.iterator().next();
+        assertSame(row, error.getKey().getRecord());
+        assertEquals(0, error.getKey().getOrder());
+        assertEquals(ERROR, error.getSeverity());
+        assertEquals(ERROR_CONVERTER, error.getCode());
+        assertEquals("Character N is neither a decimal digit number, decimal point, nor \"e\" notation exponential mark.", error.getMessage());
     }
 
     @Test

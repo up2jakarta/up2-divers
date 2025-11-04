@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.io.misc;
 
-import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.IFastRecord;
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.FastImporter;
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.fmt.FastImporter;
 import io.github.up2jakarta.csv.io.FastFileReader;
 import io.github.up2jakarta.csv.io.FastFileWriter;
 import io.github.up2jakarta.csv.io.dto.Invoice;
@@ -14,7 +14,7 @@ import org.apache.commons.csv.CSVFormat;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public abstract class AFastTests<R extends IRecord<SegmentType>, A extends FastImporter<Invoice, GroupType, SegmentType, R, ?>> extends AbstractTests<R> {
+public abstract class AFastTests<R extends IFastRecord<SegmentType>, A extends FastImporter<GroupType, SegmentType, Invoice, R, ?>> extends AbstractTests<R> {
 
     private final FastFileWriter<Invoice> writer;
     private final FastFileReader<Invoice, GroupType, SegmentType, R, ?> reader1;

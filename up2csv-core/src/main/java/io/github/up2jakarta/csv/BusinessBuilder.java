@@ -1,16 +1,14 @@
 package io.github.up2jakarta.csv;
 
-import io.github.up2jakarta.csv.api.IEvent;
-import io.github.up2jakarta.csv.api.IFullType;
-import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.*;
 import io.github.up2jakarta.csv.api.hdl.*;
-import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.core.*;
+import io.github.up2jakarta.csv.core.hdl.FatalCollector;
+import io.github.up2jakarta.csv.core.hdl.RecordCollector;
+import io.github.up2jakarta.csv.core.hdl.TraceCollector;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Referencable;
 import io.github.up2jakarta.csv.fmt.*;
-import io.github.up2jakarta.csv.fmt.hdl.*;
 import io.github.up2jakarta.xml.api.SeverityType;
 
 /**
@@ -77,7 +75,7 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @param <I>       the segment type
          * @return new preconfigured final builder
          */
-        public <I extends IFullType<B, I>> FinalBuilder<I> build(I rootType, I[] nodeTypes) {
+        public <I extends IType<B, I>> FinalBuilder<I> build(I rootType, I[] nodeTypes) {
             return new FinalBuilder<>(rootType, nodeTypes);
         }
 
@@ -89,11 +87,11 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @return new preconfigured final builder
          */
         @SuppressWarnings("unchecked")
-        public <I extends Enum<I> & IFullType<B, I>> FinalBuilder<I> build(I rootType) {
+        public <I extends Enum<I> & IType<B, I>> FinalBuilder<I> build(I rootType) {
             return this.build(rootType, ((Class<I>) rootType.getClass()).getEnumConstants());
         }
 
-        public final class FinalBuilder<I extends IFullType<B, I>> {
+        public final class FinalBuilder<I extends IType<B, I>> {
 
             private final I rootType;
             private final I[] nodeTypes;
@@ -104,13 +102,13 @@ public class BusinessBuilder<B extends DataType<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link UnitExporter}.
+             * Creates new preconfigured instance for {@link SimpleUnitExporter}.
              *
              * @return new unit-exporter
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public UnitExporter<T, B, I> format() throws BeanException {
-                return new UnitExporter<>(factory, type, rootType, nodeTypes);
+            public SimpleUnitExporter<T, B, I> format() throws BeanException {
+                return new SimpleUnitExporter<>(factory, type, rootType, nodeTypes);
             }
 
             /**
@@ -142,11 +140,11 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new unit-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IRecord<I>, E extends IEvent<B>> UnitImporter<T, B, I, R, E> build(ICreator<R, B, E> creator, SeverityType failLevel) throws BeanException {
+            public <R extends IRecord<I>, E extends IEvent<B>> UnitImporter<B, I, T, R, E> build(ICauseCreator<R, B, E> creator, SeverityType failLevel) throws BeanException {
                 return new UnitImporter<>(factory, type, rootType, nodeTypes) {
                     @Override
-                    protected FastCollector<R, B, E> create(R row) {
-                        return new FastCollector<>(row, creator, failLevel);
+                    protected FatalCollector<R, B, E> create(R row) {
+                        return new FatalCollector<>(row, creator, failLevel);
                     }
                 };
             }
@@ -158,11 +156,28 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new unit-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IUnitRecord<B, I, E, R>, E extends IUnitError<B, R, E>> UnitImporter<T, B, I, R, E> build(ICreator<R, B, E> creator) throws BeanException {
+            public <R extends IRecordCollector<B, I, E, R>, E extends IRecordEvent<B, R, E>> UnitImporter<B, I, T, R, E> build(ICauseCreator<R, B, E> creator) throws BeanException {
                 return new UnitImporter<>(factory, type, rootType, nodeTypes) {
                     @Override
-                    protected UnitCollector<B, E, R> create(R row) {
-                        return new UnitCollector<>(row, creator);
+                    protected RecordCollector<B, E, R> create(R row) {
+                        return new RecordCollector<>(row, creator);
+                    }
+                };
+            }
+
+            /**
+             * Creates new preconfigured instance for {@link UnitImporter} with the given creator and repository.
+             *
+             * @param creator    the error creator
+             * @param repository the error-order initial-value finder
+             * @return new unit-importer
+             * @throws BeanException for any missing or wrong java-beans configuration
+             */
+            public <R extends IRecord<I>, E extends ITraceEvent<B, R, ?>> UnitImporter<B, I, T, R, E> build(ITraceCreator<B, R, E> creator, IRepository<R> repository) throws BeanException {
+                return new UnitImporter<>(factory, type, rootType, nodeTypes) {
+                    @Override
+                    protected TraceCollector<B, R, E> create(R row) {
+                        return new TraceCollector<>(row, creator, repository);
                     }
                 };
             }
@@ -186,7 +201,7 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @param <I>       the segment type
          * @return new preconfigured final builder
          */
-        public <I extends IFullType<B, I>> FinalBuilder<I> build(I rootType, I[] nodeTypes) {
+        public <I extends IType<B, I>> FinalBuilder<I> build(I rootType, I[] nodeTypes) {
             return new FinalBuilder<>(rootType, nodeTypes);
         }
 
@@ -198,11 +213,11 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @return new preconfigured final builder
          */
         @SuppressWarnings("unchecked")
-        public <I extends Enum<I> & IFullType<B, I>> FinalBuilder<I> build(I rootType) {
+        public <I extends Enum<I> & IType<B, I>> FinalBuilder<I> build(I rootType) {
             return this.build(rootType, ((Class<I>) rootType.getClass()).getEnumConstants());
         }
 
-        public final class FinalBuilder<I extends IFullType<B, I>> {
+        public final class FinalBuilder<I extends IType<B, I>> {
 
             private final I rootType;
             private final I[] nodeTypes;
@@ -213,13 +228,13 @@ public class BusinessBuilder<B extends DataType<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link FastExporter}.
+             * Creates new preconfigured instance for {@link SimpleFastExporter}.
              *
              * @return new fast-exporter
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public FastExporter<T, B, I> format() throws BeanException {
-                return new FastExporter<>(factory, type, rootType, nodeTypes);
+            public SimpleFastExporter<T, B, I> format() throws BeanException {
+                return new SimpleFastExporter<>(factory, type, rootType, nodeTypes);
             }
 
             /**
@@ -251,11 +266,11 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new fast-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IRecord<I>, E extends IEvent<B>> FastImporter<T, B, I, R, E> build(ICreator<R, B, E> creator, SeverityType failLevel) throws BeanException {
+            public <R extends IFastRecord<I>, E extends IEvent<B>> FastImporter<B, I, T, R, E> build(ICauseCreator<R, B, E> creator, SeverityType failLevel) throws BeanException {
                 return new FastImporter<>(factory, type, rootType, nodeTypes) {
                     @Override
-                    protected FastCollector<R, B, E> create(R row) {
-                        return new FastCollector<>(row, creator, failLevel);
+                    protected FatalCollector<R, B, E> create(R row) {
+                        return new FatalCollector<>(row, creator, failLevel);
                     }
                 };
             }
@@ -267,11 +282,28 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new fast-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IUnitRecord<B, I, E, R>, E extends IUnitError<B, R, E>> FastImporter<T, B, I, R, E> build(ICreator<R, B, E> creator) throws BeanException {
+            public <R extends IFastRecord<I> & IRecordCollector<B, I, E, R>, E extends IRecordEvent<B, R, E>> FastImporter<B, I, T, R, E> build(ICauseCreator<R, B, E> creator) throws BeanException {
                 return new FastImporter<>(factory, type, rootType, nodeTypes) {
                     @Override
-                    protected UnitCollector<B, E, R> create(R row) {
-                        return new UnitCollector<>(row, creator);
+                    protected RecordCollector<B, E, R> create(R row) {
+                        return new RecordCollector<>(row, creator);
+                    }
+                };
+            }
+
+            /**
+             * Creates new preconfigured instance for {@link FastImporter} with the given creator and repository.
+             *
+             * @param creator    the error creator
+             * @param repository the error-order initial-value finder
+             * @return new fast-importer
+             * @throws BeanException for any missing or wrong java-beans configuration
+             */
+            public <R extends IFastRecord<I>, E extends ITraceEvent<B, R, ?>> FastImporter<B, I, T, R, E> build(ITraceCreator<B, R, E> creator, IRepository<R> repository) throws BeanException {
+                return new FastImporter<>(factory, type, rootType, nodeTypes) {
+                    @Override
+                    protected TraceCollector<B, R, E> create(R row) {
+                        return new TraceCollector<>(row, creator, repository);
                     }
                 };
             }
@@ -295,7 +327,7 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @param <I>       the segment type
          * @return new preconfigured final builder
          */
-        public <I extends IFullType<B, I>> FinalBuilder<I> build(I rootType, I[] nodeTypes) {
+        public <I extends IType<B, I>> FinalBuilder<I> build(I rootType, I[] nodeTypes) {
             return new FinalBuilder<>(rootType, nodeTypes);
         }
 
@@ -307,11 +339,11 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @return new preconfigured final builder
          */
         @SuppressWarnings("unchecked")
-        public <I extends Enum<I> & IFullType<B, I>> FinalBuilder<I> build(I rootType) {
+        public <I extends Enum<I> & IType<B, I>> FinalBuilder<I> build(I rootType) {
             return this.build(rootType, ((Class<I>) rootType.getClass()).getEnumConstants());
         }
 
-        public final class FinalBuilder<I extends IFullType<B, I>> {
+        public final class FinalBuilder<I extends IType<B, I>> {
 
             private final I rootType;
             private final I[] nodeTypes;
@@ -322,13 +354,13 @@ public class BusinessBuilder<B extends DataType<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link FullExporter}.
+             * Creates new preconfigured instance for {@link SimpleFullExporter}.
              *
              * @return new full-exporter
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public FullExporter<T, B, I> format() throws BeanException {
-                return new FullExporter<>(factory, type, rootType, nodeTypes);
+            public SimpleFullExporter<T, B, I> format() throws BeanException {
+                return new SimpleFullExporter<>(factory, type, rootType, nodeTypes);
             }
 
             /**
@@ -339,11 +371,11 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IRecord<I>, E extends IEvent<B>> FullImporter<T, B, I, R, E> build(ICreator<R, B, E> creator, SeverityType failLevel) throws BeanException {
+            public <R extends IFullRecord<I>, E extends IEvent<B>> FullImporter<B, I, T, R, E> build(ICauseCreator<R, B, E> creator, SeverityType failLevel) throws BeanException {
                 return new FullImporter<>(factory, type, rootType, nodeTypes) {
                     @Override
-                    protected FastCollector<R, B, E> create(R row) {
-                        return new FastCollector<>(row, creator, failLevel);
+                    protected FatalCollector<R, B, E> create(R row) {
+                        return new FatalCollector<>(row, creator, failLevel);
                     }
                 };
             }
@@ -355,11 +387,11 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IUnitRecord<B, I, E, R>, E extends IUnitError<B, R, E>> FullImporter<T, B, I, R, E> build(ICreator<R, B, E> creator) throws BeanException {
+            public <R extends IFullRecord<I> & IRecordCollector<B, I, E, R>, E extends IRecordEvent<B, R, E>> FullImporter<B, I, T, R, E> build(ICauseCreator<R, B, E> creator) throws BeanException {
                 return new FullImporter<>(factory, type, rootType, nodeTypes) {
                     @Override
-                    protected UnitCollector<B, E, R> create(R row) {
-                        return new UnitCollector<>(row, creator);
+                    protected RecordCollector<B, E, R> create(R row) {
+                        return new RecordCollector<>(row, creator);
                     }
                 };
             }
@@ -372,12 +404,11 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFullRecord<I, ?, ?>, E extends IFullError<B, R, ?>> FullImporter<T, B, I, R, E> build(IFullCreator<B, R, E> creator, IRepository<R> repository) throws BeanException {
+            public <R extends IFullRecord<I>, E extends ITraceEvent<B, R, ?>> FullImporter<B, I, T, R, E> build(ITraceCreator<B, R, E> creator, IRepository<R> repository) throws BeanException {
                 return new FullImporter<>(factory, type, rootType, nodeTypes) {
-
                     @Override
-                    protected FullCollector<B, R, E> create(R row) {
-                        return new FullCollector<>(row, creator, repository);
+                    protected TraceCollector<B, R, E> create(R row) {
+                        return new TraceCollector<>(row, creator, repository);
                     }
                 };
             }
@@ -389,8 +420,8 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends InputRecord<I, ?>> FullImporter<T, B, I, R, InputError<B, R>> build(IRepository<R> repository) throws BeanException {
-                return this.build((IFullCreator<B, R, InputError<B, R>>) InputError::new, repository);
+            public <R extends InputRecord<I>> FullImporter<B, I, T, R, InputError<B, R>> build(IRepository<R> repository) throws BeanException {
+                return this.build((ITraceCreator<B, R, InputError<B, R>>) InputError::new, repository);
             }
 
             /**
@@ -399,7 +430,7 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new simple full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public FullImporter<T, B, I, InputRecord<I, ?>, InputError<B, InputRecord<I, ?>>> build() throws BeanException {
+            public SimpleFullImporter<T, B, I> build() throws BeanException {
                 return new SimpleFullImporter<>(factory, type, rootType, nodeTypes);
             }
 

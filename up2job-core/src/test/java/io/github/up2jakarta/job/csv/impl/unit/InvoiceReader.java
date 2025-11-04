@@ -2,6 +2,8 @@ package io.github.up2jakarta.job.csv.impl.unit;
 
 import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.csv.io.UnitFileReader;
+import io.github.up2jakarta.job.core.SafeTranslator;
+import io.github.up2jakarta.job.core.SafeUtil;
 import io.github.up2jakarta.job.csv.dto.Invoice;
 import io.github.up2jakarta.job.csv.impl.GroupType;
 import io.github.up2jakarta.job.csv.impl.SegmentType;
@@ -15,7 +17,6 @@ import org.springframework.batch.item.ItemStreamException;
 
 import java.io.File;
 
-import static io.github.up2jakarta.job.core.SafeUtil.call;
 import static io.github.up2jakarta.job.csv.AbstractJobITest.INPUT_FILE;
 import static java.util.Objects.requireNonNull;
 
@@ -42,7 +43,7 @@ public class InvoiceReader extends UnitFileReader<Invoice, GroupType, SegmentTyp
 
     @Override
     public ExitStatus afterStep(StepExecution context) {
-        call(ItemStreamException::new, super::close);
+        SafeUtil.safe(new SafeTranslator<>(ItemStreamException::new), super::close).propagate();
         return null;
     }
 

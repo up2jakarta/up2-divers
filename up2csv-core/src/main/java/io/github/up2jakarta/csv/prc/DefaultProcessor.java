@@ -19,7 +19,7 @@ public final class DefaultProcessor extends InputProcessor<Position> {
 
     @Override
     public String process(String value, Position config) {
-        if (value == null && !undefined(config)) {
+        if (value == null) {
             return config.defaultValue();
         }
         return value;
