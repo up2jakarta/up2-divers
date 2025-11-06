@@ -9,9 +9,9 @@ import io.github.up2jakarta.csv.data.DataType;
  * @param <R> the input record type
  * @param <D> the input data type
  * @param <E> the self-record implementation
- * @see IRecordCollector
- * @see io.github.up2jakarta.csv.core.hdl.RecordCollector
+ * @see ISelfRecord
+ * @see io.github.up2jakarta.csv.core.hdl.ESelfCollector
  */
-public interface IRecordEvent<D extends DataType<D>, R extends IRecordCollector<D, ?, E, R>, E extends IRecordEvent<D, R, E>> extends IEvent<D> {
+public interface ISelfEvent<D extends DataType<D>, R extends ISelfRecord<D, ?, E, R>, E extends ISelfEvent<D, R, E>> extends IEvent<D> {
 
 }

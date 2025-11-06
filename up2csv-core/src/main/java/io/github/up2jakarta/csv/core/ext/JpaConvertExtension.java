@@ -1,6 +1,5 @@
 package io.github.up2jakarta.csv.core.ext;
 
-import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.api.ext.Conversion;
 import io.github.up2jakarta.csv.api.ext.ConversionExtension;
 import io.github.up2jakarta.csv.api.ext.ConversionResolver;
@@ -19,7 +18,6 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static io.github.up2jakarta.csv.core.ext.Beans.getBean;
 import static io.github.up2jakarta.csv.core.ext.Beans.getTypeArguments;
 import static java.util.Arrays.stream;
 
@@ -32,12 +30,9 @@ import static java.util.Arrays.stream;
 @Singleton
 public final class JpaConvertExtension extends ConversionExtension<Entity, Convert> {
 
-    private final BeanContext context;
-
     @Inject
-    JpaConvertExtension(BeanContext context) {
+    JpaConvertExtension() {
         super(Entity.class);
-        this.context = context;
     }
 
     private void check(Field property, Class<?> type, Convert jpa) throws BeanException {
@@ -48,8 +43,8 @@ public final class JpaConvertExtension extends ConversionExtension<Entity, Conve
         final Class<? extends AttributeConverter<?, String>> converterType = jpa.converter();
         final Type[] arguments = getTypeArguments(converterType, AttributeConverter.class);
         if (!type.equals(arguments[0]) || !String.class.equals(arguments[1])) {
-            final String fName = type.getSimpleName();
-            throw new BeanException(property, "@Convert[converter] must extends AttributeConverter<" + fName + ", String>");
+            final String cn = type.getSimpleName();
+            throw new BeanException(property, "@Convert[converter] should extends AttributeConverter<" + cn + ", String>");
         }
     }
 
@@ -107,7 +102,7 @@ public final class JpaConvertExtension extends ConversionExtension<Entity, Conve
         //noinspection unchecked
         final Class<? extends AttributeConverter<Object, String>> converterType = config.converter();
         final Optional<Error> error = ConversionResolver.getError(property);
-        final AttributeConverter<Object, String> converter = getBean(context, converterType);
+        final AttributeConverter<Object, String> converter = this.getBean(converterType);
         return new Conversion<>(converter::convertToEntityAttribute, converter::convertToDatabaseColumn, error);
     }
 

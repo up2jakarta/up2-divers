@@ -10,7 +10,6 @@ import io.github.up2jakarta.csv.io.impl.SegmentType;
 import io.github.up2jakarta.csv.io.misc.AFullTests;
 import io.github.up2jakarta.csv.io.misc.InputError;
 import io.github.up2jakarta.csv.io.misc.InputRecord;
-import io.github.up2jakarta.xml.adapters.KeyCoder;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,9 +42,6 @@ public class FullInvoiceTests extends AFullTests<InputRecord, FullImporter<Group
         return new FullFileReader<>(importer, format, "-") {
             @Override
             protected InputRecord create(long lineId, String recordId, SegmentType type, String beanId, String[] data) {
-                if (recordId == null) {
-                    recordId = KeyCoder.fixed(lineId);
-                }
                 return new InputRecord(recordId, type, beanId, data);
             }
         };

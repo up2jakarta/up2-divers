@@ -187,10 +187,9 @@ final class BSBuilder {
         final List<Property<?, D>> result = new LinkedList<>();
         final Class<?> superClass = beanType.getSuperclass();
         if (Segment.class.isAssignableFrom(superClass)) {
-            final Type[] arguments = Beans.getTypeArguments(beanType.getGenericSuperclass());
             //noinspection unchecked
             final Class<? extends Segment> superType = (Class<? extends Segment>) superClass;
-            final BSContext<D> superContext = context.with(superType, arguments);
+            final BSContext<D> superContext = context.with(superType, beanType.getGenericSuperclass());
             final List<Property<?, D>> superProperties = build(superType, superContext);
             superContext.end();
             result.addAll(superProperties);

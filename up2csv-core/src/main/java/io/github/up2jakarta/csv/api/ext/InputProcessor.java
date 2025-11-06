@@ -1,6 +1,7 @@
 package io.github.up2jakarta.csv.api.ext;
 
 import io.github.up2jakarta.csv.cfg.Processor;
+import io.github.up2jakarta.csv.core.ext.BeanAware;
 
 import java.lang.annotation.Annotation;
 
@@ -9,7 +10,7 @@ import java.lang.annotation.Annotation;
  *
  * @param <A> the annotation type
  */
-public abstract class InputProcessor<A extends Annotation> {
+public abstract class InputProcessor<A extends Annotation> extends BeanAware {
 
     /**
      * Processes {@link String} to the proper value of the destination field.

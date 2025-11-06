@@ -22,7 +22,7 @@ import static io.github.up2jakarta.csv.impl.SegmentType.*;
 @SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-class UnitDummy4Tests extends AUnitTest<Dummy4Invoice, UnitRecord<SegmentType>, MiniError<GroupType, UnitRecord<SegmentType>>> {
+class UnitDummy4Tests extends AUnitTest<Dummy4Invoice, UnitRecord<SegmentType>, ECause<GroupType, UnitRecord<SegmentType>>> {
 
     private final SimpleUnitImporter<Dummy4Invoice, GroupType, SegmentType> unitImporter;
 
@@ -38,7 +38,7 @@ class UnitDummy4Tests extends AUnitTest<Dummy4Invoice, UnitRecord<SegmentType>, 
 
     @Test
     void testEmpty() throws BeanException {
-        checkEmpty(new MiniRecord[0]);
+        checkEmpty(new FastRecord[0]);
     }
 
     @Test

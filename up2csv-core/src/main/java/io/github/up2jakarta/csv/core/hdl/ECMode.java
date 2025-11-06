@@ -3,10 +3,10 @@ package io.github.up2jakarta.csv.core.hdl;
 import io.github.up2jakarta.xml.api.PropertyException;
 import io.github.up2jakarta.xml.api.SeverityType;
 
-final class EventException extends EventType<PropertyException> {
-    static final EventException INSTANCE = new EventException();
+final class ECMode extends EventType<PropertyException> {
+    static final ECMode INSTANCE = new ECMode();
 
-    private EventException() {
+    private ECMode() {
         super(PropertyException.class);
     }
 
@@ -15,6 +15,7 @@ final class EventException extends EventType<PropertyException> {
         return new PropertyException(level, code, message);
     }
 
+    @Override
     public PropertyException of(SeverityType level, String code, Throwable cause) {
         return PropertyException.of(level, code, cause);
     }

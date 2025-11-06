@@ -183,7 +183,7 @@ class Up2ConverterTests {
         // THEN
         assertEquals(CodeList3Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
-        assertEquals("CodeList3Entity[key] - type must be enum", error.getMessage());
+        assertEquals("CodeList3Entity[key] - type must implements CodeList<Test3CodeList>", error.getMessage());
     }
 
     @Test
@@ -200,10 +200,11 @@ class Up2ConverterTests {
     void testConverterArgument() {
         // GIVEN
         final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test3Converter.class));
+        final String cn = CurrencyCodeType.class.getTypeName();
         // THEN
         assertEquals(Test3Converter.class, error.getSource());
         assertEquals("test", error.getLocator());
-        assertEquals("Test3Converter[test] - @Converter[value] does not support CurrencyCodeType", error.getMessage());
+        assertEquals("Test3Converter[test] - @Position[converter] does not support class " + cn, error.getMessage());
     }
 
 }

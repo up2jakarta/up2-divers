@@ -7,6 +7,7 @@ import java.io.Serializable;
  *
  * @param <K> the unique key type
  * @see io.github.up2jakarta.csv.api.hdl.ITraceEvent
+ * @see io.github.up2jakarta.csv.fmt.FullRecord
  */
 public interface Identifiable<K> extends Serializable {
 

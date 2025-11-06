@@ -3,9 +3,9 @@ package io.github.up2jakarta.csv;
 import io.github.up2jakarta.csv.api.*;
 import io.github.up2jakarta.csv.api.hdl.*;
 import io.github.up2jakarta.csv.core.*;
+import io.github.up2jakarta.csv.core.hdl.ESelfCollector;
+import io.github.up2jakarta.csv.core.hdl.ETraceCollector;
 import io.github.up2jakarta.csv.core.hdl.FatalCollector;
-import io.github.up2jakarta.csv.core.hdl.RecordCollector;
-import io.github.up2jakarta.csv.core.hdl.TraceCollector;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Referencable;
 import io.github.up2jakarta.csv.fmt.*;
@@ -156,11 +156,11 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new unit-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IRecordCollector<B, I, E, R>, E extends IRecordEvent<B, R, E>> UnitImporter<B, I, T, R, E> build(ICauseCreator<R, B, E> creator) throws BeanException {
+            public <R extends ISelfRecord<B, I, E, R>, E extends ISelfEvent<B, R, E>> UnitImporter<B, I, T, R, E> build(ICauseCreator<R, B, E> creator) throws BeanException {
                 return new UnitImporter<>(factory, type, rootType, nodeTypes) {
                     @Override
-                    protected RecordCollector<B, E, R> create(R row) {
-                        return new RecordCollector<>(row, creator);
+                    protected ESelfCollector<B, R, E> create(R row) {
+                        return new ESelfCollector<>(row, creator);
                     }
                 };
             }
@@ -176,8 +176,8 @@ public class BusinessBuilder<B extends DataType<B>> {
             public <R extends IRecord<I>, E extends ITraceEvent<B, R, ?>> UnitImporter<B, I, T, R, E> build(ITraceCreator<B, R, E> creator, IRepository<R> repository) throws BeanException {
                 return new UnitImporter<>(factory, type, rootType, nodeTypes) {
                     @Override
-                    protected TraceCollector<B, R, E> create(R row) {
-                        return new TraceCollector<>(row, creator, repository);
+                    protected ETraceCollector<B, R, E> create(R row) {
+                        return new ETraceCollector<>(row, creator, repository);
                     }
                 };
             }
@@ -282,11 +282,11 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new fast-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFastRecord<I> & IRecordCollector<B, I, E, R>, E extends IRecordEvent<B, R, E>> FastImporter<B, I, T, R, E> build(ICauseCreator<R, B, E> creator) throws BeanException {
+            public <R extends IFastRecord<I> & ISelfRecord<B, I, E, R>, E extends ISelfEvent<B, R, E>> FastImporter<B, I, T, R, E> build(ICauseCreator<R, B, E> creator) throws BeanException {
                 return new FastImporter<>(factory, type, rootType, nodeTypes) {
                     @Override
-                    protected RecordCollector<B, E, R> create(R row) {
-                        return new RecordCollector<>(row, creator);
+                    protected ESelfCollector<B, R, E> create(R row) {
+                        return new ESelfCollector<>(row, creator);
                     }
                 };
             }
@@ -302,8 +302,8 @@ public class BusinessBuilder<B extends DataType<B>> {
             public <R extends IFastRecord<I>, E extends ITraceEvent<B, R, ?>> FastImporter<B, I, T, R, E> build(ITraceCreator<B, R, E> creator, IRepository<R> repository) throws BeanException {
                 return new FastImporter<>(factory, type, rootType, nodeTypes) {
                     @Override
-                    protected TraceCollector<B, R, E> create(R row) {
-                        return new TraceCollector<>(row, creator, repository);
+                    protected ETraceCollector<B, R, E> create(R row) {
+                        return new ETraceCollector<>(row, creator, repository);
                     }
                 };
             }
@@ -387,11 +387,11 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFullRecord<I> & IRecordCollector<B, I, E, R>, E extends IRecordEvent<B, R, E>> FullImporter<B, I, T, R, E> build(ICauseCreator<R, B, E> creator) throws BeanException {
+            public <R extends IFullRecord<I> & ISelfRecord<B, I, E, R>, E extends ISelfEvent<B, R, E>> FullImporter<B, I, T, R, E> build(ICauseCreator<R, B, E> creator) throws BeanException {
                 return new FullImporter<>(factory, type, rootType, nodeTypes) {
                     @Override
-                    protected RecordCollector<B, E, R> create(R row) {
-                        return new RecordCollector<>(row, creator);
+                    protected ESelfCollector<B, R, E> create(R row) {
+                        return new ESelfCollector<>(row, creator);
                     }
                 };
             }
@@ -407,8 +407,8 @@ public class BusinessBuilder<B extends DataType<B>> {
             public <R extends IFullRecord<I>, E extends ITraceEvent<B, R, ?>> FullImporter<B, I, T, R, E> build(ITraceCreator<B, R, E> creator, IRepository<R> repository) throws BeanException {
                 return new FullImporter<>(factory, type, rootType, nodeTypes) {
                     @Override
-                    protected TraceCollector<B, R, E> create(R row) {
-                        return new TraceCollector<>(row, creator, repository);
+                    protected ETraceCollector<B, R, E> create(R row) {
+                        return new ETraceCollector<>(row, creator, repository);
                     }
                 };
             }
@@ -420,8 +420,8 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends InputRecord<I>> FullImporter<B, I, T, R, InputError<B, R>> build(IRepository<R> repository) throws BeanException {
-                return this.build((ITraceCreator<B, R, InputError<B, R>>) InputError::new, repository);
+            public <R extends FullRecord<I>> FullImporter<B, I, T, R, FullError<B, R>> build(IRepository<R> repository) throws BeanException {
+                return this.build((ITraceCreator<B, R, FullError<B, R>>) FullError::new, repository);
             }
 
             /**

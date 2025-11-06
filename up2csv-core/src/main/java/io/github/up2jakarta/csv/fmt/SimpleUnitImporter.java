@@ -1,10 +1,12 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.api.IType;
+import io.github.up2jakarta.csv.api.hdl.ICauseCreator;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.UnitImporter;
 import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.core.hdl.FatalCollector;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.RecordTransformer;
 import io.github.up2jakarta.csv.data.Referencable;
@@ -23,11 +25,11 @@ import static io.github.up2jakarta.csv.BusinessBuilder.DEFAULT_LEVEL;
  * @param <T> the business object type
  * @param <B> the data type
  * @param <I> the segment type
- * @see MiniRecord
- * @see MiniError
+ * @see FastRecord
+ * @see ECause
  */
 public final class SimpleUnitImporter<T extends Referencable, B extends DataType<B>, I extends IType<B, I>>
-        extends UnitImporter<B, I, T, UnitRecord<I>, MiniError<B, UnitRecord<I>>>
+        extends UnitImporter<B, I, T, UnitRecord<I>, ECause<B, UnitRecord<I>>>
         implements RecordTransformer<UnitRecord<I>> {
 
     private final SeverityType level;
@@ -56,8 +58,9 @@ public final class SimpleUnitImporter<T extends Referencable, B extends DataType
     }
 
     @Override
-    protected UnitCollector<B, UnitRecord<I>> create(UnitRecord<I> row) {
-        return new UnitCollector<>(row, level);
+    protected FatalCollector<UnitRecord<I>, B, ECause<B, UnitRecord<I>>> create(UnitRecord<I> row) {
+        final ICauseCreator<UnitRecord<I>, B, ECause<B, UnitRecord<I>>> creator = ECause::new;
+        return new FatalCollector<>(row, creator, level);
     }
 
     @Override
@@ -75,7 +78,7 @@ public final class SimpleUnitImporter<T extends Referencable, B extends DataType
      * @throws BeanException     for any problem when setting fields from input record
      * @throws CodeListException if type of one record is unknown
      */
-    public Up2Result<T, MiniError<B, UnitRecord<I>>> parse(List<String[]> rows) throws BeanException {
+    public Up2Result<T, ECause<B, UnitRecord<I>>> parse(List<String[]> rows) throws BeanException {
         final List<UnitRecord<I>> records = new ArrayList<>(rows.size());
         for (final String[] row : rows) {
             if (row == null || row.length <= mode.getTypeIdIndex()) {

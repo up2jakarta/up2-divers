@@ -1,6 +1,9 @@
 package io.github.up2jakarta.csv.core.ext;
 
-import io.github.up2jakarta.csv.api.ext.*;
+import io.github.up2jakarta.csv.api.ext.Conversion;
+import io.github.up2jakarta.csv.api.ext.ConversionExtension;
+import io.github.up2jakarta.csv.api.ext.ConversionResolver;
+import io.github.up2jakarta.csv.api.ext.PropertyFormatter;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
@@ -18,7 +21,6 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_XML_ENUM;
-import static io.github.up2jakarta.csv.core.ext.Beans.getBean;
 import static io.github.up2jakarta.csv.core.ext.Beans.getTypeArguments;
 
 /**
@@ -30,12 +32,9 @@ import static io.github.up2jakarta.csv.core.ext.Beans.getTypeArguments;
 @Singleton
 public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJavaTypeAdapter> {
 
-    private final BeanContext context;
-
     @Inject
-    XmlAdapterExtension(BeanContext context) {
+    XmlAdapterExtension() {
         super(XmlType.class);
-        this.context = context;
     }
 
     private static XmlJavaTypeAdapter getAdapter(Field field, Class<?> type) {
@@ -57,8 +56,8 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
             final Class<? extends XmlAdapter<String, ?>> adapterType = (Class<? extends XmlAdapter<String, ?>>) xml.value();
             final Type[] arguments = getTypeArguments(adapterType, XmlAdapter.class);
             if (!String.class.equals(arguments[0]) || !type.equals(arguments[1])) {
-                final String typeName = type.getSimpleName();
-                throw new BeanException(property, "adapter must extends XmlAdapter<String, " + typeName + ">");
+                final String cn = type.getSimpleName();
+                throw new BeanException(property, "@XmlJavaTypeAdapter[value] should extends XmlAdapter<String, " + cn + ">");
             }
             return Optional.of(xml);
         }
@@ -70,7 +69,7 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
         //noinspection unchecked
         final Class<XmlAdapter<String, Object>> adapterType = (Class<XmlAdapter<String, Object>>) config.value();
         final Optional<Error> error = ConversionResolver.getError(property);
-        final XmlAdapter<String, Object> adapter = getBean(context, adapterType);
+        final XmlAdapter<String, Object> adapter = this.getBean(adapterType);
         final PropertyFormatter<Object> f = v -> {
             try {
                 return adapter.marshal(v);

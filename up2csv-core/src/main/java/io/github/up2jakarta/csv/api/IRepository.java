@@ -6,7 +6,7 @@ package io.github.up2jakarta.csv.api;
  *
  * @param <R> the input record type
  * @see io.github.up2jakarta.csv.api.hdl.ITraceEvent.IKey#getOrder()
- * @see io.github.up2jakarta.csv.core.hdl.TraceCollector
+ * @see io.github.up2jakarta.csv.core.hdl.ETraceCollector
  * @see io.github.up2jakarta.csv.data.LazyCounter
  */
 @FunctionalInterface

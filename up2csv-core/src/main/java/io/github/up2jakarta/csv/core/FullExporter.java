@@ -26,15 +26,15 @@ public non-sealed class FullExporter<B extends DataType<B>, I extends IType<B, I
     /**
      * Segregates the given business-object to many records and notifies the callback for each one.
      *
-     * @param bean           the business object to segregate
-     * @param rowIdGenerator the record-reference supplier
-     * @param callback       the segment listener
+     * @param bean     the business object to segregate
+     * @param rowId    the record-reference supplier
+     * @param callback the segment listener
      * @throws BeanException for any problem when getting fields from business-object
      * @throws IOException   for some reason cannot be opened for writing by the callback.
      * @see FullExporter#format(Referencable, Supplier, SegmentWriter)
      */
-    public final void format(T bean, Supplier<String> rowIdGenerator, SegmentWriter callback) throws BeanException, IOException {
-        super.format(bean, rowIdGenerator, callback);
+    public final void format(T bean, Supplier<String> rowId, SegmentWriter callback) throws BeanException, IOException {
+        super.format(bean, rowId, callback);
     }
 
     @Override

@@ -174,7 +174,7 @@ public class Up2JpaExtensionTest {
         // THEN
         assertEquals(Test3Bean.class, thrown.getSource());
         assertEquals("enum1", thrown.getLocator());
-        assertEquals("Test3Bean[enum1] - must be annotated with @Up2Converter or one of its shortcuts", thrown.getMessage());
+        assertEquals("Test3Bean[enum1] - @Position[converter] must not be undefined", thrown.getMessage());
     }
 
 }

@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.fmt.MiniRecord;
+import io.github.up2jakarta.csv.fmt.FastRecord;
 import io.github.up2jakarta.csv.fmt.SimpleFastImporter;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
@@ -19,7 +19,7 @@ import java.io.IOException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class SimpleFastTests extends AFastTests<MiniRecord<SegmentType>, SimpleFastImporter<Invoice, GroupType, SegmentType>> {
+public class SimpleFastTests extends AFastTests<FastRecord<SegmentType>, SimpleFastImporter<Invoice, GroupType, SegmentType>> {
 
     @Autowired
     SimpleFastTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
@@ -32,7 +32,7 @@ public class SimpleFastTests extends AFastTests<MiniRecord<SegmentType>, SimpleF
     }
 
     @Override
-    protected FastFileReader<Invoice, GroupType, SegmentType, MiniRecord<SegmentType>, ?> reader(
+    protected FastFileReader<Invoice, GroupType, SegmentType, FastRecord<SegmentType>, ?> reader(
             SimpleFastImporter<Invoice, GroupType, SegmentType> importer, CSVFormat format
     ) {
         return new SimpleFastReader<>(importer, format);

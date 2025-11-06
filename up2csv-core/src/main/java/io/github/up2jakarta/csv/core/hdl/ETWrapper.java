@@ -3,14 +3,14 @@ package io.github.up2jakarta.csv.core.hdl;
 import io.github.up2jakarta.xml.api.IException;
 import io.github.up2jakarta.xml.api.SeverityType;
 
-public final class Event implements IException {
+public final class ETWrapper implements IException {
 
     final String code;
     final String message;
     final Throwable cause;
     final SeverityType level;
 
-    public Event(SeverityType level, String code, String message, Throwable cause) {
+    public ETWrapper(SeverityType level, String code, String message, Throwable cause) {
         this.cause = cause;
         this.code = code;
         this.level = level;

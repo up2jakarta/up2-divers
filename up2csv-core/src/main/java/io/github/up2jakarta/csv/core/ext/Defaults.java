@@ -71,7 +71,7 @@ public final class Defaults {
     }
 
     @SuppressWarnings("unchecked")
-    public static <S extends Segment> S prototype(Class<S> type) throws BeanException {
+    public static <S extends Segment> S prototype(Class<S> type) {
         try {
             final Constructor<S> constructor = getDefaultConstructor(type);
             if (type.isRecord()) {
@@ -89,7 +89,7 @@ public final class Defaults {
             } catch (Exception ignore) {
             }
         }
-        throw new BeanException(type, "cannot create new instance");
+        return null;
     }
 
     public static String[] prototype(String[] prototype, int min) {

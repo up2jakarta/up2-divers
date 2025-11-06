@@ -14,7 +14,7 @@ import io.github.up2jakarta.xml.api.SeverityType;
  * @param <R> the input record type
  * @param <D> the input data type
  * @see ICauseCreator
- * @see io.github.up2jakarta.csv.core.hdl.EventCollector#EXCEPTION_TYPE
+ * @see io.github.up2jakarta.csv.core.hdl.EventCollector#CAUSE_TYPE
  */
 public interface ICauseEvent<R extends IRecord<?>, D extends DataType<D>> extends MessageFormatter, IException, IEvent<D> {
 

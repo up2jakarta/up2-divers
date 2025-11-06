@@ -1,6 +1,7 @@
 package io.github.up2jakarta.csv.api.ext;
 
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.ext.BeanAware;
 import io.github.up2jakarta.csv.data.Segment;
 import jakarta.validation.constraints.NotNull;
 
@@ -15,7 +16,7 @@ import java.util.Optional;
  * @param <A> the annotation type that activates the extension (on class)
  * @param <C> the annotation configuration type
  */
-public abstract class ConversionExtension<A extends Annotation, C extends Annotation> {
+public abstract class ConversionExtension<A extends Annotation, C extends Annotation> extends BeanAware {
 
     private final Class<A> activation;
 

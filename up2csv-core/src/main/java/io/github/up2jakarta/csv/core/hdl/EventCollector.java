@@ -17,8 +17,9 @@ import java.util.Set;
  */
 public abstract non-sealed class EventCollector<R extends IRecord<?>, D extends DataType<D>, E extends IEvent<D>, B extends IException> extends EventHandler<R, D, E> {
 
-    public static final EventType<PropertyException> EXCEPTION_TYPE = EventException.INSTANCE;
-    public static final EventType<Event> ERROR_TYPE = EventError.INSTANCE;
+    public static final EventType<PropertyException> CAUSE_TYPE = ECMode.INSTANCE;
+    public static final EventType<ETWrapper> TRACE_TYPE = ETMode.INSTANCE;
+
     protected final EventType<B> mode;
     private final Set<Integer> offsets;
 

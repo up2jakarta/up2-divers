@@ -1,6 +1,8 @@
 package io.github.up2jakarta.csv.cfg;
 
+import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.prc.DefaultProcessor;
+import io.github.up2jakarta.xml.api.TypeConverter;
 
 import java.lang.annotation.*;
 
@@ -19,6 +21,13 @@ public @interface Position {
      * @return the column offset
      */
     int value();
+
+    /**
+     * The converter must be managed by {@link BeanContext}
+     *
+     * @return the class of the processor
+     */
+    Class<? extends TypeConverter<?>> converter() default NaN.class;
 
     /**
      * @return the default value, by default is <code>null</code>
@@ -64,5 +73,25 @@ public @interface Position {
      * @return the nullable flag
      */
     boolean required() default false;
+
+    /**
+     * Undefined implementation used only as default value for Position.
+     */
+    final class NaN extends TypeConverter<Void> {
+
+        private NaN() {
+            super(void.class, null, null);
+        }
+
+        @Override
+        public Void parse(String value) {
+            return null;
+        }
+
+        @Override
+        public String format(Void value) {
+            return null;
+        }
+    }
 
 }

@@ -2,7 +2,6 @@ package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.api.IFastRecord;
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.data.Definition;
 
 import java.util.Arrays;
@@ -15,13 +14,12 @@ import static io.github.up2jakarta.xml.adapters.KeyCoder.token;
  *
  * @param <T> the segment type
  */
-public class MiniRecord<T extends IType<?, T>> extends UnitRecord<T> implements IFastRecord<T> {
+public class FastRecord<T extends IType<?, T>> extends UnitRecord<T> implements IFastRecord<T> {
 
-    @Position(1)
     @Definition(code = "PID", value = "Pivot")
     protected final String pivot;
 
-    public MiniRecord(T type, String pivot, String... data) {
+    public FastRecord(T type, String pivot, String... data) {
         super(type, data);
         this.pivot = token(pivot);
     }

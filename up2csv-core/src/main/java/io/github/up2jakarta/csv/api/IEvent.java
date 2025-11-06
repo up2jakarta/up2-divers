@@ -15,7 +15,7 @@ public interface IEvent<D extends DataType<D>> extends IError {
      */
     String ERROR_VALIDATOR = "UP2-V001";
     /**
-     * Default error code for {@link io.github.up2jakarta.csv.cfg.Up2Converter}
+     * Default error code for {@link io.github.up2jakarta.csv.cfg.Position#converter()}
      */
     String ERROR_CONVERTER = "UP2-C002";
     /**

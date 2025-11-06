@@ -41,7 +41,7 @@ approach.
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.5.5</version>
+        <version>1.5.6</version>
     </dependency>
     <!-- Required JSR-303 Validation Provider -->
     <dependency>
@@ -153,14 +153,14 @@ public Up2Segment implements Segment {
 }
 ```
 
-## @Converter
+## @Position.converter
 
-Any type different from `String` needs to be converted, so the utility of @Converter
+Any type different from `String` needs to be converted, so the utility of converters
 
 ``` java
 public Up2Segment implements Segment {
 
-    @Converter(CurrencyConverter.class)
+    @Position(value = 0, converter = CurrencyConverter.class)
     private CurrencyCodeType currency;
 }
 ```
@@ -281,7 +281,7 @@ public Up2Segment implements Segment {
 
 This annotation allows the automatic conversion of Up2 `CodeList` API
 
-- `CodeList` based on `enum`
+- `CodeList` based on `enum` or `class` constants
 
 ``` java
 public Up2Segment implements Segment {
@@ -406,7 +406,7 @@ public Up2Segment implements Segment {
 
 Helps the engine to full-fill the right error code and severity.
 
-This annotation is fully integrated with @Processor, @Converter, @Resolver and JSR-303 Payload.
+This annotation is fully integrated with @Processor, @Resolver and JSR-303 Payload.
 
 ``` java
 public TestSegment implements Segment {
@@ -492,6 +492,13 @@ public TestSegment implements Segment {
 
 `Up2CSV` is able to gathering all events (errors or warnings) and continue
 processing flat-data within fault-tolerance principle.
+
+- [EventHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/EventHandler.java)
+    - [FastException.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/FastException.java)
+    - [EventCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/EventCollector.java)
+        - [ETraceCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/ETraceCollector.java)
+        - [FatalCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/FatalCollector.java)
+        - [ESelfCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/ESelfCollector.java)
 
 ## @Truncated
 

@@ -2,6 +2,7 @@ package io.github.up2jakarta.csv.api.ext;
 
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.core.ext.BeanAware;
 import jakarta.validation.constraints.NotNull;
 
 import java.lang.annotation.Annotation;
@@ -14,7 +15,7 @@ import java.util.Optional;
  *
  * @param <A> the annotation type
  */
-public abstract class ConversionResolver<A extends Annotation> {
+public abstract class ConversionResolver<A extends Annotation> extends BeanAware {
 
     /**
      * Get the annotation {@link Error} if present.

@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.impl;
 
-import io.github.up2jakarta.csv.core.hdl.TraceCollector;
+import io.github.up2jakarta.csv.core.hdl.ETraceCollector;
 
-public class InputCollector extends TraceCollector<GroupType, InputRecord, InputError> {
+public class InputCollector extends ETraceCollector<GroupType, InputRecord, InputError> {
 
     public InputCollector(InputRecord row) {
         super(row, InputError::new, (r) -> 0);

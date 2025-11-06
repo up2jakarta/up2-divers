@@ -1,10 +1,12 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.api.IType;
+import io.github.up2jakarta.csv.api.hdl.ITraceCreator;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.FullImporter;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.core.hdl.ETraceCollector;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.RecordTransformer;
 import io.github.up2jakarta.csv.data.Referencable;
@@ -16,12 +18,12 @@ import io.github.up2jakarta.xml.clv.CodeListException;
  * @param <T> the business object type
  * @param <B> the data type
  * @param <I> the segment type
- * @see InputRecord
- * @see InputError
+ * @see FullRecord
+ * @see ETrace
  */
 public final class SimpleFullImporter<T extends Referencable, B extends DataType<B>, I extends IType<B, I>>
-        extends FullImporter<B, I, T, InputRecord<I>, InputError<B, InputRecord<I>>>
-        implements RecordTransformer<InputRecord<I>> {
+        extends FullImporter<B, I, T, FullRecord<I>, FullError<B, FullRecord<I>>>
+        implements RecordTransformer<FullRecord<I>> {
 
     public <E extends Enum<E> & IType<B, I>> SimpleFullImporter(Up2Factory<B> mf, Class<T> type, E rootNode) throws BeanException {
         //noinspection unchecked
@@ -37,17 +39,18 @@ public final class SimpleFullImporter<T extends Referencable, B extends DataType
     }
 
     @Override
-    protected InputCollector<B, InputRecord<I>> create(InputRecord<I> row) {
-        return new InputCollector<>(row);
+    protected ETraceCollector<B, FullRecord<I>, FullError<B, FullRecord<I>>> create(FullRecord<I> row) {
+        final ITraceCreator<B, FullRecord<I>, FullError<B, FullRecord<I>>> creator = FullError::new;
+        return new ETraceCollector<>(row, creator, (r) -> 0);
     }
 
     @Override
-    public InputRecord<I> transform(String... source) throws CodeListException {
+    public FullRecord<I> transform(String... source) throws CodeListException {
         final I type = typing.type(source);
         final String[] data = typing.truncate(type, source);
-        final String recordId = source[mode.getRowKeyIndex()];
+        final String recordId = source[0];
         final String businessKey = source[mode.getBeanIdIndex()];
-        return new InputRecord<>(recordId, type, businessKey, data);
+        return new FullRecord<>(recordId, type, businessKey, data);
     }
 
     @Override

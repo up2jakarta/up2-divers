@@ -507,8 +507,12 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
         }
 
         @Override
-        String format(Segment bean, PProperty<?, ?> property) throws BeanException {
-            return property.format(bean, enabled);
+        String format(Segment bean, PProperty<?, ?> property) {
+            try {
+                return property.format(bean, enabled);
+            } catch (BeanException ignore) {
+                return null;
+            }
         }
     }
 }

@@ -182,7 +182,7 @@ public final class Tests {
         for (var i = 0; i < source.length; i++) {
             final String[] data = source[i];
             final SegmentType type = type(data[mode.getTypeIdIndex()], target);
-            final String rid = (mode == FULL) ? data[mode.getRowKeyIndex()] : null;
+            final String rid = (mode == FULL) ? data[0] : null;
             final String bid = (mode != UNIT) ? data[mode.getBeanIdIndex()] : null;
             final InputRecord entity = new InputRecord(rid, type, bid, columns(mode, type, data));
             result[i] = entity;

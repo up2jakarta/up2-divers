@@ -5,20 +5,21 @@ import io.github.up2jakarta.cii.edi.AllowanceChargeIdentificationCodeType;
 import io.github.up2jakarta.cii.edi.AllowanceChargeReasonCodeType;
 import io.github.up2jakarta.cii.ppf.ChargeReasonCodeType;
 import io.github.up2jakarta.cii.ppf.SpecialServiceDescriptionCodeType;
-import io.github.up2jakarta.xml.clv.CodeListConverter;
+import io.github.up2jakarta.xml.api.TypeConverter;
 import io.github.up2jakarta.xml.clv.CodeListException;
-import io.github.up2jakarta.xml.clv.TypeConverter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
-import java.util.stream.Stream;
-
 import static io.github.up2jakarta.cii.edi.adapters.AllowanceChargeIdentificationCodeAdapter.ECE_5189;
+import static io.github.up2jakarta.cii.edi.adapters.AllowanceChargeIdentificationCodeAdapter.LOV_5189;
 import static io.github.up2jakarta.cii.edi.adapters.AllowanceChargeReasonCodeAdapter.ECE_4465;
+import static io.github.up2jakarta.cii.edi.adapters.AllowanceChargeReasonCodeAdapter.LOV_4465;
 import static io.github.up2jakarta.cii.ppf.adapters.SpecialServiceDescriptionCodeAdapter.ECE_7161;
+import static io.github.up2jakarta.cii.ppf.adapters.SpecialServiceDescriptionCodeAdapter.LOV_7161;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.xml.clv.CodeListConverter.find;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -48,21 +49,13 @@ public class ChargeReasonCodeAdapter extends TypeConverter<ChargeReasonCodeType<
 
     public static ChargeReasonCodeType<?> from(ChargeReasonCodeType<?> value, Boolean indicator) {
         if (indicator == null) {
-            final Class<AllowanceChargeReasonCodeType> target = AllowanceChargeReasonCodeType.class;
-            final AllowanceChargeReasonCodeType[] values = AllowanceChargeReasonCodeType.values();
-            return CodeListConverter.parse(value.getCode(), target, Stream.of(values), ERROR, ECE_4465);
-        }
-        if (indicator) {
+            return find(value.getCode(), AllowanceChargeReasonCodeType.class, LOV_4465, ERROR, ECE_4465);
+        } else if (indicator) {
             // BG-21, BG-28
-            final Class<SpecialServiceDescriptionCodeType> target = SpecialServiceDescriptionCodeType.class;
-            final SpecialServiceDescriptionCodeType[] values = SpecialServiceDescriptionCodeType.values();
-            return CodeListConverter.parse(value.getCode(), target, Stream.of(values), ERROR, ECE_7161);
-        } else {
-            // BG-20, BG-27
-            final Class<AllowanceChargeIdentificationCodeType> target = AllowanceChargeIdentificationCodeType.class;
-            final AllowanceChargeIdentificationCodeType[] values = AllowanceChargeIdentificationCodeType.values();
-            return CodeListConverter.parse(value.getCode(), target, Stream.of(values), ERROR, ECE_5189);
+            return find(value.getCode(), SpecialServiceDescriptionCodeType.class, LOV_7161, ERROR, ECE_7161);
         }
+        // BG-20, BG-27
+        return find(value.getCode(), AllowanceChargeIdentificationCodeType.class, LOV_5189, ERROR, ECE_5189);
     }
 
     @Override

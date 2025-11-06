@@ -1,10 +1,12 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.api.IType;
+import io.github.up2jakarta.csv.api.hdl.ICauseCreator;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.FastImporter;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.core.hdl.FatalCollector;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.RecordTransformer;
 import io.github.up2jakarta.csv.data.Referencable;
@@ -23,12 +25,12 @@ import static io.github.up2jakarta.csv.BusinessBuilder.DEFAULT_LEVEL;
  * @param <T> the business object type
  * @param <B> the data type
  * @param <I> the segment type
- * @see MiniRecord
- * @see MiniError
+ * @see FastRecord
+ * @see ECause
  */
 public final class SimpleFastImporter<T extends Referencable, B extends DataType<B>, I extends IType<B, I>>
-        extends FastImporter<B, I, T, MiniRecord<I>, MiniError<B, MiniRecord<I>>>
-        implements RecordTransformer<MiniRecord<I>> {
+        extends FastImporter<B, I, T, FastRecord<I>, ECause<B, FastRecord<I>>>
+        implements RecordTransformer<FastRecord<I>> {
 
     private final SeverityType level;
 
@@ -56,16 +58,17 @@ public final class SimpleFastImporter<T extends Referencable, B extends DataType
     }
 
     @Override
-    protected UnitCollector<B, MiniRecord<I>> create(MiniRecord<I> row) {
-        return new UnitCollector<>(row, level);
+    protected FatalCollector<FastRecord<I>, B, ECause<B, FastRecord<I>>> create(FastRecord<I> row) {
+        final ICauseCreator<FastRecord<I>, B, ECause<B, FastRecord<I>>> creator = ECause::new;
+        return new FatalCollector<>(row, creator, level);
     }
 
     @Override
-    public MiniRecord<I> transform(String... source) throws CodeListException {
+    public FastRecord<I> transform(String... source) throws CodeListException {
         final I type = typing.type(source);
         final String[] data = typing.truncate(type, source);
         final String businessKey = source[mode.getBeanIdIndex()];
-        return new MiniRecord<>(type, businessKey, data);
+        return new FastRecord<>(type, businessKey, data);
     }
 
     /**
@@ -76,8 +79,8 @@ public final class SimpleFastImporter<T extends Referencable, B extends DataType
      * @throws BeanException     for any problem when setting fields from input record
      * @throws CodeListException if type of one record is unknown
      */
-    public Up2Result<T, MiniError<B, MiniRecord<I>>> parse(List<String[]> rows) throws BeanException {
-        final List<MiniRecord<I>> records = new ArrayList<>(rows.size());
+    public Up2Result<T, ECause<B, FastRecord<I>>> parse(List<String[]> rows) throws BeanException {
+        final List<FastRecord<I>> records = new ArrayList<>(rows.size());
         for (final String[] row : rows) {
             if (row == null || row.length <= mode.getTypeIdIndex()) {
                 continue;

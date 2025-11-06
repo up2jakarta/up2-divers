@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.api.IEvent;
 
 import java.util.List;
 
-public final class Up2Result<T extends Segment, E extends IEvent<?>> {
+public final class Up2Result<T extends Referencable, E extends IEvent<?>> {
 
     private final T bean;
     private final List<E> errors;

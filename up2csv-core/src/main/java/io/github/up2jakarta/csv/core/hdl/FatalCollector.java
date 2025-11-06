@@ -51,7 +51,7 @@ public class FatalCollector<R extends IRecord<?>, D extends DataType<D>, E exten
      * @param fatal   the severity level for failure
      */
     public FatalCollector(R row, ICauseCreator<R, D, E> creator, SeverityType fatal) {
-        super(row, EXCEPTION_TYPE);
+        super(row, CAUSE_TYPE);
         this.creator = creator;
         this.failLevel = fatal.getLevel();
     }

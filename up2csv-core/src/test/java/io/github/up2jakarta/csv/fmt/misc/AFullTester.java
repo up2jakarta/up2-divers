@@ -20,7 +20,7 @@ public final class AFullTester<R extends IFullRecord<SegmentType>> extends AUnit
     protected void assertFound(final R row, final String[] data) {
         assertEquals(key, data[mode.getBeanIdIndex()]);
         assertEquals(key, row.getPivot());
-        assertNotNull(data[mode.getRowKeyIndex()]);
+        assertNotNull(data[0]);
         assertEquals(row.getType().getCode(), data[mode.getTypeIdIndex()]);
     }
 

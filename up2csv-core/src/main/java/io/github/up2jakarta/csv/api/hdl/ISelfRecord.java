@@ -13,9 +13,9 @@ import java.util.List;
  * @param <R> the self-record implementation
  * @param <D> the input data type
  * @param <E> the input error type
- * @see io.github.up2jakarta.csv.core.hdl.RecordCollector
+ * @see io.github.up2jakarta.csv.core.hdl.ESelfCollector
  */
-public interface IRecordCollector<D extends DataType<D>, I extends IType<D, I>, E extends IRecordEvent<D, R, E>, R extends IRecordCollector<D, I, E, R>> extends IRecord<I> {
+public interface ISelfRecord<D extends DataType<D>, I extends IType<D, I>, E extends ISelfEvent<D, R, E>, R extends ISelfRecord<D, I, E, R>> extends IRecord<I> {
 
     /**
      * @return the list of related errors

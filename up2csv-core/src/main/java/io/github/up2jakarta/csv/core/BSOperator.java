@@ -10,6 +10,7 @@ import io.github.up2jakarta.csv.core.hdl.EventHandler;
 import io.github.up2jakarta.csv.core.hdl.PFProperty;
 import io.github.up2jakarta.csv.core.hdl.Property;
 import io.github.up2jakarta.csv.data.*;
+import io.github.up2jakarta.csv.slv.CodeListResolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -20,7 +21,6 @@ import java.util.function.BiPredicate;
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
 import static io.github.up2jakarta.csv.core.ext.Beans.concat;
 import static io.github.up2jakarta.csv.core.ext.PPath.getOverride;
-import static io.github.up2jakarta.csv.slv.CodeListResolver.checkUnique;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
@@ -44,7 +44,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
     BSOperator(Up2Factory<B> factory, Class<?> type, ModeType mode, I root, I[] nodes) throws BeanException {
         requireNonNull(factory, "factory is required");
         requireNonNull(root, "root is required");
-        checkUnique(type, nodes);
+        CodeListResolver.checkUnique(type, nodes);
         if (!type.equals(root.getClassType())) {
             throw new BeanException(type, "Invalid business typing");
         }

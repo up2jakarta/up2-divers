@@ -4,6 +4,7 @@ import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.core.hdl.FastException;
 import io.github.up2jakarta.csv.core.misc.cvr.Test1Definition;
+import io.github.up2jakarta.csv.core.misc.cvr.Test3Resolver;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.xml.api.SeverityType;
@@ -59,6 +60,28 @@ class Up2ResolverTests {
         assertEquals(ERROR_CONVERTER, error.getCode());
         assertNotNull(error.getCause());
         assertEquals("Text cannot be parsed to a Duration", error.getCause().getMessage());
+    }
+
+    @Test
+    void testPrivateConstant() throws BeanException {
+        // Given
+        final Up2Mapper<Test3Resolver, DynamicType> mapper = factory.build(Test3Resolver.class);
+        final FastException error = assertThrows(FastException.class, () -> mapper.map("N"));
+        // Then
+        assertEquals(SeverityType.ERROR, error.getSeverity());
+        assertEquals(ERROR_CODE_LIST, error.getCode());
+        assertNotNull(error.getCause());
+        assertEquals("Unknown value [N] for CodeList[EnumLike]", error.getCause().getMessage());
+    }
+
+    @Test
+    void testPublicConstant() throws BeanException {
+        // Given
+        final Up2Mapper<Test3Resolver, DynamicType> mapper = factory.build(Test3Resolver.class);
+        final Test3Resolver bean = mapper.map("1");
+        // Then
+        assertNotNull(bean);
+        assertEquals(Test3Resolver.EnumLike.ONE, bean.getUnit());
     }
 
 }

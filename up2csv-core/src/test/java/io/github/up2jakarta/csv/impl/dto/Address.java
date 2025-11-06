@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.impl.dto;
 
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.cfg.Up2Converter;
 import io.github.up2jakarta.csv.core.misc.clv.CountryCodeType;
 import io.github.up2jakarta.csv.core.misc.clv.CountryConverter;
 import io.github.up2jakarta.csv.data.Segment;
@@ -13,9 +12,8 @@ import jakarta.validation.constraints.NotNull;
 @SuppressWarnings("unused")
 public class Address implements Segment {
 
-    @Position(0)
+    @Position(value = 0, converter = CountryConverter.class)
     @NotNull
-    @Up2Converter(CountryConverter.class)
     private CountryCodeType country;
 
     @Position(1)

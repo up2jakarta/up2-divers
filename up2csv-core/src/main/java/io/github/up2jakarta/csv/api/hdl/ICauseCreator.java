@@ -13,7 +13,7 @@ import io.github.up2jakarta.xml.api.PropertyException;
  * @param <D> the input data type
  * @param <E> the input error type
  * @see ICauseEvent
- * @see io.github.up2jakarta.csv.core.hdl.EventCollector#EXCEPTION_TYPE
+ * @see io.github.up2jakarta.csv.core.hdl.EventCollector#CAUSE_TYPE
  */
 @FunctionalInterface
 public interface ICauseCreator<R extends IRecord<?>, D extends DataType<D>, E extends IEvent<D>> {

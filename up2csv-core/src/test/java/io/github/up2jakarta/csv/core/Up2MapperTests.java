@@ -507,7 +507,7 @@ class Up2MapperTests {
         // THEN
         assertEquals(BeanWithInteger.class, thrown.getSource());
         assertEquals("id", thrown.getLocator());
-        assertEquals("BeanWithInteger[id] - must be annotated with @Up2Converter or one of its shortcuts", thrown.getMessage());
+        assertEquals("BeanWithInteger[id] - @Position[converter] must not be undefined", thrown.getMessage());
     }
 
     @Test

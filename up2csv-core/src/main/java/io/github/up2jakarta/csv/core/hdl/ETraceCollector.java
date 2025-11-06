@@ -21,7 +21,7 @@ import java.util.Set;
  * @param <D> the data type
  * @param <E> the error type
  */
-public class TraceCollector<D extends DataType<D>, R extends IRecord<?>, E extends ITraceEvent<D, R, ?>> extends EventCollector<R, D, E, Event> {
+public class ETraceCollector<D extends DataType<D>, R extends IRecord<?>, E extends ITraceEvent<D, R, ?>> extends EventCollector<R, D, E, ETWrapper> {
 
     private final Set<E> errors = new LinkedHashSet<>();
     private final ITraceCreator<D, R, E> creator;
@@ -34,14 +34,14 @@ public class TraceCollector<D extends DataType<D>, R extends IRecord<?>, E exten
      * @param creator    the error creator
      * @param repository the input repository
      */
-    public TraceCollector(R row, ITraceCreator<D, R, E> creator, IRepository<R> repository) {
-        super(row, ERROR_TYPE);
+    public ETraceCollector(R row, ITraceCreator<D, R, E> creator, IRepository<R> repository) {
+        super(row, TRACE_TYPE);
         this.creator = creator;
         this.counter = new LazyCounter(() -> repository.max(row));
     }
 
     @Override
-    protected void accept(D type, int offset, Event cause) {
+    protected void accept(D type, int offset, ETWrapper cause) {
         final int order = counter.getAsInt() + errors.size();
         final String trace = EventType.trace(cause).orElse(null);
         final E error = creator.create(row, order, type, offset, cause, trace);

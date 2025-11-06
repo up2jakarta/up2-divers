@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, UnitRecord<SegmentType>, MiniError<GroupType, UnitRecord<SegmentType>>> {
+class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, UnitRecord<SegmentType>, ECause<GroupType, UnitRecord<SegmentType>>> {
 
     private final SimpleUnitImporter<Dummy5Invoice, GroupType, SegmentType> unitImporter;
 
@@ -59,7 +59,7 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, UnitRecord<SegmentType>, 
 
     @Test
     void testEmpty() throws BeanException {
-        checkEmpty(new MiniRecord[0]);
+        checkEmpty(new FastRecord[0]);
     }
 
     @Test

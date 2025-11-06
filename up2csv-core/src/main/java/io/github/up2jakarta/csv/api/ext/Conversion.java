@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.api.ext;
 
 import io.github.up2jakarta.csv.cfg.Error;
-import io.github.up2jakarta.xml.clv.TypeConverter;
+import io.github.up2jakarta.xml.api.TypeConverter;
 
 import java.util.Optional;
 

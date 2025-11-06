@@ -3,13 +3,13 @@ package io.github.up2jakarta.csv.fmt.misc;
 import io.github.up2jakarta.csv.cfg.PositionOverride;
 import io.github.up2jakarta.csv.cfg.ValidOverride;
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.fmt.MiniRecord;
+import io.github.up2jakarta.csv.fmt.FastRecord;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
 
 /**
  * {@link io.github.up2jakarta.csv.impl.SegmentType#S51}
  * <p>
- * No need to set {@link MiniRecord#getPivot()},
+ * No need to set {@link FastRecord#getPivot()},
  * because this class does not implement {@link io.github.up2jakarta.csv.data.BusinessObject}
  *
  * @see Tests#assertReference(ModeType, Invoice)

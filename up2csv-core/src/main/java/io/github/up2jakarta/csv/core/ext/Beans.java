@@ -197,7 +197,11 @@ public final class Beans {
     public static <T> T getBean(BeanContext context, Class<?> beanType) throws BeanException {
         try {
             //noinspection unchecked
-            return (T) context.getBean(beanType);
+            final T bean = (T) context.getBean(beanType);
+            if (bean instanceof BeanAware bc) {
+                bc.setContext(context);
+            }
+            return bean;
         } catch (Exception e) {
             throw new BeanException(beanType, "qualified bean must be found");
         }

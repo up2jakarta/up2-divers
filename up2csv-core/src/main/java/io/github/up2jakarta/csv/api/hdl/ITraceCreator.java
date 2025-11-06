@@ -13,7 +13,7 @@ import io.github.up2jakarta.xml.api.IError;
  * @param <D> the data type
  * @param <E> the error type
  * @see ITraceEvent
- * @see io.github.up2jakarta.csv.core.hdl.EventCollector#ERROR_TYPE
+ * @see io.github.up2jakarta.csv.core.hdl.EventCollector#TRACE_TYPE
  */
 @FunctionalInterface
 public interface ITraceCreator<D extends DataType<D>, R extends IRecord<?>, E extends ITraceEvent<D, R, ?>> {

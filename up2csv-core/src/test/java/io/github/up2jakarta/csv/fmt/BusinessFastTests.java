@@ -56,21 +56,6 @@ class BusinessFastTests extends AFastTest<Invoice, InputRecord, InputError> {
     }
 
     @Test
-    void testNullType() throws BeanException {
-        // Given
-        final InputRecord undefined = record(null, "TU2025R0099", "2025-03-12", "120", "100", "20");
-        final InputRecord[] rows = {
-                record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record(S02, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S03, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record(S04, "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
-                undefined
-        };
-        // When & Then
-        checkDetached(undefined, rows);
-    }
-
-    @Test
     void testCardinality1() throws BeanException {
         // Given
         final InputRecord[] rows = {

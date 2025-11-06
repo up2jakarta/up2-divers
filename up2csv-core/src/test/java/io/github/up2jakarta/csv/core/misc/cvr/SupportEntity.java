@@ -45,9 +45,8 @@ public class SupportEntity extends ParsedEntity<Integer> {
     @Up2Decimal(2)
     private BigDecimal amount;
 
-    @Position(4)
+    @Position(value = 4, converter = CurrencyConverter.class)
     @Column(name = "TU_CURRENCY")
-    @Up2Converter(CurrencyConverter.class)
     @Error(value = CurrencyConverter.ISO_4217)
     private CurrencyCodeType currency;
 
@@ -56,9 +55,8 @@ public class SupportEntity extends ParsedEntity<Integer> {
     @Up2Decimal(4)
     private BigDecimal quantity;
 
-    @Position(6)
+    @Position(value = 6, converter = MeasurementUnitConverter.class)
     @Column(name = "TU_CURRENCY")
-    @Up2Converter(MeasurementUnitConverter.class)
     private MeasurementUnitCode unit;
 
     @Position(7)

@@ -5,7 +5,7 @@ package io.github.up2jakarta.csv.api.ext;
  *
  * @see io.github.up2jakarta.csv.cfg.Processor
  * @see io.github.up2jakarta.csv.cfg.Resolver
- * @see io.github.up2jakarta.csv.cfg.Up2Converter
+ * @see io.github.up2jakarta.csv.cfg.Position#converter()
  */
 @FunctionalInterface
 public interface BeanContext {

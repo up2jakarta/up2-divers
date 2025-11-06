@@ -6,8 +6,8 @@ import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Format;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
-import io.github.up2jakarta.csv.fmt.InputError;
-import io.github.up2jakarta.csv.fmt.InputRecord;
+import io.github.up2jakarta.csv.fmt.FullError;
+import io.github.up2jakarta.csv.fmt.FullRecord;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
 import io.github.up2jakarta.csv.io.misc.TUGenerator;
 import io.github.up2jakarta.xml.api.PropertyException;
@@ -71,8 +71,8 @@ public class SingleErrorTests {
     private void assertError(int i, String[] error) {
         assertEquals(9, error.length);
         assertEquals("R" + i, error[0]);
-        assertEquals("I2025N" + i, error[1]);
-        assertEquals("01", error[2]);
+        assertEquals("01", error[1]);
+        assertEquals("I2025N" + i, error[2]);
         assertNull(error[3]);
         assertEquals("3", error[4]);
         assertEquals("E", error[5]);
@@ -109,18 +109,18 @@ public class SingleErrorTests {
         // WHEN Generating file
         this.write(file);
         // THEN
-        var i = read(file, "Record", "Pivot", "Type", "Data", "Offset", "Severity", "Code", "Message", "Stack");
+        var i = read(file, "Record", "Type", "Pivot", "Data", "Offset", "Severity", "Code", "Message", "Stack");
         // Checking number of record
         assertEquals(MAX, i - 1);
     }
 
-    public static class MyError extends InputError<DynamicType, MyRecord> {
+    public static class MyError extends FullError<DynamicType, MyRecord> {
         public MyError(MyRecord row, int order, String code) {
             super(row, order, null, 3, new PropertyException(ERROR, code, MSG), TRACE);
         }
     }
 
-    public static class MyRecord extends InputRecord<SegmentType> {
+    public static class MyRecord extends FullRecord<SegmentType> {
         public MyRecord(String rowKey, SegmentType type, String invoiceKey, String... data) {
             super(rowKey, type, invoiceKey, data);
         }

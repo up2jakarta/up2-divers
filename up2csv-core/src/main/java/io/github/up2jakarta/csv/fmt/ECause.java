@@ -5,20 +5,19 @@ import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.xml.api.PropertyException;
 
 /**
- * Simple implementation of input record based on errors, basically it's compatible with
- * {@link io.github.up2jakarta.csv.core.ModeType#FAST} and {@link io.github.up2jakarta.csv.core.ModeType#UNIT} modes.
+ * Simple implementation of input event based on cause exceptions, it's compatible with all modes.
  *
  * @param <B> the business data type
  * @param <R> the record type
  */
-public class MiniError<B extends DataType<B>, R extends UnitRecord<?>> implements ICauseEvent<R, B> {
+public class ECause<B extends DataType<B>, R extends UnitRecord<?>> implements ICauseEvent<R, B> {
 
     private final PropertyException cause;
     private final int offset;
     private final R record;
     private final B type;
 
-    public MiniError(R row, int offset, B type, PropertyException cause) {
+    public ECause(R row, int offset, B type, PropertyException cause) {
         this.offset = offset;
         this.cause = cause;
         this.record = row;

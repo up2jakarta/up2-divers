@@ -1,25 +1,25 @@
-package io.github.up2jakarta.xml.clv;
+package io.github.up2jakarta.xml.api;
 
-import io.github.up2jakarta.xml.api.PropertyException;
-import io.github.up2jakarta.xml.api.SeverityType;
 import jakarta.persistence.AttributeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * Up2 configurable converter that converts the input data {@link String} to the target property type {@link T}.
+ * <p>
+ * It's compatible with JAXB {@link XmlAdapter} and JPA {@link AttributeConverter}.
  *
  * @param <T> property type
  */
 public abstract class TypeConverter<T> extends XmlAdapter<String, T> implements AttributeConverter<T, String> {
 
-    protected final Class<T> supportedType;
     protected final String errorCode;
+    protected final Class<T> supportedType;
     protected final SeverityType errorSeverity;
 
     protected TypeConverter(Class<T> supportedType, SeverityType errorSeverity, String errorCode) {
         this.supportedType = supportedType;
-        this.errorCode = errorCode;
         this.errorSeverity = errorSeverity;
+        this.errorCode = errorCode;
     }
 
     /**

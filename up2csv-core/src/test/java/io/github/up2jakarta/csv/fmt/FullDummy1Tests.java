@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-class FullDummy1Tests extends AFullTest<Dummy1Invoice, InputRecord<SegmentType>, InputError<GroupType, InputRecord<SegmentType>>> {
+class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, FullError<GroupType, FullRecord<SegmentType>>> {
 
     private final Fixed06Generator rid = new Fixed06Generator();
     private final SimpleFullImporter<Dummy1Invoice, GroupType, SegmentType> fullImporter;

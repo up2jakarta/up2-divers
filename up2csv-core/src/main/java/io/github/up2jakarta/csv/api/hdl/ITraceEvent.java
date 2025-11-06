@@ -13,7 +13,7 @@ import io.github.up2jakarta.csv.data.Identifiable;
  * @param <K> the error key type
  * @param <D> the input record type
  * @see ITraceCreator
- * @see io.github.up2jakarta.csv.core.hdl.EventCollector#ERROR_TYPE
+ * @see io.github.up2jakarta.csv.core.hdl.EventCollector#TRACE_TYPE
  */
 public interface ITraceEvent<D extends DataType<D>, R extends IRecord<?>, K extends IKey<R>> extends IEvent<D>, Identifiable<K> {
 

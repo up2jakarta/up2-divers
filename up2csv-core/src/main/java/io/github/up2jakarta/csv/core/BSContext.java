@@ -11,11 +11,12 @@ import io.github.up2jakarta.csv.core.hdl.PProperty.PSProperty;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.clv.TypeConverter;
+import io.github.up2jakarta.xml.api.TypeConverter;
 import jakarta.persistence.AccessType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -24,9 +25,7 @@ import static io.github.up2jakarta.csv.core.ext.PPath.addOverride;
 import static io.github.up2jakarta.csv.core.ext.PPath.getOverride;
 import static io.github.up2jakarta.csv.core.hdl.PAMode.RO;
 import static io.github.up2jakarta.csv.core.hdl.PAMode.WO;
-import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
 import static jakarta.persistence.AccessType.PROPERTY;
-import static java.lang.reflect.Modifier.isFinal;
 import static java.util.Collections.unmodifiableList;
 
 /**
@@ -131,12 +130,11 @@ final class BSContext<D extends DataType<D>> {
 
     @SuppressWarnings("unchecked")
     private Conversion<?> conversion(Field field, Class<?> type, Position position) throws BeanException {
-        final Up2Converter converter = field.getAnnotation(Up2Converter.class);
         final Error error = field.getAnnotation(Error.class);
-        if (converter != null) {
-            final TypeConverter<Object> tConverter = getBean(factory.context, converter.value());
+        if (position.converter() != Position.NaN.class) {
+            final TypeConverter<Object> tConverter = getBean(factory.context, position.converter());
             if (!tConverter.getSupportedType().isAssignableFrom(field.getType())) {
-                throw new BeanException(field, "@Converter[value] does not support " + field.getType().getSimpleName());
+                throw new BeanException(field, "@Position[converter] does not support " + type);
             }
             return Conversion.of(tConverter, error);
         }
@@ -145,9 +143,6 @@ final class BSContext<D extends DataType<D>> {
             if (resolver != null) {
                 final ConversionResolver<Annotation> cr = getBean(factory.context, resolver.value());
                 final PropertyFormatter<Object> f = (PropertyFormatter<Object>) cr.forFormatting(config, field, type);
-                if (mode == RO && isFinal(field.getModifiers()) && undefined(position)) {
-                    return new Conversion<>(null, f, error);
-                }
                 final PropertyConverter<Object> p = (PropertyConverter<Object>) cr.forParsing(config, field, type);
                 return new Conversion<>(p, f, error);
             }
@@ -160,7 +155,7 @@ final class BSContext<D extends DataType<D>> {
                 return extension.resolve(field, type, config.get());
             }
         }
-        throw new BeanException(field, "must be annotated with @Up2Converter or one of its shortcuts");
+        throw new BeanException(field, "@Position[converter] must not be undefined");
     }
 
     boolean push(Class<? extends Segment> beanType) {
@@ -191,8 +186,14 @@ final class BSContext<D extends DataType<D>> {
         return result;
     }
 
-    BSContext<D> with(Class<? extends Segment> superType, Type... arguments) throws BeanException {
+    BSContext<D> with(Class<? extends Segment> superType, Type genericType) throws BeanException {
         checker.beforeSuperSegment(superType);
+        final Type[] arguments;
+        if (genericType instanceof ParameterizedType pt) {
+            arguments = resolveArguments(stack.getLast(), pt, this.arguments);
+        } else {
+            arguments = NO_TYPES;
+        }
         final BSContext<D> result = new BSContext<>(this, this.offset, superType, arguments);
         result.positions.putAll(positions);
         result.fragments.putAll(fragments);
