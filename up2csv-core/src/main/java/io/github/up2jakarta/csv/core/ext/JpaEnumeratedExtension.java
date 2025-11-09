@@ -98,19 +98,19 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
     }
 
     @Override
-    public Conversion<?> resolve(Field property, Class<?> pType, Enumerated config) throws BeanException {
+    public <V> Conversion<V> resolve(Field property, Class<V> type, Enumerated config) throws BeanException {
         //noinspection unchecked,rawtypes
-        final Class<? extends Enum> enumType = (Class<Enum>) pType;
+        final Class<? extends Enum> enumType = (Class<Enum>) type;
         check(property, enumType, Enum::name);
-        final Optional<Error> error = ConversionResolver.getError(property);
-        final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);
+        final Optional<Error> error = ConversionResolver.getError(property, type);
+        final SeverityType level = error.map(Error::severity).orElse(SeverityType.ERROR);
         final String code = error.map(Error::value).orElse(ERROR_XML_ENUM);
         if (EnumType.STRING == config.value()) {
             //noinspection unchecked
-            return ofName(enumType, error, type, code);
+            return ofName(enumType, error, level, code);
         }
         //noinspection unchecked
-        return ofOrdinal(enumType, error, type, code);
+        return ofOrdinal(enumType, error, level, code);
     }
 
 }

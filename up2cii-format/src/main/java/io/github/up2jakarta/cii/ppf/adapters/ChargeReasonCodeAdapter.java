@@ -1,10 +1,9 @@
 package io.github.up2jakarta.cii.ppf.adapters;
 
 import io.github.up2jakarta.cii.core.TokenType;
-import io.github.up2jakarta.cii.edi.AllowanceChargeIdentificationCodeType;
-import io.github.up2jakarta.cii.edi.AllowanceChargeReasonCodeType;
+import io.github.up2jakarta.cii.edi.adapters.AllowanceChargeIdentificationCodeAdapter;
+import io.github.up2jakarta.cii.edi.adapters.AllowanceChargeReasonCodeAdapter;
 import io.github.up2jakarta.cii.ppf.ChargeReasonCodeType;
-import io.github.up2jakarta.cii.ppf.SpecialServiceDescriptionCodeType;
 import io.github.up2jakarta.xml.api.TypeConverter;
 import io.github.up2jakarta.xml.clv.CodeListException;
 import jakarta.inject.Named;
@@ -12,14 +11,6 @@ import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
-import static io.github.up2jakarta.cii.edi.adapters.AllowanceChargeIdentificationCodeAdapter.ECE_5189;
-import static io.github.up2jakarta.cii.edi.adapters.AllowanceChargeIdentificationCodeAdapter.LOV_5189;
-import static io.github.up2jakarta.cii.edi.adapters.AllowanceChargeReasonCodeAdapter.ECE_4465;
-import static io.github.up2jakarta.cii.edi.adapters.AllowanceChargeReasonCodeAdapter.LOV_4465;
-import static io.github.up2jakarta.cii.ppf.adapters.SpecialServiceDescriptionCodeAdapter.ECE_7161;
-import static io.github.up2jakarta.cii.ppf.adapters.SpecialServiceDescriptionCodeAdapter.LOV_7161;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
-import static io.github.up2jakarta.xml.clv.CodeListConverter.find;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -34,7 +25,7 @@ import static java.util.Optional.ofNullable;
 public class ChargeReasonCodeAdapter extends TypeConverter<ChargeReasonCodeType<?>> {
 
     ChargeReasonCodeAdapter() {
-        super(null, ERROR, null);
+        super(null, null, null);
     }
 
     public static ChargeReasonCodeType<?> from(ChargeReasonCodeType<?> value, io.github.up2jakarta.cii.format.minified.udt.IndicatorType indicator) {
@@ -49,13 +40,11 @@ public class ChargeReasonCodeAdapter extends TypeConverter<ChargeReasonCodeType<
 
     public static ChargeReasonCodeType<?> from(ChargeReasonCodeType<?> value, Boolean indicator) {
         if (indicator == null) {
-            return find(value.getCode(), AllowanceChargeReasonCodeType.class, LOV_4465, ERROR, ECE_4465);
+            return AllowanceChargeReasonCodeAdapter.from(value);
         } else if (indicator) {
-            // BG-21, BG-28
-            return find(value.getCode(), SpecialServiceDescriptionCodeType.class, LOV_7161, ERROR, ECE_7161);
+            return SpecialServiceDescriptionCodeAdapter.from(value); // BG-21, BG-28
         }
-        // BG-20, BG-27
-        return find(value.getCode(), AllowanceChargeIdentificationCodeType.class, LOV_5189, ERROR, ECE_5189);
+        return AllowanceChargeIdentificationCodeAdapter.from(value); // BG-20, BG-27
     }
 
     @Override

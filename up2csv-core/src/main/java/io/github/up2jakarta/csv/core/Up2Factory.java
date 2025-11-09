@@ -72,7 +72,7 @@ public final class Up2Factory<D extends DataType<D>> {
      * @see Up2Factory#format(Class, DataTypeResolver)
      */
     public <S extends Segment> Up2Mapper<S, D> build(final Class<S> type) throws BeanException {
-        return new Up2Mapper<>(type, BSContext.build(type, this, resolver));
+        return new Up2Mapper<>(BSContext.build(type, this, resolver));
     }
 
     /**
@@ -87,7 +87,7 @@ public final class Up2Factory<D extends DataType<D>> {
      * @throws BeanException for any missing or wrong bean configuration
      */
     <S extends Segment, B extends DataType<B>> Up2Mapper<S, B> build(Class<S> type, DataTypeResolver<B> dtr) throws BeanException {
-        return new Up2Mapper<>(type, BSContext.build(type, this, dtr));
+        return new Up2Mapper<>(BSContext.build(type, this, dtr));
     }
 
     /**
@@ -100,7 +100,7 @@ public final class Up2Factory<D extends DataType<D>> {
      * @see Up2Factory#format(Class, DataTypeResolver)
      */
     public <S extends Segment> Up2Format<S, D> format(final Class<S> type) throws BeanException {
-        return new Up2Format<>(type, BSContext.format(type, this, resolver));
+        return new Up2Format<>(BSContext.format(type, this, resolver));
     }
 
     /**
@@ -115,7 +115,7 @@ public final class Up2Factory<D extends DataType<D>> {
      * @throws BeanException for any missing or wrong bean configuration
      */
     public <S extends Segment, B extends DataType<B>> Up2Format<S, B> format(Class<S> type, DataTypeResolver<B> dtr) throws BeanException {
-        return new Up2Format<>(type, BSContext.format(type, this, dtr));
+        return new Up2Format<>(BSContext.format(type, this, dtr));
     }
 
     /**

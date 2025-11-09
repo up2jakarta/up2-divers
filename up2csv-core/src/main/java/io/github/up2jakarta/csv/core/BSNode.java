@@ -33,21 +33,24 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("unchecked")
 public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> permits BSNode.BFNode, BSNode.BPNode {
 
-    final List<Property<?, D>> properties;
+    final List<Property<?, ?, D>> properties;
     final Validator validator;
     final boolean prototype;
     final boolean nullable;
     final BVContext context;
+    final Class<S> type;
 
-    BSNode(Validator validator, BVContext context, boolean nullable, boolean prototype, List<Property<?, D>> properties) {
+    BSNode(Class<S> type, Validator validator, BVContext context, boolean nullable, boolean prototype, List<Property<?, ?, D>> properties) {
         this.properties = properties;
         this.validator = validator;
         this.prototype = prototype;
         this.nullable = nullable;
         this.context = context;
+        this.type = type;
     }
 
     BSNode(BSNode<S, D> source) throws BeanException {
+        this.type = source.type;
         this.context = source.context;
         this.nullable = source.nullable;
         this.prototype = source.prototype;
@@ -67,27 +70,29 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
                 BSOperator.class.getName() + "$" + BSOperator.Getter.class.getSimpleName(),
                 BSOperator.class.getName() + "$" + BSOperator.BRGetter.class.getSimpleName(),
                 BSOperator.class.getName() + "$" + BSOperator.BUGetter.class.getSimpleName(),
-                BSNode.class.getName() + "$" + BPNode.class.getSimpleName(),
-                BSNode.class.getName() + "$" + BFNode.class.getSimpleName(),
-                BSNode.class.getName() + "$" + BRNode.class.getSimpleName(),
-                BSNode.class.getName() + "$" + BMNode.class.getSimpleName(),
-                BSNode.class.getName() + "$" + ACWalker.class.getSimpleName(),
-                BSNode.class.getName() + "$" + BCWalker.class.getSimpleName(),
+                BSNode.class.getName() + "$" + BSNode.BPNode.class.getSimpleName(),
+                BSNode.class.getName() + "$" + BSNode.BFNode.class.getSimpleName(),
+                BSNode.class.getName() + "$" + BSNode.BRNode.class.getSimpleName(),
+                BSNode.class.getName() + "$" + BSNode.BMNode.class.getSimpleName(),
+                BSNode.class.getName() + "$" + BSNode.NProperty.class.getSimpleName(),
+                BSNode.class.getName() + "$" + BSNode.PWalker.class.getSimpleName(),
+                BSNode.class.getName() + "$" + BSNode.ACWalker.class.getSimpleName(),
+                BSNode.class.getName() + "$" + BSNode.BCWalker.class.getSimpleName(),
                 BSBuilder.class.getName() + "$" + BSBuilder.PWrapper.class.getSimpleName(),
                 BSBuilder.class.getName() + "$" + BSBuilder.LWrapper.class.getSimpleName(),
         };
     }
 
-    private Property<?, D> find(final ConstraintViolation<?> violation) {
+    private Property<?, ?, D> find(final ConstraintViolation<?> violation) {
         final String path = violation.getPropertyPath().toString();
         final String[] fieldNames = path.split("\\.");
-        Property<?, D> property = null;
-        List<Property<?, D>> properties = this.properties;
+        Property<?, ?, D> property = null;
+        List<Property<?, ?, D>> properties = this.properties;
         for (final String fieldName : fieldNames) {
             property = properties.stream().filter(p -> fieldName.equals(p.getName())).findFirst().orElse(null);
-            if (property instanceof PFProperty<?, ?> fp) {
+            if (property instanceof FProperty<?, ?, ?> fp) {
                 //noinspection ALL
-                properties = ((PFProperty<?, D>) fp).node.properties;
+                properties = ((FProperty<?, ?, D>) fp).node.properties;
             } else {
                 return property;
             }
@@ -99,7 +104,7 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
         if (context.enabled) {
             final Set<ConstraintViolation<Object>> violations = validator.validate(b, context.groups);
             for (final ConstraintViolation<?> cv : violations) {
-                final Property<?, D> p = this.find(cv);
+                final Property<?, ?, D> p = this.find(cv);
                 if (p != null) {
                     h.handle(p.dataType, p.offset + o, cv, p.error);
                 } else {
@@ -109,74 +114,8 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
         }
     }
 
-    public final List<Property<?, D>> toList() {
+    public final List<Property<?, ?, D>> toList() {
         return this.properties;
-    }
-
-    /**
-     * Internal Context for JSR-303 validation.
-     */
-    static class BVContext {
-
-        public static final BVContext DISABLED = new BVContext(false);
-        public static final BVContext DEFAULT = new BVContext(true);
-
-        final boolean enabled;
-        final Class<?>[] groups;
-
-        private BVContext(boolean enabled, Class<?>... groups) {
-            this.enabled = enabled;
-            this.groups = groups;
-        }
-
-        private static void checkGroups(ValidOverride valid, AnnotatedElement source) throws BeanException {
-            if (source.isAnnotationPresent(Valid.class)) {
-                throw of(source, "must not be annotated by @Valid");
-            }
-            for (final Class<?> group : valid.groups()) {
-                if (!group.isInterface()) {
-                    throw of(source, "@ValidOverride[value = " + group.getName() + ".class must be an interface]");
-                }
-            }
-        }
-
-        /**
-         * Factory method that create context from the given bean type.
-         *
-         * @param type the bean type
-         * @return the validation context
-         * @throws BeanException if wrong configuration
-         */
-        static BVContext from(Class<? extends Segment> type) throws BeanException {
-            while (type != Segment.class && Segment.class.isAssignableFrom(type)) {
-                final ValidOverride override = getOverride(ValidOverride.class, type, ValidOverride::path);
-                if (override != null) {
-                    if (override.disable()) {
-                        return DISABLED;
-                    }
-                    if (override.groups().length == 0) {
-                        return DEFAULT;
-                    }
-                    checkGroups(override, type);
-                    return new BVContext(true, override.groups());
-                }
-                if (type.isAnnotationPresent(Valid.class)) {
-                    return DEFAULT;
-                }
-                //noinspection unchecked
-                type = (Class<? extends Segment>) type.getSuperclass();
-            }
-            return DISABLED;
-        }
-
-        BVContext build(Field field, ValidOverride override) throws BeanException {
-            if (enabled && override != null && !override.disable()) {
-                checkGroups(override, field);
-                return new BVContext(true, override.groups());
-            }
-            return DISABLED;
-        }
-
     }
 
     /**
@@ -186,8 +125,8 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
         private final String[] values;
         private final int index;
 
-        BFNode(Class<S> type, Validator validator, BVContext context, Fragment fragment, List<Property<?, D>> ps) throws BeanException {
-            super(validator, context, fragment.nullable(), fragment.defaultValues(), ps);
+        BFNode(Class<S> type, Validator validator, BVContext context, Fragment fragment, List<Property<?, ?, D>> ps) throws BeanException {
+            super(type, validator, context, fragment.nullable(), fragment.defaultValues(), ps);
             if (nullable) {
                 this.index = -1;
                 this.values = EMPTY;
@@ -197,8 +136,8 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
             }
         }
 
-        BFNode(Validator validator, BVContext context, List<Property<?, D>> ps) {
-            super(validator, context, false, false, ps);
+        BFNode(Class<S> type, Validator validator, BVContext context, List<Property<?, ?, D>> ps) {
+            super(type, validator, context, false, false, ps);
             this.values = EMPTY;
             this.index = -1;
         }
@@ -218,29 +157,30 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
             final int length = Processor.max(this) + 1;
             if (length != 0 && min >= 0) {
                 final String[] result = new String[length];
-                this.format(result, 0, bean, (prototype) ? BCWalker.ENABLED : BCWalker.DISABLED);
+                this.format(result, 0, bean, PWalker.getInstance(prototype));
                 return prototype(result, min);
             }
             return EMPTY;
         }
 
-        private void format(String[] result, int offset, S bean, Walker config) throws BeanException {
+        private void format(String[] result, int offset, S bean, PWalker config) throws BeanException {
             if (bean == null && config.test(result, offset, nullable, index, values)) {
                 return;
             }
-            for (final Property<?, D> p : properties) {
-                if (p instanceof PProperty<?, ?> pp) {
+            for (final Property<?, ?, D> p : properties) {
+                if (p instanceof PProperty<?, ?, ?> pp) {
                     result[offset + p.offset] = config.format(bean, pp);
-                } else if (p instanceof PFProperty<?, ?> fp) {
+                } else if (p instanceof FProperty<?, ?, ?> fp) {
                     final BFNode<Segment, D> node = (BFNode<Segment, D>) fp.node;
-                    node.format(result, offset, fp.get(bean), config);
+                    final Segment value = ((NProperty<Segment, ?, D>) fp).get(bean);
+                    node.format(result, offset, value, config);
                 }
             }
         }
 
         void header(String[] header, int offset) {
-            for (final Property<?, D> p : properties) {
-                if (p instanceof PFProperty<?, ?> fp) {
+            for (final Property<?, ?, D> p : properties) {
+                if (p instanceof FProperty<?, ?, ?> fp) {
                     final BFNode<Segment, D> node = (BFNode<Segment, D>) fp.node;
                     node.header(header, offset);
                 } else if (p.dataType != null) {
@@ -255,10 +195,11 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
 
         void validate(EventHandler<?, D, ? extends IEvent<D>> handler, S bean, int offset) throws BeanException {
             if (bean != null && context.enabled) {
-                for (final Property<?, D> property : properties) {
-                    if (property instanceof PFProperty<?, ?> fp) {
+                for (final Property<?, ?, D> property : properties) {
+                    if (property instanceof FProperty<?, ?, ?> fp) {
                         final BFNode<Segment, D> node = (BFNode<Segment, D>) fp.node;
-                        node.validate(handler, fp.get(bean), offset);
+                        final Segment value = ((NProperty<Segment, ?, D>) fp).get(bean);
+                        node.validate(handler, value, offset);
                     }
                 }
                 this.validate(bean, offset, handler);
@@ -272,19 +213,19 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
     static abstract sealed class BPNode<S extends Segment, D extends DataType<D>, C> extends BSNode<S, D> permits BMNode, BRNode {
         protected final Constructor<S> constructor;
 
-        BPNode(Class<S> type, Validator validator, BVContext context, Fragment fragment, List<Property<?, D>> ps) throws BeanException {
-            super(validator, context, fragment.nullable(), fragment.defaultValues(), ps);
+        BPNode(Class<S> type, Validator validator, BVContext context, Fragment fragment, List<Property<?, ?, D>> ps) throws BeanException {
+            super(type, validator, context, fragment.nullable(), fragment.defaultValues(), ps);
             this.constructor = getDefaultConstructor(type);
         }
 
-        BPNode(Class<S> type, Validator validator, BVContext context, List<Property<?, D>> ps) throws BeanException {
-            super(validator, context, false, false, ps);
+        BPNode(Class<S> type, Validator validator, BVContext context, List<Property<?, ?, D>> ps) throws BeanException {
+            super(type, validator, context, false, false, ps);
             this.constructor = getDefaultConstructor(type);
         }
 
-        BPNode(Class<S> type, BFNode<S, D> source) throws BeanException {
+        BPNode(BFNode<S, D> source) throws BeanException {
             super(source);
-            this.constructor = getDefaultConstructor(type);
+            this.constructor = getDefaultConstructor(source.type);
         }
 
         private S parse(EventHandler<?, D, ? extends IEvent<D>> handler, int offset, String... record) throws BeanException {
@@ -293,21 +234,22 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
             }
             final C argument = this.get();
             var empty = true;
-            for (final Property<?, D> property : properties) {
-                if (property instanceof PFProperty<?, ?>) {
-                    final PFProperty<Segment, D> fp = (PFProperty<Segment, D>) property;
+            for (final Property<?, ?, D> property : properties) {
+                if (property instanceof FProperty<?, ?, ?>) {
+                    final FProperty<Segment, Object, D> fp = (FProperty<Segment, Object, D>) property;
                     final Segment value = ((BPNode<?, D, C>) fp.node).parse(handler, offset, record);
                     if (value != null) {
                         fp.node.validate(value, offset, handler);
-                        this.set(argument, fp, value);
+                        this.set(argument, fp, fp.wrap(value));
                         empty = false;
                     }
-                } else if (property instanceof PProperty<?, D> pp) {
+                } else {
+                    final PProperty<?, Object, D> pp = (PProperty<?, Object, D>) property;
                     final int index = property.offset;
                     final String data = (index < record.length) ? record[index] : null;
-                    final Object value = pp.get(data, offset, handler);
+                    final Object value = ((NProperty<?, Object, D>) pp).parse(data, offset, handler);
                     if (value != null) {
-                        this.set(argument, (PProperty<Object, D>) pp, value);
+                        this.set(argument, pp, value);
                         empty = false;
                     } else if (nullable && pp.required) {
                         return null;
@@ -357,7 +299,7 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
 
         abstract S get(C bean) throws BeanException;
 
-        abstract <V> void set(C bean, Property<V, D> property, V value) throws BeanException;
+        abstract <V> void set(C bean, Property<?, V, D> property, V value) throws BeanException;
     }
 
     /**
@@ -365,16 +307,16 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
      */
     static final class BMNode<S extends Segment, D extends DataType<D>> extends BPNode<S, D, S> {
 
-        BMNode(Class<S> type, Validator validator, BVContext context, Fragment fragment, List<Property<?, D>> ps) throws BeanException {
+        BMNode(Class<S> type, Validator validator, BVContext context, Fragment fragment, List<Property<?, ?, D>> ps) throws BeanException {
             super(type, validator, context, fragment, ps);
         }
 
-        BMNode(Class<S> type, Validator validator, BVContext context, List<Property<?, D>> ps) throws BeanException {
+        BMNode(Class<S> type, Validator validator, BVContext context, List<Property<?, ?, D>> ps) throws BeanException {
             super(type, validator, context, ps);
         }
 
-        BMNode(Class<S> type, BFNode<S, D> source) throws BeanException {
-            super(type, source);
+        BMNode(BFNode<S, D> source) throws BeanException {
+            super(source);
         }
 
         @Override
@@ -388,8 +330,8 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
         }
 
         @Override
-        <V> void set(S bean, Property<V, D> property, V value) throws BeanException {
-            property.set(bean, value);
+        <V> void set(S bean, Property<?, V, D> property, V value) throws BeanException {
+            ((NProperty<?, V, D>) property).value(bean, value);
         }
     }
 
@@ -397,33 +339,33 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
      * Internal Mapper Node for java-records.
      */
     static final class BRNode<S extends Segment, D extends DataType<D>> extends BPNode<S, D, Object[]> {
-        private final Map<Property<?, D>, Integer> indexes;
+        private final Map<Property<?, ?, D>, Integer> indexes;
         private final Object[] prototype;
 
-        BRNode(Class<S> type, Validator validator, BVContext context, Fragment fragment, List<Property<?, D>> ps) throws BeanException {
+        BRNode(Class<S> type, Validator validator, BVContext context, Fragment fragment, List<Property<?, ?, D>> ps) throws BeanException {
             super(type, validator, context, fragment, ps);
             this.prototype = prototype(constructor);
             this.indexes = this.indexes(type);
         }
 
-        BRNode(Class<S> type, Validator validator, BVContext context, List<Property<?, D>> ps) throws BeanException {
+        BRNode(Class<S> type, Validator validator, BVContext context, List<Property<?, ?, D>> ps) throws BeanException {
             super(type, validator, context, ps);
             this.prototype = prototype(constructor);
             this.indexes = this.indexes(type);
         }
 
-        BRNode(Class<S> type, BFNode<S, D> source) throws BeanException {
-            super(type, source);
+        BRNode(BFNode<S, D> source) throws BeanException {
+            super(source);
             this.prototype = prototype(constructor);
-            this.indexes = this.indexes(type);
+            this.indexes = this.indexes(source.type);
         }
 
-        private Map<Property<?, D>, Integer> indexes(Class<S> type) {
-            final Map<Property<?, D>, Integer> indexes = new HashMap<>(properties.size());
+        private Map<Property<?, ?, D>, Integer> indexes(Class<S> type) {
+            final Map<Property<?, ?, D>, Integer> indexes = new HashMap<>(properties.size());
             final Field[] fields = type.getDeclaredFields();
-            final Iterator<Property<?, D>> it = properties.iterator();
+            final Iterator<Property<?, ?, D>> it = properties.iterator();
             for (var i = 0; it.hasNext() && i < fields.length; ) {
-                final Property<?, D> property = it.next();
+                final Property<?, ?, D> property = it.next();
                 for (var field = fields[i]; !field.equals(property.getSource()) && ++i < fields.length; ) {
                     field = fields[i];
                 }
@@ -445,26 +387,113 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
         }
 
         @Override
-        <V> void set(Object[] arguments, Property<V, D> property, V value) {
+        <V> void set(Object[] arguments, Property<?, V, D> property, V value) {
             final int index = indexes.get(property);
             arguments[index] = value;
         }
     }
 
     /**
+     * Internal Context for JSR-303 validation.
+     */
+    static class BVContext {
+
+        public static final BVContext DISABLED = new BVContext(false);
+        public static final BVContext DEFAULT = new BVContext(true);
+
+        final boolean enabled;
+        final Class<?>[] groups;
+
+        private BVContext(boolean enabled, Class<?>... groups) {
+            this.enabled = enabled;
+            this.groups = groups;
+        }
+
+        private static void checkGroups(ValidOverride valid, AnnotatedElement source) throws BeanException {
+            if (source.isAnnotationPresent(Valid.class)) {
+                throw of(source, "must not be annotated by @Valid");
+            }
+            for (final Class<?> group : valid.groups()) {
+                if (!group.isInterface()) {
+                    throw of(source, "@ValidOverride[value = " + group.getName() + ".class must be an interface]");
+                }
+            }
+        }
+
+        static BVContext from(Class<? extends Segment> type) throws BeanException {
+            while (type != Segment.class && Segment.class.isAssignableFrom(type)) {
+                final ValidOverride override = getOverride(ValidOverride.class, type, ValidOverride::path);
+                if (override != null) {
+                    if (override.disable()) {
+                        return DISABLED;
+                    }
+                    if (override.groups().length == 0) {
+                        return DEFAULT;
+                    }
+                    checkGroups(override, type);
+                    return new BVContext(true, override.groups());
+                }
+                if (type.isAnnotationPresent(Valid.class)) {
+                    return DEFAULT;
+                }
+                //noinspection unchecked
+                type = (Class<? extends Segment>) type.getSuperclass();
+            }
+            return DISABLED;
+        }
+
+        BVContext build(Field field, ValidOverride override) throws BeanException {
+            if (enabled && override != null && !override.disable()) {
+                checkGroups(override, field);
+                return new BVContext(true, override.groups());
+            }
+            return DISABLED;
+        }
+
+    }
+
+    /**
+     * Internal property representation.
+     */
+    public static abstract class NProperty<T, V, D extends DataType<D>> {
+
+        protected abstract V value(Object bean, V value) throws BeanException;
+
+        protected abstract V value(Segment bean) throws BeanException;
+
+        protected abstract String format(V value) throws BeanException;
+
+        protected abstract V parse(String value, int offset, EventHandler<?, D, ?> handler) throws BeanException;
+
+        protected abstract V wrap(T value);
+
+        protected abstract T from(V value);
+
+        final T get(Segment bean) throws BeanException {
+            return this.from(this.value(bean));
+        }
+    }
+
+    /**
      * Internal Format Walker.
      */
-    private static abstract sealed class Walker permits ACWalker, BCWalker {
+    private abstract sealed static class PWalker permits ACWalker, BCWalker {
+        static PWalker getInstance(boolean prototype) {
+            if (prototype) {
+                return BCWalker.ENABLED;
+            }
+            return BCWalker.DISABLED;
+        }
 
         abstract boolean test(String[] result, int offset, boolean nullable, int index, String[] values);
 
-        abstract String format(Segment bean, PProperty<?, ?> property) throws BeanException;
+        abstract <T, V> String format(Segment bean, PProperty<T, V, ?> property) throws BeanException;
     }
 
     /**
      * After construction walker
      */
-    private static final class ACWalker extends Walker {
+    private static final class ACWalker extends PWalker {
         private static final ACWalker INSTANCE = new ACWalker();
 
         private ACWalker() {
@@ -479,15 +508,16 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
         }
 
         @Override
-        String format(Segment bean, PProperty<?, ?> property) throws BeanException {
-            return property.format(bean);
+        <T, V> String format(Segment bean, PProperty<T, V, ?> pp) throws BeanException {
+            final V value = ((NProperty<T, V, ?>) pp).value(bean);
+            return ((NProperty<T, V, ?>) pp).format(value);
         }
     }
 
     /**
      * Before construction walker
      */
-    private static final class BCWalker extends Walker {
+    private static final class BCWalker extends PWalker {
         private static final BCWalker ENABLED = new BCWalker(true);
         private static final BCWalker DISABLED = new BCWalker(false);
 
@@ -507,10 +537,15 @@ public abstract sealed class BSNode<S extends Segment, D extends DataType<D>> pe
         }
 
         @Override
-        String format(Segment bean, PProperty<?, ?> property) {
+        <T, V> String format(Segment bean, PProperty<T, V, ?> pp) {
             try {
-                return property.format(bean, enabled);
-            } catch (BeanException ignore) {
+                final V dv = pp.defaultValue;
+                if (enabled && pp.from(dv) != null) {
+                    return ((NProperty<T, V, ?>) pp).format(dv);
+                }
+                final V value = ((NProperty<T, V, ?>) pp).value(bean);
+                return ((NProperty<T, V, ?>) pp).format(value);
+            } catch (Exception ignore) {
                 return null;
             }
         }

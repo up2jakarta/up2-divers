@@ -26,10 +26,10 @@ public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends P
     final Getter<S> parentId;
     final Getter<S> businessId;
 
-    Up2Mapper(Class<S> type, BPNode<S, D, ?> node) throws BeanException {
-        super(type, node);
-        parentId = Getter.parentId(type, node.properties);
-        businessId = Getter.businessId(type, node.properties);
+    Up2Mapper(BPNode<S, D, ?> node) throws BeanException {
+        super(node);
+        parentId = Getter.parentId(node.type, node.properties);
+        businessId = Getter.businessId(node.type, node.properties);
     }
 
     /**
@@ -110,8 +110,7 @@ public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends P
      * @throws BeanException if any property is not accessible for reading
      */
     public Up2Format<S, D> toFormat() throws BeanException {
-        final BFNode<S, D> copy = new BFNode<>(node);
-        return new Up2Format<>(type, copy);
+        return new Up2Format<>(new BFNode<>(node));
     }
 
 }

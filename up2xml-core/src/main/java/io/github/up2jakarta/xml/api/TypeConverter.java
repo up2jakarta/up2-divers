@@ -1,7 +1,13 @@
 package io.github.up2jakarta.xml.api;
 
+import io.github.up2jakarta.xml.clv.CodeListException;
 import jakarta.persistence.AttributeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Up2 configurable converter that converts the input data {@link String} to the target property type {@link T}.
@@ -12,35 +18,54 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  */
 public abstract class TypeConverter<T> extends XmlAdapter<String, T> implements AttributeConverter<T, String> {
 
-    protected final String errorCode;
-    protected final Class<T> supportedType;
-    protected final SeverityType errorSeverity;
+    protected final String code;
+    protected final Class<T> type;
+    protected final SeverityType level;
 
     protected TypeConverter(Class<T> supportedType, SeverityType errorSeverity, String errorCode) {
-        this.supportedType = supportedType;
-        this.errorSeverity = errorSeverity;
-        this.errorCode = errorCode;
+        this.type = supportedType;
+        this.level = errorSeverity;
+        this.code = errorCode;
+    }
+
+    /**
+     * Find the first corresponding type that matches the specified filter.
+     *
+     * @param pivot  the code-list output
+     * @param filter the code-list predicate
+     * @param values the stream values
+     * @param <C>    the type of CodeList
+     * @return the found Documented constant
+     * @throws CodeListException if not found
+     */
+    public static <C> Optional<C> find(Function<C, String> pivot, Predicate<String> filter, List<C> values) {
+        for (final C constant : values) {
+            if (filter.test(pivot.apply(constant))) {
+                return Optional.of(constant);
+            }
+        }
+        return Optional.empty();
     }
 
     /**
      * @return the default error severity
      */
     public SeverityType getErrorSeverity() {
-        return errorSeverity;
+        return level;
     }
 
     /**
      * @return the default error code
      */
     public String getErrorCode() {
-        return errorCode;
+        return code;
     }
 
     /**
      * @return the supported type
      */
     public Class<T> getSupportedType() {
-        return supportedType;
+        return type;
     }
 
     /**
@@ -70,7 +95,7 @@ public abstract class TypeConverter<T> extends XmlAdapter<String, T> implements 
         try {
             return parse(value);
         } catch (Throwable cause) {
-            throw PropertyException.of(errorSeverity, errorCode, cause);
+            throw PropertyException.of(level, code, cause);
         }
     }
 
@@ -85,7 +110,7 @@ public abstract class TypeConverter<T> extends XmlAdapter<String, T> implements 
         try {
             return format(value);
         } catch (Throwable cause) {
-            throw PropertyException.of(errorSeverity, errorCode, cause);
+            throw PropertyException.of(level, code, cause);
         }
     }
 

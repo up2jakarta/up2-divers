@@ -7,7 +7,6 @@ import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Trim;
 import io.github.up2jakarta.csv.core.hdl.*;
 import io.github.up2jakarta.csv.core.hdl.PProperty.POProperty;
-import io.github.up2jakarta.csv.core.hdl.PProperty.PSProperty;
 import io.github.up2jakarta.csv.core.misc.DummyException;
 import io.github.up2jakarta.csv.core.misc.ext.Dummy4;
 import io.github.up2jakarta.csv.core.misc.prc.Test2Processor;
@@ -26,7 +25,7 @@ import java.lang.reflect.Field;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_PROCESSOR;
 import static io.github.up2jakarta.csv.core.Up2ErrorTests.DUMMY;
-import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
+import static io.github.up2jakarta.csv.core.hdl.Properties.parse;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,13 +42,13 @@ public class Up2ProcessorTests {
         this.factory = factory;
     }
 
-    private PProperty<?, ?> property(String property) throws Exception {
+    private PProperty<?, ?, ?> property(String property) throws Exception {
         final Field field = Test7Processor.class.getDeclaredField(property);
         final Position position = field.getAnnotation(Position.class);
         final PProcessor<?> processor = BSBuilder.build(context, field, position);
         if (field.getType() == String.class) {
             final PAccessor<?, String> va = Properties.wo(String.class, field);
-            return new PSProperty<>(va, null, 0, position, processor);
+            return new POProperty<>(va, null, 0, position, processor, Conversion.NAN);
         } else if (field.getType() == Integer.class) {
             final PAccessor<?, Integer> va = Properties.wo(Integer.class, field);
             final Conversion<Integer> cvr = new Conversion<>(Integer::parseInt, Object::toString);
@@ -122,22 +121,22 @@ public class Up2ProcessorTests {
     @Test
     void testSDefaultValue() throws Exception {
         //Given
-        final PProperty<?, ?> property = property("value");
+        final PProperty<?, ?, ?> property = property("value");
         {
             // When null
-            final Object value = property.get(null, 0, of(ERROR));
+            final Object value = parse(property, null);
             // Then
             assertEquals("default", value);
         }
         {
             // When
-            final Object value = property.get("value", 0, of(ERROR));
+            final Object value = parse(property, "value");
             // Then
             assertEquals("value", value);
         }
         {
             // When undefined (don't set)
-            final Object value = property.get("\t\nundefined\t\n", 0, of(ERROR));
+            final Object value = parse(property, "\t\nundefined\t\n");
             // Then
             assertNull(value);
         }
@@ -146,22 +145,22 @@ public class Up2ProcessorTests {
     @Test
     void testODefaultValue() throws Exception {
         //Given
-        final PProperty<?, ?> property = property("number");
+        final PProperty<?, ?, ?> property = property("number");
         {
             // When null
-            final Object value = property.get(null, 0, of(ERROR));
+            final Object value = parse(property, null);
             // Then
             assertEquals(99, value);
         }
         {
             // When
-            final Object value = property.get("11", 0, of(ERROR));
+            final Object value = parse(property, "11");
             // Then
             assertEquals(11, value);
         }
         {
             // When undefined (don't set)
-            final Object value = property.get("undefined", 0, of(ERROR));
+            final Object value = parse(property, "undefined");
             // Then
             assertNull(value);
         }

@@ -67,12 +67,7 @@ public abstract class CodeListConverter<C extends CodeList<C>> extends TypeConve
      * @throws CodeListException if not found
      */
     public static <C extends CodeList<?>> C find(String value, Class<C> type, List<C> values, SeverityType level, String code) {
-        for (final C constant : values) {
-            if (constant.getCode().equals(value)) {
-                return constant;
-            }
-        }
-        throw new CodeListException(type, value, level, code);
+        return find(CodeList::getCode, value::equals, values).orElseThrow(() -> new CodeListException(type, value, level, code));
     }
 
     /**
@@ -88,7 +83,7 @@ public abstract class CodeListConverter<C extends CodeList<C>> extends TypeConve
      */
     @Override
     public C parse(String value) throws CodeListException {
-        return find(value, super.supportedType, values, this.errorSeverity, this.errorCode);
+        return find(value, type, values, level, code);
     }
 
 }

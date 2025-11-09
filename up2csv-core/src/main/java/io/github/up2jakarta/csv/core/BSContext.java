@@ -6,8 +6,10 @@ import io.github.up2jakarta.csv.cfg.*;
 import io.github.up2jakarta.csv.core.BSNode.*;
 import io.github.up2jakarta.csv.core.ext.PPath;
 import io.github.up2jakarta.csv.core.hdl.*;
+import io.github.up2jakarta.csv.core.hdl.FProperty.FOProperty;
+import io.github.up2jakarta.csv.core.hdl.FProperty.FWProperty;
 import io.github.up2jakarta.csv.core.hdl.PProperty.POProperty;
-import io.github.up2jakarta.csv.core.hdl.PProperty.PSProperty;
+import io.github.up2jakarta.csv.core.hdl.PProperty.PWProperty;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
@@ -106,12 +108,18 @@ final class BSContext<D extends DataType<D>> {
 
     static <D extends DataType<D>, S extends Segment> BFNode<S, D> format(Class<S> t, Up2Factory<?> f, DataTypeResolver<D> r) throws BeanException {
         final BSContext<D> mc = new BSContext<>(f, t, RO, r);
-        return new BFNode<>(f.validator, mc.context, mc.build());
+        return new BFNode<>(t, f.validator, mc.context, mc.build());
     }
 
-    private List<Property<?, D>> build() throws BeanException {
+    private <V> PAccessor<Field, V> accessor(Class<V> type, Field field) throws BeanException {
+        final Class<? extends Segment> container = getSegmentType(stack);
+        final AccessType access = BSBuilder.getAccessType(field, this.access).orElse(PROPERTY);
+        return mode.of(access, container, field, type);
+    }
+
+    private List<Property<?, ?, D>> build() throws BeanException {
         this.checker.beforeSegment(type);
-        final List<Property<?, D>> ps = BSBuilder.build(type, this);
+        final List<Property<?, ?, D>> ps = BSBuilder.build(type, this);
         this.checker.afterSegment();
         return unmodifiableList(ps);
     }
@@ -129,11 +137,14 @@ final class BSContext<D extends DataType<D>> {
     }
 
     @SuppressWarnings("unchecked")
-    private Conversion<?> conversion(Field field, Class<?> type, Position position) throws BeanException {
+    private <V> Conversion<V> conversion(Field field, Class<V> type, Position position) throws BeanException {
+        if (CharSequence.class == type || type == String.class) {
+            return (Conversion<V>) Conversion.NAN;
+        }
         final Error error = field.getAnnotation(Error.class);
         if (position.converter() != Position.NaN.class) {
-            final TypeConverter<Object> tConverter = getBean(factory.context, position.converter());
-            if (!tConverter.getSupportedType().isAssignableFrom(field.getType())) {
+            final TypeConverter<V> tConverter = getBean(factory.context, position.converter());
+            if (!tConverter.getSupportedType().isAssignableFrom(type)) {
                 throw new BeanException(field, "@Position[converter] does not support " + type);
             }
             return Conversion.of(tConverter, error);
@@ -142,8 +153,8 @@ final class BSContext<D extends DataType<D>> {
             final Resolver resolver = config.annotationType().getAnnotation(Resolver.class);
             if (resolver != null) {
                 final ConversionResolver<Annotation> cr = getBean(factory.context, resolver.value());
-                final PropertyFormatter<Object> f = (PropertyFormatter<Object>) cr.forFormatting(config, field, type);
-                final PropertyConverter<Object> p = (PropertyConverter<Object>) cr.forParsing(config, field, type);
+                final PropertyFormatter<V> f = (PropertyFormatter<V>) cr.forFormatting(config, field, type);
+                final PropertyConverter<V> p = (PropertyConverter<V>) cr.forParsing(config, field, type);
                 return new Conversion<>(p, f, error);
             }
         }
@@ -156,6 +167,15 @@ final class BSContext<D extends DataType<D>> {
             }
         }
         throw new BeanException(field, "@Position[converter] must not be undefined");
+    }
+
+    private <S extends Segment> BSNode<S, D> node(Class<S> ft, BVContext vc, Fragment fr, List<Property<?, ?, D>> ps) throws BeanException {
+        if (mode == RO) {
+            return new BFNode<>(ft, factory.validator, vc, fr, ps);
+        } else if (ft.isRecord()) {
+            return new BRNode<>(ft, factory.validator, vc, fr, ps);
+        }
+        return new BMNode<>(ft, factory.validator, vc, fr, ps);
     }
 
     boolean push(Class<? extends Segment> beanType) {
@@ -213,41 +233,33 @@ final class BSContext<D extends DataType<D>> {
         return getOverride(Fragment.class, fragments, field, FragmentOverride::value, p -> p.value() >= 0);
     }
 
-    <S extends Segment> PFProperty<S, D> node(Class<S> ft, Field ff, Fragment fr, List<Property<?, D>> ps) throws BeanException {
+    <S extends Segment> FProperty<S, ?, D> node(Class<S> ft, Field ff, Fragment fr, List<Property<?, ?, D>> ps) throws BeanException {
         checker.afterFragmentProperty(ff, ft);
         final ValidOverride override = getOverride(ValidOverride.class, validations, ff, ValidOverride::path);
-        final BVContext vc = context.build(ff, override);
-        final PAccessor<?, S> va = this.accessor(ft, ff);
-        if (mode == RO) {
-            final BFNode<S, D> node = new BFNode<>(ft, factory.validator, vc, fr, ps);
-            return new PFProperty<>(node, va, this.dataType(ff), offset, fr);
-        } else if (ft.isRecord()) {
-            final BRNode<S, D> node = new BRNode<>(ft, factory.validator, vc, fr, ps);
-            return new PFProperty<>(node, va, this.dataType(ff), offset, fr);
+        final BSNode<S, D> node = this.node(ft, context.build(ff, override), fr, ps);
+        if (Optional.class.isAssignableFrom(ff.getType())) {
+            final PAccessor<?, Optional<S>> va = this.accessor(cast(ft), ff);
+            return new FWProperty<>(node, va, this.dataType(ff), offset, fr);
         }
-        final BPNode<S, D, ?> node = new BMNode<>(ft, factory.validator, vc, fr, ps);
-        return new PFProperty<>(node, va, this.dataType(ff), offset, fr);
+        return new FOProperty<>(node, this.accessor(ft, ff), this.dataType(ff), offset, fr);
     }
 
-    <V> PProperty<?, D> property(Class<V> pt, Field pf, Position position) throws BeanException {
-        checker.positionProperty(pf, pt, offset + position.value());
-        final PProcessor<D> ps = BSBuilder.build(factory.context, pf, position);
+    <T> PProperty<T, ?, D> property(Class<T> pt, Field pf, Position pc) throws BeanException {
+        checker.positionProperty(pf, pt, offset + pc.value());
+        final PProcessor<D> ps = BSBuilder.build(factory.context, pf, pc);
         final D dataType = this.dataType(pf);
-        if (CharSequence.class == pt || pt == String.class) {
-            return new PSProperty<>(this.accessor(String.class, pf), dataType, offset, position, ps);
-        } else {
-            final Conversion<?> cv = this.conversion(pf, pt, position);
-            return new POProperty<>(this.accessor(pt, pf), dataType, offset, position, ps, cv);
+        final Conversion<T> cv = this.conversion(pf, pt, pc);
+        if (Optional.class.isAssignableFrom(pf.getType())) {
+            final PAccessor<?, Optional<T>> va = this.accessor(cast(pt), pf);
+            return new PWProperty<>(va, dataType, offset, pc, ps, cv);
         }
-    }
-
-    <V> PAccessor<Field, V> accessor(Class<V> type, Field field) throws BeanException {
-        final Class<? extends Segment> container = getSegmentType(stack);
-        final AccessType access = BSBuilder.getAccessType(field, this.access).orElse(PROPERTY);
-        return mode.of(access, container, field, type);
+        return new POProperty<>(this.accessor(pt, pf), dataType, offset, pc, ps, cv);
     }
 
     Type fieldType(Field field) {
+        if (Optional.class.isAssignableFrom(field.getType())) {
+            return getPropertyArguments(field, this.arguments)[0];
+        }
         return getPropertyType(field, arguments);
     }
 

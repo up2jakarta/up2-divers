@@ -98,11 +98,11 @@ public final class JpaConvertExtension extends ConversionExtension<Entity, Conve
     }
 
     @Override
-    public Conversion<?> resolve(Field property, Class<?> type, Convert config) throws BeanException {
+    public <V> Conversion<V> resolve(Field property, Class<V> type, Convert config) throws BeanException {
         //noinspection unchecked
-        final Class<? extends AttributeConverter<Object, String>> converterType = config.converter();
-        final Optional<Error> error = ConversionResolver.getError(property);
-        final AttributeConverter<Object, String> converter = this.getBean(converterType);
+        final Class<? extends AttributeConverter<V, String>> converterType = config.converter();
+        final Optional<Error> error = ConversionResolver.getError(property, type);
+        final AttributeConverter<V, String> converter = this.getBean(converterType);
         return new Conversion<>(converter::convertToEntityAttribute, converter::convertToDatabaseColumn, error);
     }
 

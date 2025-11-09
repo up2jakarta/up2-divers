@@ -1,5 +1,6 @@
 package io.github.up2jakarta.cii.ppf.adapters;
 
+import io.github.up2jakarta.cii.ppf.ChargeReasonCodeType;
 import io.github.up2jakarta.cii.ppf.SpecialServiceDescriptionCodeType;
 import io.github.up2jakarta.xml.clv.CodeListConverter;
 import jakarta.inject.Named;
@@ -19,11 +20,15 @@ import static java.util.Arrays.asList;
 @Singleton
 public class SpecialServiceDescriptionCodeAdapter extends CodeListConverter<SpecialServiceDescriptionCodeType> {
 
-    public static final String ECE_7161 = "ECE-7161";
-    public static final List<SpecialServiceDescriptionCodeType> LOV_7161 = asList(values());
+    private static final String CODE = "ECE-7161";
+    private static final List<SpecialServiceDescriptionCodeType> VALUES = asList(values());
 
     SpecialServiceDescriptionCodeAdapter() {
-        super(SpecialServiceDescriptionCodeType.class, ERROR, ECE_7161, LOV_7161);
+        super(SpecialServiceDescriptionCodeType.class, ERROR, CODE, VALUES);
+    }
+
+    public static ChargeReasonCodeType<?> from(ChargeReasonCodeType<?> value) {
+        return find(value.getCode(), SpecialServiceDescriptionCodeType.class, VALUES, ERROR, CODE);
     }
 
 }

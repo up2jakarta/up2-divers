@@ -42,7 +42,6 @@ public final class Defaults {
     private Defaults() {
     }
 
-    @SuppressWarnings("unchecked")
     public static Object[] prototype(Executable executable) {
         final Parameter[] parameters = executable.getParameters();
         final Object[] arguments = new Object[parameters.length];
@@ -60,11 +59,6 @@ public final class Defaults {
                 arguments[i] = Set.of();
             } else if (Map.class.isAssignableFrom(type)) {
                 arguments[i] = Map.of();
-            } else if (Segment.class.isAssignableFrom(type)) {
-                try {
-                    arguments[i] = prototype((Class<? extends Segment>) type);
-                } catch (Exception ignore) {
-                }
             }
         }
         return arguments;

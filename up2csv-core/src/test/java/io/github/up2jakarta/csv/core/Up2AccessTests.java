@@ -202,4 +202,205 @@ class Up2AccessTests {
         assertArrayEquals(new String[]{"0", "Test"}, out);
     }
 
+    @Test
+    void validOptional1Bean() throws BeanException {
+        final Up2Mapper<Optional1Bean, ?> mapper = factory.build(Optional1Bean.class);
+        final Up2Format<Optional1Bean, ?> format = mapper.toFormat();
+        {
+            // Given
+            final String[] data = new String[]{"1", "Test"};
+            // When
+            final Optional1Bean bean = mapper.map(data);
+            final String[] out = format.unmap(bean);
+            format.validate(bean, of(WARNING));
+            // Then
+            assertArrayEquals(data, out);
+        }
+        {
+            // Given
+            final String[] data = new String[]{null, null};
+            // When
+            final Optional1Bean bean = mapper.map(data);
+            final String[] out = format.unmap(bean);
+            format.validate(bean, of(WARNING));
+            // Then
+            assertArrayEquals(new String[]{"0", null}, out);
+            assertNotNull(bean.getContent());
+        }
+    }
+
+    @Test
+    void validOptional2Bean() throws BeanException {
+        final Up2Mapper<Optional2Bean, ?> mapper = factory.build(Optional2Bean.class);
+        final Up2Format<Optional2Bean, ?> format = mapper.toFormat();
+        {
+            // Given
+            final String[] data = new String[]{"1", "Test"};
+            // When
+            final Optional2Bean bean = mapper.map(data);
+            final String[] out = format.unmap(bean);
+            format.validate(bean, of(WARNING));
+            // Then
+            assertArrayEquals(data, out);
+        }
+        // Given
+        final String[] data = new String[]{"0", null};
+        {
+            // When
+            final Optional2Bean bean = mapper.map(data);
+            final String[] out = format.unmap(bean);
+            format.validate(bean, of(WARNING));
+            // Then
+            assertArrayEquals(data, out);
+            assertNotNull(bean.content());
+        }
+        {
+            // Given
+            final Optional2Bean bean = new Optional2Bean(0, null);
+            // When
+            final String[] out = format.unmap(bean);
+            // Then
+            assertArrayEquals(data, out);
+            assertNull(bean.content());
+        }
+    }
+
+    @Test
+    void validOptional3Bean() throws BeanException {
+        final Up2Mapper<Optional3Bean, ?> mapper = factory.build(Optional3Bean.class);
+        final Up2Format<Optional3Bean, ?> format = mapper.toFormat();
+        {
+            // Given
+            final String[] data = new String[]{"1", "Test"};
+            // When
+            final Optional3Bean bean = mapper.map(data);
+            final String[] out = format.unmap(bean);
+            format.validate(bean, of(WARNING));
+            // Then
+            assertArrayEquals(data, out);
+        }// Given
+        final String[] data = new String[]{null, null};
+        {
+            // When
+            final Optional3Bean bean = mapper.map(data);
+            final String[] out = format.unmap(bean);
+            format.validate(bean, of(WARNING));
+            // Then
+            assertArrayEquals(data, out);
+            assertNotNull(bean.getKey());
+            assertNotNull(bean.getContent());
+        }
+        {
+            // Given
+            final Optional3Bean bean = new Optional3Bean();
+            // When
+            final String[] out = format.unmap(bean);
+            // Then
+            assertArrayEquals(data, out);
+            assertNull(bean.getKey());
+            assertNull(bean.getKey());
+        }
+    }
+
+    @Test
+    void validOptional4Bean() throws BeanException {
+        final Up2Mapper<Optional4Bean, ?> mapper = factory.build(Optional4Bean.class);
+        final Up2Format<Optional4Bean, ?> format = mapper.toFormat();
+        // Given
+        final String[] data = new String[]{"1", "Test"};
+        // When
+        final Optional4Bean bean = mapper.map(data);
+        final String[] out = format.unmap(bean);
+        format.validate(bean, of(WARNING));
+        // Then
+        assertArrayEquals(data, out);
+    }
+
+    @Test
+    void validOptional5Bean() throws BeanException {
+        final Up2Mapper<Optional5Bean, ?> mapper = factory.build(Optional5Bean.class);
+        final Up2Format<Optional5Bean, ?> format = mapper.toFormat();
+        {
+            // Given
+            final String[] data = new String[]{"1", "Test"};
+            // When
+            final Optional5Bean bean = mapper.map(data);
+            final String[] out = format.unmap(bean);
+            format.validate(bean, of(WARNING));
+            // Then
+            assertArrayEquals(data, out);
+        }
+        // Given
+        final String[] data = new String[]{"0", null};
+        {
+            // When
+            final Optional5Bean bean = mapper.map(data);
+            final String[] out = format.unmap(bean);
+            format.validate(bean, of(WARNING));
+            // Then
+            assertArrayEquals(data, out);
+            assertNotNull(bean.getContent());
+        }
+        {
+            // Given
+            final Optional5Bean bean = new Optional5Bean();
+            // When
+            final String[] out = format.unmap(bean);
+            // Then
+            assertArrayEquals(data, out);
+            assertNull(bean.getContent());
+        }
+    }
+
+    @Test
+    void validOptional6Bean() throws BeanException {
+        final Up2Mapper<Optional6Bean, ?> mapper = factory.build(Optional6Bean.class);
+        final Up2Format<Optional6Bean, ?> format = mapper.toFormat();
+        {
+            // Given
+            final String[] data = new String[]{"1", "Test"};
+            // When
+            final Optional6Bean bean = mapper.map(data);
+            final String[] out = format.unmap(bean);
+            format.validate(bean, of(WARNING));
+            // Then
+            assertArrayEquals(data, out);
+        }
+        // Given
+        final String[] data = new String[]{"0", null};
+        {
+            // When
+            final Optional6Bean bean = mapper.map(data);
+            final String[] out = format.unmap(bean);
+            format.validate(bean, of(WARNING));
+            // Then
+            assertArrayEquals(data, out);
+            assertNotNull(bean.content());
+        }
+        {
+            // Given
+            final Optional6Bean bean = new Optional6Bean(0, null);
+            // When
+            final String[] out = format.unmap(bean);
+            // Then
+            assertArrayEquals(data, out);
+            assertNull(bean.content());
+        }
+    }
+
+    @Test
+    void validOptional7Bean() throws BeanException {
+        // Given
+        final Up2Mapper<Optional7Bean, ?> mapper = factory.build(Optional7Bean.class);
+        final Up2Format<Optional7Bean, ?> format = mapper.toFormat();
+        final String[] data = new String[]{"0", null};
+        // When
+        final Optional7Bean bean = mapper.map(data);
+        final String[] out = format.unmap(bean);
+        format.validate(bean, of(WARNING));
+        // Then
+        assertArrayEquals(data, out);
+        assertNull(bean.getContent()); // Nullable
+    }
+
 }

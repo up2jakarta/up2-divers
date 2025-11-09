@@ -7,7 +7,7 @@ import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.BSOperator.Processor;
 import io.github.up2jakarta.csv.core.hdl.EventCollector;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
-import io.github.up2jakarta.csv.core.hdl.PFProperty;
+import io.github.up2jakarta.csv.core.hdl.FProperty;
 import io.github.up2jakarta.csv.core.hdl.Property;
 import io.github.up2jakarta.csv.data.*;
 import io.github.up2jakarta.csv.slv.CodeListResolver;
@@ -72,7 +72,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
         final int min = mode.getBeanIdIndex();
         if (mapper.offset != 0) {
             if (mapper.offset < min) {
-                throw new BeanException(mapper.type, "@Truncated[value] must be greater or equals to " + min);
+                throw new BeanException(mapper.node.type, "@Truncated[value] must be greater or equals to " + min);
             }
             return mapper.offset;
         }
@@ -133,27 +133,25 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
      */
     abstract sealed static class Processor<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> permits Up2Mapper, Up2Format {
 
-        final Class<S> type;
         final int length;
         final int offset;
         final T node;
 
-        Processor(Class<S> type, T node) throws BeanException {
-            this.type = type;
+        Processor(T node) throws BeanException {
             this.node = node;
             this.length = max(node) + 1;
-            final Truncated truncated = getOverride(type, Truncated.class);
+            final Truncated truncated = getOverride(node.type, Truncated.class);
             this.offset = (truncated != null) ? truncated.value() : 0;
             if (offset < 0) {
-                throw new BeanException(type, "@Truncated[value] must be positive");
+                throw new BeanException(node.type, "@Truncated[value] must be positive");
             }
         }
 
         static int max(BSNode<?, ?> node) {
             int max = -1;
-            for (final Property<?, ?> p : node.properties) {
+            for (final Property<?, ?, ?> p : node.properties) {
                 final int offset;
-                if (p instanceof PFProperty<?, ?> fp) {
+                if (p instanceof FProperty<?, ?, ?> fp) {
                     offset = max(fp.node);
                 } else {
                     offset = p.offset;
@@ -165,9 +163,9 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
 
         static int min(BSNode<?, ?> node) {
             int min = Integer.MAX_VALUE;
-            for (final Property<?, ?> p : node.properties) {
+            for (final Property<?, ?, ?> p : node.properties) {
                 final int offset;
-                if (p instanceof PFProperty<?, ?> fp) {
+                if (p instanceof FProperty<?, ?, ?> fp) {
                     offset = max(fp.node);
                 } else {
                     offset = p.offset;
@@ -239,11 +237,11 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
      */
     abstract sealed static class Getter<S extends Segment> implements BusinessIdentifier<S> permits BRGetter, BUGetter {
 
-        private static <A extends Annotation> void path(List<? extends Property<?, ?>> ps, Class<A> at, BiConsumer<A, Property<?, ?>[]> c, Property<?, ?>... s) throws BeanException {
-            for (final Property<?, ?> property : ps) {
+        private static <A extends Annotation> void path(List<? extends Property<?, ?, ?>> ps, Class<A> at, BiConsumer<A, Property<?, ?, ?>[]> c, Property<?, ?, ?>... s) throws BeanException {
+            for (final Property<?, ?, ?> property : ps) {
                 final AnnotatedElement field = property.getSource();
                 final A annotation = field.getAnnotation(at);
-                if (property instanceof PFProperty<?, ?> fp) {
+                if (property instanceof FProperty<?, ?, ?> fp) {
                     if (annotation != null) {
                         throw BeanException.of(field, "must not be annotated with @" + at.getSimpleName());
                     }
@@ -254,8 +252,8 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             }
         }
 
-        private static <A extends Annotation> Property<?, ?>[] path(Class<? extends Segment> st, Class<A> at, List<? extends Property<?, ?>> ps) throws BeanException {
-            final Map<A, Property<?, ?>[]> found = new LinkedHashMap<>();
+        private static <A extends Annotation> Property<?, ?, ?>[] path(Class<? extends Segment> st, Class<A> at, List<? extends Property<?, ?, ?>> ps) throws BeanException {
+            final Map<A, Property<?, ?, ?>[]> found = new LinkedHashMap<>();
             path(ps, at, found::put);
             if (found.isEmpty()) {
                 return null;
@@ -266,16 +264,16 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             throw new BeanException(st, "multiple @" + at.getSimpleName() + " are found");
         }
 
-        static <S extends Segment> Getter<S> parentId(Class<S> type, List<? extends Property<?, ?>> properties) throws BeanException {
-            final Property<?, ?>[] pid = path(type, ParentId.class, properties);
+        static <S extends Segment> Getter<S> parentId(Class<S> type, List<? extends Property<?, ?, ?>> properties) throws BeanException {
+            final Property<?, ?, ?>[] pid = path(type, ParentId.class, properties);
             if (pid == null) {
                 return BUGetter.getInstance();
             }
             return new BRGetter<>(pid[pid.length - 1], Property.id(pid));
         }
 
-        static <S extends Segment> Getter<S> businessId(Class<S> type, List<? extends Property<?, ?>> properties) throws BeanException {
-            final Property<?, ?>[] bid = path(type, BusinessId.class, properties);
+        static <S extends Segment> Getter<S> businessId(Class<S> type, List<? extends Property<?, ?, ?>> properties) throws BeanException {
+            final Property<?, ?, ?>[] bid = path(type, BusinessId.class, properties);
             if (bid == null) {
                 if (Referencable.class.isAssignableFrom(type)) {
                     final BusinessIdentifier<S> getter = b -> ((Referencable) b).getReference();
@@ -305,7 +303,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             this.locator = locator;
         }
 
-        private BRGetter(Property<?, ?> p, BusinessIdentifier<S> getter) {
+        private BRGetter(Property<?, ?, ?> p, BusinessIdentifier<S> getter) {
             this(p.getType(), p.getName(), getter);
         }
 
@@ -347,12 +345,12 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
 
         @Override
         <P extends Segment> void check(Class<P> type, Getter<P> other) throws BeanException {
-            throw new BeanException(BUGetter.class, "exists", "must be checked");
+            throw new BeanException(BUGetter.class, "exists", "must be checked before");
         }
 
         @Override
         public Object get(Segment bean) throws BeanException {
-            throw new BeanException(BUGetter.class, "exists", "must be checked");
+            throw new BeanException(BUGetter.class, "exists", "must be checked before");
         }
 
     }

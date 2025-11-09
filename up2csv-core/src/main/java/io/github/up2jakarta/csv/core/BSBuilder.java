@@ -5,8 +5,14 @@ import io.github.up2jakarta.csv.api.ext.CheckerContext;
 import io.github.up2jakarta.csv.api.ext.InputProcessor;
 import io.github.up2jakarta.csv.api.ext.SegmentListener;
 import io.github.up2jakarta.csv.cfg.*;
+import io.github.up2jakarta.csv.core.BSNode.BFNode;
+import io.github.up2jakarta.csv.core.BSNode.BPNode;
 import io.github.up2jakarta.csv.core.ext.Beans;
 import io.github.up2jakarta.csv.core.hdl.*;
+import io.github.up2jakarta.csv.core.hdl.FProperty.FOProperty;
+import io.github.up2jakarta.csv.core.hdl.FProperty.FWProperty;
+import io.github.up2jakarta.csv.core.hdl.PProperty.POProperty;
+import io.github.up2jakarta.csv.core.hdl.PProperty.PWProperty;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.api.SeverityType;
@@ -150,47 +156,54 @@ final class BSBuilder {
         return result;
     }
 
-    private static <S extends Segment, B extends DataType<B>> PFProperty<S, B> reverse(PFProperty<S, B> source) throws BeanException {
-        if (source.node instanceof BSNode.BFNode<S, B> fn) {
-            return new PFProperty<>(reverse(source.getType(), fn), source);
+    @SuppressWarnings("unchecked")
+    private static <S extends Segment, B extends DataType<B>> FProperty<S, ?, B> reverse(FProperty<S, ?, B> source) throws BeanException {
+        final BSNode<S, B> node;
+        if (source.node instanceof BFNode<S, B> fn) {
+            node = reverse(fn);
         } else {
-            return new PFProperty<>(new BSNode.BFNode<>((BSNode.BPNode<S, B, ?>) source.node), source);
+            node = new BFNode<>((BPNode<S, B, ?>) source.node);
         }
+        if (source instanceof FWProperty<?, ?> pw) {
+            return new FWProperty<>(node, (FWProperty<S, B>) pw);
+        }
+        return new FOProperty<>(node, (FProperty<S, S, B>) source);
     }
 
-    public static <T extends Segment, D extends DataType<D>> BSNode.BPNode<T, D, ?> reverse(Class<T> type, BSNode.BFNode<T, D> source) throws BeanException {
+    public static <T extends Segment, D extends DataType<D>> BPNode<T, D, ?> reverse(BFNode<T, D> source) throws BeanException {
+        final Class<T> type = source.type;
         if (type.isRecord()) {
-            return new BSNode.BRNode<>(type, source);
+            return new BSNode.BRNode<>(source);
         } else {
-            return new BSNode.BMNode<>(type, source);
+            return new BSNode.BMNode<>(source);
         }
     }
 
     @SuppressWarnings("unchecked")
-    static <D extends DataType<D>> List<Property<?, D>> reverse(final List<Property<?, D>> source) throws BeanException {
-        final List<Property<?, D>> ps = new ArrayList<>(source.size());
-        for (final Property<?, D> p : source) {
-            final Property<?, D> copy = switch (p) {
-                case PFProperty<?, ?> fp -> reverse((PFProperty<?, D>) fp);
-                case PProperty.POProperty<?, D> po -> new PProperty.POProperty<>(po);
-                case PProperty.PSProperty<?> sp -> new PProperty.PSProperty<>((PProperty.PSProperty<D>) sp);
+    static <D extends DataType<D>> List<Property<?, ?, D>> reverse(final List<Property<?, ?, D>> source) throws BeanException {
+        final List<Property<?, ?, D>> ps = new ArrayList<>(source.size());
+        for (final Property<?, ?, D> p : source) {
+            final Property<?, ?, D> copy = switch (p) {
+                case FProperty<?, ?, ?> fp -> reverse((FProperty<?, ?, D>) fp);
+                case POProperty<?, ?> po -> new POProperty<>((POProperty<?, D>) po);
+                case PProperty.PWProperty<?, ?> wp -> new PWProperty<>((PWProperty<?, D>) wp);
             };
             ps.add(copy);
         }
         return unmodifiableList(ps);
     }
 
-    static <D extends DataType<D>> List<Property<?, D>> build(Class<? extends Segment> beanType, BSContext<D> context) throws BeanException {
+    static <D extends DataType<D>> List<Property<?, ?, D>> build(Class<? extends Segment> beanType, BSContext<D> context) throws BeanException {
         if (context.push(beanType)) {
             throw new BeanException(beanType, "cyclic fragment is not allowed");
         }
-        final List<Property<?, D>> result = new LinkedList<>();
+        final List<Property<?, ?, D>> result = new LinkedList<>();
         final Class<?> superClass = beanType.getSuperclass();
         if (Segment.class.isAssignableFrom(superClass)) {
             //noinspection unchecked
             final Class<? extends Segment> superType = (Class<? extends Segment>) superClass;
             final BSContext<D> superContext = context.with(superType, beanType.getGenericSuperclass());
-            final List<Property<?, D>> superProperties = build(superType, superContext);
+            final List<Property<?, ?, D>> superProperties = build(superType, superContext);
             superContext.end();
             result.addAll(superProperties);
         }
@@ -201,11 +214,11 @@ final class BSBuilder {
             final Position position = context.position(field);
             if (fragment != null) {
                 final Class<? extends Segment> fType = checkFragment(field, fieldType, fragment);
-                final List<Property<?, D>> fProps = build(fType, context.with(field, fragment, fType));
-                result.add(context.node(fType, field, fragment, fProps));
+                final List<Property<?, ?, D>> fps = build(fType, context.with(field, fragment, fType));
+                result.add(context.node(fType, field, fragment, fps));
             } else if (position != null) {
                 final Class<?> fieldClass = checkProperty(field, fieldType, position);
-                final Property<?, D> property = context.property(fieldClass, field, position);
+                final Property<?, ?, D> property = context.property(fieldClass, field, position);
                 result.add(property);
             } else {
                 final Class<?> type = getPropertyClass(field, fieldType);
@@ -226,7 +239,7 @@ final class BSBuilder {
         }
 
         @Override
-        public String process(String value, int offset, PProperty<?, D> property, EventHandler<?, D, ?> handler) {
+        public String process(String value, int offset, PProperty<?, ?, D> property, EventHandler<?, D, ?> handler) {
             for (final PWrapper<?, D> processor : processors) {
                 value = processor.process(value, offset, property, handler);
             }
@@ -249,7 +262,7 @@ final class BSBuilder {
         }
 
         @Override
-        public String process(String value, int offset, PProperty<?, D> pp, EventHandler<?, D, ?> handler) {
+        public String process(String value, int offset, PProperty<?, ?, D> pp, EventHandler<?, D, ?> handler) {
             try {
                 return delegate.process(value, config);
             } catch (RuntimeException cause) {

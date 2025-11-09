@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.hdl.PFProperty;
+import io.github.up2jakarta.csv.core.hdl.FProperty;
 import io.github.up2jakarta.csv.core.hdl.Properties;
 import io.github.up2jakarta.csv.core.hdl.Property;
 import io.github.up2jakarta.csv.core.misc.clv.CountryCodeType;
@@ -32,7 +32,6 @@ import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
 import static io.github.up2jakarta.xml.api.SeverityType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
 class Up2MapperTests {
@@ -575,33 +574,33 @@ class Up2MapperTests {
     void testValidRecursive() throws BeanException {
         // When
         final Up2Mapper<TestRecursive6Segment, GroupType> mapper = factory.build(TestRecursive6Segment.class);
-        final List<Property<?, GroupType>> fields = mapper.node.properties;
+        final List<Property<?, ?, GroupType>> fields = mapper.node.properties;
         // THEN
         assertEquals(3, fields.size());
         {
-            final Property<?, GroupType> property = fields.getFirst();
+            final Property<?, ?, GroupType> property = fields.getFirst();
             assertEquals("id", property.getName());
             assertEquals(0, property.offset);
         }
         {
-            final Property<?, GroupType> property = fields.get(1);
+            final Property<?, ?, GroupType> property = fields.get(1);
             assertEquals("any", property.getName());
             assertEquals(1, property.offset);
         }
         {
-            final Property<?, GroupType> fragment = fields.get(2);
+            final Property<?, ?, GroupType> fragment = fields.get(2);
             assertEquals("fragment", fragment.getName());
             assertEquals(2, fragment.offset);
-            assertInstanceOf(PFProperty.class, fragment);
-            final List<Property<?, GroupType>> fProperties = ((PFProperty<?, GroupType>) fragment).node.properties;
+            assertInstanceOf(FProperty.class, fragment);
+            final List<Property<?, ?, GroupType>> fProperties = ((FProperty<?, ?, GroupType>) fragment).node.properties;
             assertEquals(2, fProperties.size());
             {
-                final Property<?, GroupType> property = fProperties.getFirst();
+                final Property<?, ?, GroupType> property = fProperties.getFirst();
                 assertEquals("id", property.getName());
                 assertEquals(2, property.offset);
             }
             {
-                final Property<?, GroupType> property = fProperties.get(1);
+                final Property<?, ?, GroupType> property = fProperties.get(1);
                 assertEquals("name", property.getName());
                 assertEquals(2 + 1, property.offset);
             }
@@ -616,7 +615,7 @@ class Up2MapperTests {
         final Up2Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
         // WHEN
         final ValidBean bean = mapper.map(id, name);
-        final List<Property<?, GroupType>> fields = mapper.node.properties;
+        final List<Property<?, ?, GroupType>> fields = mapper.node.properties;
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.getFirst().getName());
@@ -632,7 +631,7 @@ class Up2MapperTests {
         final Up2Mapper<NoOrderBean, GroupType> mapper = factory.build(NoOrderBean.class);
         // WHEN
         final NoOrderBean bean = mapper.map(id, name);
-        final List<Property<?, GroupType>> fields = mapper.node.properties;
+        final List<Property<?, ?, GroupType>> fields = mapper.node.properties;
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.getFirst().getName());
@@ -648,7 +647,7 @@ class Up2MapperTests {
         final Up2Mapper<NoPositionBean, GroupType> mapper = factory.build(NoPositionBean.class);
         // WHEN
         final NoPositionBean bean = mapper.map(id, name);
-        final List<Property<?, GroupType>> fields = mapper.node.properties;
+        final List<Property<?, ?, GroupType>> fields = mapper.node.properties;
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.getFirst().getName());

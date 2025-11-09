@@ -12,6 +12,8 @@ import java.util.Optional;
  */
 public final class Conversion<R> {
 
+    public static final Conversion<String> NAN = new Conversion<>((v) -> v, (v) -> v);
+
     private final PropertyConverter<R> converter;
     private final PropertyFormatter<R> formatter;
 

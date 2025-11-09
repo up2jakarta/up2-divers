@@ -1,140 +1,111 @@
 package io.github.up2jakarta.csv.core.hdl;
 
 import io.github.up2jakarta.csv.api.ext.Conversion;
-import io.github.up2jakarta.csv.api.ext.PropertyConverter;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Segment;
+
+import java.util.Optional;
 
 import static io.github.up2jakarta.csv.core.hdl.PProperty.POProperty;
-import static io.github.up2jakarta.csv.core.hdl.PProperty.PSProperty;
+import static io.github.up2jakarta.csv.core.hdl.PProperty.PWProperty;
 
 /**
  * Internal {@link io.github.up2jakarta.csv.cfg.Position} implementation.
  */
-public abstract sealed class PProperty<T, D extends DataType<D>> extends Property<T, D> permits POProperty, PSProperty {
+public abstract sealed class PProperty<T, V, D extends DataType<D>> extends Property<T, V, D> permits POProperty, PWProperty {
 
     public final boolean required;
+    private final Conversion<T> adapter;
     private final PProcessor<D> processor;
 
-    private PProperty(PAccessor<?, T> va, D dt, int fo, Position pp, PProcessor<D> ps, PropertyConverter<T> pc) throws BeanException {
-        super(va, dt, fo, pp, (p) -> ps.defaultValue((PProperty<T, D>) p, pc));
+    private PProperty(PAccessor<?, V> va, D dt, int fo, Position pp, PProcessor<D> ps, Conversion<T> pc, DefaultValue<T, V, D> dv) throws BeanException {
+        super(va, dt, fo, pp, dv);
         this.required = pp.required();
         this.processor = ps;
+        this.adapter = pc;
     }
 
-    private PProperty(PProperty<T, D> source) throws BeanException {
-        super(source, source.defaultValue);
+    private PProperty(PProperty<T, V, D> source, V defaultValue) throws BeanException {
+        super(source, defaultValue);
         this.processor = source.processor;
         this.required = source.required;
+        this.adapter = source.adapter;
     }
 
-    public final String format(Segment bean, boolean prototype) throws BeanException {
-        if (prototype && defaultValue != null) {
-            return this.format(defaultValue);
+    @Override
+    protected final String format(V value) {
+        final T unwrapped = this.from(value);
+        if (unwrapped != null) {
+            return adapter.formatter().apply(unwrapped);
         }
-        return this.format(bean);
+        return null;
     }
 
-    public final String format(Segment bean) throws BeanException {
-        final T value = this.get(bean);
-        if (value != null) {
-            return this.format(value);
+    @Override
+    protected final V parse(String data, int offset, EventHandler<?, D, ?> handler) throws BeanException {
+        if (data != null) {
+            data = processor.process(data, offset, this, handler);
+        } else {
+            return defaultValue;
+        }
+        if (data != null) {
+            try {
+                final T value = adapter.converter().apply(data);
+                return this.wrap(value);
+            } catch (Exception cause) {
+                handler.handle(dataType, offset + this.offset, cause, this.error);
+                return this.wrap(null);
+            }
         }
         return null;
     }
 
     /**
-     * Parses and returns the property-value of the specified flat-value within processing and default-value.
-     *
-     * @param value   the property value
-     * @param offset  the truncated offset
-     * @param handler the event handler
-     * @return the parsed value
-     * @throws BeanException if the property is not accessible for write
-     */
-    public final T get(String value, int offset, EventHandler<?, D, ?> handler) throws BeanException {
-        if (value != null) {
-            value = processor.process(value, offset, this, handler);
-        } else {
-            return defaultValue;
-        }
-        return (value != null) ? this.parse(value, offset, handler) : null;
-    }
-
-    /**
-     * Parses and returns the property-value of the specified flat-value without processing and default-value.
-     *
-     * @param value   the property value
-     * @param offset  the truncated offset
-     * @param handler the event handler
-     * @return the parsed value
-     * @throws BeanException if the property is not accessible for write
-     */
-    public abstract T parse(String value, int offset, EventHandler<?, D, ?> handler) throws BeanException;
-
-    /**
-     * Formats the given value for CSV output.
-     *
-     * @param value the value to format
-     * @return the formatted sequence
-     */
-    abstract String format(T value);
-
-    /**
      * Internal representation for {@link Object} property.
      */
-    public static final class POProperty<T, D extends DataType<D>> extends PProperty<T, D> {
-        private final Conversion<T> adapter;
+    public static final class POProperty<T, D extends DataType<D>> extends PProperty<T, T, D> {
 
-        public POProperty(PAccessor<?, ?> va, D type, int fo, Position pp, PProcessor<D> ps, Conversion<T> pc) throws BeanException {
-            //noinspection unchecked
-            super((PAccessor<?, T>) va, type, fo, pp, ps, pc.converter());
-            this.adapter = pc;
+        public POProperty(PAccessor<?, T> va, D type, int fo, Position pp, PProcessor<D> ps, Conversion<T> pc) throws BeanException {
+            super(va, type, fo, pp, ps, pc, (p) -> ps.defaultValue(p, pc.converter()));
         }
 
         public POProperty(POProperty<T, D> source) throws BeanException {
-            super(source);
-            this.adapter = source.adapter;
+            super(source, source.defaultValue);
         }
 
         @Override
-        public T parse(String value, int offset, EventHandler<?, D, ?> handler) {
-            try {
-                return adapter.converter().apply(value);
-            } catch (Exception cause) {
-                handler.handle(dataType, offset + this.offset, cause, super.error);
-                return null;
-            }
+        protected T wrap(T value) {
+            return value;
         }
 
         @Override
-        String format(T value) {
-            return adapter.formatter().apply(value);
+        protected T from(T value) {
+            return value;
         }
     }
 
     /**
-     * Internal representation for {@link String} property.
+     * Internal representation for {@link java.util.Optional} property.
      */
-    public static final class PSProperty<D extends DataType<D>> extends PProperty<String, D> {
-        public PSProperty(PAccessor<?, String> va, D type, int fo, Position pp, PProcessor<D> ps) throws BeanException {
-            super(va, type, fo, pp, ps, v -> v);
+    public static final class PWProperty<T, D extends DataType<D>> extends PProperty<T, Optional<T>, D> {
+
+        public PWProperty(PAccessor<?, Optional<T>> va, D type, int fo, Position pp, PProcessor<D> ps, Conversion<T> pc) throws BeanException {
+            super(va, type, fo, pp, ps, pc, (p) -> Optional.ofNullable(ps.defaultValue(p, pc.converter())));
         }
 
-        public PSProperty(PSProperty<D> source) throws BeanException {
-            super(source);
-        }
-
-        @Override
-        public String parse(String value, int offset, EventHandler<?, D, ?> handler) {
-            return value;
+        public PWProperty(PWProperty<T, D> source) throws BeanException {
+            super(source, source.defaultValue);
         }
 
         @Override
-        String format(String value) {
-            return value;
+        protected Optional<T> wrap(T value) {
+            return Optional.ofNullable(value);
+        }
+
+        @Override
+        protected T from(Optional<T> value) {
+            return value.orElse(null);
         }
     }
 }

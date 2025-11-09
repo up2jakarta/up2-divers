@@ -58,6 +58,11 @@ public final class Beans {
         return getClassArguments(superType, finalType, typeArguments);
     }
 
+    @SuppressWarnings("unchecked")
+    public static <E> Class<E> cast(Class<?> type) {
+        return (Class<E>) type;
+    }
+
     public static Type[] resolveArguments(Class<?> type, ParameterizedType pType, Type[] typeArguments) {
         final Type[] typeParameters = type.getTypeParameters();
         var actualArguments = pType.getActualTypeArguments();

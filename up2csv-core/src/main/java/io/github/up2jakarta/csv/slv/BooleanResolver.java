@@ -30,7 +30,7 @@ public final class BooleanResolver extends ConversionResolver<Up2Boolean> {
                 if (config.falseValue().equals(v)) {
                     return false;
                 }
-                final Optional<Error> error = getError(property);
+                final Optional<Error> error = getError(property, type);
                 final SeverityType level = error.map(Error::severity).orElse(SeverityType.ERROR);
                 final String code = error.map(Error::value).orElse(ERROR_BOOLEAN);
                 throw new PropertyException(level, code, "Unknown value [" + v + "] for Boolean");

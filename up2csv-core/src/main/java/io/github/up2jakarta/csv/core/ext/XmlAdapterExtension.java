@@ -65,12 +65,12 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
     }
 
     @Override
-    public Conversion<?> resolve(Field property, Class<?> type, XmlJavaTypeAdapter config) throws BeanException {
+    public <V> Conversion<V> resolve(Field property, Class<V> type, XmlJavaTypeAdapter config) throws BeanException {
         //noinspection unchecked
-        final Class<XmlAdapter<String, Object>> adapterType = (Class<XmlAdapter<String, Object>>) config.value();
-        final Optional<Error> error = ConversionResolver.getError(property);
-        final XmlAdapter<String, Object> adapter = this.getBean(adapterType);
-        final PropertyFormatter<Object> f = v -> {
+        final Class<XmlAdapter<String, V>> adapterType = (Class<XmlAdapter<String, V>>) config.value();
+        final Optional<Error> error = ConversionResolver.getError(property, type);
+        final XmlAdapter<String, V> adapter = this.getBean(adapterType);
+        final PropertyFormatter<V> f = v -> {
             try {
                 return adapter.marshal(v);
             } catch (Exception ex) {

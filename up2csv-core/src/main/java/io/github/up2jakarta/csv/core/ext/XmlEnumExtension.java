@@ -35,11 +35,11 @@ public final class XmlEnumExtension extends ConversionExtension<XmlType, XmlEnum
         super(XmlType.class);
     }
 
-    private static Map<String, Object> getConstants(Class<?> enumType, Field field) throws BeanException {
-        final Object[] constants = enumType.getEnumConstants();
-        final Map<String, Object> mapping = new HashMap<>(constants.length);
+    private static <V> Map<String, V> getConstants(Class<V> enumType, Field field) throws BeanException {
+        final V[] constants = enumType.getEnumConstants();
+        final Map<String, V> mapping = new HashMap<>(constants.length);
         var maxLength = 0;
-        for (final Object constant : constants) {
+        for (final V constant : constants) {
             var constantName = constant.toString();
             try {
                 final XmlEnumValue xml = enumType.getField(constantName).getAnnotation(XmlEnumValue.class);
@@ -79,19 +79,19 @@ public final class XmlEnumExtension extends ConversionExtension<XmlType, XmlEnum
     }
 
     @Override
-    public Conversion<?> resolve(Field property, Class<?> enumType, XmlEnum config) throws BeanException {
-        final Map<String, Object> mapping = getConstants(enumType, property);
-        final Optional<Error> error = ConversionResolver.getError(property);
+    public <V> Conversion<V> resolve(Field property, Class<V> enumType, XmlEnum config) throws BeanException {
+        final Map<String, V> mapping = getConstants(enumType, property);
+        final Optional<Error> error = ConversionResolver.getError(property, enumType);
         final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);
         final String code = error.map(Error::value).orElse(ERROR_XML_ENUM);
-        final PropertyConverter<Object> p = v -> mapping.entrySet().stream().filter(e -> e.getKey().equals(v))
+        final PropertyConverter<V> p = v -> mapping.entrySet().stream().filter(e -> e.getKey().equals(v))
                 .map(Map.Entry::getValue)
                 .findAny()
                 .orElseThrow(() -> {
                     final String msg = String.format(FORMAT, v, enumType.getSimpleName());
                     return new PropertyException(type, code, msg);
                 });
-        final PropertyFormatter<Object> f = v -> mapping.entrySet().stream().filter(e -> e.getValue().equals(v))
+        final PropertyFormatter<V> f = v -> mapping.entrySet().stream().filter(e -> e.getValue().equals(v))
                 .map(Map.Entry::getKey)
                 .findAny()
                 .orElseGet(v::toString);

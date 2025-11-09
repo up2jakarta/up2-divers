@@ -72,7 +72,7 @@ public final class CodeListResolver extends ConversionResolver<Up2CodeList> {
             throw new BeanException(pf, "type must implements CodeList<" + type.getSimpleName() + ">");
         }
         final CodeList<?>[] values = values(type, pc.value());
-        final Optional<Error> error = getError(pf);
+        final Optional<Error> error = getError(pf, type);
         final SeverityType level = error.map(Error::severity).orElse(SeverityType.ERROR);
         final String code = error.map(Error::value).orElse(ERROR_CODE_LIST);
         if (values.length == 0) {

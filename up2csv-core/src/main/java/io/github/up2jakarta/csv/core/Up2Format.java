@@ -3,12 +3,13 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.BSNode.BFNode;
-import io.github.up2jakarta.csv.core.BSNode.BPNode;
 import io.github.up2jakarta.csv.core.BSOperator.Processor;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
+
+import static io.github.up2jakarta.csv.core.BSBuilder.reverse;
 
 /**
  * Map and validate input data to a configurable bean that supports only {@link String} type.
@@ -19,8 +20,8 @@ import io.github.up2jakarta.csv.data.Segment;
  */
 public final class Up2Format<S extends Segment, D extends DataType<D>> extends Processor<S, D, BFNode<S, D>> {
 
-    Up2Format(Class<S> type, BFNode<S, D> node) throws BeanException {
-        super(type, node);
+    Up2Format(BFNode<S, D> node) throws BeanException {
+        super(node);
     }
 
     /**
@@ -111,8 +112,7 @@ public final class Up2Format<S extends Segment, D extends DataType<D>> extends P
      * @throws BeanException if any property is not accessible for writing
      */
     public Up2Mapper<S, D> toMapper() throws BeanException {
-        final BPNode<S, D, ?> copy = BSBuilder.reverse(type, node);
-        return new Up2Mapper<>(type, copy);
+        return new Up2Mapper<>(reverse(node));
     }
 
 }

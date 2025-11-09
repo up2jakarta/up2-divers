@@ -1,5 +1,6 @@
 package io.github.up2jakarta.csv.core.hdl;
 
+import io.github.up2jakarta.csv.core.Up2Mapper;
 import io.github.up2jakarta.xml.api.IException;
 import io.github.up2jakarta.xml.api.SeverityType;
 
@@ -32,9 +33,34 @@ public abstract sealed class EventType<E extends IException> permits ECMode, ETM
         }
         return Optional.ofNullable(error.getCause()).map(c -> {
             final StringWriter writer = new StringWriter();
-            ETMode.stackTrace(c, new PrintWriter(writer));
+            ETMode.stackTrace(Up2Mapper.class, c, new PrintWriter(writer));
             return writer.toString().trim();
         });
+    }
+
+    /**
+     * Prints this throwable and its backtrace to the specified <code>printer</code>.
+     * Notes that the stack elements will be truncated from the given <code>entry</code> point class
+     *
+     * @param error   the exception to print
+     * @param entry   the entry point
+     * @param printer the printer stream
+     */
+    public static void stackTrace(Class<?> entry, Throwable error, PrintWriter printer) {
+        final String cn = entry.getName();
+        printer.println(error);
+        final StackTraceElement[] traces = error.getStackTrace();
+        for (final StackTraceElement element : traces) {
+            if (cn.equals(element.getClassName())) {
+                break;
+            } else if (!ETMode.EXCLUSIONS.contains(element.getClassName())) {
+                printer.println("\t" + element);
+            }
+        }
+        final Throwable cause = error.getCause();
+        if (cause != null) {
+            printer.println(cause);
+        }
     }
 
     /**

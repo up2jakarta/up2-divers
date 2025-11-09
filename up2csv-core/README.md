@@ -22,16 +22,17 @@ approach.
 - Configuration based on @Annotation
 - Support of Java OOP (Object-Oriented Programming)
 - Support of Java `Record`
+- Support of Java `Optional`
 - Mapping from flat-data to java-bean
-- Unmapping from java-bean to flat data
+- Unmapping from java-bean to flat-data
 - Extensions
     - Processor API
     - Conversion Resolver API
+    - Conversion Extension API
+    - Bean Checker API for java-beans
+    - Resolver API for business Data Definition
     - Error API
     - Input API
-    - Conversion Extension API
-    - Bean Checker API
-    - Business Data Definition and Resolver API
 - Format API for multi-segments import and export
 - Stream API for batch processing support
 
@@ -41,7 +42,7 @@ approach.
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.5.6</version>
+        <version>1.5.7</version>
     </dependency>
     <!-- Required JSR-303 Validation Provider -->
     <dependency>
@@ -146,9 +147,9 @@ public Up2Segment implements Segment {
 ``` java
 public Up2Segment implements Segment {
 
-    @Position(value = 0, defaultValue = "*") 
-    @Up2Trim({"", "-", "null", "undefined"}) // 1st order
-    @Up2Token // 2nd order
+    @Position(value = 0, defaultValue = "*") // 1st order
+    @Up2Trim({"", "-", "null", "undefined"}) // 2nd order
+    @Up2Token // 3rd order
     private String code;
 }
 ```
@@ -182,7 +183,7 @@ public Up2Segment implements Segment {
 
     @Position(0)
     @Up2Boolean(trueValue = "Yes", falseValue = "No")
-    private Boolean valid;
+    private Boolean flag;
 }
 ```
 
@@ -201,11 +202,11 @@ public Up2Segment implements Segment {
 
     @Position(value = 0, defaultValue = "-1")
     @Up2Number
-    private int anInt;
+    private int number;
     
-    @Position(2)
+    @Position(1)
     @Up2Number
-    private Integer anInteger;
+    private Integer other;
     
     // ...
 }
@@ -224,11 +225,11 @@ public Up2Segment implements Segment {
 
     @Position(0)
     @Up2Decimal(value = 4, roundingMode = RoundingMode.HALF_EVEN)
-    private BigDecimal aDecimal;
+    private BigDecimal amount;
     
-    @Position(2)
+    @Position(1)
     @Up2Decimal(value = 4)
-    private double aDouble;
+    private double quantity;
     
     // ...
 }
@@ -251,7 +252,7 @@ This annotation allows the automatic conversion of `java.time.Temporal`:
 ``` java
 public Up2Segment implements Segment {
 
-    @Position(2)
+    @Position(0)
     @Up2Temporal
     private LocalDate date;
     
@@ -269,7 +270,7 @@ This annotation allows the automatic conversion of `java.time.TemporalAmount`:
 ``` java
 public Up2Segment implements Segment {
 
-    @Position(2)
+    @Position(1)
     @Up2TemporalAmount
     private Period perid;
     
@@ -290,7 +291,7 @@ public Up2Segment implements Segment {
     @Up2CodeList
     private CurrencyCodeType currency;
 
-    @Position(9)
+    @Position(1)
     @Up2CodeList
     private CountryCodeType country;
     
@@ -360,10 +361,10 @@ public Up2Segment implements Segment {
     @Position(1)
     private TestXmlEnum enum2; // enum without @XmlEnumValue
 
-    @Position(3)
+    @Position(2)
     private CurrencyCodeType currency; // type annotated with XmlJavaTypeAdapter
     
-    @Position(4)
+    @Position(3)
     @XmlJavaTypeAdapter(CountryXmlAdapter.class) // property annotated with XmlJavaTypeAdapter
     private CountryCodeType country;
     
@@ -474,7 +475,13 @@ public TestSegment implements Segment {
 
 ## @ValidOverride
 
-Enables JSR-303 validation within specific groups.
+- Enables JSR-303 validation within specific groups, this annotation works with segments only,
+  whatever the main segment or embeddable fragments.
+- If `ValidOverride.disable` is equals to `true`, then the validation of embeddable fragments will be disabled too.
+- To avoid double validation, `@Valid` must not exist when `@ValidOverride` is used on properties aka fields.
+- On segment classes, `@ValidOverride` always takes precedence over JSR-303 `@Valid` annotation.
+- On segment classes, the validation can be enabled by super-segment classes, the first super-class annotated by
+  `@ValidOverride` or `@Valid` will be considered.
 
 ``` java
 @ValidOverride(groups = Up2Group.class)
@@ -566,12 +573,10 @@ public record MyRecord(long id, @Position(0) String code, @Position(1) String la
 
 ### The specifications are described in [io.gitHub.up2jakarta.csv.api](./src/main/java/io/github/up2jakarta/csv/api)
 
-- `BeanJoiner`: Bean getter for segregation processing only.
 - `BeanLinker`: Bean linker for aggregation/segregation processing.
 - `IEvent`: Input event representation (model) for errors or exceptions.
 - `IRecord`: Input record representation (model)
-- `IType`: Segment definition for segregation processing only.
-- `IFullType`: Segment definition for aggregation/segregation processing.
+- `IType`: Segment definition for import/export processing.
 
 See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/impl)
 
@@ -600,7 +605,7 @@ public void test() {
     // GIVEN Singleton
     final Up2Mapper<Up2Segment, ?> mapper = factory.build(Up2Segment.class);
     // WHEN
-    final Up2Segment bean = mapper.map("Data 1", "Data 2", "Data n");
+    final Up2Segment bean = mapper.map("Data 1", "Data 2", "...", "Data n");
     // THEN
     // Here the bean is full-filled automatically 
 }
@@ -612,14 +617,14 @@ public void test() {
 @Inject
 private Up2Factory<?> factory;
 
-public void process(final PathRecord<?> row) {
+public void process(final MyRecord row) {
     // GIVEN Singletons
     final Up2Mapper<Up2Segment, ?> mapper = factory.build(Up2Segment.class);
     // GIVEN Prototypes
-    final InputCollector<?, ?> handler = new InputCollector<>(row) ;
+    final MyCollector handler = new MyCollector<>(row) ;
     // WHEN
     final Up2Segment bean = mapper.map(row, handler);
-    final Collection<InputError<?, ?>> errors = handler.toCollection();
+    final Collection<MyError> errors = handler.toCollection();
     // THEN
     // Here the bean is full-filled automatically
     // Here the errors is full-filled automatically 
@@ -631,11 +636,12 @@ public void process(final PathRecord<?> row) {
 
 During the unmapping of java-bean:
 
-- The `Processor API` are not supported for String properties except the annotation `@Up2Default` without modifying the
-  source.
-- The JSR-303 validation is not supported because default values maybe are not supplied.
+- The `Processor API` are not supported for String properties except the default value without modifying the bean.
+- The JSR-303 validation is not enabled automatically because beans maybe be not full-filled with default values,
+  but the validation can be invoked manually
 - The formatting of properties are done with the same annotations for mapping aka `Resolver API`
 - The annotation `@Truncated` is supported
+- When the flag `@Fragment.nullable` is enabled then export of default values is disabled when fragment is `null`
 
 ``` java
 @Inject
@@ -647,6 +653,7 @@ public void test() {
     final Up2Segment bean ; // ... full-fill the bean
     // WHEN
     final String[] data = mapper.unmap(bean);
+    mapper.validate(bean, FastHandler.of(ERROR)); // manual validation
     // THEN
     // Here the data is full-filled automatically 
 }

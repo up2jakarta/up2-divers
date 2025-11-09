@@ -110,10 +110,10 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
             return;
         }
         if (!parent.businessId.exists()) {
-            final Class<?> type = parent.type;
+            final Class<?> type = parent.node.type;
             throw new BeanException(type, "must have one property annotated by @BusinessId to link with #[" + name + ']');
         }
-        child.parentId.check(child.type, parent.businessId);
+        child.parentId.check(child.node.type, parent.businessId);
     }
 
     /**

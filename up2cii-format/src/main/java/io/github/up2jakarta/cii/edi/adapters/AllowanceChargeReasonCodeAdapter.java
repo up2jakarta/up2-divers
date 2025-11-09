@@ -1,6 +1,7 @@
 package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.AllowanceChargeReasonCodeType;
+import io.github.up2jakarta.cii.ppf.ChargeReasonCodeType;
 import io.github.up2jakarta.xml.clv.CodeListConverter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -19,11 +20,15 @@ import static java.util.Arrays.asList;
 @Singleton
 public class AllowanceChargeReasonCodeAdapter extends CodeListConverter<AllowanceChargeReasonCodeType> {
 
-    public static final String ECE_4465 = "ECE-4465";
-    public static final List<AllowanceChargeReasonCodeType> LOV_4465 = asList(values());
+    private static final String CODE = "ECE-4465";
+    private static final List<AllowanceChargeReasonCodeType> VALUES = asList(values());
 
     AllowanceChargeReasonCodeAdapter() {
-        super(AllowanceChargeReasonCodeType.class, ERROR, ECE_4465, LOV_4465);
+        super(AllowanceChargeReasonCodeType.class, ERROR, CODE, VALUES);
+    }
+
+    public static ChargeReasonCodeType<?> from(ChargeReasonCodeType<?> value) {
+        return find(value.getCode(), AllowanceChargeReasonCodeType.class, VALUES, ERROR, CODE);
     }
 
 }

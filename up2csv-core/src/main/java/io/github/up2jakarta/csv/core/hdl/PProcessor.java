@@ -13,9 +13,9 @@ import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 @FunctionalInterface
 public interface PProcessor<D extends DataType<D>> {
 
-    default <V> V defaultValue(PProperty<V, D> pp, PropertyConverter<V> pc) throws BeanException {
+    default <T> T defaultValue(Property<T, ?, D> pp, PropertyConverter<T> pc) throws BeanException {
         try {
-            var v = this.process(null, 0, pp, of(ERROR));
+            var v = this.process(null, 0, (PProperty<?, ?, D>) pp, of(ERROR));
             if (v != null) {
                 return pc.apply(v);
             }
@@ -25,6 +25,6 @@ public interface PProcessor<D extends DataType<D>> {
         }
     }
 
-    String process(String value, int offset, PProperty<?, D> property, EventHandler<?, D, ?> handler);
+    String process(String value, int offset, PProperty<?, ?, D> property, EventHandler<?, D, ?> handler);
 
 }

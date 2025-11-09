@@ -3,6 +3,7 @@ package io.github.up2jakarta.csv.core.hdl;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.core.BSNode.NProperty;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.BusinessIdentifier;
 import io.github.up2jakarta.csv.data.DataType;
@@ -12,42 +13,44 @@ import java.lang.reflect.AnnotatedElement;
 
 /**
  * Internal property representation.
- *
- * @param <V> the value type
  */
-public abstract sealed class Property<V, D extends DataType<D>> permits PFProperty, PProperty {
+public abstract sealed class Property<T, V, D extends DataType<D>> extends NProperty<T, V, D> permits FProperty, PProperty {
 
     public final int offset;
     public final D dataType;
     public final Error error;
-    protected final V defaultValue;
+    public final V defaultValue;
     private final PAccessor<?, V> accessor;
 
-    private Property(PAccessor<?, V> accessor, D dataType, int offset, DefaultValue<V, D> dvs) throws BeanException {
+    private Property(PAccessor<?, V> accessor, D dataType, int offset, DefaultValue<T, V, D> dvs) throws BeanException {
+        this.error = accessor.source.getAnnotation(Error.class);
         this.offset = offset;
         this.dataType = dataType;
         this.accessor = accessor;
-        this.error = accessor.source.getAnnotation(Error.class);
         this.defaultValue = dvs.get(this);
     }
 
-    Property(Property<V, D> source, V defaultValue) throws BeanException {
-        this.accessor = source.accessor.reverse();
+    Property(Property<T, ?, D> source, PAccessor<?, V> accessor, V defaultValue) {
         this.defaultValue = defaultValue;
         this.dataType = source.dataType;
         this.offset = source.offset;
         this.error = source.error;
+        this.accessor = accessor;
+    }
+
+    Property(Property<T, V, D> source, V defaultValue) throws BeanException {
+        this(source, source.accessor.reverse(), defaultValue);
     }
 
     Property(PAccessor<?, V> accessor, D dataType, int offset, Fragment fp, V defaultValue) throws BeanException {
         this(accessor, dataType, offset + fp.value(), (p) -> defaultValue);
     }
 
-    Property(PAccessor<?, V> va, D dt, int fo, Position pp, DefaultValue<V, D> dv) throws BeanException {
+    Property(PAccessor<?, V> va, D dt, int fo, Position pp, DefaultValue<T, V, D> dv) throws BeanException {
         this(va, dt, fo + pp.value(), dv);
     }
 
-    public static <S extends Segment> BusinessIdentifier<S> id(Property<?, ?>[] path) throws BeanException {
+    public static <S extends Segment> BusinessIdentifier<S> id(Property<?, ?, ?>[] path) throws BeanException {
         if (path.length == 1) {
             final PAccessor<?, ?> getter = path[0].accessor.reverse();
             return b -> getter.value(b, null);
@@ -80,15 +83,16 @@ public abstract sealed class Property<V, D extends DataType<D>> permits PFProper
         return accessor.source;
     }
 
-    @SuppressWarnings("unchecked")
-    public final <T> T get(Segment bean) throws BeanException {
+    @Override
+    protected final V value(Segment bean) throws BeanException {
         if (bean == null) {
-            return (T) defaultValue;
+            return defaultValue;
         }
-        return (T) accessor.value(bean, defaultValue);
+        return accessor.value(bean, defaultValue);
     }
 
-    public final V set(Object bean, V value) throws BeanException {
+    @Override
+    protected final V value(Object bean, V value) throws BeanException {
         if (value != null) {
             return accessor.value(bean, value);
         }
@@ -101,9 +105,9 @@ public abstract sealed class Property<V, D extends DataType<D>> permits PFProper
     }
 
     @FunctionalInterface
-    protected interface DefaultValue<T, D extends DataType<D>> {
+    protected interface DefaultValue<T, V, D extends DataType<D>> {
 
-        T get(Property<T, D> pp) throws BeanException;
+        V get(Property<T, V, D> property) throws BeanException;
 
     }
 }

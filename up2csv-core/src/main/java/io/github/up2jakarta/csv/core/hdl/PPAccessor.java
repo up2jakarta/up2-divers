@@ -73,7 +73,7 @@ abstract sealed class PPAccessor<V> extends PAccessor<Field, V> permits PPAccess
 
         @Override
         public V value(Object bean, V value) throws BeanException {
-            throw BeanException.of(source, "unsupported setter");
+            throw BeanException.of(source, "unsupported operation");
         }
 
         @Override

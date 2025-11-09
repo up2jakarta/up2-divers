@@ -3,7 +3,6 @@ package io.github.up2jakarta.csv.api.ext;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.ext.BeanAware;
 import io.github.up2jakarta.csv.data.Segment;
-import jakarta.validation.constraints.NotNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -57,9 +56,10 @@ public abstract class ConversionExtension<A extends Annotation, C extends Annota
      * @param property the property that is being converted automatically
      * @param type     the type of the property
      * @param config   the annotation configuration
+     * @param <V>      the property type
      * @return the right conversion
      * @throws BeanException for any missing or wrong bean configuration
      */
-    public abstract Conversion<?> resolve(@NotNull Field property, Class<?> type, @NotNull C config) throws BeanException;
+    public abstract <V> Conversion<V> resolve(Field property, Class<V> type, C config) throws BeanException;
 
 }

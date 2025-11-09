@@ -20,13 +20,14 @@ public abstract class ConversionResolver<A extends Annotation> extends BeanAware
     /**
      * Get the annotation {@link Error} if present.
      *
-     * @param property the java field
+     * @param property the annotated property
+     * @param type     the property type
      * @return the optional annotation
      */
-    public static Optional<Error> getError(Field property) {
+    public static Optional<Error> getError(Field property, Class<?> type) {
         final Error error = property.getAnnotation(Error.class);
         if (error == null) {
-            return Optional.ofNullable(property.getType().getAnnotation(Error.class));
+            return Optional.ofNullable(type.getAnnotation(Error.class));
         }
         return Optional.of(error);
     }
