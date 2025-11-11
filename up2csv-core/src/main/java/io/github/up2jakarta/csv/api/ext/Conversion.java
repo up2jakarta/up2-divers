@@ -12,53 +12,58 @@ import java.util.Optional;
  */
 public final class Conversion<R> {
 
-    public static final Conversion<String> NAN = new Conversion<>((v) -> v, (v) -> v);
+    public static final Conversion<String> NAN = new Conversion<>(String.class, (v) -> v, (v) -> v);
 
+    private final Class<R> type;
     private final PropertyConverter<R> converter;
     private final PropertyFormatter<R> formatter;
 
     /**
+     * @param type      the supported type
      * @param converter the parsing function
      * @param formatter the formatting function
      * @param config    the error configuration
      */
-    public Conversion(PropertyConverter<R> converter, PropertyFormatter<R> formatter, Optional<Error> config) {
-        this(converter, formatter, config.orElse(null));
+    public Conversion(Class<R> type, PropertyConverter<R> converter, PropertyFormatter<R> formatter, Optional<Error> config) {
+        this(type, converter, formatter, config.orElse(null));
     }
 
     /**
+     * @param type      the supported type
      * @param converter the parsing function
      * @param formatter the formatting function
      * @param config    the error configuration
      */
-    public Conversion(PropertyConverter<R> converter, PropertyFormatter<R> formatter, Error config) {
-        this(PropertyConverter.of(converter, config), PropertyFormatter.of(formatter, config));
+    public Conversion(Class<R> type, PropertyConverter<R> converter, PropertyFormatter<R> formatter, Error config) {
+        this(type, PropertyConverter.of(converter, config), PropertyFormatter.of(formatter, config));
     }
 
     /**
+     * @param type      the supported type
      * @param converter the parsing function
      * @param formatter the formatting function
      */
-    public Conversion(PropertyConverter<R> converter, PropertyFormatter<R> formatter) {
+    public Conversion(Class<R> type, PropertyConverter<R> converter, PropertyFormatter<R> formatter) {
         this.converter = converter;
         this.formatter = formatter;
+        this.type = type;
     }
 
     /**
      * Creates Property conversion from {@link TypeConverter}
      *
-     * @param cvr   the type converter
+     * @param tc    the type converter
      * @param error the configuration of errors
      * @param <T>   the type of property
      * @return new preconfigured conversion
      */
-    public static <T> Conversion<T> of(TypeConverter<T> cvr, Error error) {
+    public static <T> Conversion<T> of(TypeConverter<T> tc, Error error) {
         if (error == null) {
-            final PropertyConverter<T> p = PropertyConverter.of(cvr::parse, cvr.getErrorSeverity(), cvr.getErrorCode());
-            final PropertyFormatter<T> f = PropertyFormatter.of(cvr::format, cvr.getErrorSeverity(), cvr.getErrorCode());
-            return new Conversion<>(p, f);
+            final PropertyConverter<T> p = PropertyConverter.of(tc::parse, tc.getErrorSeverity(), tc.getErrorCode());
+            final PropertyFormatter<T> f = PropertyFormatter.of(tc::format, tc.getErrorSeverity(), tc.getErrorCode());
+            return new Conversion<>(tc.getSupportedType(), p, f);
         }
-        return new Conversion<>(cvr::parse, cvr::format, error);
+        return new Conversion<>(tc.getSupportedType(), tc::parse, tc::format, error);
     }
 
     public PropertyConverter<R> converter() {
@@ -67,6 +72,10 @@ public final class Conversion<R> {
 
     public PropertyFormatter<R> formatter() {
         return formatter;
+    }
+
+    public Class<R> type() {
+        return type;
     }
 
 }

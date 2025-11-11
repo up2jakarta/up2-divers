@@ -1,12 +1,17 @@
 package io.github.up2jakarta.csv.data;
 
-public interface BusinessObject extends Referencable {
+/**
+ * Contract interface for segment having unique reference, useful when the {@link BusinessId} is undefined.
+ *
+ * @param <T> the reference type.
+ */
+public interface BusinessObject<T extends Comparable<T>> extends Referencable<T> {
 
     /**
      * Sets the unique business reference.
      *
      * @param value the unique business reference
      */
-    void setReference(String value);
+    void setReference(T value);
 
 }

@@ -9,7 +9,6 @@ import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.fmt.FullError;
 import io.github.up2jakarta.csv.fmt.FullRecord;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
-import io.github.up2jakarta.csv.io.misc.TUGenerator;
 import io.github.up2jakarta.xml.api.PropertyException;
 import jakarta.validation.Validator;
 import org.apache.commons.csv.CSVFormat;
@@ -27,6 +26,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import static io.github.up2jakarta.csv.io.impl.SegmentType.S01;
+import static io.github.up2jakarta.csv.io.misc.Tests.TUGenerator.path;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,13 +41,13 @@ public class SingleErrorTests {
     private static final String MSG = "Text cannot be parsed to a LocalDate";
     private static final String TRACE = "java.time.format.DateTimeParseException: " + MSG + " ...";
 
-    private final SingleWriter<MyError, DynamicType> writer;
+    private final SingleWriter<TSError, DynamicType> writer;
     private final CSVFormat format;
 
     @Autowired
     SingleErrorTests(BeanContext context, Validator validator, CSVFormat fmt) throws BeanException {
         final Up2Factory<DynamicType> factory = new Up2Factory<>(context, validator, DataTypeResolver.dynamic());
-        final Up2Format<MyError, DynamicType> format = factory.format(MyError.class);
+        final Up2Format<TSError, DynamicType> format = factory.format(TSError.class);
         this.writer = new SingleWriter<>(format, fmt);
         this.format = fmt;
     }
@@ -56,8 +56,8 @@ public class SingleErrorTests {
         try {
             writer.open(file);
             for (var i = MIN; i <= MAX; i++) {
-                final MyRecord row = new MyRecord("R" + i, S01, "I2025N" + i, "");
-                final MyError error = new MyError(row, i, "DT-" + i);
+                final TSRecord row = new TSRecord("R" + i, S01, "I2025N" + i, "");
+                final TSError error = new TSError(row, i, "DT-" + i);
                 writer.write(error);
                 writer.flush();
             }
@@ -105,7 +105,7 @@ public class SingleErrorTests {
     @Test
     void testReader() throws IOException {
         // GIVEN
-        final File file = TUGenerator.path(this.getClass()).resolve("errors.csv").toFile();
+        final File file = path(this.getClass()).resolve("errors.csv").toFile();
         // WHEN Generating file
         this.write(file);
         // THEN
@@ -114,15 +114,15 @@ public class SingleErrorTests {
         assertEquals(MAX, i - 1);
     }
 
-    public static class MyError extends FullError<DynamicType, MyRecord> {
-        public MyError(MyRecord row, int order, String code) {
+    public static class TSError extends FullError<DynamicType, String, TSRecord> {
+        public TSError(TSRecord row, int order, String code) {
             super(row, order, null, 3, new PropertyException(ERROR, code, MSG), TRACE);
         }
     }
 
-    public static class MyRecord extends FullRecord<SegmentType> {
-        public MyRecord(String rowKey, SegmentType type, String invoiceKey, String... data) {
-            super(rowKey, type, invoiceKey, data);
+    public static class TSRecord extends FullRecord<SegmentType, String> {
+        public TSRecord(String rowKey, SegmentType type, String invoiceNumber, String... data) {
+            super(rowKey, type, invoiceNumber, data);
         }
     }
 

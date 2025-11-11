@@ -27,7 +27,7 @@ public class PropertyException extends RuntimeException implements IException, M
                 return new PropertyException(level, code, cause.getMessage());
             }
         }
-        return new PropertyException(level, code, cause.toString(), cause);
+        return new PropertyException(level, code, cause.getMessage(), cause);
     }
 
     public final boolean equals(SeverityType level, String code) {

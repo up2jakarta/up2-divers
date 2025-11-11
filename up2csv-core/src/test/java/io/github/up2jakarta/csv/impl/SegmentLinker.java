@@ -5,10 +5,11 @@ import io.github.up2jakarta.csv.core.BeanLinker;
 import io.github.up2jakarta.csv.core.ext.Beans;
 import io.github.up2jakarta.csv.core.misc.Parsable;
 import io.github.up2jakarta.csv.fmt.misc.CyclicInvoice;
-import io.github.up2jakarta.csv.fmt.misc.CyclicItem;
 import io.github.up2jakarta.csv.impl.dto.*;
 
 import java.util.function.BiConsumer;
+
+import static io.github.up2jakarta.csv.fmt.misc.CyclicInvoice.CyclicItem;
 
 public class SegmentLinker<P extends Parsable, T extends Parsable> extends BeanLinker<T, P> {
 

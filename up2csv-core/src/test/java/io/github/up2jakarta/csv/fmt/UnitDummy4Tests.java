@@ -3,6 +3,7 @@ package io.github.up2jakarta.csv.fmt;
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
 import io.github.up2jakarta.csv.fmt.misc.AUnitTest;
 import io.github.up2jakarta.csv.fmt.misc.Dummy4Invoice;
 import io.github.up2jakarta.csv.impl.GroupType;
@@ -22,7 +23,7 @@ import static io.github.up2jakarta.csv.impl.SegmentType.*;
 @SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-class UnitDummy4Tests extends AUnitTest<Dummy4Invoice, UnitRecord<SegmentType>, ECause<GroupType, UnitRecord<SegmentType>>> {
+class UnitDummy4Tests extends AUnitTest<Dummy4Invoice, UnitRecord<SegmentType>, PropertyEvent<GroupType, UnitRecord<SegmentType>>> {
 
     private final SimpleUnitImporter<Dummy4Invoice, GroupType, SegmentType> unitImporter;
 
@@ -37,7 +38,7 @@ class UnitDummy4Tests extends AUnitTest<Dummy4Invoice, UnitRecord<SegmentType>, 
     }
 
     @Test
-    void testEmpty() throws BeanException {
+    void testEmpty() {
         checkEmpty(new FastRecord[0]);
     }
 
@@ -49,11 +50,11 @@ class UnitDummy4Tests extends AUnitTest<Dummy4Invoice, UnitRecord<SegmentType>, 
                 record("41", null, "2025-03-12", "120", "100", "20"),
         };
         // When & Then
-        check1Cardinality1(rows);
+        check2Cardinality1(rows);
     }
 
     @Test
-    void testCardinality2() throws BeanException {
+    void testCardinality2() {
         // Given
         final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("41", null, "2025-03-12", "120", "100", "20")
@@ -63,7 +64,7 @@ class UnitDummy4Tests extends AUnitTest<Dummy4Invoice, UnitRecord<SegmentType>, 
     }
 
     @Test
-    void testCardinality3() throws BeanException {
+    void testCardinality3() {
         // Given
         final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("41", null, "2025-03-12", "120", "100", "20"),
@@ -77,7 +78,7 @@ class UnitDummy4Tests extends AUnitTest<Dummy4Invoice, UnitRecord<SegmentType>, 
     }
 
     @Test
-    void testCardinality4() throws BeanException {
+    void testCardinality4() {
         // Given
         final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("41", null, "2025-03-12", "120", "100", "20"),
@@ -89,7 +90,7 @@ class UnitDummy4Tests extends AUnitTest<Dummy4Invoice, UnitRecord<SegmentType>, 
     }
 
     @Test
-    void testDetached() throws BeanException {
+    void testDetached() {
         // Given
         final UnitRecord<SegmentType> detached = record("90", "9999", "Warning", "Detached");
         final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
@@ -112,7 +113,7 @@ class UnitDummy4Tests extends AUnitTest<Dummy4Invoice, UnitRecord<SegmentType>, 
     }
 
     @Test
-    void testValid2() throws BeanException, IOException {
+    void testValid2() throws IOException {
         // Given
         final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("41", null, "2025-03-12", "120", "100", "20"),
@@ -126,7 +127,7 @@ class UnitDummy4Tests extends AUnitTest<Dummy4Invoice, UnitRecord<SegmentType>, 
     }
 
     @Test
-    void testValidation() throws BeanException {
+    void testValidation() {
         // Given
         final UnitRecord<SegmentType> invalid = record("90", "1199", "Support", null);
         final UnitRecord<SegmentType>[] rows = new UnitRecord[]{

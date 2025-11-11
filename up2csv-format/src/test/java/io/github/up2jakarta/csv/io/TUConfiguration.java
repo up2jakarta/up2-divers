@@ -44,6 +44,7 @@ public class TUConfiguration {
                 .setIgnoreEmptyLines(true)
                 .setTrim(true)
                 .setIgnoreSurroundingSpaces(true)
+                .setCommentMarker('-')
                 .get();
     }
 

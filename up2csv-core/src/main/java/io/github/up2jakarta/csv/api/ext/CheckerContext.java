@@ -1,5 +1,6 @@
 package io.github.up2jakarta.csv.api.ext;
 
+import io.github.up2jakarta.csv.core.AccessMode;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
 
@@ -16,61 +17,62 @@ public interface CheckerContext {
     /**
      * Listener callback before scanning the super-class of a <code>segment</code>.
      *
-     * @param superType the super-class type
+     * @param type the super-class type
      * @throws BeanException for any missing or wrong bean configuration
      */
-    default void beforeSuperSegment(Class<? extends Segment> superType) throws BeanException {
+    default void beforeSuperSegment(Class<? extends Segment> type) throws BeanException {
     }
 
     /**
      * Listener callback after scanning the super-class of a <code>segment</code>.
      *
-     * @param superType the super-class type
+     * @param type the super-class type
      * @throws BeanException for any missing or wrong bean configuration
      */
-    default void afterSuperSegment(Class<? extends Segment> superType) throws BeanException {
+    default void afterSuperSegment(Class<? extends Segment> type) throws BeanException {
     }
 
     /**
      * Listener callback before scanning a segment annotated by {@link io.github.up2jakarta.csv.cfg.Fragment}.
      * Before super-class segment handler or listener.
      *
-     * @param fragment     the field annotated by {@link io.github.up2jakarta.csv.cfg.Fragment}
-     * @param fragmentType the fragment type
+     * @param fragment the field annotated by {@link io.github.up2jakarta.csv.cfg.Fragment}
+     * @param mode     the access mode read/write only
+     * @param type     the fragment type
      * @throws BeanException for any missing or wrong bean configuration
      */
-    default void beforeFragmentProperty(Field fragment, Class<? extends Segment> fragmentType) throws BeanException {
+    default void beforeFragmentProperty(AccessMode mode, Field fragment, Class<? extends Segment> type) throws BeanException {
     }
 
     /**
      * Listener callback after scanning a segment annotated by {@link io.github.up2jakarta.csv.cfg.Fragment}.
      *
-     * @param fragment     the field annotated by {@link io.github.up2jakarta.csv.cfg.Fragment}
-     * @param fragmentType the fragment type
+     * @param fragment the field annotated by {@link io.github.up2jakarta.csv.cfg.Fragment}
+     * @param type     the fragment type
      * @throws BeanException for any missing or wrong bean configuration
      */
-    default void afterFragmentProperty(Field fragment, Class<? extends Segment> fragmentType) throws BeanException {
+    default void afterFragmentProperty(Field fragment, Class<? extends Segment> type) throws BeanException {
     }
 
     /**
      * Listener callback before scanning a field annotated by {@link io.github.up2jakarta.csv.cfg.Position}.
      *
-     * @param property     the field annotated by {@link io.github.up2jakarta.csv.cfg.Position}
-     * @param propertyType the property type
-     * @param offset       the position index
+     * @param property the field annotated by {@link io.github.up2jakarta.csv.cfg.Position}
+     * @param type     the property type
+     * @param offset   the position index
      * @throws BeanException for any missing or wrong bean configuration
      */
-    default void positionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
+    default void positionProperty(Field property, Class<?> type, int offset) throws BeanException {
     }
 
     /**
      * Listener callback after scanning an unknown property the not annotated by <code>Position</code> and <code>Fragment</code>.
      *
-     * @param property     the unknown field
-     * @param propertyType the unknown field type
+     * @param property the unknown field
+     * @param type     the unknown field type
      * @throws BeanException for any missing or wrong bean configuration
      */
-    default void unknownProperty(Field property, Class<?> propertyType) throws BeanException {
+    default void unknownProperty(Field property, Class<?> type) throws BeanException {
     }
 
     /**

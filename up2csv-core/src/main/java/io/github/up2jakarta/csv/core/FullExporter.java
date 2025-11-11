@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.data.SegmentWriter;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  *
  * @param <T> the business object type
  */
-public non-sealed class FullExporter<B extends DataType<B>, I extends IType<B, I>, T extends Referencable> extends BusinessExporter<B, I, T> {
+public non-sealed class FullExporter<B extends DataType<B>, I extends IType<B, I>, T extends Segment> extends BusinessExporter<B, I, T> {
 
     public FullExporter(Up2Factory<B> factory, Class<T> type, I rootNode, I[] nodes) throws BeanException {
         super(factory, ModeType.FULL, type, rootNode, nodes);
@@ -29,19 +29,19 @@ public non-sealed class FullExporter<B extends DataType<B>, I extends IType<B, I
      * @param bean     the business object to segregate
      * @param rowId    the record-reference supplier
      * @param callback the segment listener
-     * @throws BeanException for any problem when getting fields from business-object
-     * @throws IOException   for some reason cannot be opened for writing by the callback.
-     * @see FullExporter#format(Referencable, Supplier, SegmentWriter)
+     * @throws AccessException for any problem when getting properties from the specified business-object
+     * @throws IOException     for some reason cannot be opened for writing by the callback.
+     * @see FullExporter#format(Segment, Supplier, SegmentWriter)
      */
-    public final void format(T bean, Supplier<String> rowId, SegmentWriter callback) throws BeanException, IOException {
+    public final void format(T bean, Supplier<String> rowId, SegmentWriter callback) throws AccessException, IOException {
         super.format(bean, rowId, callback);
     }
 
     @Override
-    final void fill(String[] target, Supplier<String> rowId, IType<?, ?> type, Referencable source) {
+    final void fill(String[] target, Supplier<String> rowId, IType<?, ?> type, String reference) {
         target[0] = rowId.get();
         target[1] = type.getCode();
-        target[2] = source.getReference();
+        target[2] = reference;
     }
 
 }

@@ -1,15 +1,17 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.api.IEvent;
+import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
 import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.BSNode.BFNode;
 import io.github.up2jakarta.csv.core.BSOperator.Processor;
+import io.github.up2jakarta.csv.core.hdl.ComplianceHandler;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
+import jakarta.validation.ValidationException;
 
-import static io.github.up2jakarta.csv.core.BSBuilder.reverse;
+import java.util.List;
 
 /**
  * Map and validate input data to a configurable bean that supports only {@link String} type.
@@ -56,9 +58,9 @@ public final class Up2Format<S extends Segment, D extends DataType<D>> extends P
      *
      * @param segment the bean that is being mapped to flat-data
      * @return the formatted array of strings
-     * @throws BeanException for any problem configuring and reading fields of the input to bean properties
+     * @throws AccessException for any problem when reading properties from the specified segment
      */
-    public String[] unmap(S segment) throws BeanException {
+    public String[] unmap(S segment) throws AccessException {
         return this.unmap(segment, offset);
     }
 
@@ -68,9 +70,9 @@ public final class Up2Format<S extends Segment, D extends DataType<D>> extends P
      * @param segment the bean that is being mapped to flat-data
      * @param offset  the number of columns reserved {@link Truncated#value()}
      * @return the formatted array of strings
-     * @throws BeanException for any problem configuring and reading fields of the input to bean properties
+     * @throws AccessException for any problem when reading properties from the specified segment
      */
-    public String[] unmap(S segment, int offset) throws BeanException {
+    public String[] unmap(S segment, int offset) throws AccessException {
         if (segment == null) {
             return null;
         }
@@ -82,26 +84,55 @@ public final class Up2Format<S extends Segment, D extends DataType<D>> extends P
     }
 
     /**
-     * Validates the given bean with the given JSR-303 validation groups and gathering
-     * {@link jakarta.validation.ConstraintViolation} in the given handler with recursive validation of embeddable fragments.
+     * Validates the given bean and recursively its embeddable fragments and gathering
+     * {@link jakarta.validation.ConstraintViolation} in the specified handler.
      *
      * @param segment the bean that is being validated
      * @param offset  the number of columns reserved {@link Truncated#value()}
      * @param handler the event handler
+     * @throws AccessException for any problem when reading properties from the specified segment
      */
-    public void validate(S segment, int offset, EventHandler<?, D, ? extends IEvent<D>> handler) throws BeanException {
+    public void validate(S segment, int offset, EventHandler<D> handler) throws AccessException {
         node.validate(handler, segment, offset);
     }
 
     /**
-     * Validates the given bean with the given JSR-303 validation groups and gathering
-     * {@link jakarta.validation.ConstraintViolation} in the given handler with recursive validation of embeddable fragments.
+     * Validates the given bean and recursively its embeddable fragments and gathering
+     * {@link jakarta.validation.ConstraintViolation} in the specified handler.
      *
      * @param segment the bean that is being validated
      * @param handler the event handler
+     * @throws AccessException for any problem when reading properties from the specified segment
      */
-    public void validate(S segment, EventHandler<?, D, ? extends IEvent<D>> handler) throws BeanException {
+    public void validate(S segment, EventHandler<D> handler) throws AccessException {
         this.validate(segment, this.offset, handler);
+    }
+
+    /**
+     * Validates the given bean and recursively its embeddable fragments and returns the collected
+     * {@link jakarta.validation.ConstraintViolation} wrapped in {@link IComplianceEvent} with more details.
+     *
+     * @param segment the bean that is being validated
+     * @param offset  the number of columns reserved {@link Truncated#value()}
+     * @return the collected constraint violations
+     * @throws AccessException for any problem when reading properties from the specified segment
+     */
+    public List<IComplianceEvent<D>> validate(S segment, int offset) throws AccessException {
+        final ComplianceHandler<D> handler = new ComplianceHandler<>();
+        this.validate(segment, offset, handler);
+        return handler.toList();
+    }
+
+    /**
+     * Validates the given bean and recursively its embeddable fragments and returns the collected
+     * {@link jakarta.validation.ConstraintViolation} wrapped in {@link IComplianceEvent} with more details.
+     *
+     * @param segment the bean that is being validated
+     * @return the collected constraint violations
+     * @throws AccessException for any problem when reading properties from the specified segment
+     */
+    public List<IComplianceEvent<D>> validate(S segment) throws AccessException, ValidationException {
+        return this.validate(segment, this.offset);
     }
 
     /**
@@ -109,10 +140,10 @@ public final class Up2Format<S extends Segment, D extends DataType<D>> extends P
      * This method is faster then {@link Up2Factory#build(Class, DataTypeResolver)} when the bean is already scanned.
      *
      * @return preconfigured CSV Mapper for the same segment
-     * @throws BeanException if any property is not accessible for writing
+     * @throws BeanException if any property is not accessible for write or cannot create segment instances
      */
     public Up2Mapper<S, D> toMapper() throws BeanException {
-        return new Up2Mapper<>(reverse(node));
+        return new Up2Mapper<>(node.reverse());
     }
 
 }

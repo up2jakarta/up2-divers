@@ -2,13 +2,19 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.BusinessBuilder;
 import io.github.up2jakarta.csv.api.ext.BeanContext;
+import io.github.up2jakarta.csv.core.BSOperator.Factory;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.xml.api.IException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.validation.*;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Optional;
 
 /**
  * Up2 Configurable Factory for {@link Up2Mapper} and {@link Up2Format}.
@@ -17,10 +23,8 @@ import jakarta.validation.*;
  */
 @Named
 @Singleton
-public final class Up2Factory<D extends DataType<D>> {
+public final class Up2Factory<D extends DataType<D>> extends Factory {
 
-    final BeanContext context;
-    final Validator validator;
     final DataTypeResolver<D> resolver;
 
     /**
@@ -42,8 +46,7 @@ public final class Up2Factory<D extends DataType<D>> {
      */
     @Inject
     public Up2Factory(BeanContext context, Validator validator, DataTypeResolver<D> resolver) {
-        this.validator = validator;
-        this.context = context;
+        super(context, validator);
         this.resolver = resolver;
     }
 
@@ -63,13 +66,30 @@ public final class Up2Factory<D extends DataType<D>> {
     }
 
     /**
+     * Builds and returns the stack trace of the cause of the specified error.
+     *
+     * @param event the source error
+     * @return the stack-trace if exists
+     */
+    public static Optional<String> trace(IException event) {
+        while (event.getCause() instanceof IException cause) {
+            event = cause;
+        }
+        return Optional.ofNullable(event.getCause()).map(c -> {
+            final StringWriter writer = new StringWriter();
+            BSBuilder.stackTrace(c, new PrintWriter(writer));
+            return writer.toString().trim();
+        });
+    }
+
+    /**
      * Build a preconfigured CSV Mapper that is able to map flat-data to bean-segment with default resolver.
      *
      * @param type the type of segment that is being mapped
      * @param <S>  The class of segment
      * @return the CSV mapper
      * @throws BeanException for any missing or wrong bean configuration
-     * @see Up2Factory#format(Class, DataTypeResolver)
+     * @see Up2Factory#build(Class, DataTypeResolver)
      */
     public <S extends Segment> Up2Mapper<S, D> build(final Class<S> type) throws BeanException {
         return new Up2Mapper<>(BSContext.build(type, this, resolver));

@@ -1,7 +1,11 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.misc.map.*;
+import io.github.up2jakarta.csv.core.BSOperator.BAccessor;
+import io.github.up2jakarta.csv.core.misc.acs.*;
+import io.github.up2jakarta.csv.core.misc.map.Default1Bean;
+import io.github.up2jakarta.csv.data.DataTypeResolver;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.impl.GroupType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static io.github.up2jakarta.csv.core.Properties.assertUndefined;
+import static io.github.up2jakarta.csv.core.Properties.assertValid;
 import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
 import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,10 +23,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 class Up2AccessTests {
 
+    private final DataTypeResolver<?> resolver;
     private final Up2Factory<?> factory;
 
     @Autowired
     Up2AccessTests(Up2Factory<GroupType> factory) {
+        this.resolver = factory.resolver;
         this.factory = factory;
     }
 
@@ -400,7 +408,105 @@ class Up2AccessTests {
         format.validate(bean, of(WARNING));
         // Then
         assertArrayEquals(data, out);
-        assertNull(bean.getContent()); // Nullable
+        assertNotNull(bean.getContent()); // Nullable
+        assertTrue(bean.getContent().isEmpty());
+    }
+
+    @Test
+    void validOptionalBusinessId() throws BeanException {
+        // When
+        final BAccessor<Segment, Object> bid1 = factory.build(resolver, BIdOBean.class).businessId;
+        final BAccessor<Segment, Object> bid2 = factory.format(resolver, BIdOBean.class).businessId;
+        // Then
+        assertValid(bid1, new BIdOBean());
+        assertValid(bid2, new BIdOBean());
+    }
+
+    @Test
+    void validReadOnlyBusinessId() throws BeanException {
+        // Given
+        final BId5Bean bean = new BId5Bean(99);
+        // When
+        final BAccessor<Segment, Object> bid = factory.format(resolver, BId5Bean.class).businessId;
+        // Then
+        assertTrue(bid.supports(null));
+        assertTrue(bid.supports(AccessMode.RO));
+        assertFalse(bid.supports(AccessMode.WO));
+        assertEquals(99, bid.get(bean));
+        assertEquals("99", bid.format(bean));
+        assertThrows(AccessException.class, () -> bid.set(bean, 0));
+    }
+
+    @Test
+    void validBusinessId1() throws BeanException {
+        // Given
+        final BId1Bean bean = new BId1Bean();
+        // When
+        final BAccessor<Segment, Object> bid1 = factory.build(resolver, BId1Bean.class).businessId;
+        final BAccessor<Segment, Object> bid2 = factory.format(resolver, BId1Bean.class).businessId;
+        // Then
+        assertValid(bid1, bean);
+        assertValid(bid2, bean);
+    }
+
+    @Test
+    void validBusinessId2() throws BeanException {
+        // Given
+        final BId2Bean bean = new BId2Bean();
+        // When
+        final BAccessor<Segment, Object> bid1 = factory.build(resolver, BId2Bean.class).businessId;
+        final BAccessor<Segment, Object> bid2 = factory.format(resolver, BId2Bean.class).businessId;
+        // Then
+        assertValid(bid1, bean);
+        assertValid(bid2, bean);
+    }
+
+    @Test
+    void validBusinessId3() throws BeanException {
+        // Given
+        final BId3Bean bean = new BId3Bean();
+        // When
+        final BAccessor<Segment, Object> bid1 = factory.build(resolver, BId3Bean.class).businessId;
+        final BAccessor<Segment, Object> bid2 = factory.format(resolver, BId3Bean.class).businessId;
+        // Then
+        assertValid(bid1, bean);
+        assertValid(bid2, bean);
+    }
+
+    @Test
+    void validBusinessId4() throws BeanException {
+        // Given
+        final BId4Bean bean = new BId4Bean(99);
+        // When
+        final BAccessor<Segment, Object> bid1 = factory.build(resolver, BId4Bean.class).businessId;
+        final BAccessor<Segment, Object> bid2 = factory.format(resolver, BId4Bean.class).businessId;
+        // Then
+        assertValid(bid1, bean);
+        assertValid(bid2, bean);
+    }
+
+    @Test
+    void validBusinessId5() throws BeanException {
+        // Given
+        final Default1Bean bean = new Default1Bean();
+        // When
+        final BAccessor<Segment, Object> bid1 = factory.build(resolver, Default1Bean.class).businessId;
+        final BAccessor<Segment, Object> bid2 = factory.format(resolver, Default1Bean.class).businessId;
+        // Then
+        assertUndefined(bid1, bean);
+        assertUndefined(bid2, bean);
+    }
+
+    @Test
+    void validBusinessId6() throws BeanException {
+        // Given
+        final Record1Bean bean = new Record1Bean(null);
+        // When
+        final BAccessor<Segment, Object> bid1 = factory.build(resolver, Record1Bean.class).businessId;
+        final BAccessor<Segment, Object> bid2 = factory.format(resolver, Record1Bean.class).businessId;
+        // Then
+        assertUndefined(bid1, bean);
+        assertUndefined(bid2, bean);
     }
 
 }

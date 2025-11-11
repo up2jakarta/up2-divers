@@ -2,6 +2,7 @@ package io.github.up2jakarta.csv.core.ext;
 
 import io.github.up2jakarta.csv.api.ext.CheckerContext;
 import io.github.up2jakarta.csv.api.ext.SegmentListener;
+import io.github.up2jakarta.csv.core.AccessMode;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
 import jakarta.inject.Named;
@@ -19,7 +20,7 @@ import java.util.List;
 public final class UniqueOffsetChecker implements SegmentListener {
 
     @Override
-    public CheckerContext beforeSegment(Class<? extends Segment> segmentType) {
+    public CheckerContext beforeSegment(AccessMode mode, Class<? extends Segment> type) {
         return new ContextImpl();
     }
 
@@ -27,7 +28,7 @@ public final class UniqueOffsetChecker implements SegmentListener {
         private final List<Integer> offsets = new LinkedList<>();
 
         @Override
-        public void positionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
+        public void positionProperty(Field property, Class<?> type, int offset) throws BeanException {
             if (!offsets.add(offset)) {
                 throw new BeanException(property, "@Position[value] must be unique");
             }

@@ -4,19 +4,28 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IFastRecord;
 import io.github.up2jakarta.csv.api.IFullRecord;
 import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.hdl.ISelfEvent;
+import io.github.up2jakarta.csv.api.hdl.ISelfRecord;
 import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.*;
+import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
+import io.github.up2jakarta.csv.core.hdl.PropertyFailureCollector;
 import io.github.up2jakarta.csv.fmt.Fixed06Generator;
+import io.github.up2jakarta.csv.fmt.FullRecord;
 import io.github.up2jakarta.csv.fmt.UnitRecord;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
 import io.github.up2jakarta.csv.impl.dto.Item;
+import io.github.up2jakarta.xml.api.PropertyException;
+import io.github.up2jakarta.xml.api.SeverityType;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.BiFunction;
 
 import static io.github.up2jakarta.csv.core.ModeType.*;
@@ -93,9 +102,7 @@ public final class Tests {
         return copyOfRange(data, from, data.length);
     }
 
-    private static <T extends Invoice, R extends IRecord<SegmentType>> T aggregate(
-            ModeType mode, BusinessImporter<GroupType, SegmentType, T, R, ?> importer, R[] rows
-    ) throws BeanException {
+    private static <T extends Invoice, R extends IRecord<SegmentType>> T aggregate(ModeType mode, BusinessImporter<GroupType, SegmentType, T, R, ?> importer, R[] rows) {
         // When Parsing
         final T invoice = importer.parse(rows, (i, r) -> {
             assertEquals(0, r.size());
@@ -119,21 +126,21 @@ public final class Tests {
         if (mode == ModeType.UNIT) {
             if (invoice instanceof Dummy4Invoice || invoice instanceof Dummy5Invoice) {
                 assertNull(invoice.getReference());
-                assertFalse(invoice.getRecord() instanceof IFastRecord<?>);
+                assertFalse(invoice.getRecord() instanceof IFastRecord<?, ?>);
             } else if (invoice instanceof Dummy1Invoice) {
                 // Manual setting : BusinessObject#setReference(String)
                 assertNotNull(invoice.getReference());
                 assertInstanceOf(IFastRecord.class, invoice.getRecord());
-                assertEquals(((IFastRecord<?>) invoice.getRecord()).getPivot(), invoice.getReference());
+                assertEquals(((IFastRecord<?, ?>) invoice.getRecord()).getPivot(), invoice.getReference());
             } else {
                 assertNotNull(invoice.getReference());
                 assertInstanceOf(IFastRecord.class, invoice.getRecord());
-                assertNull(((IFastRecord<?>) invoice.getRecord()).getPivot());
+                assertNull(((IFastRecord<?, ?>) invoice.getRecord()).getPivot());
             }
         } else {
             assertNotNull(invoice.getReference());
             assertInstanceOf(IFastRecord.class, invoice.getRecord());
-            assertEquals(((IFastRecord<?>) invoice.getRecord()).getPivot(), invoice.getReference());
+            assertEquals(((IFastRecord<?, ?>) invoice.getRecord()).getPivot(), invoice.getReference());
         }
     }
 
@@ -162,12 +169,12 @@ public final class Tests {
         return result;
     }
 
-    public static MyRecord[] fastInvoice(SegmentType target) {
-        final MyRecord[] result = new MyRecord[FAST_INVOICE.length];
+    public static TURecord[] fastInvoice(SegmentType target) {
+        final TURecord[] result = new TURecord[FAST_INVOICE.length];
         for (var i = 0; i < FAST_INVOICE.length; i++) {
             final String[] data = FAST_INVOICE[i];
             final SegmentType type = type(data[0], target);
-            result[i] = new MyRecord(type, data[FAST.getBeanIdIndex()], columns(FAST, type, data));
+            result[i] = new TURecord(type, data[FAST.getBeanIdIndex()], columns(FAST, type, data));
         }
         return result;
     }
@@ -190,7 +197,7 @@ public final class Tests {
         return result;
     }
 
-    public static <T extends Invoice, R extends IFastRecord<SegmentType>> void assertInvoice(
+    public static <T extends Invoice, R extends IFastRecord<SegmentType, ?>> void assertInvoice(
             FastImporter<GroupType, SegmentType, T, R, ?> importer, R[] rows
     ) throws BeanException, IOException {
         // When Parsing
@@ -201,7 +208,7 @@ public final class Tests {
         tc.assertEmpty();
     }
 
-    public static <T extends Invoice, R extends IFullRecord<SegmentType>> void assertInvoice(
+    public static <T extends Invoice, R extends IFullRecord<SegmentType, ?>> void assertInvoice(
             FullImporter<GroupType, SegmentType, T, R, ?> importer, R[] rows
     ) throws BeanException, IOException {
         // When Parsing
@@ -223,4 +230,36 @@ public final class Tests {
         tc.assertEmpty();
     }
 
+    public static class TUCollector extends PropertyFailureCollector<TURecord, GroupType, TUError> {
+        public TUCollector(TURecord row) {
+            super(row, TUError::new, SeverityType.FATAL);
+        }
+    }
+
+    public static class TURecord extends FullRecord<SegmentType, String> implements ISelfRecord<GroupType, SegmentType, TUError, TURecord> {
+
+        private final List<TUError> errors = new LinkedList<>();
+
+        // UNIT Mode compatibility
+        public TURecord(SegmentType type, String[] data) {
+            super(null, type, null, data);
+        }
+
+        // FAST Mode compatibility
+        public TURecord(SegmentType type, String businessKey, String... data) {
+            super(null, type, businessKey, data);
+        }
+
+        @Override
+        public List<TUError> getErrors() {
+            return errors;
+        }
+    }
+
+    public static class TUError extends PropertyEvent<GroupType, TURecord> implements ISelfEvent<GroupType, TURecord, TUError> {
+
+        public TUError(TURecord row, Integer offset, GroupType type, PropertyException cause) {
+            super(row, offset, type, cause);
+        }
+    }
 }

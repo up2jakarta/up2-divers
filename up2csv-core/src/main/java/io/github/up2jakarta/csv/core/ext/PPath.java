@@ -16,6 +16,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static io.github.up2jakarta.csv.core.BeanException.of;
+import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
 import static java.util.Arrays.copyOfRange;
 import static java.util.Arrays.stream;
 
@@ -39,13 +40,13 @@ public final class PPath {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     public static <A extends Annotation> A getOverride(Class<? extends Segment> bean, Class<A> type) {
         while (bean != Segment.class && Segment.class.isAssignableFrom(bean)) {
             final A result = bean.getAnnotation(type);
             if (result != null) {
                 return result;
             }
-            //noinspection unchecked
             bean = (Class<? extends Segment>) bean.getSuperclass();
         }
         return null;
@@ -61,7 +62,7 @@ public final class PPath {
         if (overrides.size() == 1) {
             return overrides.getFirst();
         }
-        throw of(origin, "multiple @" + type.getSimpleName() + "(path = {})");
+        throw of(origin, "multiple @" + getTypeName(type) + "(path = {})");
     }
 
     public static <A extends Annotation> A getOverride(Class<A> type, Map<PPath, A> overrides, Field field, Function<A, String[]> mapper) throws BeanException {
@@ -98,7 +99,7 @@ public final class PPath {
             final PPath source = new PPath(mapper.apply(override));
             for (int j = i + 1; j < overrides.length; j++) {
                 if (equals(mapper.apply(overrides[j]), source.path, 0)) {
-                    throw of(origin, "multiple @" + type.getSimpleName() + "(path = " + source + ")");
+                    throw of(origin, "multiple @" + getTypeName(type) + "(path = " + source + ")");
                 }
             }
             collector.accept(source, override);

@@ -2,6 +2,7 @@ package io.github.up2jakarta.csv.core.ext;
 
 import io.github.up2jakarta.csv.api.ext.CheckerContext;
 import io.github.up2jakarta.csv.api.ext.SegmentListener;
+import io.github.up2jakarta.csv.core.AccessMode;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
 import jakarta.inject.Named;
@@ -28,8 +29,8 @@ public final class JpaTableChecker implements SegmentListener {
         throw new BeanException((Class<?>) source, message);
     }
 
-    static Class<?>[] checkAndGetArguments(Field field, Class<?> fieldType, int length) throws BeanException {
-        final TypeVariable<?>[] parameters = fieldType.getTypeParameters();
+    static Class<?>[] checkAndGetArguments(Field field, Class<?> type, int length) throws BeanException {
+        final TypeVariable<?>[] parameters = type.getTypeParameters();
         final Type[] arguments = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
         if (parameters.length != length) {
             throw new BeanException(field, "must be checked");
@@ -41,8 +42,8 @@ public final class JpaTableChecker implements SegmentListener {
             if (parameter.getBounds().length == 0) {
                 throw new BeanException(field, "must be checked");
             }
-            if (argument instanceof Class<?> type) {
-                result.add(type);
+            if (argument instanceof Class<?> c) {
+                result.add(c);
             } else if (parameter.getBounds()[0] instanceof ParameterizedType pt && pt.getActualTypeArguments().length == 1) {
                 result.add((Class<?>) pt.getActualTypeArguments()[0]);
             } else if ((argument instanceof ParameterizedType pt) && pt.getRawType() instanceof Class<?> rc) {
@@ -88,120 +89,120 @@ public final class JpaTableChecker implements SegmentListener {
         }
     }
 
-    static Class<?> checkEntity(Class<?> entityType) throws BeanException {
-        final Table table = entityType.getAnnotation(Table.class);
-        if (table == null && entityType.isAnnotationPresent(DiscriminatorValue.class)) {
-            return checkEntity(entityType.getSuperclass());
+    static Class<?> checkEntity(Class<?> type) throws BeanException {
+        final Table table = type.getAnnotation(Table.class);
+        if (table == null && type.isAnnotationPresent(DiscriminatorValue.class)) {
+            return checkEntity(type.getSuperclass());
         }
         if (table == null) {
-            throw new BeanException(entityType, "must be annotated with @Table");
+            throw new BeanException(type, "must be annotated with @Table");
         }
-        final String prefix = checkAndGetPrefix(entityType.getPackage());
-        checkName(entityType, table.name(), prefix, "@Table[name]");
-        return entityType;
+        final String prefix = checkAndGetPrefix(type.getPackage());
+        checkName(type, table.name(), prefix, "@Table[name]");
+        return type;
     }
 
     @Override
-    public boolean isActivated(Class<? extends Segment> segmentType) {
-        return segmentType.isAnnotationPresent(Entity.class) && segmentType.getPackage().isAnnotationPresent(Prefix.class);
+    public boolean isActivated(Class<? extends Segment> type) {
+        return type.isAnnotationPresent(Entity.class) && type.getPackage().isAnnotationPresent(Prefix.class);
     }
 
     @Override
-    public CheckerContext beforeSegment(Class<? extends Segment> segmentType) throws BeanException {
-        checkEntity(segmentType);
-        return new JpaTableContext(segmentType);
+    public CheckerContext beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException {
+        checkEntity(type);
+        return new JpaTableContext(type);
     }
 
     private static class JpaTableContext implements CheckerContext {
 
         private final Stack<Class<?>> stack = new Stack<>();
 
-        private JpaTableContext(Class<? extends Segment> segmentType) {
-            stack.push(segmentType);
+        private JpaTableContext(Class<? extends Segment> type) {
+            stack.push(type);
         }
 
-        private static Class<?> checkFragment(Field field, Class<? extends Segment> fieldType) throws BeanException {
-            final OneToOne o2o = field.getAnnotation(OneToOne.class);
+        private static Class<?> checkFragment(Field fragment, Class<? extends Segment> type) throws BeanException {
+            final OneToOne o2o = fragment.getAnnotation(OneToOne.class);
             if (o2o != null) {
-                final Class<?> entityType = (o2o.targetEntity() != void.class) ? o2o.targetEntity() : fieldType;
+                final Class<?> entityType = (o2o.targetEntity() != void.class) ? o2o.targetEntity() : type;
                 if (entityType.getAnnotation(Entity.class) == null) {
-                    throw new BeanException(fieldType, "must be annotated by @Entity");
+                    throw new BeanException(type, "must be annotated by @Entity");
                 }
                 return checkEntity(entityType);
             }
-            final ManyToOne m2o = field.getAnnotation(ManyToOne.class);
+            final ManyToOne m2o = fragment.getAnnotation(ManyToOne.class);
             if (m2o != null) {
-                final Class<?> entityType = (m2o.targetEntity() != void.class) ? m2o.targetEntity() : fieldType;
+                final Class<?> entityType = (m2o.targetEntity() != void.class) ? m2o.targetEntity() : type;
                 if (entityType.getAnnotation(Entity.class) == null) {
-                    throw new BeanException(fieldType, "must be annotated by @Entity");
+                    throw new BeanException(type, "must be annotated by @Entity");
                 }
                 return checkEntity(entityType);
             }
-            if (fieldType.getAnnotation(Entity.class) != null) {
-                return checkEntity(fieldType);
+            if (type.getAnnotation(Entity.class) != null) {
+                return checkEntity(type);
             }
-            return fieldType;
+            return type;
         }
 
         @Override
-        public void beforeFragmentProperty(Field field, Class<? extends Segment> fieldType) throws BeanException {
-            stack.push(checkFragment(field, fieldType));
-            this.unknownProperty(field, fieldType);
+        public void beforeFragmentProperty(AccessMode mode, Field fragment, Class<? extends Segment> type) throws BeanException {
+            stack.push(checkFragment(fragment, type));
+            this.unknownProperty(fragment, type);
         }
 
         @Override
-        public void afterFragmentProperty(Field field, Class<? extends Segment> fieldType) {
+        public void afterFragmentProperty(Field fragment, Class<? extends Segment> type) {
             stack.pop();
         }
 
         @Override
-        public void unknownProperty(Field field, Class<?> fieldType) throws BeanException {
-            final SecondaryTable[] st = field.getAnnotationsByType(SecondaryTable.class);
+        public void unknownProperty(Field property, Class<?> type) throws BeanException {
+            final SecondaryTable[] st = property.getAnnotationsByType(SecondaryTable.class);
             for (final SecondaryTable t : st) {
                 final String prefix = checkAndGetPrefix(stack.peek().getPackage());
-                checkName(field.getDeclaringClass(), t.name(), prefix, "@SecondaryTable[name]");
+                checkName(property.getDeclaringClass(), t.name(), prefix, "@SecondaryTable[name]");
             }
-            final JoinTable jt = field.getAnnotation(JoinTable.class);
+            final JoinTable jt = property.getAnnotation(JoinTable.class);
             if (jt != null) {
                 final String prefix = checkAndGetPrefix(stack.peek().getPackage());
-                checkName(field.getDeclaringClass(), jt.name(), prefix, "@JoinTable[name]");
+                checkName(property.getDeclaringClass(), jt.name(), prefix, "@JoinTable[name]");
             }
-            final OneToOne o2o = field.getAnnotation(OneToOne.class);
+            final OneToOne o2o = property.getAnnotation(OneToOne.class);
             if (o2o != null) {
-                final Class<?> entityType = (o2o.targetEntity() != void.class) ? o2o.targetEntity() : fieldType;
+                final Class<?> entityType = (o2o.targetEntity() != void.class) ? o2o.targetEntity() : type;
                 if (entityType.getAnnotation(Entity.class) == null) {
-                    throw new BeanException(fieldType, "must be annotated by @Entity");
+                    throw new BeanException(type, "must be annotated by @Entity");
                 }
                 checkEntity(entityType);
             }
-            final ManyToOne m2o = field.getAnnotation(ManyToOne.class);
+            final ManyToOne m2o = property.getAnnotation(ManyToOne.class);
             if (m2o != null) {
-                final Class<?> entityType = (m2o.targetEntity() != void.class) ? m2o.targetEntity() : fieldType;
+                final Class<?> entityType = (m2o.targetEntity() != void.class) ? m2o.targetEntity() : type;
                 if (entityType.getAnnotation(Entity.class) == null) {
-                    throw new BeanException(fieldType, "must be annotated by @Entity");
+                    throw new BeanException(type, "must be annotated by @Entity");
                 }
                 checkEntity(entityType);
             }
-            final OneToMany o2m = field.getAnnotation(OneToMany.class);
-            final ManyToMany m2m = field.getAnnotation(ManyToMany.class);
+            final OneToMany o2m = property.getAnnotation(OneToMany.class);
+            final ManyToMany m2m = property.getAnnotation(ManyToMany.class);
             if (o2m != null || m2m != null) {
-                if (Collection.class.isAssignableFrom(fieldType)) {
-                    final Class<?>[] types = checkAndGetArguments(field, fieldType, 1);
+                if (Collection.class.isAssignableFrom(type)) {
+                    final Class<?>[] types = checkAndGetArguments(property, type, 1);
                     if (types[0].getAnnotation(Entity.class) == null) {
-                        throw new BeanException(field, "type must be annotated by @Entity");
+                        throw new BeanException(property, "type must be annotated by @Entity");
                     }
                     checkEntity(types[0]);
-                } else if (Map.class.isAssignableFrom(fieldType)) {
-                    final Class<?>[] types = checkAndGetArguments(field, fieldType, 2);
+                } else if (Map.class.isAssignableFrom(type)) {
+                    final Class<?>[] types = checkAndGetArguments(property, type, 2);
                     if (types[0].getAnnotation(Entity.class) != null) {
                         checkEntity(types[0]);
                     }
                     if (types[1].getAnnotation(Entity.class) == null) {
-                        throw new BeanException(field, "type must be annotated by @Entity");
+                        throw new BeanException(property, "type must be annotated by @Entity");
                     }
                     checkEntity(types[1]);
                 } else {
-                    throw new BeanException(field, "must be collection");
+                    throw new BeanException(property, "must be collection");
                 }
             }
         }

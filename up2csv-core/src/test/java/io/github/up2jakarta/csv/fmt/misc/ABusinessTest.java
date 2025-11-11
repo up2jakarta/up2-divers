@@ -2,12 +2,12 @@ package io.github.up2jakarta.csv.fmt.misc;
 
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.api.hdl.ICauseEvent;
-import io.github.up2jakarta.csv.api.hdl.ITraceEvent;
+import io.github.up2jakarta.csv.api.hdl.IBusinessEvent;
+import io.github.up2jakarta.csv.api.hdl.IPropertyEvent;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.BusinessImporter;
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.core.hdl.FatalException;
+import io.github.up2jakarta.csv.core.hdl.PropertyFailureException;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.*;
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
-import static io.github.up2jakarta.csv.data.DataType.DETACHED;
 import static io.github.up2jakarta.csv.impl.GroupType.*;
 import static io.github.up2jakarta.csv.impl.SegmentType.S01;
 import static io.github.up2jakarta.csv.impl.SegmentType.S11;
@@ -118,16 +117,16 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
 
     protected abstract void checkValid1(R[] rows) throws BeanException, IOException;
 
-    protected abstract void checkValid2(R[] rows) throws BeanException, IOException;
+    protected abstract void checkValid2(R[] rows) throws IOException;
 
+    @SuppressWarnings("unchecked")
     protected final <A extends BusinessImporter<GroupType, SegmentType, T, R, E>> A get() {
-        //noinspection unchecked
         return (A) importer;
     }
 
     @Test
     @SuppressWarnings("ConstantValue")
-    void testAggregateNull() throws BeanException {
+    void testAggregateNull() {
         // Given
         final R[] rows = null;
         final List<E> errors = new LinkedList<>();
@@ -141,7 +140,7 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertEquals(0, errors.size());
     }
 
-    protected void checkEmpty(R[] rows) throws BeanException {
+    protected void checkEmpty(R[] rows) {
         // Given
         final List<E> errors = new LinkedList<>();
         // When
@@ -156,10 +155,10 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
 
     protected void check1Cardinality1(R[] rows) {
         // When
-        final FatalException e = assertThrows(FatalException.class, () -> importer.parse(rows, (i, r) -> i));
-        assertEquals(0, e.getCauses().size());
+        final PropertyFailureException e = assertThrows(PropertyFailureException.class, () -> importer.parse(rows, (i, r) -> i));
+        assertEquals(0, e.toList().size());
         // Then
-        assertEquals(mode.getTypeIdIndex(), e.getOffset());
+        assertNull(e.getOffset());
         assertEquals(S11.getBusinessType(), e.getType());
         assertEquals(S11.getErrorLevel(), e.getSeverity());
         assertEquals(S11.getErrorCode(), e.getCode());
@@ -168,7 +167,7 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertEquals("cardinality must be 1 and only one", e.getCause().getMessage());
     }
 
-    protected void check2Cardinality1(R[] rows) throws BeanException {
+    protected void check2Cardinality1(R[] rows) {
         final List<E> errors = new LinkedList<>();
         // When
         final T invoice = importer.parse(rows, (i, r) -> {
@@ -179,14 +178,14 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertEquals(2, errors.size());
         // Then
         for (final E e : errors) {
-            if (e instanceof ITraceEvent<?, ?, ?> t) {
+            if (e instanceof IBusinessEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertNotNull(t.getKey());
                 assertNotNull(t.getKey().getRecord());
-            } else if (e instanceof ICauseEvent<?, ?> c) {
+            } else if (e instanceof IPropertyEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
             }
-            assertEquals(mode.getTypeIdIndex(), e.getOffset());
+            assertNull(e.getOffset());
             assertEquals(S01.getBusinessType(), e.getType());
             assertEquals(S01.getErrorLevel(), e.getSeverity());
             assertEquals(S01.getErrorCode(), e.getCode());
@@ -194,7 +193,7 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         }
     }
 
-    protected void checkCardinality2(R[] rows) throws BeanException {
+    protected void checkCardinality2(R[] rows) {
         final List<E> errors = new LinkedList<>();
         // When
         final T invoice = importer.parse(rows, (i, r) -> {
@@ -207,12 +206,12 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertNull(invoice.getBuyer());
         assertEquals(3, errors.size());
         for (var e : errors) {
-            if (e instanceof ITraceEvent<?, ?, ?> t) {
+            if (e instanceof IBusinessEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
-            } else if (e instanceof ICauseEvent<?, ?> c) {
+            } else if (e instanceof IPropertyEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
             }
-            assertEquals(0, e.getOffset());
+            assertNull(e.getOffset());
             assertEquals(SeverityType.ERROR, e.getSeverity());
             if (e.getType() == D002 || e.getType() == D003) {
                 assertEquals("cardinality must be 1 and only one", e.getMessage());
@@ -224,7 +223,7 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         }
     }
 
-    protected void checkCardinality3(SegmentType type, R[] rows) throws BeanException {
+    protected void checkCardinality3(SegmentType type, R[] rows) {
         // Given
         final List<E> errors = new LinkedList<>();
         // When
@@ -238,22 +237,22 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertNotNull(invoice.getBuyer());
         assertEquals(2, errors.size());
         for (var e : errors) {
-            if (e instanceof ITraceEvent<?, ?, ?> t) {
+            if (e instanceof IBusinessEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertEquals(type, t.getKey().getRecord().getType());
-            } else if (e instanceof ICauseEvent<?, ?> c) {
+            } else if (e instanceof IPropertyEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
                 assertEquals(type, c.getRecord().getType());
             }
             assertEquals(D002, e.getType());
-            assertEquals(mode.getTypeIdIndex(), e.getOffset());
+            assertNull(e.getOffset());
             assertEquals(type.getErrorCode(), e.getCode());
             assertEquals(type.getErrorLevel(), e.getSeverity());
             assertEquals("cardinality must be 1 and only one", e.getMessage());
         }
     }
 
-    protected void checkCardinality4(SegmentType type, SegmentType origin, R[] rows) throws BeanException {
+    protected void checkCardinality4(SegmentType type, SegmentType origin, R[] rows) {
         // Given
         final List<E> errors = new LinkedList<>();
         // When
@@ -267,22 +266,22 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertNotNull(invoice.getBuyer());
         assertEquals(1, errors.size());
         for (var e : errors) {
-            if (e instanceof ITraceEvent<?, ?, ?> t) {
+            if (e instanceof IBusinessEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertEquals(origin, t.getKey().getRecord().getType());
-            } else if (e instanceof ICauseEvent<?, ?> c) {
+            } else if (e instanceof IPropertyEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
                 assertEquals(origin, c.getRecord().getType());
             }
             assertEquals(D004, e.getType());
-            assertEquals(0, e.getOffset());
+            assertNull(e.getOffset());
             assertEquals(type.getErrorCode(), e.getCode());
             assertEquals(type.getErrorLevel(), e.getSeverity());
             assertEquals("cardinality must be greater than or equal to 1", e.getMessage());
         }
     }
 
-    protected void checkDetached(R detached, R[] rows) throws BeanException {
+    protected void checkDetached(R detached, R[] rows) {
         // Given
         final List<E> errors = new LinkedList<>();
         // When
@@ -302,14 +301,14 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertEquals(1, errors.size());
         {
             final E e = errors.getFirst();
-            if (e instanceof ITraceEvent<?, ?, ?> t) {
+            if (e instanceof IBusinessEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertNotNull(t.getKey());
                 assertEquals(detached, t.getKey().getRecord());
-            } else if (e instanceof ICauseEvent<?, ?> c) {
+            } else if (e instanceof IPropertyEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
             }
-            assertEquals(0, e.getOffset());
+            assertNull(e.getOffset());
             if (detached.getType() != null) {
                 assertEquals(detached.getType().getErrorLevel(), e.getSeverity());
                 assertEquals(detached.getType().getErrorCode(), e.getCode());
@@ -323,7 +322,7 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         }
     }
 
-    protected void checkValidation(R invalid, R[] rows) throws BeanException {
+    protected void checkValidation(R invalid, R[] rows) {
         // Given
         final List<E> errors = new LinkedList<>();
         // When
@@ -340,11 +339,11 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertEquals(1, errors.size());
         {
             final E e = errors.getFirst();
-            if (e instanceof ITraceEvent<?, ?, ?> t) {
+            if (e instanceof IBusinessEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertNotNull(t.getKey());
                 assertEquals(invalid, t.getKey().getRecord());
-            } else if (e instanceof ICauseEvent<?, ?> c) {
+            } else if (e instanceof IPropertyEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
             }
             assertEquals(mode.getLength() + 2, e.getOffset());

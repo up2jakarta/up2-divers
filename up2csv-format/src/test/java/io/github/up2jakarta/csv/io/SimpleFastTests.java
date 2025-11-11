@@ -19,7 +19,7 @@ import java.io.IOException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class SimpleFastTests extends AFastTests<FastRecord<SegmentType>, SimpleFastImporter<Invoice, GroupType, SegmentType>> {
+public class SimpleFastTests extends AFastTests<FastRecord<SegmentType, String>, SimpleFastImporter<Invoice, GroupType, SegmentType>> {
 
     @Autowired
     SimpleFastTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
@@ -32,19 +32,19 @@ public class SimpleFastTests extends AFastTests<FastRecord<SegmentType>, SimpleF
     }
 
     @Override
-    protected FastFileReader<Invoice, GroupType, SegmentType, FastRecord<SegmentType>, ?> reader(
+    protected FastFileReader<Invoice, GroupType, SegmentType, FastRecord<SegmentType, String>, ?> reader(
             SimpleFastImporter<Invoice, GroupType, SegmentType> importer, CSVFormat format
     ) {
         return new SimpleFastReader<>(importer, format);
     }
 
     @Test
-    void test10() throws BeanException, IOException {
+    void test10() throws IOException {
         testFile(10);
     }
 
     @Test
-    void test100() throws BeanException, IOException {
+    void test100() throws IOException {
         testFile(100);
     }
 

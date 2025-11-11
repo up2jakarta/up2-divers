@@ -5,8 +5,6 @@ import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.fmt.misc.AUnitTest;
 import io.github.up2jakarta.csv.fmt.misc.Dummy1Invoice;
-import io.github.up2jakarta.csv.fmt.misc.MyError;
-import io.github.up2jakarta.csv.fmt.misc.MyRecord;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.xml.clv.CodeListException;
@@ -18,33 +16,33 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 
-import static io.github.up2jakarta.csv.fmt.misc.Tests.fastInvoice;
+import static io.github.up2jakarta.csv.fmt.misc.Tests.*;
 import static io.github.up2jakarta.csv.impl.SegmentType.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, MyRecord, MyError> {
+class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, TURecord, TUError> {
 
     @Autowired
     UnitDummy1Tests(Up2Factory<GroupType> factory) throws BeanException {
-        super(factory.builder().unit(Dummy1Invoice.class).build(S11).build(MyError::new));
+        super(factory.builder().unit(Dummy1Invoice.class).build(S11).build(TUError::new));
     }
 
-    public MyRecord record(String code, String... data) throws CodeListException {
+    public TURecord record(String code, String... data) throws CodeListException {
         final SegmentType type = SegmentType.valueOf('S' + code);
-        return new MyRecord(type, "TU2025R0099", data);
+        return new TURecord(type, "TU2025R0099", data);
     }
 
     @Test
-    void testEmpty() throws BeanException {
-        checkEmpty(new MyRecord[0]);
+    void testEmpty() {
+        checkEmpty(new TURecord[0]);
     }
 
     @Test
-    void testCardinality1() throws BeanException {
+    void testCardinality1() {
         // Given
-        final MyRecord[] rows = new MyRecord[]{
+        final TURecord[] rows = new TURecord[]{
                 record("11", null, "2025-03-12", "120", "100", "20"),
                 record("11", null, "2025-03-12", "120", "100", "20"),
         };
@@ -55,9 +53,9 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, MyRecord, MyError> {
     }
 
     @Test
-    void testCardinality2() throws BeanException {
+    void testCardinality2() {
         // Given
-        final MyRecord[] rows = new MyRecord[]{
+        final TURecord[] rows = new TURecord[]{
                 record("11", null, "2025-03-12", "120", "100", "20")
         };
         // When & Then
@@ -66,9 +64,9 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, MyRecord, MyError> {
     }
 
     @Test
-    void testCardinality3() throws BeanException {
+    void testCardinality3() {
         // Given
-        final MyRecord[] rows = new MyRecord[]{
+        final TURecord[] rows = new TURecord[]{
                 record("11", null, "2025-03-12", "120", "100", "20"),
                 record("12", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record("12", "SEL0088", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
@@ -83,9 +81,9 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, MyRecord, MyError> {
     }
 
     @Test
-    void testCardinality4() throws BeanException {
+    void testCardinality4() {
         // Given
-        final MyRecord[] rows = new MyRecord[]{
+        final TURecord[] rows = new TURecord[]{
                 record("11", null, "2025-03-12", "120", "100", "20"),
                 record("12", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record("13", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
@@ -96,10 +94,10 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, MyRecord, MyError> {
     }
 
     @Test
-    void testDetached() throws BeanException {
+    void testDetached() {
         // Given
-        final MyRecord detached = record("90", "9999", "Warning", "Detached");
-        final MyRecord[] rows = new MyRecord[]{
+        final TURecord detached = record("90", "9999", "Warning", "Detached");
+        final TURecord[] rows = new TURecord[]{
                 record("11", null, "2025-03-12", "120", "100", "20"),
                 record("12", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record("13", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
@@ -115,15 +113,15 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, MyRecord, MyError> {
     @Test
     void testValid1() throws BeanException, IOException {
         // Given
-        final MyRecord[] rows = fastInvoice(S11);
+        final TURecord[] rows = fastInvoice(S11);
         // When & Then
         checkValid1(rows);
     }
 
     @Test
-    void testValid2() throws BeanException, IOException {
+    void testValid2() throws IOException {
         // Given
-        final MyRecord[] rows = new MyRecord[]{
+        final TURecord[] rows = new TURecord[]{
                 record("11", null, "2025-03-12", "120", "100", "20"),
                 record("12", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record("13", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
@@ -135,10 +133,10 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, MyRecord, MyError> {
     }
 
     @Test
-    void testValidation() throws BeanException {
+    void testValidation() {
         // Given
-        final MyRecord invalid = record("90", "1199", "Support", null);
-        final MyRecord[] rows = new MyRecord[]{
+        final TURecord invalid = record("90", "1199", "Support", null);
+        final TURecord[] rows = new TURecord[]{
                 record("11", null, "2025-03-12", "120", "100", "20"),
                 record("12", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record("13", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),

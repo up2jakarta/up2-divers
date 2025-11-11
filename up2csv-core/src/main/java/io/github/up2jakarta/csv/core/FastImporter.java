@@ -3,9 +3,8 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IFastRecord;
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.data.BusinessObject;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.data.Segment;
 
 import java.util.Objects;
 
@@ -18,7 +17,7 @@ import java.util.Objects;
  * @param <R> the record type
  * @param <E> the error type
  */
-public abstract non-sealed class FastImporter<B extends DataType<B>, I extends IType<B, I>, T extends Referencable, R extends IFastRecord<I>, E extends IEvent<B>> extends BusinessImporter<B, I, T, R, E> {
+public abstract non-sealed class FastImporter<B extends DataType<B>, I extends IType<B, I>, T extends Segment, R extends IFastRecord<I, ?>, E extends IEvent<B>> extends BusinessImporter<B, I, T, R, E> {
 
     protected FastImporter(Up2Factory<B> factory, Class<T> type, I rootNode, I[] nodes) throws BeanException {
         super(factory, ModeType.FAST, type, rootNode, nodes);
@@ -29,8 +28,8 @@ public abstract non-sealed class FastImporter<B extends DataType<B>, I extends I
     }
 
     @Override
-    final void reference(BusinessObject bean, R record) {
-        bean.setReference(record.getPivot());
+    final Object nullPivot(T bean, R record) {
+        return bid.set(bean, record.getPivot());
     }
 
     @Override
@@ -42,7 +41,7 @@ public abstract non-sealed class FastImporter<B extends DataType<B>, I extends I
      * Creates and returns a fast-exporter for the same configuration without scan bean annotations again.
      *
      * @return new fast-exporter
-     * @throws BeanException for any problem when getting business-object properties.
+     * @throws BeanException if any property is not accessible for read.
      */
     public FastExporter<B, I, T> toExporter() throws BeanException {
         return new FastExporter<>(this);

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_XML_ENUM;
@@ -63,7 +62,7 @@ public class Up2JpaExtensionTest {
         // When
         final InputCollector handler = new InputCollector(row);
         final Test1Bean bean = mapper.map(row, handler);
-        final List<InputError> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = handler.toList();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
@@ -129,7 +128,7 @@ public class Up2JpaExtensionTest {
         // When
         final InputCollector handler = new InputCollector(row);
         final Test2Bean bean = mapper.map(row, handler);
-        final List<InputError> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = handler.toList();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);

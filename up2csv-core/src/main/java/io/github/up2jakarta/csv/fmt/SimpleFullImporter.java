@@ -1,15 +1,16 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.api.hdl.ITraceCreator;
+import io.github.up2jakarta.csv.api.hdl.IBusinessCreator;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.FullImporter;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.core.hdl.ETraceCollector;
+import io.github.up2jakarta.csv.core.hdl.BusinessCollector;
+import io.github.up2jakarta.csv.core.hdl.BusinessEvent;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.RecordTransformer;
-import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.clv.CodeListException;
 
 /**
@@ -19,14 +20,14 @@ import io.github.up2jakarta.xml.clv.CodeListException;
  * @param <B> the data type
  * @param <I> the segment type
  * @see FullRecord
- * @see ETrace
+ * @see BusinessEvent
  */
-public final class SimpleFullImporter<T extends Referencable, B extends DataType<B>, I extends IType<B, I>>
-        extends FullImporter<B, I, T, FullRecord<I>, FullError<B, FullRecord<I>>>
-        implements RecordTransformer<FullRecord<I>> {
+public final class SimpleFullImporter<T extends Segment, B extends DataType<B>, I extends IType<B, I>>
+        extends FullImporter<B, I, T, FullRecord<I, String>, FullError<B, String, FullRecord<I, String>>>
+        implements RecordTransformer<FullRecord<I, String>> {
 
+    @SuppressWarnings("unchecked")
     public <E extends Enum<E> & IType<B, I>> SimpleFullImporter(Up2Factory<B> mf, Class<T> type, E rootNode) throws BeanException {
-        //noinspection unchecked
         this(mf, type, (I) rootNode, ((Class<I>) rootNode.getClass()).getEnumConstants());
     }
 
@@ -39,13 +40,13 @@ public final class SimpleFullImporter<T extends Referencable, B extends DataType
     }
 
     @Override
-    protected ETraceCollector<B, FullRecord<I>, FullError<B, FullRecord<I>>> create(FullRecord<I> row) {
-        final ITraceCreator<B, FullRecord<I>, FullError<B, FullRecord<I>>> creator = FullError::new;
-        return new ETraceCollector<>(row, creator, (r) -> 0);
+    protected BusinessCollector<B, FullRecord<I, String>, FullError<B, String, FullRecord<I, String>>> create(FullRecord<I, String> row) {
+        final IBusinessCreator<B, FullRecord<I, String>, FullError<B, String, FullRecord<I, String>>> creator = FullError::new;
+        return new BusinessCollector<>(row, creator, (r) -> 0);
     }
 
     @Override
-    public FullRecord<I> transform(String... source) throws CodeListException {
+    public FullRecord<I, String> transform(String... source) throws CodeListException {
         final I type = typing.type(source);
         final String[] data = typing.truncate(type, source);
         final String recordId = source[0];

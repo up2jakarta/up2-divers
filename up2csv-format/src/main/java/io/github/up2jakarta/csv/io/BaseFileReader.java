@@ -6,7 +6,7 @@ import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.BusinessImporter;
 import io.github.up2jakarta.csv.core.BusinessReader;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.data.Segment;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -30,7 +30,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @param <R> the record type
  * @param <E> the error type
  */
-public abstract class BaseFileReader<T extends Referencable, B extends DataType<B>, I extends IType<B, I>, R extends IRecord<I>, E extends IEvent<B>> extends BusinessReader<B, I, T, R, E> implements Closeable {
+public abstract class BaseFileReader<T extends Segment, B extends DataType<B>, I extends IType<B, I>, R extends IRecord<I>, E extends IEvent<B>> extends BusinessReader<B, I, T, R, E> implements Closeable {
 
     private final int length;
     private final CSVFormat format;

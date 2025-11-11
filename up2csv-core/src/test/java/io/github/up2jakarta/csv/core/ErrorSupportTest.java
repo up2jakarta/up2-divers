@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -46,7 +45,7 @@ public class ErrorSupportTest {
         // When
         final InputCollector handler = new InputCollector(row);
         final Test3Processor bean = mapper.map(row, handler);
-        final List<InputError> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = handler.toList();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
@@ -81,7 +80,7 @@ public class ErrorSupportTest {
         // When
         final InputCollector handler = new InputCollector(row);
         final Test4Processor bean = mapper.map(row, handler);
-        final List<InputError> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = handler.toList();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
@@ -116,7 +115,7 @@ public class ErrorSupportTest {
         // When
         final InputCollector handler = new InputCollector(row);
         final Test1Converter bean = mapper.map(row, handler);
-        final List<InputError> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = handler.toList();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
@@ -138,7 +137,7 @@ public class ErrorSupportTest {
             assertEquals(1, error.getOffset());
             assertEquals(ERROR, error.getSeverity());
             assertEquals(DummyConverter.TU_P_005, error.getCode());
-            assertEquals("java.lang.NumberFormatException: For input string: \"int\"", error.getMessage());
+            assertEquals("For input string: \"int\"", error.getMessage());
             assertNotNull(error.getTrace());
         }
     }
@@ -151,7 +150,7 @@ public class ErrorSupportTest {
         // When
         final InputCollector handler = new InputCollector(row);
         final Test2Converter bean = mapper.map(row, handler);
-        final List<InputError> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = handler.toList();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
@@ -173,7 +172,7 @@ public class ErrorSupportTest {
             assertEquals(1, error.getOffset());
             assertEquals(ERROR, error.getSeverity());
             assertEquals(Test2Converter.TU_P_006, error.getCode());
-            assertEquals("java.lang.NumberFormatException: For input string: \"int\"", error.getMessage());
+            assertEquals("For input string: \"int\"", error.getMessage());
             assertNotNull(error.getTrace());
         }
     }
@@ -186,7 +185,7 @@ public class ErrorSupportTest {
         // When
         final InputCollector handler = new InputCollector(row);
         final Test1Resolver bean = mapper.map(row, handler);
-        final List<InputError> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = handler.toList();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
@@ -231,7 +230,7 @@ public class ErrorSupportTest {
         // When
         final InputCollector handler = new InputCollector(row);
         final Test2Resolver bean = mapper.map(row, handler);
-        final List<InputError> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = handler.toList();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
@@ -253,7 +252,7 @@ public class ErrorSupportTest {
             assertEquals(1, error.getOffset());
             assertEquals(WARNING, error.getSeverity());
             assertEquals(Test2Resolver.TU_P_008, error.getCode());
-            assertEquals("java.time.format.DateTimeParseException: Text cannot be parsed to a Duration", error.getMessage());
+            assertEquals("Text cannot be parsed to a Duration", error.getMessage());
             assertNotNull(error.getTrace());
         }
     }
@@ -266,7 +265,7 @@ public class ErrorSupportTest {
         // When
         final InputCollector handler = new InputCollector(row);
         final Test1Validator bean = mapper.map(row, handler);
-        final List<InputError> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = handler.toList();
         // Then
         assertNotNull(errors);
         assertNotNull(bean);
@@ -345,7 +344,7 @@ public class ErrorSupportTest {
         // When
         final InputCollector handler = new InputCollector(row);
         final Test2Validator bean = mapper.map(row, handler);
-        final List<InputError> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = handler.toList();
         // Then
         assertNotNull(errors);
         errors.sort(Comparator.comparingInt(InputError::getOffset));

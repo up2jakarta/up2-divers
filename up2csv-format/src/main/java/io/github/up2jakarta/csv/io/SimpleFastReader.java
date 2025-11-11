@@ -2,9 +2,9 @@ package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.ModeType;
+import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Referencable;
-import io.github.up2jakarta.csv.fmt.ECause;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.fmt.FastRecord;
 import io.github.up2jakarta.csv.fmt.SimpleFastImporter;
 import org.apache.commons.csv.CSVFormat;
@@ -17,14 +17,14 @@ import org.apache.commons.csv.CSVFormat;
  * @param <I> the segment type
  * @see SimpleFastImporter
  */
-public final class SimpleFastReader<T extends Referencable, B extends DataType<B>, I extends IType<B, I>> extends FastFileReader<T, B, I, FastRecord<I>, ECause<B, FastRecord<I>>> {
+public final class SimpleFastReader<T extends Segment, B extends DataType<B>, I extends IType<B, I>> extends FastFileReader<T, B, I, FastRecord<I, String>, PropertyEvent<B, FastRecord<I, String>>> {
 
     public SimpleFastReader(SimpleFastImporter<T, B, I> importer, CSVFormat format, String... nullValues) {
         super(importer, format, nullValues);
     }
 
     @Override
-    protected FastRecord<I> create(I type, String beanId, String[] data) {
+    protected FastRecord<I, String> create(I type, String beanId, String[] data) {
         return new FastRecord<>(type, beanId, data);
     }
 

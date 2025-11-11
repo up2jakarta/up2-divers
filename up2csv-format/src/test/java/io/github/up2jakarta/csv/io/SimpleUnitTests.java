@@ -39,12 +39,12 @@ public class SimpleUnitTests extends AUnitTests<UnitRecord<SegmentType>, SimpleU
     }
 
     @Test
-    void test10() throws BeanException, IOException {
+    void test10() throws IOException {
         testFile(10);
     }
 
     @Test
-    void test100() throws BeanException, IOException {
+    void test100() throws IOException {
         testFile(100);
     }
 

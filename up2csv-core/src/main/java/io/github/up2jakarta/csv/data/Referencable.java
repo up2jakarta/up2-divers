@@ -1,16 +1,16 @@
 package io.github.up2jakarta.csv.data;
 
 /**
- * Contract interface for business-objects have unique reference.
+ * Contract interface for segment having unique reference.
  *
  * @see io.github.up2jakarta.csv.api.IFullRecord
  * @see BusinessObject
  */
-public interface Referencable extends Segment {
+public interface Referencable<T extends Comparable<T>> extends Segment {
 
     /**
      * @return the unique business reference
      */
-    String getReference();
+    T getReference();
 
 }

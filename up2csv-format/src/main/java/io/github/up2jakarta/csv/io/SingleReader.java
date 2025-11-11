@@ -53,7 +53,7 @@ public final class SingleReader<S extends Segment> extends Up2Reader<S> implemen
      * Opens the given file-reader argument and initializes the reader.
      *
      * @param reader the file-reader to open
-     * @return the header
+     * @return the header record
      * @throws IOException if the file does not exist or for some other reason cannot be opened for reading.
      */
     public String[] open(final FileReader reader) throws IOException {
@@ -61,8 +61,7 @@ public final class SingleReader<S extends Segment> extends Up2Reader<S> implemen
         this.iterator = parser.iterator();
         this.reader = reader;
         if (iterator.hasNext()) {
-            // Ignore header
-            return iterator.next().values();
+            return iterator.next().values(); // Ignore header
         }
         return null;
     }

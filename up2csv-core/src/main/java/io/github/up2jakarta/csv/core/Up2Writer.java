@@ -30,10 +30,10 @@ public abstract class Up2Writer<S extends Segment, D extends DataType<D>> implem
      * Unmaps the given segment-objects to flat-data and writes them.
      *
      * @param beans the segment objects to write in mono-segment format
-     * @throws IOException   for some reason cannot be opened for writing.
-     * @throws BeanException for any problem when getting fields from segment
+     * @throws IOException     for some reason cannot be opened for writing.
+     * @throws AccessException for any problem when getting properties from the specified segments
      */
-    public final void write(Collection<S> beans) throws IOException, BeanException {
+    public final void write(Collection<S> beans) throws IOException, AccessException {
         for (final S bean : beans) {
             final String[] data = mapper.unmap(bean, 0);
             this.write(data);
@@ -45,10 +45,10 @@ public abstract class Up2Writer<S extends Segment, D extends DataType<D>> implem
      * Unmaps the given segment-object to flat-data and writes it.
      *
      * @param bean the segment object to write in mono-segment format
-     * @throws IOException   for some reason cannot be opened for writing.
-     * @throws BeanException for any problem when getting fields from segment
+     * @throws IOException     for some reason cannot be opened for writing.
+     * @throws AccessException for any problem when getting properties from the specified segments
      */
-    public final void write(S bean) throws IOException, BeanException {
+    public final void write(S bean) throws IOException, AccessException {
         final String[] data = mapper.unmap(bean, 0);
         this.write(data);
     }

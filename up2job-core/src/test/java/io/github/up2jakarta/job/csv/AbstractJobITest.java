@@ -117,19 +117,18 @@ public abstract class AbstractJobITest {
             final Path csv = path.resolve(fileName);
             final CSVPrinter writer = this.format.print(csv, StandardCharsets.UTF_8);
             // Write segments
-            var lineNumber = 0;
-            writer.printRecord('-');
             final String currentYear = Year.now().toString();
             final String prefix = "I" + currentYear;
             final List<String[]> data = this.clone(segments);
             var ces = 0;
             var cen = 0;
-            for (var i = 0; i < size; i++) {
+            for (int i = 1, ln = 0; i <= size; i++) {
+                writer.printComment("Generated Invoice N°" + i);
                 final String randomInt = String.valueOf(RANDOM.nextInt(999_999) + 75_000_001);
                 final String invoiceNumber = prefix + fixed(i + 1).toUpperCase();
                 for (var j = 0; j < segments.size(); j++) {
                     final String[] record = data.get(j);
-                    var dn = this.fill(segments.get(j), record, invoiceNumber, currentYear, randomInt, ++lineNumber);
+                    var dn = this.fill(segments.get(j), record, invoiceNumber, currentYear, randomInt, ++ln);
                     // Error simulation ->
                     if (dn) {
                         cen++;
@@ -144,7 +143,6 @@ public abstract class AbstractJobITest {
                     }
                     // <- Error simulation
                 }
-                writer.printRecord('-');
             }
             if (ces != 0) {
                 TUConfiguration.LOG.info("Error simulation - {} segments have been deleted", ces);

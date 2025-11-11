@@ -5,7 +5,7 @@ import io.github.up2jakarta.csv.cfg.Up2Decimal;
 import io.github.up2jakarta.csv.cfg.Up2Temporal;
 import io.github.up2jakarta.csv.cfg.Up2Token;
 import io.github.up2jakarta.csv.data.BusinessId;
-import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.data.Segment;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -19,7 +19,7 @@ import java.util.Map;
 
 @Valid
 @SuppressWarnings("unused")
-public class Invoice implements Referencable {
+public class Invoice implements Segment {
 
     @Position(0)
     @Up2Token
@@ -57,7 +57,6 @@ public class Invoice implements Referencable {
     private List<Item> items = new LinkedList<>();
     private Map<Amount, Amount.Type> amounts = new LinkedHashMap<>();
 
-    @Override
     public String getReference() {
         return reference;
     }

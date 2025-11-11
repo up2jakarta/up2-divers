@@ -8,7 +8,6 @@ import io.github.up2jakarta.csv.core.Up2Mapper;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.io.dto.Note;
-import io.github.up2jakarta.csv.io.misc.TUGenerator;
 import jakarta.validation.Validator;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.File;
 import java.io.IOException;
 
+import static io.github.up2jakarta.csv.io.misc.Tests.TUGenerator.path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -40,7 +40,7 @@ public class SingleNoteTests {
         final SingleWriter<Note, DynamicType> writer = new SingleWriter<>(format, fmt);
         final Up2Mapper<Note, DynamicType> mapper = factory.build(Note.class);
         this.reader = new SingleReader<>(mapper, fmt);
-        this.file = TUGenerator.path(this.getClass()).resolve("notes.csv").toFile();
+        this.file = path(this.getClass()).resolve("notes.csv").toFile();
         // Generating file
         writer.open(file);
         for (var i = MIN; i <= MAX; i++) {
@@ -51,7 +51,7 @@ public class SingleNoteTests {
     }
 
     @Test
-    void testReader() throws BeanException, IOException {
+    void testReader() throws IOException {
         // GIVEN
         reader.open(file);
         // WHEN

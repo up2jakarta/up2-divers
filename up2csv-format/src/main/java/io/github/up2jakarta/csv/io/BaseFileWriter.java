@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.core.*;
-import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.data.Segment;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -17,7 +17,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * @param <T> the business object type
  */
-public abstract class BaseFileWriter<T extends Referencable> extends BusinessWriter<T> {
+public abstract class BaseFileWriter<T extends Segment> extends BusinessWriter<T> {
 
     private final CSVFormat format;
 
@@ -47,7 +47,6 @@ public abstract class BaseFileWriter<T extends Referencable> extends BusinessWri
      */
     public final void open(final File file) throws IOException {
         this.open(new FileWriter(file, UTF_8));
-        this.reset();
     }
 
     /**
@@ -59,6 +58,12 @@ public abstract class BaseFileWriter<T extends Referencable> extends BusinessWri
     public final void open(final FileWriter writer) throws IOException {
         this.printer = new CSVPrinter(writer, format);
         this.writer = writer;
+        this.reset();
+    }
+
+    @Override
+    protected void init(T bean) throws IOException {
+        printer.printComment("");
     }
 
     @Override

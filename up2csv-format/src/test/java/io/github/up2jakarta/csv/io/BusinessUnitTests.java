@@ -5,7 +5,6 @@ import io.github.up2jakarta.csv.io.impl.InvoiceUnitImporter;
 import io.github.up2jakarta.csv.io.impl.InvoiceUnitReader;
 import io.github.up2jakarta.csv.io.impl.InvoiceUnitWriter;
 import io.github.up2jakarta.csv.io.misc.AUnitTests;
-import io.github.up2jakarta.csv.io.misc.MyRecord;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +14,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 
+import static io.github.up2jakarta.csv.io.misc.Tests.TURecord;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class BusinessUnitTests extends AUnitTests<MyRecord, InvoiceUnitImporter> {
+public class BusinessUnitTests extends AUnitTests<TURecord, InvoiceUnitImporter> {
 
     @Autowired
     BusinessUnitTests(InvoiceUnitImporter importer, CSVFormat format) throws IOException, BeanException {
@@ -35,12 +36,12 @@ public class BusinessUnitTests extends AUnitTests<MyRecord, InvoiceUnitImporter>
     }
 
     @Test
-    void test10() throws BeanException, IOException {
+    void test10() throws IOException {
         testFile(10);
     }
 
     @Test
-    void test100() throws BeanException, IOException {
+    void test100() throws IOException {
         testFile(100);
     }
 

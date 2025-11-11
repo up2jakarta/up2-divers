@@ -44,7 +44,7 @@ public class InvoiceWriter extends UnitFileWriter<Invoice> implements ItemWriter
     }
 
     @Override
-    public void write(Chunk<? extends Up2Result<Invoice, InputError>> chunk) throws IOException, BeanException {
+    public void write(Chunk<? extends Up2Result<Invoice, InputError>> chunk) throws IOException {
         for (final Up2Result<Invoice, InputError> item : chunk) {
             final long warnings = item.getErrors().stream().filter(e -> ERROR.compareTo(e.getSeverity()) > 0).count();
             if (warnings == item.getErrors().size()) {
@@ -64,7 +64,7 @@ public class InvoiceWriter extends UnitFileWriter<Invoice> implements ItemWriter
 
     @Override
     public ExitStatus afterStep(StepExecution context) {
-        SafeUtil.safe(new SafeTranslator<>(ItemStreamException::new), super::flush, super::close).propagate();
+        SafeUtil.safe(new SafeTranslator<>(ItemStreamException::new), super::close).propagate();
         return null;
     }
 

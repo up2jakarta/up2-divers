@@ -1,9 +1,7 @@
 package io.github.up2jakarta.csv.core.hdl;
 
 import io.github.up2jakarta.csv.api.IEvent;
-import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.cfg.Error;
-import io.github.up2jakarta.csv.data.Collectable;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.xml.api.PropertyException;
 import io.github.up2jakarta.xml.api.SeverityType;
@@ -21,19 +19,12 @@ import static java.util.Optional.ofNullable;
 /**
  * Internal handler that handles events during the mapping, validation and parsing phases.
  *
- * @param <R> the input row type
  * @param <D> the business data type
- * @param <E> the error type
- * @see EventCollector for custom definition.
+ * @see BusinessHandler for aggregation/segregation operations
+ * @see ComplianceHandler for validation only.
  * @see FastHandler  for fail-fast handler
  */
-public abstract sealed class EventHandler<R extends IRecord<?>, D extends DataType<D>, E extends IEvent<D>> implements Collectable<E> permits EventCollector, FastHandler {
-
-    public final R row;
-
-    public EventHandler(R row) {
-        this.row = row;
-    }
+public abstract sealed class EventHandler<D extends DataType<D>> permits ComplianceHandler, BusinessHandler, FastHandler {
 
     private static Optional<Error> error(ConstraintViolation<?> violation) {
         final ConstraintDescriptor<?> descriptor = violation.getConstraintDescriptor();
@@ -86,17 +77,6 @@ public abstract sealed class EventHandler<R extends IRecord<?>, D extends DataTy
     /**
      * Handles any error caused by the input at the given offset.
      *
-     * @param type    the data type
-     * @param offset  the input index
-     * @param level   the error severity
-     * @param code    the error code
-     * @param message the error message
-     */
-    public abstract void handle(D type, int offset, SeverityType level, String code, String message);
-
-    /**
-     * Handles any error caused by the input at the given offset.
-     *
      * @param type   the data type
      * @param offset the input index
      * @param level  the error severity
@@ -113,7 +93,7 @@ public abstract sealed class EventHandler<R extends IRecord<?>, D extends DataTy
      * @param violation the JSR-303 constraint violation
      * @param config    the error annotation defined at property level
      */
-    public abstract void handle(D type, int offset, ConstraintViolation<?> violation, Error config);
+    public abstract void handle(D type, Integer offset, ConstraintViolation<?> violation, Error config);
 
     /**
      * Handles any exception caused by the input at the given offset.

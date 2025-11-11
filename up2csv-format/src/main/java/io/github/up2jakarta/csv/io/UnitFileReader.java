@@ -6,7 +6,7 @@ import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.UnitImporter;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.data.Segment;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
@@ -19,7 +19,7 @@ import org.apache.commons.csv.CSVRecord;
  * @param <R> the record type
  * @param <E> the error type
  */
-public abstract class UnitFileReader<T extends Referencable, B extends DataType<B>, I extends IType<B, I>, R extends IRecord<I>, E extends IEvent<B>> extends BaseFileReader<T, B, I, R, E> {
+public abstract class UnitFileReader<T extends Segment, B extends DataType<B>, I extends IType<B, I>, R extends IRecord<I>, E extends IEvent<B>> extends BaseFileReader<T, B, I, R, E> {
 
     protected UnitFileReader(UnitImporter<B, I, T, R, E> importer, CSVFormat format, String... nullValues) {
         super(importer, format, nullValues);

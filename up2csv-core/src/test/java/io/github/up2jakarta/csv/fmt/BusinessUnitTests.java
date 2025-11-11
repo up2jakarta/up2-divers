@@ -35,12 +35,12 @@ class BusinessUnitTests extends AUnitTest<Invoice, InputRecord, InputError> {
     }
 
     @Test
-    void testEmpty() throws BeanException {
+    void testEmpty() {
         checkEmpty(new InputRecord[0]);
     }
 
     @Test
-    void testCardinality1() throws BeanException {
+    void testCardinality1() {
         // Given
         final InputRecord[] rows = new InputRecord[]{
                 record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
@@ -51,7 +51,7 @@ class BusinessUnitTests extends AUnitTest<Invoice, InputRecord, InputError> {
     }
 
     @Test
-    void testCardinality2() throws BeanException {
+    void testCardinality2() {
         // Given
         final InputRecord[] rows = new InputRecord[]{
                 record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20")
@@ -61,7 +61,7 @@ class BusinessUnitTests extends AUnitTest<Invoice, InputRecord, InputError> {
     }
 
     @Test
-    void testCardinality3() throws BeanException {
+    void testCardinality3() {
         // Given
         final InputRecord[] rows = new InputRecord[]{
                 record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
@@ -75,7 +75,7 @@ class BusinessUnitTests extends AUnitTest<Invoice, InputRecord, InputError> {
     }
 
     @Test
-    void testCardinality4() throws BeanException {
+    void testCardinality4() {
         // Given
         final InputRecord[] rows = new InputRecord[]{
                 record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
@@ -87,7 +87,7 @@ class BusinessUnitTests extends AUnitTest<Invoice, InputRecord, InputError> {
     }
 
     @Test
-    void testDetached() throws BeanException {
+    void testDetached() {
         // Given
         final InputRecord detached = record(S90, "9999", "Warning", "Detached");
         final InputRecord[] rows = new InputRecord[]{
@@ -110,7 +110,7 @@ class BusinessUnitTests extends AUnitTest<Invoice, InputRecord, InputError> {
     }
 
     @Test
-    void testValid2() throws BeanException, IOException {
+    void testValid2() throws IOException {
         // Given
         final InputRecord[] rows = new InputRecord[]{
                 record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
@@ -124,7 +124,7 @@ class BusinessUnitTests extends AUnitTest<Invoice, InputRecord, InputError> {
     }
 
     @Test
-    void testValidation() throws BeanException {
+    void testValidation() {
         // Given
         final InputRecord invalid = record(S90, "1199", "Support", null);
         final InputRecord[] rows = new InputRecord[]{

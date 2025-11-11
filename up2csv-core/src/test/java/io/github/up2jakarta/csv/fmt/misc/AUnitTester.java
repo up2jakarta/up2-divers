@@ -48,7 +48,7 @@ public class AUnitTester<R extends IRecord<SegmentType>> {
                 return;
             }
         }
-        throw new AssertionFailedError(Arrays.toString(data) + " does not exists");
+        throw new AssertionFailedError(Arrays.toString(data) + "\tdoes not exists");
     }
 
     protected void assertFound(final R row, final String[] data) {

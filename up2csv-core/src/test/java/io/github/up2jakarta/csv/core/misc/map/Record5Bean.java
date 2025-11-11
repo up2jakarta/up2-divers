@@ -1,8 +1,0 @@
-package io.github.up2jakarta.csv.core.misc.map;
-
-import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.data.Segment;
-
-public record Record5Bean(@Position(0) @Up2Number int id, @Position(1) CharSequence content) implements Segment {
-}

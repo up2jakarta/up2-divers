@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.fmt;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.*;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.data.Segment;
 
 /**
  * {@link ModeType#FAST} Processor that's able to segregate and export java-bean to flat-data.
@@ -13,7 +13,7 @@ import io.github.up2jakarta.csv.data.Referencable;
  * @param <I> the segment type
  * @see SimpleFastImporter
  */
-public final class SimpleFastExporter<T extends Referencable, B extends DataType<B>, I extends IType<B, I>> extends FastExporter<B, I, T> {
+public final class SimpleFastExporter<T extends Segment, B extends DataType<B>, I extends IType<B, I>> extends FastExporter<B, I, T> {
 
     public SimpleFastExporter(Up2Factory<B> factory, Class<T> type, I rootNode, I[] nodes) throws BeanException {
         super(factory, type, rootNode, nodes);
@@ -27,7 +27,7 @@ public final class SimpleFastExporter<T extends Referencable, B extends DataType
      * Creates and returns a simple fast-importer for the same configuration without scan bean annotations again.
      *
      * @return new simple fast-importer
-     * @throws BeanException for any problem setting business-object properties or creating segments
+     * @throws BeanException if any property is not accessible for write or cannot create segment instances
      */
     public SimpleFastImporter<T, B, I> toImporter() throws BeanException {
         return new SimpleFastImporter<>(this);

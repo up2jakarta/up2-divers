@@ -48,14 +48,14 @@ public class InvoiceWriter extends ConditionalWriter<Up2Result<Invoice, InputErr
     }
 
     @Override
-    public void write(Up2Result<Invoice, InputError> item) throws IOException, BeanException {
+    public void write(Up2Result<Invoice, InputError> item) throws IOException {
         LOG.debug("#Invoice[{}] has been imported successfully", item.getBean().getReference());
         delegate.write(item.getBean());
     }
 
     @Override
     public ExitStatus afterStep(StepExecution context) {
-        SafeUtil.safe(new SafeTranslator<>(ItemStreamException::new), delegate::flush, delegate::close).propagate();
+        SafeUtil.safe(new SafeTranslator<>(ItemStreamException::new), delegate::close).propagate();
         return null;
     }
 

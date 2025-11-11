@@ -18,7 +18,7 @@ public abstract class Up2Reader<S extends Segment> {
         this.mapper = mapper;
     }
 
-    public final S next() throws BeanException {
+    public final S next() throws AccessException {
         final String[] record = this.record();
         if (record == null) {
             return null;

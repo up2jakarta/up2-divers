@@ -6,26 +6,25 @@ import io.github.up2jakarta.csv.data.Definition;
 
 import java.util.Arrays;
 
-import static io.github.up2jakarta.xml.adapters.KeyCoder.token;
-
 /**
  * Simple implementation of input record,
  * basically it's compatible with {@link io.github.up2jakarta.csv.core.ModeType#FAST} mode .
  *
- * @param <T> the segment type
+ * @param <I> the input type definition
+ * @param <P> the pivot type
  */
-public class FastRecord<T extends IType<?, T>> extends UnitRecord<T> implements IFastRecord<T> {
+public class FastRecord<I extends IType<?, I>, P extends Comparable<P>> extends UnitRecord<I> implements IFastRecord<I, P> {
 
     @Definition(code = "PID", value = "Pivot")
-    protected final String pivot;
+    protected final P pivot;
 
-    public FastRecord(T type, String pivot, String... data) {
+    public FastRecord(I type, P pivot, String... data) {
         super(type, data);
-        this.pivot = token(pivot);
+        this.pivot = pivot;
     }
 
     @Override
-    public final String getPivot() {
+    public final P getPivot() {
         return pivot;
     }
 

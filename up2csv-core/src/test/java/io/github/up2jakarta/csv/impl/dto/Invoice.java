@@ -6,7 +6,6 @@ import io.github.up2jakarta.csv.cfg.Up2Temporal;
 import io.github.up2jakarta.csv.cfg.Up2Token;
 import io.github.up2jakarta.csv.core.misc.Parsable;
 import io.github.up2jakarta.csv.data.BusinessId;
-import io.github.up2jakarta.csv.data.Referencable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +22,7 @@ import java.util.Map;
  */
 @Valid
 @SuppressWarnings("unused")
-public class Invoice extends Parsable implements Referencable {
+public class Invoice extends Parsable {
 
     @Position(0)
     @Up2Token
@@ -61,7 +60,6 @@ public class Invoice extends Parsable implements Referencable {
     private List<Item> items = new LinkedList<>();
     private Map<Amount, Amount.Type> amounts = new LinkedHashMap<>();
 
-    @Override
     public String getReference() {
         return reference;
     }

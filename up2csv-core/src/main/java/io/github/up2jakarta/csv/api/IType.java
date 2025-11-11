@@ -44,16 +44,16 @@ public interface IType<B extends DataType<B>, I extends IType<B, I>> extends Cod
     /**
      * @return the segment class-type
      */
+    @SuppressWarnings("unchecked")
     default <C extends Segment> Class<C> getClassType() {
-        //noinspection unchecked
         return (Class<C>) this.getJoinLinker().classType;
     }
 
     /**
      * @return the segment class-type
      */
+    @SuppressWarnings("unchecked")
     default <C extends Segment> Class<C> getParentType() {
-        //noinspection unchecked
         return (Class<C>) this.getJoinLinker().parentType;
     }
 

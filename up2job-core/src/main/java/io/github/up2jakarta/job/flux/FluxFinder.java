@@ -68,12 +68,12 @@ public abstract class FluxFinder
     }
 
     @Override
+    @SuppressWarnings("SuspiciousMethodCalls")
     public final List<T> load(StepExecution step, Logger log) {
         final Map<Long, ? extends Archive> firstArchives = loadArchives(firstType);
         final Map<Long, ? extends Archive> othersArchives = loadArchives(otherType);
         this.loadContext(step, log, (t, d) -> (t == firstType) ? firstArchives.remove(d) : othersArchives.remove(d));
         firstArchives.forEach((firstId, firstArchive) -> {
-            //noinspection SuspiciousMethodCalls
             final Archive otherArchive = othersArchives.entrySet().stream()
                     .filter(e -> matches(firstArchive, firstType, e.getValue(), otherType))
                     .findAny()

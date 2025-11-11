@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, FullError<GroupType, FullRecord<SegmentType>>> {
+class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType, String>, FullError<GroupType, String, FullRecord<SegmentType, String>>> {
 
     private final Fixed06Generator rid = new Fixed06Generator();
     private final SimpleFullImporter<Dummy1Invoice, GroupType, SegmentType> fullImporter;
@@ -43,7 +43,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
     }
 
     @Test
-    void testEmpty() throws BeanException {
+    void testEmpty() {
         checkEmpty(new io.github.up2jakarta.csv.impl.InputRecord[0]);
     }
 
@@ -63,7 +63,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
     }
 
     @Test
-    void testCardinality1() throws BeanException {
+    void testCardinality1() {
         // Given
         final io.github.up2jakarta.csv.impl.InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
@@ -74,7 +74,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
     }
 
     @Test
-    void testCardinality2() throws BeanException {
+    void testCardinality2() {
         // Given
         final io.github.up2jakarta.csv.impl.InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20")
@@ -84,7 +84,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
     }
 
     @Test
-    void testCardinality3() throws BeanException {
+    void testCardinality3() {
         // Given
         final io.github.up2jakarta.csv.impl.InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
@@ -98,7 +98,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
     }
 
     @Test
-    void testCardinality4() throws BeanException {
+    void testCardinality4() {
         // Given
         final io.github.up2jakarta.csv.impl.InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
@@ -110,7 +110,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
     }
 
     @Test
-    void testDetached() throws BeanException {
+    void testDetached() {
         // Given
         final io.github.up2jakarta.csv.impl.InputRecord detached = record(S90, "9999", "Warning", "Detached");
         final io.github.up2jakarta.csv.impl.InputRecord[] rows = {
@@ -133,7 +133,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
     }
 
     @Test
-    void testValid2() throws BeanException, IOException {
+    void testValid2() throws IOException {
         // Given
         final io.github.up2jakarta.csv.impl.InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
@@ -147,7 +147,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
     }
 
     @Test
-    void testValidation() throws BeanException {
+    void testValidation() {
         // Given
         final io.github.up2jakarta.csv.impl.InputRecord invalid = record(S90, "1199", "Support", null);
         final io.github.up2jakarta.csv.impl.InputRecord[] rows = {

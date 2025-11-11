@@ -4,7 +4,8 @@ import java.lang.annotation.*;
 
 /**
  * Up2 Aggregation Annotation that indicates the parent-identifier property in order match parent-child relationship.
- *
+ * <p>
+ * Note that it's supported on {@link io.github.up2jakarta.csv.cfg.Position} properties only and must be unique.
  * <p>
  * Here is a business case of how annotations can be used:
  * <blockquote><pre>

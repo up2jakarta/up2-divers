@@ -4,13 +4,18 @@ import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.cfg.FragmentOverride;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.PositionOverride;
+import io.github.up2jakarta.csv.core.hdl.BusinessEvent;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.xml.api.IError;
 
 /**
- * Simple implementation of {@link ETrace}, it's well configured as segment to be exportable.
+ * Simple implementation of {@link BusinessEvent}, it's well configured as segment to be exportable.
+ * <p>
+ * If the {@link R#pivot} is not of type <code>String</code>, the related {@link Position#converter()} must be
+ * overridden when the segment is used as exportable segment.
  *
  * @param <D> the business data type
+ * @param <P> the pivot type
  * @param <R> the record type
  * @see SimpleFullImporter
  */
@@ -25,9 +30,9 @@ import io.github.up2jakarta.xml.api.IError;
 @PositionOverride(path = "code", value = @Position(6))
 @PositionOverride(path = "message", value = @Position(7))
 @PositionOverride(path = "trace", value = @Position(8))
-public class FullError<D extends DataType<D>, R extends FullRecord<?>> extends ETrace<D, R> {
+public class FullError<D extends DataType<D>, P extends Comparable<P>, R extends FullRecord<?, P>> extends BusinessEvent<D, R> {
 
-    public FullError(R row, int order, D type, int offset, IError cause, String trace) {
+    public FullError(R row, int order, D type, Integer offset, IError cause, String trace) {
         super(row, order, type, offset, cause, trace);
     }
 

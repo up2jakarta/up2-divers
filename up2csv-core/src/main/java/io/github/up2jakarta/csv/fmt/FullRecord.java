@@ -11,15 +11,16 @@ import static io.github.up2jakarta.xml.adapters.KeyCoder.token;
  * Simple implementation of input record,
  * basically it's compatible with {@link io.github.up2jakarta.csv.core.ModeType#FULL}.
  *
- * @param <T> the segment type
+ * @param <I> the input type definition
+ * @param <P> the pivot type
  * @see FullError
  */
-public class FullRecord<T extends IType<?, T>> extends FastRecord<T> implements IFullRecord<T>, Identifiable<String> {
+public class FullRecord<I extends IType<?, I>, P extends Comparable<P>> extends FastRecord<I, P> implements IFullRecord<I, P>, Identifiable<String> {
 
     @Definition(code = "RID", value = "Record")
     protected final String key;
 
-    public FullRecord(String key, T type, String pivot, String[] data) {
+    public FullRecord(String key, I type, P pivot, String[] data) {
         super(type, pivot, data);
         this.key = token(key);
     }

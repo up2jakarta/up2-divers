@@ -3,60 +3,46 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.xml.api.MessageFormatter;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.lang.reflect.Member;
+
+import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
 
 /**
- * Up2 Bean Exception for {@link Up2Factory#build(Class)} wraps missing configuration or bean access.
+ * Up2 Bean Exception for {@link Up2Factory#build(Class)} wraps missing configuration or bean access problems.
  */
 public class BeanException extends Exception implements MessageFormatter {
 
     private static final String FORMAT = "%s[%s] - %s";
 
     private final AnnotatedElement source;
-    private final String sourceName;
+    private final CharSequence name;
     private final String locator;
 
-    private BeanException(AnnotatedElement source, String sourceName, String locator, String message) {
+    private BeanException(AnnotatedElement source, CharSequence name, String locator, String message) {
         super(message);
         this.source = source;
-        this.sourceName = sourceName;
+        this.name = name;
         this.locator = locator;
     }
 
-    public BeanException(final Class<?> source, final String locator, final String message) {
-        this(source, source.getSimpleName(), locator, message);
+    public BeanException(Class<?> source, String locator, final String message) {
+        this(source, getTypeName(source), locator, message);
     }
 
-    public BeanException(final Class<?> source, final Field locator, final String message) {
-        this(source, locator.getName(), message);
-    }
-
-    public BeanException(final Class<?> source, final Method locator, final String message) {
-        this(source, locator.getName(), message);
-    }
-
-    public BeanException(final Field source, final String message) {
+    public BeanException(Member source, String message) {
         this(source.getDeclaringClass(), source.getName(), message);
     }
 
-    public BeanException(final Method source, final String message) {
-        this(source.getDeclaringClass(), source.getName(), message);
-    }
-
-    public BeanException(final Class<?> source, final String message) {
+    public BeanException(Class<?> source, String message) {
         this(source, "class", message);
     }
 
-    public BeanException(final Package source, final String message) {
-        this(source, "package-info", source.getName(), message);
+    public BeanException(Package source, String message) {
+        this(source, "info", source.getName(), message);
     }
 
     public static BeanException of(AnnotatedElement source, String message) {
-        if (source instanceof Field f) {
-            return new BeanException(f, message);
-        }
-        if (source instanceof Method m) {
+        if (source instanceof Member m) {
             return new BeanException(m, message);
         }
         if (source instanceof Package p) {
@@ -89,7 +75,7 @@ public class BeanException extends Exception implements MessageFormatter {
 
     @Override
     public String getFormattedMessage() {
-        return String.format(FORMAT, sourceName, locator, super.getMessage());
+        return String.format(FORMAT, name, locator, super.getMessage());
     }
 
 }

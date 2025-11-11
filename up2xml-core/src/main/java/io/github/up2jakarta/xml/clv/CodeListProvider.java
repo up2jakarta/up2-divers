@@ -1,5 +1,7 @@
 package io.github.up2jakarta.xml.clv;
 
+import java.util.List;
+
 /**
  * List of values provider that's supplies the all possibles values for the specified code-list.
  *
@@ -12,8 +14,8 @@ public interface CodeListProvider<T extends CodeList<?>> {
      * Returns all possibles values for the specified code-list <code>type</code>.
      *
      * @param type the code-list type
-     * @return the array of values
+     * @return the list of values
      */
-    T[] values(Class<T> type);
+    List<T> values(Class<T> type);
 
 }

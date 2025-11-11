@@ -5,7 +5,11 @@ import io.github.up2jakarta.csv.api.ext.SegmentListener;
 import io.github.up2jakarta.csv.data.Segment;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+
+import static io.github.up2jakarta.csv.core.AccessMode.WO;
+import static io.github.up2jakarta.csv.core.ext.Beans.isInnerType;
+import static java.lang.reflect.Modifier.isAbstract;
+import static java.lang.reflect.Modifier.isStatic;
 
 /**
  * Internal technical checker.
@@ -17,42 +21,42 @@ final class BeanChecker implements SegmentListener, CheckerContext {
     private BeanChecker() {
     }
 
-    private static void checkField(Field field) throws BeanException {
-        final Class<?> type = field.getDeclaringClass();
-        if (Character.isUpperCase(field.getName().charAt(0))) {
-            throw new BeanException(type, field, "must starts with an lowercase character");
+    private static void check(Field field) throws BeanException {
+        if (isStatic(field.getModifiers())) {
+            throw new BeanException(field, "must not be static");
         }
-        if (Modifier.isStatic(field.getModifiers())) {
-            throw new BeanException(type, field, "must not be static");
+    }
+
+    private static void check(AccessMode mode, Class<? extends Segment> type) throws BeanException {
+        if (mode == WO && type.isLocalClass()) {
+            throw new BeanException(type, "local class is not allowed");
+        }
+        if (type.isInterface()) {
+            throw new BeanException(type, "interface is not allowed");
+        }
+        if (isAbstract(type.getModifiers())) {
+            throw new BeanException(type, "abstract class is not allowed");
         }
     }
 
     @Override
-    public CheckerContext beforeSegment(Class<? extends Segment> segmentType) throws BeanException {
-        if (segmentType.isLocalClass()) {
-            throw new BeanException(segmentType, "local class is not allowed");
-        }
-        if (segmentType.isInterface()) {
-            throw new BeanException(segmentType, "interface is not allowed");
-        }
-        if (Modifier.isAbstract(segmentType.getModifiers())) {
-            throw new BeanException(segmentType, "abstract class is not allowed");
-        }
-        if (segmentType.getEnclosingClass() != null && !Modifier.isStatic(segmentType.getModifiers())) {
-            throw new BeanException(segmentType, "inner class is not allowed");
+    public CheckerContext beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException {
+        check(mode, type);
+        if (mode == WO && isInnerType(type)) {
+            throw new BeanException(type, "inner class is not allowed");
         }
         return this;
     }
 
     @Override
-    public void positionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
-        checkField(property);
+    public void positionProperty(Field property, Class<?> type, int offset) throws BeanException {
+        check(property);
     }
 
     @Override
-    public void beforeFragmentProperty(Field fragment, Class<? extends Segment> fragmentType) throws BeanException {
-        beforeSegment(fragmentType);
-        checkField(fragment);
+    public void beforeFragmentProperty(AccessMode mode, Field fragment, Class<? extends Segment> fragmentType) throws BeanException {
+        check(mode, fragmentType);
+        check(fragment);
     }
 
 }

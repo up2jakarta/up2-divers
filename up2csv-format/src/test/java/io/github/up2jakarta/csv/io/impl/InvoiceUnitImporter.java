@@ -4,14 +4,13 @@ import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.UnitImporter;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.io.dto.Invoice;
-import io.github.up2jakarta.csv.io.misc.MyError;
-import io.github.up2jakarta.csv.io.misc.MyHandler;
-import io.github.up2jakarta.csv.io.misc.MyRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static io.github.up2jakarta.csv.io.misc.Tests.*;
+
 @Service
-public class InvoiceUnitImporter extends UnitImporter<GroupType, SegmentType, Invoice, MyRecord, MyError> {
+public class InvoiceUnitImporter extends UnitImporter<GroupType, SegmentType, Invoice, TURecord, TUError> {
 
     @Autowired
     public InvoiceUnitImporter(Up2Factory<GroupType> factory) throws BeanException {
@@ -19,8 +18,8 @@ public class InvoiceUnitImporter extends UnitImporter<GroupType, SegmentType, In
     }
 
     @Override
-    protected MyHandler create(MyRecord row) {
-        return new MyHandler(row);
+    protected TUHandler create(TURecord row) {
+        return new TUHandler(row);
     }
 
 }

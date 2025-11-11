@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_XML_ENUM;
+import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
 
 /**
  * {@link XmlType} extension that supports {@link XmlEnum}.
@@ -64,7 +65,7 @@ public final class XmlEnumExtension extends ConversionExtension<XmlType, XmlEnum
     }
 
     @Override
-    public Optional<XmlEnum> get(Class<? extends Segment> segmentType, Field property, Class<?> type, Field... path) throws BeanException {
+    public Optional<XmlEnum> get(Class<? extends Segment> st, Field p, Class<?> type, Field... ps) throws BeanException {
         if (!type.isEnum()) {
             return Optional.empty();
         }
@@ -79,23 +80,23 @@ public final class XmlEnumExtension extends ConversionExtension<XmlType, XmlEnum
     }
 
     @Override
-    public <V> Conversion<V> resolve(Field property, Class<V> enumType, XmlEnum config) throws BeanException {
-        final Map<String, V> mapping = getConstants(enumType, property);
-        final Optional<Error> error = ConversionResolver.getError(property, enumType);
-        final SeverityType type = error.map(Error::severity).orElse(SeverityType.ERROR);
+    public <V> Conversion<V> resolve(Field property, Class<V> type, XmlEnum config) throws BeanException {
+        final Map<String, V> mapping = getConstants(type, property);
+        final Optional<Error> error = ConversionResolver.getError(property, type);
+        final SeverityType level = error.map(Error::severity).orElse(SeverityType.ERROR);
         final String code = error.map(Error::value).orElse(ERROR_XML_ENUM);
         final PropertyConverter<V> p = v -> mapping.entrySet().stream().filter(e -> e.getKey().equals(v))
                 .map(Map.Entry::getValue)
                 .findAny()
                 .orElseThrow(() -> {
-                    final String msg = String.format(FORMAT, v, enumType.getSimpleName());
-                    return new PropertyException(type, code, msg);
+                    final String msg = String.format(FORMAT, v, getTypeName(type));
+                    return new PropertyException(level, code, msg);
                 });
         final PropertyFormatter<V> f = v -> mapping.entrySet().stream().filter(e -> e.getValue().equals(v))
                 .map(Map.Entry::getKey)
                 .findAny()
                 .orElseGet(v::toString);
-        return new Conversion<>(p, f);
+        return new Conversion<>(type, p, f);
     }
 
 }

@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_XML_ENUM;
+import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
 import static java.util.Arrays.stream;
 
 /**
@@ -46,51 +47,51 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
     }
 
     private <T extends Enum<T>> Conversion<?> ofOrdinal(Class<T> type, Optional<Error> error, SeverityType et, String ec) {
-        final Object[] constants = type.getEnumConstants();
-        final PropertyConverter<Object> p = v -> {
+        final T[] constants = type.getEnumConstants();
+        final PropertyConverter<T> p = v -> {
             try {
                 final int ordinal = Integer.parseInt(v);
                 return constants[ordinal];
             } catch (Exception exception) {
-                final String msg = String.format(FORMAT, v, type.getSimpleName());
+                final String msg = String.format(FORMAT, v, getTypeName(type));
                 throw new PropertyException(et, ec, msg);
             }
         };
-        final PropertyFormatter<Object> f = v -> {
+        final PropertyFormatter<T> f = v -> {
             for (var i = 0; i < constants.length; i++) {
                 if (v == constants[i]) {
                     return String.valueOf(i);
                 }
             }
-            final String msg = String.format(FORMAT, v, type.getSimpleName());
+            final String msg = String.format(FORMAT, v, getTypeName(type));
             throw new PropertyException(et, ec, msg);
         };
-        return new Conversion<>(p, f, error);
+        return new Conversion<>(type, p, f, error);
     }
 
     private <T extends Enum<T>> Conversion<?> ofName(Class<T> type, Optional<Error> error, SeverityType et, String ec) {
-        final PropertyConverter<Object> p = v -> {
+        final PropertyConverter<T> p = v -> {
             try {
                 return Enum.valueOf(type, v);
             } catch (IllegalArgumentException exception) {
-                final String msg = String.format(FORMAT, v, type.getSimpleName());
+                final String msg = String.format(FORMAT, v, getTypeName(type));
                 throw new PropertyException(et, ec, msg);
             }
         };
-        return new Conversion<>(p, Object::toString, error);
+        return new Conversion<>(type, p, Object::toString, error);
     }
 
     @Override
-    public Optional<Enumerated> get(Class<? extends Segment> segmentType, Field property, Class<?> type, Field... path) throws BeanException {
-        final Enumerated jpa = property.getAnnotation(Enumerated.class);
+    @SuppressWarnings("unchecked")
+    public Optional<Enumerated> get(Class<? extends Segment> st, Field p, Class<?> type, Field... ps) throws BeanException {
+        final Enumerated jpa = p.getAnnotation(Enumerated.class);
         if (jpa != null) {
-            if (!segmentType.isAnnotationPresent(Entity.class)) {
-                throw new BeanException(segmentType, "must be annotated with @Entity");
+            if (!st.isAnnotationPresent(Entity.class)) {
+                throw new BeanException(st, "must be annotated with @Entity");
             }
-            //noinspection unchecked
             final Class<? extends Enum<?>> enumType = (Class<Enum<?>>) type;
             if (!enumType.isEnum()) {
-                throw new BeanException(property, "must not be annotated with @Enumerated");
+                throw new BeanException(p, "must not be annotated with @Enumerated");
             }
             return Optional.of(jpa);
         }
@@ -98,18 +99,16 @@ public final class JpaEnumeratedExtension extends ConversionExtension<Entity, En
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public <V> Conversion<V> resolve(Field property, Class<V> type, Enumerated config) throws BeanException {
-        //noinspection unchecked,rawtypes
         final Class<? extends Enum> enumType = (Class<Enum>) type;
         check(property, enumType, Enum::name);
         final Optional<Error> error = ConversionResolver.getError(property, type);
         final SeverityType level = error.map(Error::severity).orElse(SeverityType.ERROR);
         final String code = error.map(Error::value).orElse(ERROR_XML_ENUM);
         if (EnumType.STRING == config.value()) {
-            //noinspection unchecked
             return ofName(enumType, error, level, code);
         }
-        //noinspection unchecked
         return ofOrdinal(enumType, error, level, code);
     }
 

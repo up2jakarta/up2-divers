@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.data.Referencable;
 import io.github.up2jakarta.csv.data.Resettable;
+import io.github.up2jakarta.csv.data.Segment;
 
 import java.io.Closeable;
 import java.io.Flushable;
@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  *
  * @param <T> the business object type
  */
-public abstract class BusinessWriter<T extends Referencable> implements Closeable, Flushable {
+public abstract class BusinessWriter<T extends Segment> implements Closeable, Flushable {
 
     private final Supplier<String> generator;
     private final BusinessExporter<?, ?, T> exporter;
@@ -37,10 +37,11 @@ public abstract class BusinessWriter<T extends Referencable> implements Closeabl
      * Segregates the given business-object to many records and writes them.
      *
      * @param bean the business object to write in multi-segments format
-     * @throws IOException   for some reason cannot be opened for writing.
-     * @throws BeanException for any problem when getting fields from business-object
+     * @throws IOException     for some reason cannot be opened for writing.
+     * @throws AccessException for any problem when getting properties from the specified business-object
      */
-    public final void write(T bean) throws IOException, BeanException {
+    public final void write(T bean) throws IOException, AccessException {
+        this.init(bean);
         exporter.format(bean, generator, this::write);
         this.flush();
     }
@@ -54,6 +55,14 @@ public abstract class BusinessWriter<T extends Referencable> implements Closeabl
             r.reset();
         }
     }
+
+    /**
+     * Callback before starting format of business-object and write its multiple segments,
+     * useful for bean validation, full-filling missed data or checking the output stream.
+     *
+     * @param bean the business object to write in multi-segments format
+     */
+    protected abstract void init(T bean) throws IOException;
 
     /**
      * Writes the given record in the stream.

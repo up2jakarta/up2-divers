@@ -1,35 +1,39 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.hdl.FProperty;
-import io.github.up2jakarta.csv.core.hdl.Properties;
-import io.github.up2jakarta.csv.core.hdl.Property;
+import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
+import io.github.up2jakarta.csv.core.BSProperty.FProperty;
+import io.github.up2jakarta.csv.core.hdl.FailureException;
+import io.github.up2jakarta.csv.core.misc.acs.BIdOBean;
 import io.github.up2jakarta.csv.core.misc.clv.CountryCodeType;
 import io.github.up2jakarta.csv.core.misc.clv.CurrencyCodeType;
-import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
 import io.github.up2jakarta.csv.core.misc.jpa.NoteEntity;
 import io.github.up2jakarta.csv.core.misc.map.*;
+import io.github.up2jakarta.csv.core.misc.map.Inner1Segment.InnerFragment;
 import io.github.up2jakarta.csv.core.misc.map.oneshot.AbstractAddress;
 import io.github.up2jakarta.csv.core.misc.map.oneshot.ClientSegment;
 import io.github.up2jakarta.csv.core.misc.map.oneshot.ComplexAddress;
 import io.github.up2jakarta.csv.core.misc.map.oneshot.SimpleAddress;
 import io.github.up2jakarta.csv.core.misc.prc.ProcessorBean;
+import io.github.up2jakarta.csv.core.misc.vld.Validator3Bean;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.impl.*;
+import io.github.up2jakarta.csv.fmt.UnitRecord;
+import io.github.up2jakarta.csv.impl.GroupType;
+import io.github.up2jakarta.csv.impl.InputCollector;
+import io.github.up2jakarta.csv.impl.InputRecord;
+import io.github.up2jakarta.csv.impl.SegmentType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Collection;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_CONVERTER;
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
-import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
-import static io.github.up2jakarta.xml.api.SeverityType.*;
+import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -72,6 +76,48 @@ class Up2MapperTests {
         assertNull(bean2);
         assertNull(bean3);
         assertNull(bean4);
+    }
+
+    @Test
+    void testFastHandler() throws BeanException {
+        // Given
+        final Up2Mapper<Validator3Bean, GroupType> mapper = factory.build(Validator3Bean.class);
+        final InputRecord row = record(SegmentType.S00, ".");
+        // When
+        final FailureException error = assertThrows(FailureException.class, () -> mapper.map(row));
+        // Then
+        assertNotNull(error);
+        assertNotNull(error.getCause());
+        assertInstanceOf(NumberFormatException.class, error.getCause());
+        // Then Error
+        assertEquals(ERROR, error.getSeverity());
+        assertEquals(ERROR_CONVERTER, error.getCode());
+        assertEquals("java.lang.NumberFormatException: No digits found.", error.getMessage());
+    }
+
+    @Test
+    void testValidRecordable() throws BeanException {
+        // Given
+        final Up2Mapper<Validator3Bean, GroupType> mapper = factory.build(Validator3Bean.class);
+        final InputRecord row = record(SegmentType.S00, "1.");
+        // When
+        final Validator3Bean bean = mapper.map(row);
+        // Then
+        assertNotNull(bean);
+        assertEquals(BigDecimal.ONE, bean.getAmount());
+        assertSame(row, bean.getRecord());
+    }
+
+    @Test
+    void testInvalidRecordable() throws BeanException {
+        // Given
+        final Up2Mapper<Validator3Bean, GroupType> mapper = factory.build(Validator3Bean.class);
+        final UnitRecord<SegmentType> row = new UnitRecord<>(SegmentType.S00, "1.");
+        // When
+        final AccessException error = assertThrows(AccessException.class, () -> mapper.map(row));
+        // Then
+        assertNotNull(error.getCause());
+        assertInstanceOf(ClassCastException.class, error.getCause());
     }
 
     @Test
@@ -155,24 +201,6 @@ class Up2MapperTests {
         assertEquals("Software engineer", bean.getRole());
         // When Unmapping
         final Up2Format<SimpleSegment, GroupType> format = factory.format(SimpleSegment.class);
-        final String[] out = format.unmap(bean);
-        assertArrayEquals(data, out);
-    }
-
-    @Test
-    void testInnerStaticClass() throws BeanException {
-        // Given
-        final Up2Mapper<InnerStaticSegment, GroupType> mapper = factory.build(InnerStaticSegment.class);
-        final String[] data = new String[]{"AAB", "ABBESSI"};
-        // When
-        final InnerStaticSegment bean = mapper.map(data);
-        // Then
-        assertNotNull(bean);
-        assertEquals("AAB", bean.getId());
-        assertNotNull(bean.getInner());
-        assertEquals("ABBESSI", bean.getInner().getName());
-        // When Unmapping
-        final Up2Format<InnerStaticSegment, GroupType> format = factory.format(InnerStaticSegment.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -307,98 +335,6 @@ class Up2MapperTests {
         assertEquals("Tunisian Dinar", bean.getName());
     }
 
-    @Test
-    void testValidatedAnnotation() throws BeanException {
-        // Given
-        final Up2Mapper<Validator2Bean, GroupType> mapper = factory.build(Validator2Bean.class);
-        final InputRecord row = record(SegmentType.S00, "\n\t");
-        // When
-        final InputCollector handler = new InputCollector(row);
-        final Validator2Bean bean = mapper.map(row, handler);
-        final Collection<InputError> errors = handler.toCollection();
-        // Then
-        assertNotNull(errors);
-        assertNotNull(bean);
-        assertEquals(2, errors.size());
-        for (final InputError error : errors) {
-            assertSame(row, error.getKey().getRecord());
-            assertTrue(error.getKey().getOrder() >= 0);
-            assertEquals(ERROR_VALIDATOR, error.getCode());
-            if (error.getSeverity() == FATAL) {
-                assertEquals("must not be empty", error.getMessage());
-            } else {
-                assertEquals(WARNING, error.getSeverity());
-                assertEquals("size must be between 1 and 3", error.getMessage());
-            }
-        }
-    }
-
-    @Test
-    void testValidationGroupsAnnotation() throws BeanException {
-        // Given
-        final Up2Mapper<ValidatedGroupsBean, GroupType> mapper = factory.build(ValidatedGroupsBean.class);
-        final InputRecord row = record(SegmentType.S00, "\t\n");
-        // When
-        final InputCollector handler = new InputCollector(row);
-        final ValidatedGroupsBean bean = mapper.map(row, handler);
-        final Collection<InputError> errors = handler.toCollection();
-        // Then
-        assertNotNull(errors);
-        assertNotNull(bean);
-        assertEquals(1, errors.size());
-        // Then Error
-        final InputError error = errors.iterator().next();
-        assertSame(row, error.getKey().getRecord());
-        assertEquals(0, error.getKey().getOrder());
-        assertEquals(WARNING, error.getSeverity());
-        assertEquals(ERROR_VALIDATOR, error.getCode());
-        assertEquals("size must be between 1 and 3", error.getMessage());
-    }
-
-    @Test
-    void testValidationUniqueError() throws BeanException {
-        // Given
-        final Up2Mapper<Validator3Bean, GroupType> mapper = factory.build(Validator3Bean.class);
-        final InputRecord row = record(SegmentType.S00, "NaN");
-        // When
-        final InputCollector handler = new InputCollector(row);
-        final Validator3Bean bean = mapper.map(row, handler);
-        final Collection<InputError> errors = handler.toCollection();
-        // Then
-        assertNotNull(errors);
-        assertNotNull(bean);
-        assertEquals(1, errors.size());
-        // Then Error
-        final InputError error = errors.iterator().next();
-        assertSame(row, error.getKey().getRecord());
-        assertEquals(0, error.getKey().getOrder());
-        assertEquals(ERROR, error.getSeverity());
-        assertEquals(ERROR_CONVERTER, error.getCode());
-        assertEquals("Character N is neither a decimal digit number, decimal point, nor \"e\" notation exponential mark.", error.getMessage());
-    }
-
-    @Test
-    void testValidAnnotation() throws BeanException {
-        // Given
-        final Up2Mapper<Validator1Bean, GroupType> mapper = factory.build(Validator1Bean.class);
-        final InputRecord row = record(SegmentType.S00, "eTND");
-        // When
-        final InputCollector handler = new InputCollector(row);
-        final Validator1Bean bean = mapper.map(row, handler);
-        final Collection<InputError> errors = handler.toCollection();
-        // Then
-        assertNotNull(errors);
-        assertNotNull(bean);
-        assertEquals(1, errors.size());
-        // Then Error
-        final InputError error = errors.iterator().next();
-        assertSame(row, error.getKey().getRecord());
-        assertEquals(0, error.getKey().getOrder());
-        assertEquals(ERROR, error.getSeverity());
-        assertEquals(CurrencyConverter.ISO_4217, error.getCode());
-        assertEquals("size must be between 0 and 3", error.getMessage());
-    }
-
     // Checking
     @Test
     void testLocalClass() {
@@ -410,7 +346,7 @@ class Up2MapperTests {
         // THEN
         assertEquals(LocalSegment.class, thrown.getSource());
         assertEquals("class", thrown.getLocator());
-        assertEquals("LocalSegment[class] - local class is not allowed", thrown.getFormattedMessage());
+        assertEquals("Up2MapperTests.LocalSegment[class] - local class is not allowed", thrown.getFormattedMessage());
     }
 
     @Test
@@ -436,31 +372,83 @@ class Up2MapperTests {
     @Test
     void testGenericClass() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test8Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test4Segment.class));
         // THEN
-        assertEquals(Test8Segment.class, thrown.getSource());
+        assertEquals(Test4Segment.class, thrown.getSource());
         assertEquals("class", thrown.getLocator());
-        assertEquals("Test8Segment[class] - generic class is not allowed", thrown.getMessage());
+        assertEquals("Test4Segment[class] - generic class is not allowed", thrown.getMessage());
     }
 
     @Test
-    void testInnerClass() {
+    void testInner1Class() throws BeanException {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(InnerSegment.class));
+        final Up2Mapper<Inner1Segment, GroupType> mapper = factory.build(Inner1Segment.class).toFormat().toMapper();
+        final Inner1Segment bean = mapper.map("TU");
         // THEN
-        assertEquals(InnerSegment.InnerFragment.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("InnerFragment[class] - inner class is not allowed", thrown.getMessage());
+        assertNotNull(bean);
+        assertEquals("TU", bean.getId());
+        assertNotNull(bean.getFragment());
+        assertEquals("Test", bean.getFragment().getName());
+    }
+
+    @Test
+    void testInner2Class() {
+        // When
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Inner2Segment.class));
+        // THEN
+        assertEquals(Inner2Segment.InnerFragment.class, thrown.getSource());
+        assertEquals("fragment", thrown.getLocator());
+        assertEquals("Inner2Segment.InnerFragment[fragment] - inner class is not allowed outside enclosing segments: Inner2Segment, Inner2Segment.InnerFragment", thrown.getMessage());
+    }
+
+    @Test
+    void testInner3Class() throws BeanException {
+        // Given
+        final Up2Mapper<Inner3Segment, GroupType> mapper = factory.build(Inner3Segment.class);
+        final String[] data = new String[]{"AAB", "ABBESSI"};
+        // When
+        final Inner3Segment bean = mapper.map(data);
+        // Then
+        assertNotNull(bean);
+        assertEquals("AAB", bean.getId());
+        assertNotNull(bean.getFragment());
+        assertEquals("ABBESSI", bean.getFragment().getName());
+        // When Unmapping
+        final Up2Format<Inner3Segment, GroupType> format = factory.format(Inner3Segment.class);
+        final String[] out = format.unmap(bean);
+        assertArrayEquals(data, out);
+    }
+
+    @Test
+    void testInner4Class() throws BeanException {
+        // When
+        final Up2Mapper<Inner4Segment, GroupType> mapper = factory.build(Inner4Segment.class).toFormat().toMapper();
+        final Inner4Segment bean = mapper.map("TU");
+        // THEN
+        assertNotNull(bean);
+        assertEquals("TU", bean.fragment().getId());
+        assertNotNull(bean.fragment().getFragment());
+        assertEquals("Test", bean.fragment().getFragment().getName());
+    }
+
+    @Test
+    void testInner5Class() {
+        // When
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Inner5Segment.class));
+        // THEN
+        assertEquals(Inner5Segment.class, thrown.getSource());
+        assertEquals("fragment", thrown.getLocator());
+        assertEquals("Inner5Segment[fragment] - inner class is not allowed inside enclosing records", thrown.getMessage());
     }
 
     @Test
     void testInnerSegment() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(InnerSegment.InnerFragment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(InnerFragment.class));
         // THEN
-        assertEquals(InnerSegment.InnerFragment.class, thrown.getSource());
+        assertEquals(InnerFragment.class, thrown.getSource());
         assertEquals("class", thrown.getLocator());
-        assertEquals("InnerFragment[class] - inner class is not allowed", thrown.getMessage());
+        assertEquals("Inner1Segment.InnerFragment[class] - inner class is not allowed", thrown.getMessage());
     }
 
     @Test
@@ -540,16 +528,6 @@ class Up2MapperTests {
     }
 
     @Test
-    void testFieldName() {
-        // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test4Segment.class));
-        // THEN
-        assertEquals(Test4Segment.class, thrown.getSource());
-        assertEquals("Upper", thrown.getLocator());
-        assertEquals("Test4Segment[Upper] - must starts with an lowercase character", thrown.getMessage());
-    }
-
-    @Test
     void testFieldFinal() {
         // WHEN
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test6Segment.class));
@@ -574,33 +552,33 @@ class Up2MapperTests {
     void testValidRecursive() throws BeanException {
         // When
         final Up2Mapper<TestRecursive6Segment, GroupType> mapper = factory.build(TestRecursive6Segment.class);
-        final List<Property<?, ?, GroupType>> fields = mapper.node.properties;
+        final List<BSProperty<?, ?, GroupType>> fields = mapper.node.properties;
         // THEN
         assertEquals(3, fields.size());
         {
-            final Property<?, ?, GroupType> property = fields.getFirst();
+            final BSProperty<?, ?, GroupType> property = fields.getFirst();
             assertEquals("id", property.getName());
             assertEquals(0, property.offset);
         }
         {
-            final Property<?, ?, GroupType> property = fields.get(1);
+            final BSProperty<?, ?, GroupType> property = fields.get(1);
             assertEquals("any", property.getName());
             assertEquals(1, property.offset);
         }
         {
-            final Property<?, ?, GroupType> fragment = fields.get(2);
+            final BSProperty<?, ?, GroupType> fragment = fields.get(2);
             assertEquals("fragment", fragment.getName());
             assertEquals(2, fragment.offset);
             assertInstanceOf(FProperty.class, fragment);
-            final List<Property<?, ?, GroupType>> fProperties = ((FProperty<?, ?, GroupType>) fragment).node.properties;
+            final List<BSProperty<?, ?, GroupType>> fProperties = ((FProperty<?, ?, GroupType>) fragment).node.properties;
             assertEquals(2, fProperties.size());
             {
-                final Property<?, ?, GroupType> property = fProperties.getFirst();
+                final BSProperty<?, ?, GroupType> property = fProperties.getFirst();
                 assertEquals("id", property.getName());
                 assertEquals(2, property.offset);
             }
             {
-                final Property<?, ?, GroupType> property = fProperties.get(1);
+                final BSProperty<?, ?, GroupType> property = fProperties.get(1);
                 assertEquals("name", property.getName());
                 assertEquals(2 + 1, property.offset);
             }
@@ -615,7 +593,7 @@ class Up2MapperTests {
         final Up2Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
         // WHEN
         final ValidBean bean = mapper.map(id, name);
-        final List<Property<?, ?, GroupType>> fields = mapper.node.properties;
+        final List<BSProperty<?, ?, GroupType>> fields = mapper.node.properties;
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.getFirst().getName());
@@ -631,7 +609,7 @@ class Up2MapperTests {
         final Up2Mapper<NoOrderBean, GroupType> mapper = factory.build(NoOrderBean.class);
         // WHEN
         final NoOrderBean bean = mapper.map(id, name);
-        final List<Property<?, ?, GroupType>> fields = mapper.node.properties;
+        final List<BSProperty<?, ?, GroupType>> fields = mapper.node.properties;
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.getFirst().getName());
@@ -647,7 +625,7 @@ class Up2MapperTests {
         final Up2Mapper<NoPositionBean, GroupType> mapper = factory.build(NoPositionBean.class);
         // WHEN
         final NoPositionBean bean = mapper.map(id, name);
-        final List<Property<?, ?, GroupType>> fields = mapper.node.properties;
+        final List<BSProperty<?, ?, GroupType>> fields = mapper.node.properties;
         // THEN
         assertEquals(2, fields.size());
         assertEquals("id", fields.getFirst().getName());
@@ -662,9 +640,10 @@ class Up2MapperTests {
         final String[] data = new String[]{"ZZZ", "Content", null, "???", "T2", "EUR"};
         // When
         final NoteEntity segment = mapper.map(data);
-        mapper.toFormat().validate(segment, of(WARNING));
+        final List<IComplianceEvent<GroupType>> violations = mapper.toFormat().validate(segment);
         // Then
         assertNotNull(segment);
+        assertEquals(0, violations.size());
         assertEquals("ZZZ", segment.getSubjectCode());
         assertEquals("Content", segment.getContent());
         assertNull(segment.getTest1());
@@ -703,6 +682,19 @@ class Up2MapperTests {
         assertNotNull(segment);
         assertNull(segment.getCode());
         assertNull(segment.getCountry());
+    }
+
+    @Test
+    void testOptional() throws BeanException {
+        // Given
+        final Up2Mapper<BIdOBean, ?> mapper = factory.build(BIdOBean.class);
+        // When
+        final BIdOBean bean = mapper.map();
+        // Then
+        assertNotNull(bean.fragment);
+        assertFalse(bean.fragment.isEmpty());
+        assertNotNull(bean.fragment.get().id);
+        assertTrue(bean.fragment.get().id.isEmpty());
     }
 
 }

@@ -14,7 +14,9 @@ import org.apache.commons.csv.CSVFormat;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public abstract class AFastTests<R extends IFastRecord<SegmentType>, A extends FastImporter<GroupType, SegmentType, Invoice, R, ?>> extends AbstractTests<R> {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public abstract class AFastTests<R extends IFastRecord<SegmentType, ?>, A extends FastImporter<GroupType, SegmentType, Invoice, R, ?>> extends Tests.AbstractTests<R> {
 
     private final FastFileWriter<Invoice> writer;
     private final FastFileReader<Invoice, GroupType, SegmentType, R, ?> reader1;
@@ -33,9 +35,10 @@ public abstract class AFastTests<R extends IFastRecord<SegmentType>, A extends F
 
     @Override
     final void assertRecord(R data, R origin) {
+        assertEquals(data.getPivot(), data.getPivot());
     }
 
-    protected final void testFile(int size) throws IOException, BeanException {
+    protected final void testFile(int size) throws IOException {
         // GIVEN
         final Path filePath = this.input(size);
         final Path copyPath = this.output(filePath);

@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public abstract class AFullTests<R extends IFullRecord<SegmentType>, A extends FullImporter<GroupType, SegmentType, Invoice, R, ?>> extends AbstractTests<R> {
+public abstract class AFullTests<R extends IFullRecord<SegmentType, ?>, A extends FullImporter<GroupType, SegmentType, Invoice, R, ?>> extends Tests.AbstractTests<R> {
 
     private final FullFileWriter<Invoice> writer;
     private final FullFileReader<Invoice, GroupType, SegmentType, R, ?> reader1;
@@ -40,7 +40,7 @@ public abstract class AFullTests<R extends IFullRecord<SegmentType>, A extends F
         assertEquals(source.getPivot(), data.getPivot());
     }
 
-    protected final void testFile(int size) throws IOException, BeanException {
+    protected final void testFile(int size) throws IOException {
         // GIVEN
         final Path filePath = this.input(size);
         final Path copyPath = this.output(filePath);

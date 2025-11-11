@@ -1,5 +1,7 @@
 package io.github.up2jakarta.cii.core;
 
+import io.github.up2jakarta.xml.api.Wrapper;
+
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Period;

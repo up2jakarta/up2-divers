@@ -1,6 +1,5 @@
 package io.github.up2jakarta.job.csv.impl.full;
 
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Format;
 import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.data.Up2Result;
@@ -48,7 +47,7 @@ public class ErrorWriter extends ConditionalWriter<Up2Result<Invoice, InputError
     }
 
     @Override
-    public void write(Up2Result<Invoice, InputError> item) throws IOException, BeanException {
+    public void write(Up2Result<Invoice, InputError> item) throws IOException {
         final String invoiceNumber = item.getErrors().getFirst().getKey().getRecord().getPivot();
         LOG.warn("#Invoice[{}] has ({}) errors", invoiceNumber, item.getErrors().size());
         delegate.write(item.getErrors());

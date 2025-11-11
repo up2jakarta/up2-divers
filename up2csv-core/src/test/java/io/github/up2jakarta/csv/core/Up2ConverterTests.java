@@ -18,8 +18,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
@@ -58,7 +56,7 @@ class Up2ConverterTests {
         // WHEN
         final SupportEntity entity = parser.map(row, handler);
         assertNotNull(entity);
-        assertEquals(0, handler.toCollection().size());
+        assertEquals(0, handler.toList().size());
         // THEN
         assertEquals(100, entity.getKey());
         assertEquals("Test 100", entity.getReference());
@@ -82,7 +80,7 @@ class Up2ConverterTests {
         // WHEN
         final SupportEntity entity = parser.map(row, handler);
         assertNotNull(entity);
-        final Collection<InputError> errors = handler.toCollection();
+        final List<InputError> errors = handler.toList();
         assertEquals(1, errors.size());
         // THEN
         assertEquals(100, entity.getKey());
@@ -96,7 +94,7 @@ class Up2ConverterTests {
         assertEquals(Period.ofWeeks(1), entity.getShippingPeriod());
         assertEquals(CountryCodeType.FR, entity.getShippingCountry());
         // Error
-        final InputError error = errors.iterator().next();
+        final InputError error = errors.getFirst();
         assertEquals(row, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
         assertEquals(WARNING, error.getSeverity());
@@ -116,7 +114,7 @@ class Up2ConverterTests {
         // WHEN
         final SupportEntity entity = parser.map(row, handler);
         assertNotNull(entity);
-        final List<InputError> errors = new ArrayList<>(handler.toCollection());
+        final List<InputError> errors = handler.toList();
         assertEquals(2, errors.size());
         // THEN
         assertEquals(100, entity.getKey());

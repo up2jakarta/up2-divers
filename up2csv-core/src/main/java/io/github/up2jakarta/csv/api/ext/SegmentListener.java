@@ -1,5 +1,6 @@
 package io.github.up2jakarta.csv.api.ext;
 
+import io.github.up2jakarta.csv.core.AccessMode;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
 
@@ -13,21 +14,22 @@ public interface SegmentListener {
     /**
      * Checks if the checker is activated.
      *
-     * @param segmentType the segment type
+     * @param type the segment type
      * @return <code>true</code> if it should activate the checking.
      */
-    default boolean isActivated(Class<? extends Segment> segmentType) {
+    default boolean isActivated(Class<? extends Segment> type) {
         return true;
     }
 
     /**
      * Listener callback before scanning the <code>segment</code>.
      *
-     * @param segmentType the segment type
+     * @param type the segment type
+     * @param mode the access mode read/write only
      * @return the checker context for the given <code>segment</code>.
      * @throws BeanException for any missing or wrong bean configuration
      */
-    CheckerContext beforeSegment(Class<? extends Segment> segmentType) throws BeanException;
+    CheckerContext beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException;
 
     /**
      * Listener callback after the completion of scanning the segment.

@@ -1,23 +1,18 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.api.hdl.ICauseCreator;
-import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.FastImporter;
-import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.core.hdl.FatalCollector;
+import io.github.up2jakarta.csv.api.hdl.IPropertyCreator;
+import io.github.up2jakarta.csv.core.*;
+import io.github.up2jakarta.csv.core.hdl.PropertyCollector;
+import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.RecordTransformer;
-import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.data.Up2Result;
-import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.clv.CodeListException;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.github.up2jakarta.csv.BusinessBuilder.DEFAULT_LEVEL;
 
 /**
  * {@link ModeType#FAST} Processor that's able to aggregate and import java-bean from flat-data.
@@ -26,45 +21,33 @@ import static io.github.up2jakarta.csv.BusinessBuilder.DEFAULT_LEVEL;
  * @param <B> the data type
  * @param <I> the segment type
  * @see FastRecord
- * @see ECause
+ * @see PropertyEvent
  */
-public final class SimpleFastImporter<T extends Referencable, B extends DataType<B>, I extends IType<B, I>>
-        extends FastImporter<B, I, T, FastRecord<I>, ECause<B, FastRecord<I>>>
-        implements RecordTransformer<FastRecord<I>> {
+public final class SimpleFastImporter<T extends Segment, B extends DataType<B>, I extends IType<B, I>>
+        extends FastImporter<B, I, T, FastRecord<I, String>, PropertyEvent<B, FastRecord<I, String>>>
+        implements RecordTransformer<FastRecord<I, String>> {
 
-    private final SeverityType level;
-
+    @SuppressWarnings("unchecked")
     public <E extends Enum<E> & IType<B, I>> SimpleFastImporter(Up2Factory<B> mf, Class<T> type, E rootNode) throws BeanException {
-        this(mf, type, rootNode, DEFAULT_LEVEL);
-    }
-
-    public <E extends Enum<E> & IType<B, I>> SimpleFastImporter(Up2Factory<B> mf, Class<T> type, E rootNode, SeverityType level) throws BeanException {
-        //noinspection unchecked
-        this(mf, type, (I) rootNode, ((Class<I>) rootNode.getClass()).getEnumConstants(), level);
+        this(mf, type, (I) rootNode, ((Class<I>) rootNode.getClass()).getEnumConstants());
     }
 
     public SimpleFastImporter(Up2Factory<B> mf, Class<T> type, I rootNode, I[] nodes) throws BeanException {
-        this(mf, type, rootNode, nodes, DEFAULT_LEVEL);
-    }
-
-    public SimpleFastImporter(Up2Factory<B> mf, Class<T> type, I rootNode, I[] nodes, SeverityType level) throws BeanException {
         super(mf, type, rootNode, nodes);
-        this.level = level;
     }
 
     public SimpleFastImporter(SimpleFastExporter<T, B, I> source) throws BeanException {
         super(source);
-        this.level = DEFAULT_LEVEL;
     }
 
     @Override
-    protected FatalCollector<FastRecord<I>, B, ECause<B, FastRecord<I>>> create(FastRecord<I> row) {
-        final ICauseCreator<FastRecord<I>, B, ECause<B, FastRecord<I>>> creator = ECause::new;
-        return new FatalCollector<>(row, creator, level);
+    protected PropertyCollector<FastRecord<I, String>, B, PropertyEvent<B, FastRecord<I, String>>> create(FastRecord<I, String> row) {
+        final IPropertyCreator<FastRecord<I, String>, B, PropertyEvent<B, FastRecord<I, String>>> creator = PropertyEvent::new;
+        return new PropertyCollector<>(row, creator);
     }
 
     @Override
-    public FastRecord<I> transform(String... source) throws CodeListException {
+    public FastRecord<I, String> transform(String... source) throws CodeListException {
         final I type = typing.type(source);
         final String[] data = typing.truncate(type, source);
         final String businessKey = source[mode.getBeanIdIndex()];
@@ -76,11 +59,11 @@ public final class SimpleFastImporter<T extends Referencable, B extends DataType
      *
      * @param rows the records source
      * @return the parsed business-object with all collected errors
-     * @throws BeanException     for any problem when setting fields from input record
+     * @throws AccessException   for any problem when setting properties of java-beans from input record
      * @throws CodeListException if type of one record is unknown
      */
-    public Up2Result<T, ECause<B, FastRecord<I>>> parse(List<String[]> rows) throws BeanException {
-        final List<FastRecord<I>> records = new ArrayList<>(rows.size());
+    public Up2Result<T, PropertyEvent<B, FastRecord<I, String>>> parse(List<String[]> rows) throws AccessException {
+        final List<FastRecord<I, String>> records = new ArrayList<>(rows.size());
         for (final String[] row : rows) {
             if (row == null || row.length <= mode.getTypeIdIndex()) {
                 continue;

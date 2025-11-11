@@ -5,14 +5,20 @@ import io.github.up2jakarta.csv.api.ext.CheckerContext;
 import io.github.up2jakarta.csv.api.ext.InputProcessor;
 import io.github.up2jakarta.csv.api.ext.SegmentListener;
 import io.github.up2jakarta.csv.cfg.*;
-import io.github.up2jakarta.csv.core.BSNode.BFNode;
-import io.github.up2jakarta.csv.core.BSNode.BPNode;
+import io.github.up2jakarta.csv.core.BSNode.BFNode.BSWalker;
+import io.github.up2jakarta.csv.core.BSNode.BFNode.BSWalker.ACWalker;
+import io.github.up2jakarta.csv.core.BSNode.BFNode.BSWalker.BCWalker;
+import io.github.up2jakarta.csv.core.BSNode.BPNode.BMNode;
+import io.github.up2jakarta.csv.core.BSNode.BPNode.BRNode;
+import io.github.up2jakarta.csv.core.BSOperator.Computer.BSFormat;
+import io.github.up2jakarta.csv.core.BSOperator.Computer.BSMapper;
+import io.github.up2jakarta.csv.core.BSProperty.FProperty;
+import io.github.up2jakarta.csv.core.BSProperty.FProperty.FOProperty;
+import io.github.up2jakarta.csv.core.BSProperty.FProperty.FWProperty;
+import io.github.up2jakarta.csv.core.BSProperty.PProcessor;
+import io.github.up2jakarta.csv.core.BSProperty.PProperty;
 import io.github.up2jakarta.csv.core.ext.Beans;
 import io.github.up2jakarta.csv.core.hdl.*;
-import io.github.up2jakarta.csv.core.hdl.FProperty.FOProperty;
-import io.github.up2jakarta.csv.core.hdl.FProperty.FWProperty;
-import io.github.up2jakarta.csv.core.hdl.PProperty.POProperty;
-import io.github.up2jakarta.csv.core.hdl.PProperty.PWProperty;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.api.SeverityType;
@@ -20,6 +26,7 @@ import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.validation.Valid;
 
+import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.lang.reflect.AnnotatedElement;
@@ -29,62 +36,54 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_PROCESSOR;
-import static io.github.up2jakarta.csv.core.ext.Beans.getBean;
-import static io.github.up2jakarta.csv.core.ext.Beans.getPropertyClass;
+import static io.github.up2jakarta.csv.core.AccessMode.WO;
+import static io.github.up2jakarta.csv.core.BSNode.BFNode;
+import static io.github.up2jakarta.csv.core.BSNode.BPNode;
+import static io.github.up2jakarta.csv.core.BSOperator.BAccessor;
+import static io.github.up2jakarta.csv.core.BSOperator.BAccessor.*;
+import static io.github.up2jakarta.csv.core.BSOperator.BAccessor.BPAccessor.PMProperty;
+import static io.github.up2jakarta.csv.core.BSOperator.BAccessor.BPAccessor.PSProperty;
+import static io.github.up2jakarta.csv.core.BSOperator.Computer;
+import static io.github.up2jakarta.csv.core.BSProperty.PAccessor;
+import static io.github.up2jakarta.csv.core.BSProperty.PAccessor.PFAccessor.FRAccessor;
+import static io.github.up2jakarta.csv.core.BSProperty.PAccessor.PFAccessor.FWAccessor;
+import static io.github.up2jakarta.csv.core.BSProperty.PAccessor.PPAccessor.*;
+import static io.github.up2jakarta.csv.core.BSProperty.PProperty.POProperty;
+import static io.github.up2jakarta.csv.core.BSProperty.PProperty.PWProperty;
+import static io.github.up2jakarta.csv.core.BusinessImporter.Entry;
+import static io.github.up2jakarta.csv.core.ext.Beans.*;
 import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
 import static java.util.Collections.unmodifiableList;
 
+@SuppressWarnings("unchecked")
 final class BSBuilder {
+
+    private static final List<String> EXCLUSIONS = Arrays.stream(excludes()).map(Beans::getClassName).toList();
+    private static final List<String> CN_ENTRIES = List.of(Up2Mapper.class.getName(), BSMapper.class.getName());
 
     private BSBuilder() {
     }
 
-    static <D extends DataType<D>> PWrapper<?, D> build(BeanContext ctx, Annotation ppa) throws BeanException {
-        final Class<? extends Annotation> type = ppa.annotationType();
-        final Processor prc = type.getAnnotation(Processor.class);
-        final Class<? extends InputProcessor<?>> pType = prc.value();
-        final Type[] types = Beans.getTypeArguments(pType, InputProcessor.class);
-        if (types.length == 0 || type != types[0]) {
-            final String aName = type.getSimpleName();
-            throw new BeanException(type, "@Processor[value] must implements InputProcessor<" + aName + ">");
-        }
-        final InputProcessor<Annotation> delegate = getBean(ctx, pType);
-        return new PWrapper<>(delegate, prc.skip(), ppa);
-    }
-
-    static <D extends DataType<D>> PProcessor<D> build(BeanContext ctx, Field pf, Position pc) throws BeanException {
-        final List<PWrapper<?, D>> result = new LinkedList<>();
-        if (!undefined(pc)) {
-            result.addFirst(build(ctx, pc));
-        }
-        for (final Annotation ppa : pf.getAnnotations()) {
-            final Class<? extends Annotation> type = ppa.annotationType();
-            if (type.isAnnotationPresent(Processor.class) && type != Position.class) {
-                result.addLast(build(ctx, ppa));
-            }
-        }
-        if (result.isEmpty()) {
-            return (v, o, p, h) -> v;
-        }
-        if (result.size() == 1) {
-            return result.getFirst();
-        }
-        return new LWrapper<>(result);
-    }
-
-    private static Class<? extends Segment> checkFragment(Field field, Type type, Fragment csv) throws BeanException {
-        final Class<?> fType = getPropertyClass(field, type);
-        if (csv.value() < 0) {
-            throw new BeanException(field, "@Fragment[value] must be positive");
-        }
-        if (Segment.class.isAssignableFrom(fType)) {
-            //noinspection unchecked
-            return (Class<? extends Segment>) fType;
-
-        }
-        throw new BeanException(field, "type must implements Segment");
+    private static Class<?>[] excludes() {
+        return new Class<?>[]{
+                BAccessor.class, BOAccessor.class, BUAccessor.class, BRAccessor.class,
+                BPAccessor.class, PSProperty.class, PMProperty.class,
+                PAccessor.class, FRAccessor.class, FWAccessor.class,
+                PRAccessor.class, PWAccessor.class, PNAccessor.class,
+                EventHandler.class, FastHandler.class, BusinessHandler.class, ComplianceHandler.class,
+                BusinessCollector.class, PropertyFailureCollector.class, PropertyCollector.class,
+                SelfPropertyCollector.class, SelfBusinessCollector.class,
+                BSProperty.class, PProperty.class, POProperty.class, PWProperty.class,
+                FProperty.class, FOProperty.class, FWProperty.class,
+                PProcessor.class, PWrapper.class, LWrapper.class,
+                BSOperator.Processor.class, Up2Mapper.class, Up2Format.class,
+                Computer.class, BSFormat.class, BSMapper.class,
+                BSBuilder.class, BSOperator.class, Entry.class,
+                BSNode.class, BPNode.class, BFNode.class, BRNode.class, BMNode.class,
+                BSWalker.class, ACWalker.class, BCWalker.class,
+        };
     }
 
     private static Class<?> checkProperty(Field field, Type type, Position csv) throws BeanException {
@@ -114,6 +113,67 @@ final class BSBuilder {
         return null;
     }
 
+    private static Class<? extends Segment> checkFragment(Field field, Type type, Fragment csv) throws BeanException {
+        final Class<?> fType = getPropertyClass(field, type);
+        if (csv.value() < 0) {
+            throw new BeanException(field, "@Fragment[value] must be positive");
+        }
+        if (Segment.class.isAssignableFrom(fType)) {
+            return (Class<? extends Segment>) fType;
+        }
+        throw new BeanException(field, "type must implements Segment");
+    }
+
+    static void stackTrace(Throwable error, PrintWriter printer) {
+        printer.println(error);
+        final StackTraceElement[] traces = error.getStackTrace();
+        for (final StackTraceElement element : traces) {
+            final String cn = element.getClassName();
+            if (CN_ENTRIES.contains(cn)) {
+                break;
+            } else if (!EXCLUSIONS.contains(cn)) {
+                printer.println("\t" + element);
+            }
+        }
+        final Throwable cause = error.getCause();
+        if (cause != null) {
+            printer.println(cause);
+        }
+    }
+
+    static <D extends DataType<D>> PWrapper<?, D> build(BeanContext ctx, Annotation ppa) throws BeanException {
+        final Class<? extends Annotation> type = ppa.annotationType();
+        final Processor prc = type.getAnnotation(Processor.class);
+        final Class<? extends InputProcessor<?>> pType = prc.value();
+        final Type[] types = Beans.getTypeArguments(pType, InputProcessor.class);
+        if (types.length == 0 || type != types[0]) {
+            final CharSequence cn = getTypeName(type);
+            throw new BeanException(type, "@Processor[value] must implements InputProcessor<" + cn + ">");
+        }
+        final InputProcessor<Annotation> delegate = getBean(ctx, pType);
+        return new PWrapper<>(delegate, prc.skip(), ppa);
+    }
+
+    static <D extends DataType<D>> PProcessor<D> build(BeanContext ctx, Field pf, Position pc) throws BeanException {
+        final List<PWrapper<?, D>> result = new LinkedList<>();
+        if (!undefined(pc)) {
+            result.addFirst(build(ctx, pc));
+        }
+        for (final Annotation ppa : pf.getAnnotations()) {
+            final Class<? extends Annotation> type = ppa.annotationType();
+            if (type.isAnnotationPresent(Processor.class) && type != Position.class) {
+                result.addLast(build(ctx, ppa));
+            }
+        }
+        if (result.isEmpty()) {
+            return (v, o, p, h) -> v;
+        }
+        if (result.size() == 1) {
+            return result.getFirst();
+        }
+        return new LWrapper<>(result);
+    }
+
     static Optional<AccessType> getAccessType(Optional<AccessType> first, Class<? extends Segment> type) {
         if (first.isEmpty()) {
             return getAccessType(type, first);
@@ -136,13 +196,11 @@ final class BSBuilder {
             final Class<? extends Annotation> aType = annotation.annotationType();
             // direct
             if (annotationType.equals(aType)) {
-                //noinspection unchecked
                 result.add((A) annotation);
             }
             // indirect
             if (repeatValue != null && repeatValue.getDeclaringClass().equals(aType)) {
                 try {
-                    //noinspection unchecked
                     final A[] indirectArray = (A[]) repeatValue.invoke(annotation);
                     result.addAll(Arrays.asList(indirectArray));
                 } catch (Exception t) {
@@ -156,54 +214,40 @@ final class BSBuilder {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
-    private static <S extends Segment, B extends DataType<B>> FProperty<S, ?, B> reverse(FProperty<S, ?, B> source) throws BeanException {
-        final BSNode<S, B> node;
-        if (source.node instanceof BFNode<S, B> fn) {
-            node = reverse(fn);
-        } else {
-            node = new BFNode<>((BPNode<S, B, ?>) source.node);
+    static <A extends Annotation> void id(AccessMode mode, BSNode<?, ?> pn, Class<A> ct, BIdPath bc, FProperty<Segment, ?, ?>... pp) throws BeanException {
+        for (final BSProperty<?, ?, ?> p : pn.properties) {
+            final AnnotatedElement field = p.getSource();
+            final A annotation = field.getAnnotation(ct);
+            if (p instanceof FProperty<?, ?, ?> fp) {
+                if (annotation != null) {
+                    throw BeanException.of(field, "must not be annotated with @" + getTypeName(ct));
+                }
+                id(mode, fp.node, ct, bc, concat(pp, (FProperty<Segment, ?, ?>) fp));
+            } else if (annotation != null) {
+                if (mode == WO) {
+                    final List<FProperty<Segment, ?, ?>> path = new ArrayList<>(pp.length);
+                    for (final FProperty<Segment, ?, ?> fp : pp) {
+                        path.add(fp.reverse());
+                    }
+                    final BSProperty<Object, Object, ?> pr = ((BSProperty<Object, Object, ?>) p).reverse();
+                    bc.accept(unmodifiableList(path), (PProperty<Object, Object, ?>) pr);
+                } else {
+                    bc.accept(Arrays.asList(pp), (PProperty<Object, Object, ?>) p);
+                }
+            }
         }
-        if (source instanceof FWProperty<?, ?> pw) {
-            return new FWProperty<>(node, (FWProperty<S, B>) pw);
-        }
-        return new FOProperty<>(node, (FProperty<S, S, B>) source);
     }
 
-    public static <T extends Segment, D extends DataType<D>> BPNode<T, D, ?> reverse(BFNode<T, D> source) throws BeanException {
-        final Class<T> type = source.type;
-        if (type.isRecord()) {
-            return new BSNode.BRNode<>(source);
-        } else {
-            return new BSNode.BMNode<>(source);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    static <D extends DataType<D>> List<Property<?, ?, D>> reverse(final List<Property<?, ?, D>> source) throws BeanException {
-        final List<Property<?, ?, D>> ps = new ArrayList<>(source.size());
-        for (final Property<?, ?, D> p : source) {
-            final Property<?, ?, D> copy = switch (p) {
-                case FProperty<?, ?, ?> fp -> reverse((FProperty<?, ?, D>) fp);
-                case POProperty<?, ?> po -> new POProperty<>((POProperty<?, D>) po);
-                case PProperty.PWProperty<?, ?> wp -> new PWProperty<>((PWProperty<?, D>) wp);
-            };
-            ps.add(copy);
-        }
-        return unmodifiableList(ps);
-    }
-
-    static <D extends DataType<D>> List<Property<?, ?, D>> build(Class<? extends Segment> beanType, BSContext<D> context) throws BeanException {
+    static <D extends DataType<D>> List<BSProperty<?, ?, D>> build(Class<? extends Segment> beanType, BSContext<D> context) throws BeanException {
         if (context.push(beanType)) {
             throw new BeanException(beanType, "cyclic fragment is not allowed");
         }
-        final List<Property<?, ?, D>> result = new LinkedList<>();
+        final List<BSProperty<?, ?, D>> result = new LinkedList<>();
         final Class<?> superClass = beanType.getSuperclass();
         if (Segment.class.isAssignableFrom(superClass)) {
-            //noinspection unchecked
             final Class<? extends Segment> superType = (Class<? extends Segment>) superClass;
             final BSContext<D> superContext = context.with(superType, beanType.getGenericSuperclass());
-            final List<Property<?, ?, D>> superProperties = build(superType, superContext);
+            final List<BSProperty<?, ?, D>> superProperties = build(superType, superContext);
             superContext.end();
             result.addAll(superProperties);
         }
@@ -214,11 +258,17 @@ final class BSBuilder {
             final Position position = context.position(field);
             if (fragment != null) {
                 final Class<? extends Segment> fType = checkFragment(field, fieldType, fragment);
-                final List<Property<?, ?, D>> fps = build(fType, context.with(field, fragment, fType));
-                result.add(context.node(fType, field, fragment, fps));
+                final List<BSProperty<?, ?, D>> fps = build(fType, context.with(field, fragment, fType));
+                if (!(fragment.nullable() && fps.isEmpty())) {
+                    try {
+                        result.add(context.node(fType, field, fragment, fps));
+                    } catch (AccessException ex) {
+                        throw new BeanException(field, ex.getMessage());
+                    }
+                }
             } else if (position != null) {
                 final Class<?> fieldClass = checkProperty(field, fieldType, position);
-                final Property<?, ?, D> property = context.property(fieldClass, field, position);
+                final BSProperty<?, ?, D> property = context.property(fieldClass, field, position);
                 result.add(property);
             } else {
                 final Class<?> type = getPropertyClass(field, fieldType);
@@ -226,6 +276,10 @@ final class BSBuilder {
             }
         }
         return result;
+    }
+
+    interface BIdPath {
+        void accept(List<FProperty<Segment, ?, ?>> path, PProperty<Object, Object, ?> property) throws BeanException;
     }
 
     /**
@@ -239,7 +293,7 @@ final class BSBuilder {
         }
 
         @Override
-        public String process(String value, int offset, PProperty<?, ?, D> property, EventHandler<?, D, ?> handler) {
+        public String process(String value, int offset, PProperty<?, ?, D> property, EventHandler<D> handler) {
             for (final PWrapper<?, D> processor : processors) {
                 value = processor.process(value, offset, property, handler);
             }
@@ -262,7 +316,7 @@ final class BSBuilder {
         }
 
         @Override
-        public String process(String value, int offset, PProperty<?, ?, D> pp, EventHandler<?, D, ?> handler) {
+        public String process(String value, int offset, PProperty<?, ?, D> pp, EventHandler<D> handler) {
             try {
                 return delegate.process(value, config);
             } catch (RuntimeException cause) {
@@ -281,7 +335,7 @@ final class BSBuilder {
     /**
      * Internal composite checker.
      */
-    static final class WChecker implements CheckerContext {
+    static final class WChecker implements CheckerContext, SegmentListener {
 
         private final SegmentListener[] listeners;
         private final CheckerContext[] contexts;
@@ -309,57 +363,61 @@ final class BSBuilder {
             return new WChecker(listeners, contexts);
         }
 
-        void beforeSegment(Class<? extends Segment> type) throws BeanException {
+        @Override
+        public WChecker beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException {
             for (var i = 0; i < listeners.length; i++) {
-                contexts[i] = listeners[i].beforeSegment(type);
+                contexts[i] = listeners[i].beforeSegment(mode, type);
             }
+            return this;
         }
 
-        void afterSegment() throws BeanException {
+        @Override
+        public void afterSegment(CheckerContext context) throws BeanException {
             for (var i = 0; i < this.listeners.length; i++) {
                 this.listeners[i].afterSegment(contexts[i]);
             }
+            context.close();
         }
 
         @Override
-        public void beforeSuperSegment(Class<? extends Segment> superType) throws BeanException {
+        public void beforeSuperSegment(Class<? extends Segment> type) throws BeanException {
             for (final CheckerContext context : contexts) {
-                context.beforeSuperSegment(superType);
+                context.beforeSuperSegment(type);
             }
         }
 
         @Override
-        public void afterSuperSegment(Class<? extends Segment> superType) throws BeanException {
+        public void afterSuperSegment(Class<? extends Segment> type) throws BeanException {
             for (final CheckerContext context : contexts) {
-                context.afterSuperSegment(superType);
+                context.afterSuperSegment(type);
             }
         }
 
         @Override
-        public void beforeFragmentProperty(Field fragment, Class<? extends Segment> fragmentType) throws BeanException {
+        public void beforeFragmentProperty(AccessMode mode, Field fragment, Class<? extends Segment> type) throws BeanException {
             for (final CheckerContext context : contexts) {
-                context.beforeFragmentProperty(fragment, fragmentType);
+                context.beforeFragmentProperty(mode, fragment, type);
             }
         }
 
         @Override
-        public void afterFragmentProperty(Field fragment, Class<? extends Segment> fragmentType) throws BeanException {
+        public void afterFragmentProperty(Field fragment, Class<? extends Segment> type) throws BeanException {
             for (final CheckerContext context : contexts) {
-                context.afterFragmentProperty(fragment, fragmentType);
+                context.afterFragmentProperty(fragment, type);
             }
         }
 
         @Override
-        public void positionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
+        public void positionProperty(Field property, Class<?> type, int offset) throws BeanException {
             for (final CheckerContext context : contexts) {
-                context.positionProperty(property, propertyType, offset);
+                context.positionProperty(property, type, offset);
             }
         }
 
         @Override
-        public void unknownProperty(Field property, Class<?> propertyType) throws BeanException {
+        public void unknownProperty(Field property, Class<?> type) throws BeanException {
             for (final CheckerContext context : contexts) {
-                context.unknownProperty(property, propertyType);
+                context.unknownProperty(property, type);
             }
         }
 

@@ -48,12 +48,12 @@ public class FullInvoiceTests extends AFullTests<InputRecord, FullImporter<Group
     }
 
     @Test
-    void test10() throws BeanException, IOException {
+    void test10() throws IOException {
         testFile(10);
     }
 
     @Test
-    void test100() throws BeanException, IOException {
+    void test100() throws IOException {
         testFile(100);
     }
 

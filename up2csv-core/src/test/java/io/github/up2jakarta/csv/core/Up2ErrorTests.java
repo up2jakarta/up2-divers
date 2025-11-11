@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.hdl.FastException;
-import io.github.up2jakarta.csv.core.hdl.FatalException;
+import io.github.up2jakarta.csv.core.hdl.FailureException;
+import io.github.up2jakarta.csv.core.hdl.PropertyFailureException;
 import io.github.up2jakarta.csv.core.misc.DummyException;
 import io.github.up2jakarta.csv.core.misc.cvr.Test1Converter;
 import io.github.up2jakarta.csv.core.misc.ext.Dummy1Processor;
@@ -10,8 +10,6 @@ import io.github.up2jakarta.csv.core.misc.ext.DummyConverter;
 import io.github.up2jakarta.csv.core.misc.map.Test1Exception;
 import io.github.up2jakarta.csv.core.misc.map.Test2Exception;
 import io.github.up2jakarta.csv.core.misc.prc.Test6Processor;
-import io.github.up2jakarta.csv.fmt.misc.MyCollector;
-import io.github.up2jakarta.csv.fmt.misc.MyRecord;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputCollector;
 import io.github.up2jakarta.csv.impl.InputError;
@@ -30,7 +28,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
+import static io.github.up2jakarta.csv.fmt.misc.Tests.*;
 import static io.github.up2jakarta.csv.impl.SegmentType.S00;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,10 +36,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 public class Up2ErrorTests {
 
-    static final String DUMMY = DummyException.class.getName();
-    static final String FAST = FastException.class.getName();
-    static final String FATAL = FatalException.class.getName();
-    static final String EVENT = PropertyException.class.getName();
+    static final String EX_CAUSE = DummyException.class.getName();
+    static final String EX_EVENT = PropertyException.class.getName();
+    static final String EX_FAILURE = FailureException.class.getName();
+    static final String EX_EVENT_FAILURE = PropertyFailureException.class.getName();
 
     private final Up2Factory<GroupType> factory;
 
@@ -71,11 +69,11 @@ public class Up2ErrorTests {
         // Given
         final Up2Mapper<Test6Processor, ?> mapper = factory.build(Test6Processor.class);
         final List<String> expected = Arrays.asList(
-                FAST + ": " + DUMMY + ": dummy message",
-                "Caused by: " + DUMMY + ": dummy message"
+                EX_FAILURE + ": " + EX_CAUSE + ": dummy message",
+                "Caused by: " + EX_CAUSE + ": dummy message"
         );
         // Then
-        final FastException thrown = assertThrows(FastException.class, () -> mapper.map("dummy"));
+        final FailureException thrown = assertThrows(FailureException.class, () -> mapper.map("dummy"));
         // THEN
         {
             var buffer = "";
@@ -124,16 +122,16 @@ public class Up2ErrorTests {
         // Given
         final Up2Mapper<Test1Exception, GroupType> mapper = factory.build(Test1Exception.class);
         final List<String> expected = Arrays.asList(
-                FATAL + ": " + EVENT + ": " + DUMMY + ": dummy message",
-                "Caused by: " + DUMMY + ": dummy message",
+                EX_EVENT_FAILURE + ": " + EX_EVENT + ": dummy message",
+                "Caused by: " + EX_CAUSE + ": dummy message",
                 "Multiple events have been occurred:",
                 "1) the data #[1] has warning: W001 - Unknown value [EURO] for CodeList[CountryCodeType]",
                 "2) the data #[2] has error: E002 - Unknown value [USA] for CodeList[CurrencyCodeType]"
         );
-        final MyRecord row = new MyRecord(S00, null, "EURO", "USA", "dummy");
-        final MyCollector handler = new MyCollector(row);
+        final TURecord row = new TURecord(S00, null, "EURO", "USA", "dummy");
+        final TUCollector handler = new TUCollector(row);
         // Then
-        final FatalException thrown = assertThrows(FatalException.class, () -> mapper.map(row, handler));
+        final PropertyFailureException thrown = assertThrows(PropertyFailureException.class, () -> mapper.map(row, handler));
         // THEN
         {
             var buffer = "";
@@ -182,19 +180,19 @@ public class Up2ErrorTests {
         // Given
         final Up2Mapper<Test2Exception, GroupType> mapper = factory.build(Test2Exception.class);
         final List<String> expected = Arrays.asList(
-                FATAL + ": " + EVENT + ": " + DUMMY + ": dummy message",
-                "Caused by: " + EVENT + ": " + DUMMY + ": dummy message",
-                "Caused by: " + DUMMY + ": dummy message",
+                EX_EVENT_FAILURE + ": " + EX_EVENT + ": dummy message",
+                "Caused by: " + EX_EVENT + ": dummy message",
+                "Caused by: " + EX_CAUSE + ": dummy message",
                 "Multiple events have been occurred:",
-                "1) the data #[0] has warning: W001 - java.lang.RuntimeException: EURO message",
+                "1) the data #[0] has warning: W001 - EURO message",
                 "java.lang.RuntimeException: EURO message",
-                "2) the data #[1] has error: E002 - java.lang.RuntimeException: USA message",
+                "2) the data #[1] has error: E002 - USA message",
                 "java.lang.RuntimeException: USA message"
         );
-        final MyRecord row = new MyRecord(S00, null, "EURO", "USA", "dummy");
-        final MyCollector handler = new MyCollector(row);
+        final TURecord row = new TURecord(S00, null, "EURO", "USA", "dummy");
+        final TUCollector handler = new TUCollector(row);
         // Then
-        final FatalException thrown = assertThrows(FatalException.class, () -> mapper.map(row, handler));
+        final PropertyFailureException thrown = assertThrows(PropertyFailureException.class, () -> mapper.map(row, handler));
         // THEN
         {
             var buffer = "";
@@ -247,8 +245,8 @@ public class Up2ErrorTests {
         // Then
         mapper.map(row, handler);
         // THEN
-        assertEquals(1, handler.toCollection().size());
-        final InputError error = handler.toCollection().iterator().next();
+        assertEquals(1, handler.toList().size());
+        final InputError error = handler.toList().getFirst();
         assertTrace(error.getTrace(),
                 "java.lang.NullPointerException: null message",
                 "\t" + Dummy1Processor.class.getName() + ".process(Dummy1Processor.java:21)",
@@ -266,8 +264,8 @@ public class Up2ErrorTests {
         // Then
         mapper.map(row, handler);
         // THEN
-        assertEquals(1, handler.toCollection().size());
-        final InputError error = handler.toCollection().iterator().next();
+        assertEquals(1, handler.toList().size());
+        final InputError error = handler.toList().getFirst();
         assertEquals("Unknown value [USD] for CodeList[CurrencyCodeType]", error.getMessage());
         assertNull(error.getTrace());
     }
@@ -281,10 +279,10 @@ public class Up2ErrorTests {
         // Then
         mapper.map(row, handler);
         // THEN
-        assertEquals(1, handler.toCollection().size());
-        final InputError error = handler.toCollection().iterator().next();
+        assertEquals(1, handler.toList().size());
+        final InputError error = handler.toList().getFirst();
         assertTrace(error.getTrace(),
-                DUMMY + ": dummy wrapped message",
+                EX_CAUSE + ": dummy wrapped message",
                 "\t" + DummyConverter.class.getName() + ".parse(DummyConverter.java:24)",
                 "\t" + DummyConverter.class.getName() + ".parse(DummyConverter.java:8)",
                 "\tio.github.up2jakarta.csv.api.ext.PropertyConverter.lambda$of$0(PropertyConverter.java:42)",

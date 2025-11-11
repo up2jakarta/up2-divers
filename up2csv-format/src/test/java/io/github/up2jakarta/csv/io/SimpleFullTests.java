@@ -20,7 +20,7 @@ import java.io.IOException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class SimpleFullTests extends AFullTests<FullRecord<SegmentType>, SimpleFullImporter<Invoice, GroupType, SegmentType>> {
+public class SimpleFullTests extends AFullTests<FullRecord<SegmentType, String>, SimpleFullImporter<Invoice, GroupType, SegmentType>> {
 
     @Autowired
     SimpleFullTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
@@ -38,12 +38,12 @@ public class SimpleFullTests extends AFullTests<FullRecord<SegmentType>, SimpleF
     }
 
     @Test
-    void test10() throws BeanException, IOException {
+    void test10() throws IOException {
         testFile(10);
     }
 
     @Test
-    void test100() throws BeanException, IOException {
+    void test100() throws IOException {
         testFile(100);
     }
 

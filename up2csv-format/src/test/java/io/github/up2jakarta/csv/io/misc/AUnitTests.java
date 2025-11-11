@@ -1,5 +1,6 @@
 package io.github.up2jakarta.csv.io.misc;
 
+import io.github.up2jakarta.csv.api.IFastRecord;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.ModeType;
@@ -14,7 +15,9 @@ import org.apache.commons.csv.CSVFormat;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public abstract class AUnitTests<R extends IRecord<SegmentType>, A extends UnitImporter<GroupType, SegmentType, Invoice, R, ?>> extends AbstractTests<R> {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public abstract class AUnitTests<R extends IRecord<SegmentType>, A extends UnitImporter<GroupType, SegmentType, Invoice, R, ?>> extends Tests.AbstractTests<R> {
 
     private final UnitFileWriter<Invoice> writer;
     private final UnitFileReader<Invoice, GroupType, SegmentType, R, ?> reader1;
@@ -33,9 +36,12 @@ public abstract class AUnitTests<R extends IRecord<SegmentType>, A extends UnitI
 
     @Override
     final void assertRecord(R data, R origin) {
+        if (data instanceof IFastRecord<?, ?> fd && origin instanceof IFastRecord<?, ?> fo) {
+            assertEquals(fd.getPivot(), fo.getPivot());
+        }
     }
 
-    protected final void testFile(int size) throws IOException, BeanException {
+    protected final void testFile(int size) throws IOException {
         // GIVEN
         final Path filePath = this.input(size);
         final Path copyPath = this.output(filePath);

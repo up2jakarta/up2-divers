@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.data.SegmentWriter;
 import io.github.up2jakarta.csv.fmt.SimpleUnitImporter;
 
@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  * @param <I> the segment type
  * @see SimpleUnitImporter
  */
-public non-sealed class UnitExporter<B extends DataType<B>, I extends IType<B, I>, T extends Referencable> extends BusinessExporter<B, I, T> {
+public non-sealed class UnitExporter<B extends DataType<B>, I extends IType<B, I>, T extends Segment> extends BusinessExporter<B, I, T> {
 
     public UnitExporter(Up2Factory<B> factory, Class<T> type, I rootNode, I[] nodes) throws BeanException {
         super(factory, ModeType.UNIT, type, rootNode, nodes);
@@ -32,15 +32,15 @@ public non-sealed class UnitExporter<B extends DataType<B>, I extends IType<B, I
      *
      * @param bean     the business object to segregate
      * @param callback the segment listener
-     * @throws BeanException for any problem when getting fields from business-object
-     * @throws IOException   for some reason cannot be opened for writing by the callback.
+     * @throws AccessException for any problem when getting properties from the specified business-object
+     * @throws IOException     for some reason cannot be opened for writing by the callback.
      */
-    public final void format(T bean, SegmentWriter callback) throws BeanException, IOException {
+    public final void format(T bean, SegmentWriter callback) throws AccessException, IOException {
         this.format(bean, () -> null, callback);
     }
 
     @Override
-    final void fill(String[] target, Supplier<String> ignore, IType<?, ?> type, Referencable source) {
+    final void fill(String[] target, Supplier<String> ignore, IType<?, ?> type, String reference) {
         target[0] = type.getCode();
     }
 

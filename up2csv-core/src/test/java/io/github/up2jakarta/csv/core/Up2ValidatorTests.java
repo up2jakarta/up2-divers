@@ -1,0 +1,306 @@
+package io.github.up2jakarta.csv.core;
+
+import io.github.up2jakarta.csv.TUConfiguration;
+import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
+import io.github.up2jakarta.csv.core.BSContext.BVContext;
+import io.github.up2jakarta.csv.core.BSProperty.FProperty;
+import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
+import io.github.up2jakarta.csv.core.misc.vld.*;
+import io.github.up2jakarta.csv.impl.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.List;
+
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_CONVERTER;
+import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
+import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
+import static io.github.up2jakarta.xml.api.SeverityType.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = TUConfiguration.class)
+class Up2ValidatorTests {
+
+    private final Up2Factory<GroupType> factory;
+
+    @Autowired
+    Up2ValidatorTests(Up2Factory<GroupType> factory) {
+        this.factory = factory;
+    }
+
+    @Test
+    void testUniqueError() throws BeanException {
+        // Given
+        final Up2Mapper<Validator3Bean, GroupType> mapper = factory.build(Validator3Bean.class);
+        final InputRecord row = record(SegmentType.S00, ".");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator3Bean bean = mapper.map(row, handler);
+        final List<InputError> errors = handler.toList();
+        // Then
+        assertNotNull(errors);
+        assertNotNull(bean);
+        assertEquals(1, errors.size());
+        // Then Error
+        final InputError error = errors.getFirst();
+        assertSame(row, error.getKey().getRecord());
+        assertEquals(0, error.getKey().getOrder());
+        assertEquals(ERROR, error.getSeverity());
+        assertEquals(ERROR_CONVERTER, error.getCode());
+        assertEquals("No digits found.", error.getMessage());
+    }
+
+    @Test
+    void testValidationGroupsAnnotation() throws BeanException {
+        // Given
+        final Up2Mapper<ValidatedGroupsBean, GroupType> mapper = factory.build(ValidatedGroupsBean.class);
+        final InputRecord row = record(SegmentType.S00, "\t\n");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final ValidatedGroupsBean bean = mapper.map(row, handler);
+        final List<InputError> errors = handler.toList();
+        // Then
+        assertNotNull(errors);
+        assertNotNull(bean);
+        assertEquals(1, errors.size());
+        // Then Error
+        final InputError error = errors.getFirst();
+        assertSame(row, error.getKey().getRecord());
+        assertEquals(0, error.getKey().getOrder());
+        assertEquals(WARNING, error.getSeverity());
+        assertEquals(ERROR_VALIDATOR, error.getCode());
+        assertEquals("size must be between 1 and 3", error.getMessage());
+    }
+
+    @Test
+    void testValidAnnotation() throws BeanException {
+        // Given
+        final Up2Mapper<Validator1Bean, GroupType> mapper = factory.build(Validator1Bean.class);
+        final InputRecord row = record(SegmentType.S00, "eTND");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator1Bean bean = mapper.map(row, handler);
+        final List<InputError> errors = handler.toList();
+        // Then
+        assertNotNull(errors);
+        assertNotNull(bean);
+        assertEquals(1, errors.size());
+        // Then Error
+        final InputError error = errors.getFirst();
+        assertSame(row, error.getKey().getRecord());
+        assertEquals(0, error.getKey().getOrder());
+        assertEquals(ERROR, error.getSeverity());
+        assertEquals(CurrencyConverter.ISO_4217, error.getCode());
+        assertEquals("size must be between 0 and 3", error.getMessage());
+    }
+
+    @Test
+    void testValidOverrideAnnotation() throws BeanException {
+        // Given
+        final Up2Mapper<Validator2Bean, GroupType> mapper = factory.build(Validator2Bean.class);
+        final InputRecord row = record(SegmentType.S00, "\n\t");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator2Bean bean = mapper.map(row, handler);
+        final List<InputError> errors = handler.toList();
+        // Then
+        assertNotNull(errors);
+        assertNotNull(bean);
+        assertEquals(2, errors.size());
+        for (final InputError error : errors) {
+            assertSame(row, error.getKey().getRecord());
+            assertTrue(error.getKey().getOrder() >= 0);
+            assertEquals(ERROR_VALIDATOR, error.getCode());
+            if (error.getSeverity() == FATAL) {
+                assertEquals("must not be empty", error.getMessage());
+            } else {
+                assertEquals(WARNING, error.getSeverity());
+                assertEquals("size must be between 1 and 3", error.getMessage());
+            }
+        }
+    }
+
+    @Test
+    void testValid4Fragment() throws BeanException {
+        // Given
+        final Up2Mapper<Validator4Bean, GroupType> mapper = factory.build(Validator4Bean.class);
+        final InputRecord row = record(SegmentType.S00, "");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator4Bean bean = mapper.map(row, handler);
+        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        // Then
+        assertEquals(1, evs.size());
+        assertEquals(evs.size(), handler.toList().size());
+        assertFalse(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+    }
+
+    @Test
+    void testValid5Fragment() throws BeanException {
+        // Given
+        final Up2Mapper<Validator5Bean, GroupType> mapper = factory.build(Validator5Bean.class);
+        final InputRecord row = record(SegmentType.S00, "");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator5Bean bean = mapper.map(row, handler);
+        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        // Then
+        assertEquals(1, evs.size());
+        assertEquals(evs.size(), handler.toList().size());
+        // Context
+        assertFalse(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+    }
+
+    @Test
+    void testValid6Fragment() throws BeanException {
+        // Given
+        final Up2Mapper<Validator6Bean, GroupType> mapper = factory.build(Validator6Bean.class);
+        final InputRecord row = record(SegmentType.S00, "");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator6Bean bean = mapper.map(row, handler);
+        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        // Then
+        assertEquals(1, evs.size());
+        assertEquals(evs.size(), handler.toList().size());
+        // Context
+        assertTrue(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+    }
+
+    @Test
+    void testValid7Fragment() throws BeanException {
+        // Given
+        final Up2Mapper<Validator7Bean, GroupType> mapper = factory.build(Validator7Bean.class);
+        final InputRecord row = record(SegmentType.S00, "");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator7Bean bean = mapper.map(row, handler);
+        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        // Then
+        assertEquals(1, evs.size());
+        assertEquals(evs.size(), handler.toList().size());
+        // Context
+        assertTrue(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+    }
+
+    @Test
+    void testValid8Fragment() throws BeanException {
+        // Given
+        final Up2Mapper<Validator8Bean, GroupType> mapper = factory.build(Validator8Bean.class);
+        final InputRecord row = record(SegmentType.S00, "");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator8Bean bean = mapper.map(row, handler);
+        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        // Then
+        assertEquals(1, evs.size());
+        assertEquals(evs.size(), handler.toList().size());
+        // Context
+        assertTrue(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+    }
+
+    @Test
+    void testValid9Fragment() throws BeanException {
+        // Given
+        final Up2Mapper<Validator9Bean, GroupType> mapper = factory.build(Validator9Bean.class);
+        final InputRecord row = record(SegmentType.S00, "");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator9Bean bean = mapper.map(row, handler);
+        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        // Then
+        assertEquals(1, evs.size());
+        assertEquals(evs.size(), handler.toList().size());
+        // Context
+        assertTrue(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+    }
+
+    @Test
+    void testValid10Fragment() throws BeanException {
+        // Given
+        final Up2Mapper<Validator10Bean, GroupType> mapper = factory.build(Validator10Bean.class);
+        final InputRecord row = record(SegmentType.S00, "");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator10Bean bean = mapper.map(row, handler);
+        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        // Then
+        assertEquals(1, evs.size());
+        assertEquals(evs.size(), handler.toList().size());
+        // Context
+        assertTrue(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+    }
+
+    @Test
+    void testValid11Fragment() throws BeanException {
+        // Given
+        final Up2Mapper<Validator11Bean, GroupType> mapper = factory.build(Validator11Bean.class);
+        final InputRecord row = record(SegmentType.S00, "");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator11Bean bean = mapper.map(row, handler);
+        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        // Then
+        assertEquals(1, evs.size());
+        assertEquals(evs.size(), handler.toList().size());
+        // Context
+        assertFalse(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+    }
+
+    @Test
+    void testValid12Fragment() throws BeanException {
+        // Given
+        final Up2Mapper<Validator12Bean, GroupType> mapper = factory.build(Validator12Bean.class);
+        final InputRecord row = record(SegmentType.S00, "");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator12Bean bean = mapper.map(row, handler);
+        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        // Then
+        assertEquals(1, evs.size());
+        assertEquals(evs.size(), handler.toList().size());
+        // Context
+        assertTrue(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+    }
+
+    @Test
+    void testValid13Fragment() throws BeanException {
+        // Given
+        final Up2Mapper<Validator13Bean, GroupType> mapper = factory.build(Validator13Bean.class);
+        final InputRecord row = record(SegmentType.S00, "");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator13Bean bean = mapper.map(row, handler);
+        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        // Then
+        assertEquals(1, evs.size());
+        assertEquals(evs.size(), handler.toList().size());
+        // Context
+        final BVContext context = ((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context;
+        assertEquals(1, context.groups.length);
+        assertTrue(context.enabled);
+    }
+
+    @Test
+    void testValid14Fragment() throws BeanException {
+        // Given
+        final Up2Mapper<Validator14Bean, GroupType> mapper = factory.build(Validator14Bean.class);
+        final InputRecord row = record(SegmentType.S00, "");
+        // When
+        final InputCollector handler = new InputCollector(row);
+        final Validator14Bean bean = mapper.map(row, handler);
+        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        // Then
+        assertEquals(1, evs.size());
+        assertEquals(evs.size(), handler.toList().size());
+        // Context
+        final BVContext context = ((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context;
+        assertEquals(2, mapper.node.context.groups.length);
+        assertFalse(context.enabled);
+    }
+
+}

@@ -36,9 +36,15 @@ public interface IEvent<D extends DataType<D>> extends IError {
     String ERROR_BOOLEAN = "UP2-P004";
 
     /**
+     * <ul>
+     *      Note that the offset can be <code>null</code> in the following cases:
+     *      <li>Unknown property violates JSR-303 constraint</li>
+     *      <li>Segment violates the cardinalities of join relationship ({@link DataType#isValid(DataType, int)})</li>
+     * </ul>
+     *
      * @return the data offset of the input record
      */
-    int getOffset();
+    Integer getOffset();
 
     /**
      * @return the business data type

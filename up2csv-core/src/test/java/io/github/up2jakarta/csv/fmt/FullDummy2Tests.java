@@ -5,8 +5,6 @@ import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.fmt.misc.AFullTest;
 import io.github.up2jakarta.csv.fmt.misc.Dummy2Invoice;
-import io.github.up2jakarta.csv.fmt.misc.MyError;
-import io.github.up2jakarta.csv.fmt.misc.MyRecord;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.xml.clv.CodeListException;
@@ -18,31 +16,31 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 
-import static io.github.up2jakarta.csv.fmt.misc.Tests.fastInvoice;
+import static io.github.up2jakarta.csv.fmt.misc.Tests.*;
 import static io.github.up2jakarta.csv.impl.SegmentType.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-class FullDummy2Tests extends AFullTest<Dummy2Invoice, MyRecord, MyError> {
+class FullDummy2Tests extends AFullTest<Dummy2Invoice, TURecord, TUError> {
 
     @Autowired
     FullDummy2Tests(Up2Factory<GroupType> factory) throws BeanException {
-        super(factory.builder().full(Dummy2Invoice.class).build(S21).build(MyError::new));
+        super(factory.builder().full(Dummy2Invoice.class).build(S21).build(TUError::new));
     }
 
-    private MyRecord record(SegmentType type, String... data) throws CodeListException {
-        return new MyRecord(type, "TU2025R0099", data);
-    }
-
-    @Test
-    void testEmpty() throws BeanException {
-        checkEmpty(new MyRecord[0]);
+    private TURecord record(SegmentType type, String... data) throws CodeListException {
+        return new TURecord(type, "TU2025R0099", data);
     }
 
     @Test
-    void testCardinality1() throws BeanException {
+    void testEmpty() {
+        checkEmpty(new TURecord[0]);
+    }
+
+    @Test
+    void testCardinality1() {
         // Given
-        final MyRecord[] rows = {
+        final TURecord[] rows = {
                 record(S21, "2025-03-12", "120", "100", "20"),
                 record(S21, "2025-03-12", "120", "100", "20"),
         };
@@ -51,9 +49,9 @@ class FullDummy2Tests extends AFullTest<Dummy2Invoice, MyRecord, MyError> {
     }
 
     @Test
-    void testCardinality2() throws BeanException {
+    void testCardinality2() {
         // Given
-        final MyRecord[] rows = {
+        final TURecord[] rows = {
                 record(S21, "2025-03-12", "120", "100", "20"),
         };
         // When & Then
@@ -61,9 +59,9 @@ class FullDummy2Tests extends AFullTest<Dummy2Invoice, MyRecord, MyError> {
     }
 
     @Test
-    void testCardinality3() throws BeanException {
+    void testCardinality3() {
         // Given
-        final MyRecord[] rows = {
+        final TURecord[] rows = {
                 record(S21, "2025-03-12", "120", "100", "20"),
                 record(S22, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record(S22, "SEL0088", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
@@ -75,9 +73,9 @@ class FullDummy2Tests extends AFullTest<Dummy2Invoice, MyRecord, MyError> {
     }
 
     @Test
-    void testCardinality4() throws BeanException {
+    void testCardinality4() {
         // Given
-        final MyRecord[] rows = {
+        final TURecord[] rows = {
                 record(S21, "2025-03-12", "120", "100", "20"),
                 record(S22, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record(S23, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
@@ -87,10 +85,10 @@ class FullDummy2Tests extends AFullTest<Dummy2Invoice, MyRecord, MyError> {
     }
 
     @Test
-    void testDetached() throws BeanException {
+    void testDetached() {
         // Given
-        final MyRecord detached = record(S90, "9999", "Warning", "Detached");
-        final MyRecord[] rows = {
+        final TURecord detached = record(S90, "9999", "Warning", "Detached");
+        final TURecord[] rows = {
                 record(S21, "2025-03-12", "120", "100", "20"),
                 record(S22, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record(S23, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
@@ -104,15 +102,15 @@ class FullDummy2Tests extends AFullTest<Dummy2Invoice, MyRecord, MyError> {
     @Test
     void testValid1() throws BeanException, IOException {
         // Given
-        final MyRecord[] rows = fastInvoice(S21);
+        final TURecord[] rows = fastInvoice(S21);
         // When & Then
         checkValid1(rows);
     }
 
     @Test
-    void testValid2() throws BeanException, IOException {
+    void testValid2() throws IOException {
         // Given
-        final MyRecord[] rows = {
+        final TURecord[] rows = {
                 record(S21, "2025-03-12", "120", "100", "20"),
                 record(S22, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record(S23, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
@@ -124,10 +122,10 @@ class FullDummy2Tests extends AFullTest<Dummy2Invoice, MyRecord, MyError> {
     }
 
     @Test
-    void testValidation() throws BeanException {
+    void testValidation() {
         // Given
-        final MyRecord invalid = record(S90, "1199", "Support", null);
-        final MyRecord[] rows = {
+        final TURecord invalid = record(S90, "1199", "Support", null);
+        final TURecord[] rows = {
                 record(S21, "2025-03-12", "120", "100", "20"),
                 record(S22, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
                 record(S23, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),

@@ -7,7 +7,6 @@ import io.github.up2jakarta.csv.api.ext.PropertyFormatter;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Up2CodeList;
 import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.csv.core.ext.Beans;
 import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.clv.CodeList;
 import io.github.up2jakarta.xml.clv.CodeListException;
@@ -22,8 +21,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_CODE_LIST;
+import static io.github.up2jakarta.csv.core.ext.Beans.getTypeArguments;
+import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
 import static io.github.up2jakarta.xml.clv.CodeListConverter.find;
-import static java.util.Arrays.asList;
 
 /**
  * Up2 {@link Conversion} resolver that supports {@link CodeList} types.
@@ -32,22 +32,22 @@ import static java.util.Arrays.asList;
 @Singleton
 public final class CodeListResolver extends ConversionResolver<Up2CodeList> {
 
-    public static void checkUnique(Class<?> type, CodeList<?>[] values) throws BeanException {
-        for (var i = 0; i < values.length; i++) {
-            final CodeList<?> value = values[i];
+    public static void checkUnique(Class<?> type, List<? extends CodeList<?>> values) throws BeanException {
+        for (var i = 0; i < values.size(); i++) {
+            final CodeList<?> value = values.get(i);
             if (value == null || value.getCode() == null) {
                 throw new BeanException(type, String.valueOf(i), "must be not null");
             }
-            for (int j = i + 1; j < values.length; j++) {
-                if (value == values[j]) {
+            for (int j = i + 1; j < values.size(); j++) {
+                if (value == values.get(j)) {
                     throw new BeanException(type, value.getCode(), "must be unique");
                 }
             }
         }
     }
 
-    private CodeList<?>[] values(Class<CodeList<?>> type, Class<? extends CodeListProvider<?>> clp) throws BeanException {
-        final CodeList<?>[] values;
+    private List<CodeList<?>> values(Class<CodeList<?>> type, Class<? extends CodeListProvider<?>> clp) throws BeanException {
+        final List<CodeList<?>> values;
         if (DefaultProvider.class.equals(clp)) {
             values = DefaultProvider.INSTANCE.values(type);
             checkUnique(type, values);
@@ -64,24 +64,23 @@ public final class CodeListResolver extends ConversionResolver<Up2CodeList> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public PropertyConverter<? extends CodeList<?>> forParsing(Up2CodeList pc, Field pf, Class<?> pt) throws BeanException {
-        //noinspection unchecked
         final Class<CodeList<?>> type = (Class<CodeList<?>>) pt;
-        final Type[] types = Beans.getTypeArguments(type, CodeList.class);
+        final Type[] types = getTypeArguments(type, CodeList.class);
         if (types.length == 0 || type != types[0]) {
-            throw new BeanException(pf, "type must implements CodeList<" + type.getSimpleName() + ">");
+            throw new BeanException(pf, "type must implements CodeList<" + getTypeName(type) + ">");
         }
-        final CodeList<?>[] values = values(type, pc.value());
+        final List<CodeList<?>> values = values(type, pc.value());
         final Optional<Error> error = getError(pf, type);
         final SeverityType level = error.map(Error::severity).orElse(SeverityType.ERROR);
         final String code = error.map(Error::value).orElse(ERROR_CODE_LIST);
-        if (values.length == 0) {
+        if (values.isEmpty()) {
             return v -> {
                 throw new CodeListException(type, v, level, code);
             };
         }
-        final List<CodeList<?>> lov = asList(values);
-        return v -> find(v, type, lov, level, code);
+        return v -> find(v, type, values, level, code);
     }
 
     @Override

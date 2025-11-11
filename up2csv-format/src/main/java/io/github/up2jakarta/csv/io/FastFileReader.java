@@ -6,7 +6,7 @@ import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.FastImporter;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.data.Segment;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
@@ -21,7 +21,7 @@ import java.util.Objects;
  * @param <R> the record type
  * @param <E> the error type
  */
-public abstract class FastFileReader<T extends Referencable, B extends DataType<B>, I extends IType<B, I>, R extends IFastRecord<I>, E extends IEvent<B>> extends BaseFileReader<T, B, I, R, E> {
+public abstract class FastFileReader<T extends Segment, B extends DataType<B>, I extends IType<B, I>, R extends IFastRecord<I, ?>, E extends IEvent<B>> extends BaseFileReader<T, B, I, R, E> {
 
     protected FastFileReader(FastImporter<B, I, T, R, E> importer, CSVFormat format, String... nullValues) {
         super(importer, format, nullValues);

@@ -5,8 +5,11 @@ import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.api.ext.Conversion;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Trim;
-import io.github.up2jakarta.csv.core.hdl.*;
-import io.github.up2jakarta.csv.core.hdl.PProperty.POProperty;
+import io.github.up2jakarta.csv.core.BSProperty.PAccessor;
+import io.github.up2jakarta.csv.core.BSProperty.PProcessor;
+import io.github.up2jakarta.csv.core.BSProperty.PProperty;
+import io.github.up2jakarta.csv.core.BSProperty.PProperty.POProperty;
+import io.github.up2jakarta.csv.core.hdl.FailureException;
 import io.github.up2jakarta.csv.core.misc.DummyException;
 import io.github.up2jakarta.csv.core.misc.ext.Dummy4;
 import io.github.up2jakarta.csv.core.misc.prc.Test2Processor;
@@ -24,8 +27,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.lang.reflect.Field;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_PROCESSOR;
-import static io.github.up2jakarta.csv.core.Up2ErrorTests.DUMMY;
-import static io.github.up2jakarta.csv.core.hdl.Properties.parse;
+import static io.github.up2jakarta.csv.core.Properties.parse;
+import static io.github.up2jakarta.csv.core.Up2ErrorTests.EX_CAUSE;
 import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,7 +54,7 @@ public class Up2ProcessorTests {
             return new POProperty<>(va, null, 0, position, processor, Conversion.NAN);
         } else if (field.getType() == Integer.class) {
             final PAccessor<?, Integer> va = Properties.wo(Integer.class, field);
-            final Conversion<Integer> cvr = new Conversion<>(Integer::parseInt, Object::toString);
+            final Conversion<Integer> cvr = new Conversion<>(Integer.class, Integer::parseInt, Object::toString);
             return new POProperty<>(va, null, 0, position, processor, cvr);
         }
         throw new UnsupportedOperationException();
@@ -172,18 +175,18 @@ public class Up2ProcessorTests {
         final Up2Mapper<Test6Processor, ?> mapper = factory.build(Test6Processor.class);
         {
             // Then
-            final FastException thrown = assertThrows(FastException.class, () -> mapper.map("dummy"));
+            final FailureException thrown = assertThrows(FailureException.class, () -> mapper.map("dummy"));
             // THEN
             assertNotNull(thrown.getCause());
             assertInstanceOf(DummyException.class, thrown.getCause());
             assertEquals(ERROR, thrown.getSeverity());
             assertEquals(ERROR_PROCESSOR, thrown.getCode());
             assertEquals(1, thrown.getOffset());
-            assertEquals(DUMMY + ": dummy message", thrown.getMessage());
+            assertEquals(EX_CAUSE + ": dummy message", thrown.getMessage());
         }
         {
             // When
-            final FastException thrown = assertThrows(FastException.class, () -> mapper.map(""));
+            final FailureException thrown = assertThrows(FailureException.class, () -> mapper.map(""));
             // THEN
             assertEquals(ERROR_PROCESSOR, thrown.getCode());
             assertEquals(ERROR, thrown.getSeverity());
@@ -192,7 +195,7 @@ public class Up2ProcessorTests {
         }
         {
             // When
-            final FastException thrown = assertThrows(FastException.class, () -> mapper.map("other"));
+            final FailureException thrown = assertThrows(FailureException.class, () -> mapper.map("other"));
             // THEN
             assertEquals(ERROR_PROCESSOR, thrown.getCode());
             assertEquals(ERROR, thrown.getSeverity());

@@ -1,6 +1,7 @@
 package io.github.up2jakarta.csv.core.ext;
 
 import io.github.up2jakarta.csv.api.ext.BeanContext;
+import io.github.up2jakarta.csv.core.AccessException;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
 
@@ -8,6 +9,7 @@ import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.Stack;
 
+import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
 
 public final class Beans {
@@ -17,7 +19,23 @@ public final class Beans {
     private Beans() {
     }
 
-    private static Type[] getInterfaceArguments(Class<?> beanType, Class<?> finalType, final Type... typeArguments) {
+    private static StringBuilder getTypeName(Class<?> type, char delimiter) {
+        final StringBuilder sb = new StringBuilder(type.getSimpleName());
+        while ((type = type.getEnclosingClass()) != null) {
+            sb.insert(0, delimiter).insert(0, type.getSimpleName());
+        }
+        return sb;
+    }
+
+    public static CharSequence getTypeName(Class<?> type) {
+        return getTypeName(type, '.');
+    }
+
+    public static String getClassName(Class<?> type) {
+        return getTypeName(type, '$').insert(0, ".").insert(0, type.getPackageName()).toString();
+    }
+
+    public static Type[] getInterfaceArguments(Class<?> beanType, Class<?> finalType, final Type... typeArguments) {
         // Safe findFirst: Java 17 does not support multiple generic interfaces
         return stream(beanType.getGenericInterfaces())
                 .filter(i -> i instanceof ParameterizedType)
@@ -40,7 +58,7 @@ public final class Beans {
                 });
     }
 
-    private static Type[] getClassArguments(Class<?> beanType, Class<?> finalType, Type... typeArguments) {
+    public static Type[] getClassArguments(Class<?> beanType, Class<?> finalType, Type... typeArguments) {
         final Class<?> superType = beanType.getSuperclass();
         if (beanType == finalType) {
             return typeArguments;
@@ -199,9 +217,9 @@ public final class Beans {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T getBean(BeanContext context, Class<?> beanType) throws BeanException {
         try {
-            //noinspection unchecked
             final T bean = (T) context.getBean(beanType);
             if (bean instanceof BeanAware bc) {
                 bc.setContext(context);
@@ -237,6 +255,10 @@ public final class Beans {
         return getMethod(type, "get" + pName, fn, "getter");
     }
 
+    public static boolean isInnerType(Class<?> type) {
+        return type.getEnclosingClass() != null && !isStatic(type.getModifiers());
+    }
+
     public static <T> Constructor<T> getDefaultConstructor(Class<T> type) throws BeanException {
         try {
             final Constructor<T> constructor;
@@ -247,13 +269,15 @@ public final class Beans {
                     types[i] = fields[i].getType();
                 }
                 constructor = type.getDeclaredConstructor(types);
+            } else if (isInnerType(type)) {
+                constructor = type.getDeclaredConstructor(type.getEnclosingClass());
             } else {
                 constructor = type.getDeclaredConstructor();
             }
             setAccessible(constructor);
             return constructor;
-        } catch (Exception e) {
-            throw new BeanException(type, e.getMessage());
+        } catch (Exception cause) {
+            throw new BeanException(type, "new", cause.getMessage());
         }
     }
 
@@ -269,52 +293,52 @@ public final class Beans {
         }
     }
 
-    public static <T> T newInstance(Constructor<T> constructor, Object... arguments) throws BeanException {
-        try {
-            return constructor.newInstance(arguments);
-        } catch (Exception ex) {
-            throw new BeanException(constructor.getDeclaringClass(), ex.getMessage());
-        }
-    }
-
-    public static <V> void setValue(Object bean, V value, Method setter) throws BeanException {
-        try {
-            setter.invoke(bean, value);
-        } catch (Exception ex) {
-            throw new BeanException(bean.getClass(), setter, ex.getMessage());
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <V> V getValue(Object bean, Method getter) throws BeanException {
-        try {
-            return (V) getter.invoke(bean);
-        } catch (Exception ex) {
-            throw new BeanException(bean.getClass(), getter, ex.getMessage());
-        }
-    }
-
-    public static <V> void setValue(Object bean, V value, Field field) throws BeanException {
-        try {
-            field.set(bean, value);
-        } catch (Exception ex) {
-            throw new BeanException(bean.getClass(), field, ex.getMessage());
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <V> V getValue(Object bean, Field field) throws BeanException {
-        try {
-            return (V) field.get(bean);
-        } catch (Exception ex) {
-            throw new BeanException(bean.getClass(), field, ex.getMessage());
-        }
-    }
-
     public static <T> T[] concat(T[] source, T value) {
         final T[] values = Arrays.copyOf(source, source.length + 1);
         values[source.length] = value;
         return values;
+    }
+
+    public static <T> T newInstance(Constructor<T> constructor, Object... arguments) throws AccessException {
+        try {
+            return constructor.newInstance(arguments);
+        } catch (Exception ex) {
+            throw new AccessException(constructor, ex);
+        }
+    }
+
+    public static <V> void setValue(Object bean, V value, Method setter) throws AccessException {
+        try {
+            setter.invoke(bean, value);
+        } catch (Exception ex) {
+            throw new AccessException(setter, ex);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <V> V getValue(Object bean, Method getter) throws AccessException {
+        try {
+            return (V) getter.invoke(bean);
+        } catch (Exception ex) {
+            throw new AccessException(getter, ex);
+        }
+    }
+
+    public static <V> void setValue(Object bean, V value, Field field) throws AccessException {
+        try {
+            field.set(bean, value);
+        } catch (Exception ex) {
+            throw new AccessException(field, ex);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <V> V getValue(Object bean, Field field) throws AccessException {
+        try {
+            return (V) field.get(bean);
+        } catch (Exception ex) {
+            throw new AccessException(field, ex);
+        }
     }
 
 }

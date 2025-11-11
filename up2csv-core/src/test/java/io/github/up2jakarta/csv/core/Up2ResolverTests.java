@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.api.ext.BeanContext;
-import io.github.up2jakarta.csv.core.hdl.FastException;
+import io.github.up2jakarta.csv.core.hdl.FailureException;
 import io.github.up2jakarta.csv.core.misc.cvr.Test1Definition;
 import io.github.up2jakarta.csv.core.misc.cvr.Test3Resolver;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
@@ -34,7 +34,7 @@ class Up2ResolverTests {
     void test1() throws BeanException {
         // Given
         final Up2Mapper<Test1Definition, DynamicType> mapper = factory.build(Test1Definition.class);
-        final FastException error = assertThrows(FastException.class, () -> mapper.map("TON", "PT24H"));
+        final FailureException error = assertThrows(FailureException.class, () -> mapper.map("TON", "PT24H"));
         // Then
         assertNotNull(error.getType());
         assertNotNull(error.getType().getName());
@@ -50,7 +50,7 @@ class Up2ResolverTests {
     void test2() throws BeanException {
         // Given
         final Up2Mapper<Test1Definition, DynamicType> mapper = factory.build(Test1Definition.class);
-        final FastException error = assertThrows(FastException.class, () -> mapper.map("KGM", "24H"));
+        final FailureException error = assertThrows(FailureException.class, () -> mapper.map("KGM", "24H"));
         // Then
         assertNotNull(error.getType());
         assertNotNull(error.getType().getName());
@@ -66,7 +66,7 @@ class Up2ResolverTests {
     void testPrivateConstant() throws BeanException {
         // Given
         final Up2Mapper<Test3Resolver, DynamicType> mapper = factory.build(Test3Resolver.class);
-        final FastException error = assertThrows(FastException.class, () -> mapper.map("N"));
+        final FailureException error = assertThrows(FailureException.class, () -> mapper.map("N"));
         // Then
         assertEquals(SeverityType.ERROR, error.getSeverity());
         assertEquals(ERROR_CODE_LIST, error.getCode());

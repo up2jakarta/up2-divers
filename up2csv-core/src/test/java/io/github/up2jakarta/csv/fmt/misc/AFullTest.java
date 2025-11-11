@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.assertInvoice;
 import static org.junit.jupiter.api.Assertions.*;
 
-public abstract class AFullTest<T extends Invoice, R extends IFullRecord<SegmentType>, E extends IEvent<GroupType>> extends ABusinessTest<T, R, E> {
+public abstract class AFullTest<T extends Invoice, R extends IFullRecord<SegmentType, ?>, E extends IEvent<GroupType>> extends ABusinessTest<T, R, E> {
 
     protected final FullImporter<GroupType, SegmentType, T, R, E> importer;
     protected final FullExporter<GroupType, SegmentType, T> exporter;
@@ -32,7 +32,7 @@ public abstract class AFullTest<T extends Invoice, R extends IFullRecord<Segment
     }
 
     @Test
-    void testSegregateNull() throws BeanException, IOException {
+    void testSegregateNull() throws IOException {
         // Given
         final AtomicInteger count = new AtomicInteger(0);
         // When
@@ -45,7 +45,7 @@ public abstract class AFullTest<T extends Invoice, R extends IFullRecord<Segment
         assertInvoice(importer, rows);
     }
 
-    protected void checkValid2(R[] rows) throws BeanException, IOException {
+    protected void checkValid2(R[] rows) throws IOException {
         // When Parsing
         final T invoice = importer.parse(rows, (i, r) -> {
             assertEquals(0, r.size());

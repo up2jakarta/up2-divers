@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.core.FastExporter;
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.data.Referencable;
+import io.github.up2jakarta.csv.data.Segment;
 import org.apache.commons.csv.CSVFormat;
 
 /**
@@ -10,7 +10,7 @@ import org.apache.commons.csv.CSVFormat;
  *
  * @param <T> the business object type
  */
-public class FastFileWriter<T extends Referencable> extends BaseFileWriter<T> {
+public class FastFileWriter<T extends Segment> extends BaseFileWriter<T> {
 
     public FastFileWriter(FastExporter<?, ?, T> exporter, CSVFormat format) {
         super(exporter, format);

@@ -7,9 +7,6 @@ import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
 import io.github.up2jakarta.csv.io.misc.AFastTests;
-import io.github.up2jakarta.csv.io.misc.MyError;
-import io.github.up2jakarta.csv.io.misc.MyHandler;
-import io.github.up2jakarta.csv.io.misc.MyRecord;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,44 +16,46 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 
+import static io.github.up2jakarta.csv.io.misc.Tests.*;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class FastInvoiceTests extends AFastTests<MyRecord, FastImporter<GroupType, SegmentType, Invoice, MyRecord, MyError>> {
+public class FastInvoiceTests extends AFastTests<TURecord, FastImporter<GroupType, SegmentType, Invoice, TURecord, TUError>> {
 
     @Autowired
     FastInvoiceTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
         super(new FastImporter<>(factory, Invoice.class, SegmentType.S01, SegmentType.values()) {
             @Override
-            protected MyHandler create(MyRecord row) {
-                return new MyHandler(row);
+            protected TUHandler create(TURecord row) {
+                return new TUHandler(row);
             }
         }, format);
     }
 
     @Override
-    protected FastFileWriter<Invoice> writer(FastImporter<GroupType, SegmentType, Invoice, MyRecord, MyError> importer, CSVFormat format) throws BeanException {
+    protected FastFileWriter<Invoice> writer(FastImporter<GroupType, SegmentType, Invoice, TURecord, TUError> importer, CSVFormat format) throws BeanException {
         return new FastFileWriter<>(importer.toExporter(), format);
     }
 
     @Override
-    protected FastFileReader<Invoice, GroupType, SegmentType, MyRecord, MyError> reader(
-            FastImporter<GroupType, SegmentType, Invoice, MyRecord, MyError> importer, CSVFormat format
+    protected FastFileReader<Invoice, GroupType, SegmentType, TURecord, TUError> reader(
+            FastImporter<GroupType, SegmentType, Invoice, TURecord, TUError> importer, CSVFormat format
     ) {
         return new FastFileReader<>(importer, format, "-") {
             @Override
-            protected MyRecord create(SegmentType type, String invoiceNumber, String[] data) {
-                return new MyRecord(type, invoiceNumber, data);
+            protected TURecord create(SegmentType type, String invoiceNumber, String[] data) {
+                return new TURecord(type, invoiceNumber, data);
             }
         };
     }
 
     @Test
-    void test10() throws BeanException, IOException {
+    void test10() throws IOException {
         testFile(10);
     }
 
     @Test
-    void test100() throws BeanException, IOException {
+    void test100() throws IOException {
         testFile(100);
     }
 

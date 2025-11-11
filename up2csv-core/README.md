@@ -42,7 +42,7 @@ approach.
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.5.7</version>
+        <version>1.5.8</version>
     </dependency>
     <!-- Required JSR-303 Validation Provider -->
     <dependency>
@@ -501,11 +501,14 @@ public TestSegment implements Segment {
 processing flat-data within fault-tolerance principle.
 
 - [EventHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/EventHandler.java)
-    - [FastException.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/FastException.java)
-    - [EventCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/EventCollector.java)
-        - [ETraceCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/ETraceCollector.java)
-        - [FatalCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/FatalCollector.java)
-        - [ESelfCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/ESelfCollector.java)
+    - [FastHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/FastHandler.java)
+    - [ComplianceHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/ComplianceHandler.java)
+    - [BusinessHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/BusinessHandler.java)
+        - [BusinessCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/BusinessCollector.java)
+            - [SelfBusinessCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/SelfBusinessCollector.java)
+        - [PropertyCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/PropertyCollector.java)
+            - [PropertyFailureCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/PropertyFailureCollector.java)
+            - [SelfPropertyCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/SelfPropertyCollector.java)
 
 ## @Truncated
 
@@ -652,8 +655,8 @@ public void test() {
     final Up2Format<Up2Segment, ?> mapper = factory.format(Up2Segment.class);
     final Up2Segment bean ; // ... full-fill the bean
     // WHEN
+    final List<IViolationEvent<?>> violations =  mapper.validate(bean); // manual validation
     final String[] data = mapper.unmap(bean);
-    mapper.validate(bean, FastHandler.of(ERROR)); // manual validation
     // THEN
     // Here the data is full-filled automatically 
 }

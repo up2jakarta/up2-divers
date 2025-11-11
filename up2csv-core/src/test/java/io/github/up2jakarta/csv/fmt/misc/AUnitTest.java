@@ -30,7 +30,7 @@ public abstract class AUnitTest<T extends Invoice, R extends IRecord<SegmentType
     }
 
     @Test
-    void testSegregateNull() throws BeanException, IOException {
+    void testSegregateNull() throws IOException {
         // Given
         final AtomicInteger count = new AtomicInteger(0);
         // When
@@ -43,7 +43,7 @@ public abstract class AUnitTest<T extends Invoice, R extends IRecord<SegmentType
         assertInvoice(importer, rows);
     }
 
-    protected void checkValid2(R[] rows) throws BeanException, IOException {
+    protected void checkValid2(R[] rows) throws IOException {
         // When Parsing
         final T invoice = importer.parse(rows, (i, r) -> {
             assertEquals(0, r.size());

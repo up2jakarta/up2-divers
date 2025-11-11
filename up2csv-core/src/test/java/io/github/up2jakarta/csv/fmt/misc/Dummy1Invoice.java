@@ -9,6 +9,6 @@ import io.github.up2jakarta.csv.impl.dto.Invoice;
  */
 // Skipping @Position(0)
 @PositionOverride(path = "reference")
-public class Dummy1Invoice extends Invoice implements BusinessObject {
+public class Dummy1Invoice extends Invoice implements BusinessObject<String> {
 
 }

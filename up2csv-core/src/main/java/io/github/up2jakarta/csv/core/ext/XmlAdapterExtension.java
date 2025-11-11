@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import static io.github.up2jakarta.csv.api.IEvent.ERROR_XML_ENUM;
 import static io.github.up2jakarta.csv.core.ext.Beans.getTypeArguments;
+import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
 
 /**
  * {@link XmlType} extension that supports {@link XmlJavaTypeAdapter}.
@@ -46,18 +47,18 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
     }
 
     @Override
-    public Optional<XmlJavaTypeAdapter> get(Class<? extends Segment> segmentType, Field property, Class<?> type, Field... path) throws BeanException {
-        final XmlJavaTypeAdapter xml = getAdapter(property, type);
+    @SuppressWarnings("unchecked")
+    public Optional<XmlJavaTypeAdapter> get(Class<? extends Segment> st, Field p, Class<?> type, Field... ps) throws BeanException {
+        final XmlJavaTypeAdapter xml = getAdapter(p, type);
         if (xml != null) {
-            if (!segmentType.isAnnotationPresent(XmlType.class)) {
-                throw new BeanException(segmentType, "must be annotated with @XmlType");
+            if (!st.isAnnotationPresent(XmlType.class)) {
+                throw new BeanException(st, "must be annotated with @XmlType");
             }
-            //noinspection unchecked
             final Class<? extends XmlAdapter<String, ?>> adapterType = (Class<? extends XmlAdapter<String, ?>>) xml.value();
             final Type[] arguments = getTypeArguments(adapterType, XmlAdapter.class);
             if (!String.class.equals(arguments[0]) || !type.equals(arguments[1])) {
-                final String cn = type.getSimpleName();
-                throw new BeanException(property, "@XmlJavaTypeAdapter[value] should extends XmlAdapter<String, " + cn + ">");
+                final CharSequence cn = getTypeName(type);
+                throw new BeanException(p, "@XmlJavaTypeAdapter[value] should extends XmlAdapter<String, " + cn + ">");
             }
             return Optional.of(xml);
         }
@@ -65,8 +66,8 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <V> Conversion<V> resolve(Field property, Class<V> type, XmlJavaTypeAdapter config) throws BeanException {
-        //noinspection unchecked
         final Class<XmlAdapter<String, V>> adapterType = (Class<XmlAdapter<String, V>>) config.value();
         final Optional<Error> error = ConversionResolver.getError(property, type);
         final XmlAdapter<String, V> adapter = this.getBean(adapterType);
@@ -79,7 +80,7 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
                 throw PropertyException.of(severityType, code, ex);
             }
         };
-        return new Conversion<>(adapter::unmarshal, f, error);
+        return new Conversion<>(type, adapter::unmarshal, f, error);
     }
 
 }

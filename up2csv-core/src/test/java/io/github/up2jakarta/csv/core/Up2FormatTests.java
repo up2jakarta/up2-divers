@@ -2,20 +2,27 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.api.ext.BeanContext;
+import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.core.misc.acs.BIdOBean;
 import io.github.up2jakarta.csv.core.misc.cvr.SupportEntity;
 import io.github.up2jakarta.csv.core.misc.map.*;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.xml.api.PropertyException;
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.Optional;
 
 import static io.github.up2jakarta.csv.impl.GroupType.D001;
 import static io.github.up2jakarta.csv.impl.GroupType.NONE;
@@ -35,6 +42,39 @@ class Up2FormatTests {
     Up2FormatTests(Up2Factory<GroupType> factory, BeanContext context, Validator validator) {
         this.factory = factory;
         this.fh = new Up2Factory<>(context, validator, DataTypeResolver.dynamic());
+    }
+
+    @Test
+    void testLocalClass() throws BeanException {
+        //Given
+        @Access(AccessType.FIELD)
+        class LocalSegment implements Segment {
+            private final @Position(0) String test;
+
+            public LocalSegment(String test) {
+                this.test = test;
+            }
+        }
+        // When
+        final Up2Format<LocalSegment, GroupType> format = factory.format(LocalSegment.class);
+        final LocalSegment bean = new LocalSegment("TU");
+        final String[] data = format.unmap(bean);
+        // THEN
+        assertEquals(1, data.length);
+        assertArrayEquals(new String[]{bean.test}, data);
+    }
+
+    @Test
+    void testInnerClass() throws BeanException {
+        // When
+        final Up2Format<Inner1Segment, GroupType> format = factory.format(Inner1Segment.class);
+        final Inner1Segment bean = new Inner1Segment();
+        bean.setFragment(bean.new InnerFragment());
+        bean.setId("TU");
+        final String[] data = format.unmap(bean);
+        // THEN
+        assertEquals(2, data.length);
+        assertArrayEquals(new String[]{bean.getId(), bean.getFragment().getName()}, data);
     }
 
     @Test
@@ -185,7 +225,7 @@ class Up2FormatTests {
         // Then
         assertNotNull(out);
         assertEquals(9, out.length);
-        assertArrayEquals(new String[]{null, null, null, "0000", "9", "E", "CSV", "Test", "Error"}, out);
+        assertArrayEquals(new String[]{null, "00", null, "0000", "9", "E", "CSV", "Test", "Error"}, out);
     }
 
     @Test
@@ -219,6 +259,29 @@ class Up2FormatTests {
         for (var i = 0; i < data.length; i++) {
             assertEquals(data[i], out[i + 1]);
         }
+    }
+
+    @Test
+    void testOptional() throws BeanException {
+        // Given
+        final Up2Format<BIdOBean, ?> format = factory.format(BIdOBean.class);
+        // When
+        final BIdOBean bean = new BIdOBean();
+        // Then Null Fragment
+        assertEquals(0, format.validate(bean).size());
+        assertArrayEquals(new String[]{null}, format.unmap(bean));
+        // Empty Fragment
+        bean.fragment = Optional.empty();
+        assertEquals(0, format.validate(bean).size());
+        assertArrayEquals(new String[]{null}, format.unmap(bean));
+        // Null ID
+        bean.fragment = Optional.of(new BIdOBean.OFragment());
+        assertEquals(0, format.validate(bean).size());
+        assertArrayEquals(new String[]{null}, format.unmap(bean));
+        // Empty ID
+        bean.fragment.get().id = Optional.empty();
+        assertEquals(0, format.validate(bean).size());
+        assertArrayEquals(new String[]{null}, format.unmap(bean));
     }
 
 }

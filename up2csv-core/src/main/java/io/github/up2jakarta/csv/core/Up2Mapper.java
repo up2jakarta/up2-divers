@@ -1,19 +1,21 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Truncated;
-import io.github.up2jakarta.csv.core.BSNode.BFNode;
 import io.github.up2jakarta.csv.core.BSNode.BPNode;
-import io.github.up2jakarta.csv.core.BSOperator.Getter;
 import io.github.up2jakarta.csv.core.BSOperator.Processor;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
+import io.github.up2jakarta.csv.core.hdl.FailureException;
 import io.github.up2jakarta.csv.core.hdl.FastHandler;
+import io.github.up2jakarta.csv.core.hdl.PropertyFailureException;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.xml.api.SeverityType;
+
+import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Map and validate input data to a configurable bean that supports only {@link String} type.
@@ -23,27 +25,22 @@ import io.github.up2jakarta.xml.api.SeverityType;
  */
 public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends Processor<S, D, BPNode<S, D, ?>> {
 
-    final Getter<S> parentId;
-    final Getter<S> businessId;
-
     Up2Mapper(BPNode<S, D, ?> node) throws BeanException {
         super(node);
-        parentId = Getter.parentId(node.type, node.properties);
-        businessId = Getter.businessId(node.type, node.properties);
     }
 
     /**
      * Maps and validates input data to java bean depending on annotations like {@link Position}
-     * with fail-fast principle.
+     * with fail-fast principle but ignores the warnings events.
      *
      * @param record the input data
      * @return the parsed segment
-     * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
-     * @see #map(IRecord, EventHandler)
+     * @throws AccessException  for any problem when assigning properties of the returned segment from the input record
+     * @throws FailureException if an event occurs having severity greater or equals {@link SeverityType#ERROR}
      * @see FastHandler#of(SeverityType)
      */
-    public S map(final String... record) throws BeanException {
-        return this.map(FastHandler.of(SeverityType.ERROR), record);
+    public S map(final String... record) throws AccessException {
+        return this.map(FastHandler.of(ERROR), record);
     }
 
     /**
@@ -53,9 +50,9 @@ public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends P
      * @param handler the error collector, must not be null
      * @param record  the input data
      * @return the parsed segment
-     * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
+     * @throws AccessException for any problem when assigning properties of the returned segment from the input record
      */
-    public S map(EventHandler<?, D, ? extends IEvent<D>> handler, String... record) throws BeanException {
+    public S map(EventHandler<D> handler, String... record) throws AccessException {
         return this.map(handler, offset, record);
     }
 
@@ -67,10 +64,30 @@ public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends P
      * @param offset  the number of columns reserved {@link Truncated#value()}
      * @param record  the input data
      * @return the parsed segment
-     * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
+     * @throws AccessException for any problem when assigning properties of the returned segment from the input record
      */
-    public S map(EventHandler<?, D, ? extends IEvent<D>> handler, int offset, String... record) throws BeanException {
-        return node.map(handler, offset, record);
+    public S map(EventHandler<D> handler, int offset, String... record) throws AccessException {
+        if (record == null) {
+            return null;
+        }
+        requireNonNull(handler, "handler is required");
+        final S bean = node.parse(handler, offset, record);
+        node.validate(bean, offset, handler);
+        return bean;
+    }
+
+    /**
+     * Maps and validates input data to java bean depending on annotations like {@link Position}
+     * with fail-fast principle but ignores the warnings events.
+     *
+     * @param record the input record
+     * @param <R>    the record type
+     * @return the parsed segment and its parsing/validating events
+     * @throws AccessException  for any problem when assigning properties of the returned segment from the input record
+     * @throws FailureException if an event occurs having severity greater or equals {@link SeverityType#ERROR}
+     */
+    public <R extends IRecord<?>> S map(R record) throws AccessException, PropertyFailureException {
+        return this.map(record, offset, FastHandler.of(ERROR));
     }
 
     /**
@@ -81,9 +98,9 @@ public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends P
      * @param handler the error collector, must not be null
      * @param <R>     the row type
      * @return the parsed segment
-     * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
+     * @throws AccessException for any problem when assigning properties of the returned segment from the input record
      */
-    public <R extends IRecord<?>> S map(R record, EventHandler<R, D, ? extends IEvent<D>> handler) throws BeanException {
+    public <R extends IRecord<?>> S map(R record, EventHandler<D> handler) throws AccessException {
         return this.map(record, offset, handler);
     }
 
@@ -96,10 +113,15 @@ public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends P
      * @param handler the error collector, must not be null
      * @param <R>     the row type
      * @return the parsed segment
-     * @throws BeanException for any problem configuring and assigning fields of the input to bean properties
+     * @throws AccessException for any problem when assigning properties of the returned segment from the input record
      */
-    public <R extends IRecord<?>> S map(R record, int offset, EventHandler<R, D, ? extends IEvent<D>> handler) throws BeanException {
-        return node.map(record, offset, true, handler);
+    public <R extends IRecord<?>> S map(R record, int offset, EventHandler<D> handler) throws AccessException {
+        if (record == null) {
+            return null;
+        }
+        final S bean = this.map(handler, offset, record.getColumns());
+        node.update(bean, record);
+        return bean;
     }
 
     /**
@@ -107,10 +129,10 @@ public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends P
      * This method is faster then {@link Up2Factory#format(Class, DataTypeResolver)} when the bean is already scanned.
      *
      * @return preconfigured CSV Format for the same segment
-     * @throws BeanException if any property is not accessible for reading
+     * @throws BeanException if any property is not accessible for read
      */
     public Up2Format<S, D> toFormat() throws BeanException {
-        return new Up2Format<>(new BFNode<>(node));
+        return new Up2Format<>(node.reverse());
     }
 
 }

@@ -4,6 +4,7 @@ import io.github.up2jakarta.csv.api.ext.CheckerContext;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
 import io.github.up2jakarta.csv.cfg.Up2Number;
+import io.github.up2jakarta.csv.core.AccessMode;
 import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
 import jakarta.persistence.*;
@@ -20,11 +21,11 @@ final class JpaColumnContext implements CheckerContext {
 
     private final String prefix;
 
-    JpaColumnContext(Class<? extends Segment> entityType, String prefix) throws BeanException {
+    JpaColumnContext(Class<? extends Segment> type, String prefix) throws BeanException {
         this.prefix = prefix;
-        final PrimaryKeyJoinColumn column = entityType.getAnnotation(PrimaryKeyJoinColumn.class);
+        final PrimaryKeyJoinColumn column = type.getAnnotation(PrimaryKeyJoinColumn.class);
         if (column != null) {
-            checkName(entityType, column.name(), prefix, "@PrimaryKeyJoinColumn[name]");
+            checkName(type, column.name(), prefix, "@PrimaryKeyJoinColumn[name]");
         }
     }
 
@@ -40,7 +41,7 @@ final class JpaColumnContext implements CheckerContext {
         }
     }
 
-    private void checkNumberColumn(Field field, Class<?> fieldType, Column column) throws BeanException {
+    private void checkNumberColumn(Field field, Class<?> type, Column column) throws BeanException {
         if (field.isAnnotationPresent(Digits.class)) {
             throw new BeanException(field, "must not be annotated with @Digits");
         }
@@ -50,16 +51,16 @@ final class JpaColumnContext implements CheckerContext {
         if (column.precision() < 0) {
             throw new BeanException(field, "@Column[precision] must be positive");
         }
-        if (fieldType == Long.class || fieldType == long.class) {
+        if (type == Long.class || type == long.class) {
             checkNumber(field, column, 19);
         }
-        if (fieldType == Integer.class || fieldType == int.class) {
+        if (type == Integer.class || type == int.class) {
             checkNumber(field, column, 10);
         }
-        if (fieldType == Short.class || fieldType == short.class) {
+        if (type == Short.class || type == short.class) {
             checkNumber(field, column, 5);
         }
-        if (fieldType == Byte.class || fieldType == byte.class) {
+        if (type == Byte.class || type == byte.class) {
             checkNumber(field, column, 3);
         }
         if (column.scale() == 0 && !field.isAnnotationPresent(Up2Number.class)) {
@@ -101,90 +102,90 @@ final class JpaColumnContext implements CheckerContext {
         }
     }
 
-    private void checkColumn(Field field, Class<?> fieldType, Column column) throws BeanException {
+    private void checkColumn(Field field, Class<?> type, Column column) throws BeanException {
         checkName(field, column.name(), prefix, "@Column[name]");
         if (column.length() < 0) {
             throw new BeanException(field, "@Column[length] must be positive");
         }
         //Check length & nullable
         final Size size = field.getAnnotation(Size.class);
-        if (String.class.equals(fieldType)) {
+        if (String.class.equals(type)) {
             checkStringColumn(field, column, size);
         } else {
             if (column.nullable() == field.isAnnotationPresent(NotNull.class)) {
                 throw new BeanException(field, "@NotNull does not match with @Column[nullable]");
             }
-            if (size != null && !(fieldType.isArray() || Collection.class.isAssignableFrom(fieldType) || Map.class.isAssignableFrom(fieldType))) {
+            if (size != null && !(type.isArray() || Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type))) {
                 throw new BeanException(field, "must not be annotated with @Size");
             }
         }
         // Check Number
-        if (Number.class.isAssignableFrom(fieldType)) {
-            checkNumberColumn(field, fieldType, column);
+        if (Number.class.isAssignableFrom(type)) {
+            checkNumberColumn(field, type, column);
         }
     }
 
     @Override
-    public void beforeSuperSegment(Class<? extends Segment> superType) throws BeanException {
-        if (superType.getAnnotation(Entity.class) != null) {
-            final Inheritance inheritance = superType.getAnnotation(Inheritance.class);
+    public void beforeSuperSegment(Class<? extends Segment> type) throws BeanException {
+        if (type.getAnnotation(Entity.class) != null) {
+            final Inheritance inheritance = type.getAnnotation(Inheritance.class);
             if (inheritance == null) {
-                throw new BeanException(superType, "must be annotated by @Inheritance");
+                throw new BeanException(type, "must be annotated by @Inheritance");
             }
-            final DiscriminatorColumn column = superType.getAnnotation(DiscriminatorColumn.class);
+            final DiscriminatorColumn column = type.getAnnotation(DiscriminatorColumn.class);
             if (column != null) {
-                checkName(superType, column.name(), prefix, "@DiscriminatorColumn[name]");
+                checkName(type, column.name(), prefix, "@DiscriminatorColumn[name]");
             }
-        } else if (superType.getAnnotation(MappedSuperclass.class) == null) {
-            throw new BeanException(superType, "must be annotated by @MappedSuperclass");
+        } else if (type.getAnnotation(MappedSuperclass.class) == null) {
+            throw new BeanException(type, "must be annotated by @MappedSuperclass");
         }
     }
 
     @Override
-    public void positionProperty(Field property, Class<?> propertyType, int offset) throws BeanException {
+    public void positionProperty(Field property, Class<?> type, int offset) throws BeanException {
         final Column column = property.getAnnotation(Column.class);
         if (column != null) {
-            checkColumn(property, propertyType, column);
+            checkColumn(property, type, column);
         }
     }
 
     @Override
-    public void beforeFragmentProperty(Field field, Class<? extends Segment> fieldType) throws BeanException {
-        final PrimaryKeyJoinColumn column = fieldType.getAnnotation(PrimaryKeyJoinColumn.class);
+    public void beforeFragmentProperty(AccessMode mode, Field fragment, Class<? extends Segment> type) throws BeanException {
+        final PrimaryKeyJoinColumn column = type.getAnnotation(PrimaryKeyJoinColumn.class);
         if (column != null) {
-            checkName(fieldType, column.name(), prefix, "@PrimaryKeyJoinColumn[name]");
+            checkName(type, column.name(), prefix, "@PrimaryKeyJoinColumn[name]");
         }
-        if (field.getAnnotation(Embedded.class) != null || field.getAnnotation(EmbeddedId.class) != null) {
-            if (fieldType.getAnnotation(Embeddable.class) == null) {
-                throw new BeanException(fieldType, "must be annotated by @Embeddable");
+        if (fragment.getAnnotation(Embedded.class) != null || fragment.getAnnotation(EmbeddedId.class) != null) {
+            if (type.getAnnotation(Embeddable.class) == null) {
+                throw new BeanException(type, "must be annotated by @Embeddable");
             }
-        } else if (field.getAnnotation(OneToOne.class) != null) {
-            if (fieldType.getAnnotation(Entity.class) == null) {
-                throw new BeanException(fieldType, "must be annotated by @Entity");
+        } else if (fragment.getAnnotation(OneToOne.class) != null) {
+            if (type.getAnnotation(Entity.class) == null) {
+                throw new BeanException(type, "must be annotated by @Entity");
             }
-        } else if (field.getAnnotation(ManyToOne.class) != null) {
-            if (fieldType.getAnnotation(Entity.class) == null) {
-                throw new BeanException(fieldType, "must be annotated by @Entity");
+        } else if (fragment.getAnnotation(ManyToOne.class) != null) {
+            if (type.getAnnotation(Entity.class) == null) {
+                throw new BeanException(type, "must be annotated by @Entity");
             }
-            final JoinColumn join = fieldType.getAnnotation(JoinColumn.class);
-            final JoinColumns joins = fieldType.getAnnotation(JoinColumns.class);
+            final JoinColumn join = type.getAnnotation(JoinColumn.class);
+            final JoinColumns joins = type.getAnnotation(JoinColumns.class);
             if (join != null) {
                 if (joins != null) {
-                    throw new BeanException(field, "must be annotated by only one @JoinColumn(s)");
+                    throw new BeanException(fragment, "must be annotated by only one @JoinColumn(s)");
                 }
-                checkName(field, join.name(), prefix, "@JoinColumn[name]");
+                checkName(fragment, join.name(), prefix, "@JoinColumn[name]");
             } else if (joins == null) {
-                throw new BeanException(fieldType, "must be annotated by @JoinColumn(s)");
+                throw new BeanException(type, "must be annotated by @JoinColumn(s)");
             } else {
                 for (final JoinColumn jc : joins.value()) {
-                    checkName(field, jc.name(), prefix, "@JoinColumn[name]");
+                    checkName(fragment, jc.name(), prefix, "@JoinColumn[name]");
                     if (!jc.foreignKey().name().isBlank()) {
-                        throw new BeanException(fieldType, "@ForeignKey[name] must be empty");
+                        throw new BeanException(type, "@ForeignKey[name] must be empty");
                     }
                 }
             }
-        } else if (field.getAnnotation(Transient.class) != null) {
-            throw new BeanException(field, "must be annotated by @Transient");
+        } else if (fragment.getAnnotation(Transient.class) != null) {
+            throw new BeanException(fragment, "must be annotated by @Transient");
         }
     }
 
