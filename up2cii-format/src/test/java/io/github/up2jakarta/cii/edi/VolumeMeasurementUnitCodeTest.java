@@ -6,10 +6,10 @@ import io.github.up2jakarta.cii.format.standard.qdt.VolumeUnitMeasureType;
 import io.github.up2jakarta.cii.format.standard.ram.HeaderTradeDeliveryType;
 import io.github.up2jakarta.cii.format.standard.ram.SupplyChainConsignmentType;
 import io.github.up2jakarta.cii.format.standard.ram.SupplyChainTradeTransactionType;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.xml.api.IValidationError;
-import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.api.XValidationException;
-import io.github.up2jakarta.xml.clv.CodeListException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,9 +71,9 @@ public class VolumeMeasurementUnitCodeTest extends CodeAdapterTest {
         assertEquals(1, errors.size());
         {
             final IValidationError error = errors.getFirst();
-            assertEquals(SeverityType.ERROR, error.getSeverity());
+            assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(165, error.getLineNumber());
-            assertEquals(56, error.getColumnNumber());
+            assertEquals(56, error.getLineOffset());
             assertEquals("ECE-R20: Unknown value [???] for CodeList[VolumeMeasurementUnitCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());

@@ -1,8 +1,8 @@
 package io.github.up2jakarta.cii.ppf;
 
+import io.github.up2jakarta.cii.Documented;
+import io.github.up2jakarta.cii.core.Agency;
 import io.github.up2jakarta.cii.ppf.adapters.EASchemeIDAdapter;
-import io.github.up2jakarta.xml.clv.Agency;
-import io.github.up2jakarta.xml.clv.Documented;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import javax.annotation.processing.Generated;

@@ -1,108 +1,67 @@
 package io.github.up2jakarta.csv.core.hdl;
 
-import io.github.up2jakarta.csv.api.IEvent;
+import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.hdl.EventCode;
+import io.github.up2jakarta.csv.api.hdl.EventLevel;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.xml.api.PropertyException;
-import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.clv.CodeListException;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.metadata.ConstraintDescriptor;
+import io.github.up2jakarta.lov.IError;
+import io.github.up2jakarta.lov.SeverityType;
 
-import java.lang.annotation.Annotation;
-import java.util.Comparator;
-import java.util.Objects;
-import java.util.Optional;
-
-import static java.util.Optional.ofNullable;
+import static io.github.up2jakarta.csv.api.IEvent.EC_CONVERTER;
 
 /**
- * Internal handler that handles events during the mapping, validation and parsing phases.
+ * Input events handler that accepts both compliance and mapping events.
  *
  * @param <D> the business data type
- * @see BusinessHandler for aggregation/segregation operations
- * @see ComplianceHandler for validation only.
- * @see FastHandler  for fail-fast handler
+ * @see io.github.up2jakarta.csv.core.Up2Mapper#map(IRecord, EventHandler)
+ * @see io.github.up2jakarta.csv.core.Up2Mapper#map(EventHandler, String...)
+ * @see io.github.up2jakarta.csv.core.Up2Mapper#map(IRecord, int, EventHandler)
+ * @see io.github.up2jakarta.csv.core.Up2Mapper#map(EventHandler, int, String...)
  */
-public abstract sealed class EventHandler<D extends DataType<D>> permits ComplianceHandler, BusinessHandler, FastHandler {
+public abstract class EventHandler<D extends DataType<D>> extends ComplianceHandler<D> {
 
-    private static Optional<Error> error(ConstraintViolation<?> violation) {
-        final ConstraintDescriptor<?> descriptor = violation.getConstraintDescriptor();
-        final Class<? extends Annotation> annotationType = descriptor.getAnnotation().annotationType();
-        return descriptor.getPayload().stream()
-                .filter(Error.Payload.class::isAssignableFrom)
-                .map(c -> c.getAnnotation(Error.class))
-                .filter(Objects::nonNull)
-                .max(Comparator.comparingInt(e -> e.severity().getLevel()))
-                .or(() -> ofNullable(annotationType.getAnnotation(Error.class)));
-    }
-
-    static SeverityType level(ConstraintViolation<?> violation, Error config) {
+    private static SeverityType level(Exception exception, Error config) {
         if (config != null) {
-            return config.severity();
+            return config.level();
         }
-        return error(violation).map(Error::severity).orElse(SeverityType.ERROR);
-    }
-
-    static String code(ConstraintViolation<?> violation, Error config) {
-        if (config != null) {
-            return config.value();
-        }
-        return error(violation).map(Error::value).orElse(IEvent.ERROR_VALIDATOR);
-    }
-
-    static SeverityType level(Exception exception, Error config) {
-        if (config != null) {
-            return config.severity();
-        }
-        if (exception instanceof PropertyException pException) {
-            return pException.getSeverity();
+        if (exception instanceof IError ie) {
+            return ie.getLevel();
         }
         return SeverityType.ERROR;
     }
 
-    static String code(Exception exception, Error config) {
-        if (exception instanceof CodeListException clException) {
-            return clException.getCode();
-        }
+    private static String code(Exception exception, Error config) {
         if (config != null) {
             return config.value();
         }
-        if (exception instanceof PropertyException pException) {
-            return pException.getCode();
+        if (exception instanceof IError ie) {
+            return ie.getCode();
         }
-        return IEvent.ERROR_CONVERTER;
+        return EC_CONVERTER;
     }
-
-    /**
-     * Handles any error caused by the input at the given offset.
-     *
-     * @param type   the data type
-     * @param offset the input index
-     * @param level  the error severity
-     * @param code   the error code
-     * @param cause  the cause exception
-     */
-    public abstract void handle(D type, int offset, SeverityType level, String code, Throwable cause);
-
-    /**
-     * Handles the JSR-303 constraint violation caused by the input at the given offset.
-     *
-     * @param type      the data type
-     * @param offset    the input index
-     * @param violation the JSR-303 constraint violation
-     * @param config    the error annotation defined at property level
-     */
-    public abstract void handle(D type, Integer offset, ConstraintViolation<?> violation, Error config);
 
     /**
      * Handles any exception caused by the input at the given offset.
      *
-     * @param type   the data type
-     * @param offset the input index
+     * @param data   the business data type
+     * @param offset the input index in the related record
      * @param cause  the cause exception
-     * @param config the error annotation defined at property level
+     * @param config the config annotation defined at property level
      */
-    public abstract void handle(D type, int offset, Exception cause, Error config);
+    public final void handle(D data, int offset, Exception cause, Error config) {
+        this.handle(() -> level(cause, config), () -> code(cause, config), data, offset, cause);
+    }
+
+    /**
+     * Handles any event caused by the input at the given offset.
+     *
+     * @param type   the business data type
+     * @param offset the input index in the related record
+     * @param level  the event level supplier
+     * @param code   the event code supplier
+     * @param cause  the cause exception
+     */
+    public abstract void handle(EventLevel level, EventCode code, D type, int offset, Throwable cause);
 
 }

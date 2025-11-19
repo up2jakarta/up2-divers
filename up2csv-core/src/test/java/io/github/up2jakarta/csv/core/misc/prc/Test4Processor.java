@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.core.misc.ext.Dummy3;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.SeverityType;
 
 @SuppressWarnings("unused")
 public class Test4Processor implements Segment {
@@ -14,12 +14,12 @@ public class Test4Processor implements Segment {
 
     @Position(0)
     @Dummy3
-    @Error(value = TU_P_002, severity = SeverityType.WARNING)
+    @Error(value = TU_P_002, level = SeverityType.WARNING)
     private String test;
 
     @Position(1)
     @Dummy3
-    @Error(value = TU_P_003, severity = SeverityType.ERROR)
+    @Error(value = TU_P_003, level = SeverityType.ERROR)
     private String other;
 
     public String getTest() {

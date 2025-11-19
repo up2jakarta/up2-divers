@@ -1,11 +1,11 @@
 package io.github.up2jakarta.job.csv.impl.unit;
 
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.csv.io.UnitFileWriter;
 import io.github.up2jakarta.job.core.SafeTranslator;
 import io.github.up2jakarta.job.core.SafeUtil;
 import io.github.up2jakarta.job.csv.dto.Invoice;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.apache.commons.csv.CSVFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static io.github.up2jakarta.job.csv.AbstractJobITest.OUTPUT_FILE;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static java.util.Objects.requireNonNull;
 
 public class InvoiceWriter extends UnitFileWriter<Invoice> implements ItemWriter<Up2Result<Invoice, InputError>>, StepExecutionListener {
@@ -46,15 +46,15 @@ public class InvoiceWriter extends UnitFileWriter<Invoice> implements ItemWriter
     @Override
     public void write(Chunk<? extends Up2Result<Invoice, InputError>> chunk) throws IOException {
         for (final Up2Result<Invoice, InputError> item : chunk) {
-            final long warnings = item.getErrors().stream().filter(e -> ERROR.compareTo(e.getSeverity()) > 0).count();
-            if (warnings == item.getErrors().size()) {
-                LOG.info("#Invoice[{}] has been imported with ({}) warnings", item.getBean().getReference(), warnings);
-                this.write(item.getBean());
+            final long warnings = item.toList().stream().filter(e -> ERROR.compareTo(e.getLevel()) > 0).count();
+            if (warnings == item.toList().size()) {
+                LOG.info("#Invoice[{}] has been imported with ({}) warnings", item.get().getReference(), warnings);
+                this.write(item.get());
             } else {
-                final String invoiceNumber = Optional.ofNullable(item.getBean()).map(Invoice::getReference).orElse("?");
-                LOG.error("#Invoice[{}] has ({}) errors", invoiceNumber, item.getErrors().size());
+                final String invoiceNumber = Optional.ofNullable(item.get()).map(Invoice::getReference).orElse("?");
+                LOG.error("#Invoice[{}] has ({}) errors", invoiceNumber, item.toList().size());
                 var i = 1;
-                for (final InputError e : item.getErrors()) {
+                for (final InputError e : item.toList()) {
                     final Throwable cause = e.getCause().getCause();
                     LOG.warn("{}) #Offset[{}] #Type[{}] - {}", i++, e.getOffset(), e.getType(), e, cause);
                 }

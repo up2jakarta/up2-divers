@@ -5,22 +5,25 @@ import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.data.SegmentWriter;
 import io.github.up2jakarta.csv.fmt.SimpleFastImporter;
+import io.github.up2jakarta.lov.core.AccessException;
+import io.github.up2jakarta.lov.core.BeanException;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
  * {@link ModeType#FAST} Processor that's able to segregate and export java-bean to flat-data.
  *
  * @param <T> the business object type
- * @param <B> the data type
- * @param <I> the segment type
+ * @param <B> the business data type
+ * @param <I> the input segment type
  * @see SimpleFastImporter
  */
 public non-sealed class FastExporter<B extends DataType<B>, I extends IType<B, I>, T extends Segment> extends BusinessExporter<B, I, T> {
 
-    public FastExporter(Up2Factory<B> factory, Class<T> type, I rootNode, I[] nodes) throws BeanException {
-        super(factory, ModeType.FAST, type, rootNode, nodes);
+    public FastExporter(Up2Factory<B> factory, Class<T> type, I root, List<I> nodes) throws BeanException {
+        super(factory, ModeType.FAST, type, root, nodes);
     }
 
     protected FastExporter(FastImporter<B, I, T, ?, ?> source) throws BeanException {

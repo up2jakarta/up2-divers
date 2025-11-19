@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.core.misc.vld;
 
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
+import io.github.up2jakarta.csv.core.misc.lov.CurrencyConverter;
 import io.github.up2jakarta.csv.data.Segment;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;

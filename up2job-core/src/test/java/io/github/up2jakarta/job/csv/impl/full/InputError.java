@@ -2,7 +2,7 @@ package io.github.up2jakarta.job.csv.impl.full;
 
 import io.github.up2jakarta.csv.fmt.FullError;
 import io.github.up2jakarta.job.csv.impl.GroupType;
-import io.github.up2jakarta.xml.api.IError;
+import io.github.up2jakarta.lov.IError;
 
 public class InputError extends FullError<GroupType, String, InputRecord> {
 

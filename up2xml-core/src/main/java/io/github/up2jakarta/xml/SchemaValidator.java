@@ -1,5 +1,6 @@
 package io.github.up2jakarta.xml;
 
+import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.xml.api.*;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;

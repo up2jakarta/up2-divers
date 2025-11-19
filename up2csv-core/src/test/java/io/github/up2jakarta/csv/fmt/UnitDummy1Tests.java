@@ -1,13 +1,13 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.fmt.misc.AUnitTest;
 import io.github.up2jakarta.csv.fmt.misc.Dummy1Invoice;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
-import io.github.up2jakarta.xml.clv.CodeListException;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, TURecord, TUError> {
     }
 
     public TURecord record(String code, String... data) throws CodeListException {
-        final SegmentType type = SegmentType.valueOf('S' + code);
+        final SegmentType type = PARSER.parse(code);
         return new TURecord(type, "TU2025R0099", data);
     }
 
@@ -48,8 +48,8 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, TURecord, TUError> {
         };
         // When & Then
         check2Cardinality1(rows);
-        assertEquals(1, rows[0].getErrors().size());
-        assertEquals(1, rows[1].getErrors().size());
+        assertEquals(1, rows[0].getEvents().size());
+        assertEquals(1, rows[1].getEvents().size());
     }
 
     @Test
@@ -60,7 +60,7 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, TURecord, TUError> {
         };
         // When & Then
         checkCardinality2(rows);
-        assertEquals(3, rows[0].getErrors().size());
+        assertEquals(3, rows[0].getEvents().size());
     }
 
     @Test
@@ -75,9 +75,9 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, TURecord, TUError> {
         };
         // When & Then
         checkCardinality3(S12, rows);
-        assertEquals(0, rows[0].getErrors().size());
-        assertEquals(1, rows[1].getErrors().size());
-        assertEquals(1, rows[2].getErrors().size());
+        assertEquals(0, rows[0].getEvents().size());
+        assertEquals(1, rows[1].getEvents().size());
+        assertEquals(1, rows[2].getEvents().size());
     }
 
     @Test
@@ -90,7 +90,7 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, TURecord, TUError> {
         };
         // When & Then
         checkCardinality4(S14, S11, rows);
-        assertEquals(1, rows[0].getErrors().size());
+        assertEquals(1, rows[0].getEvents().size());
     }
 
     @Test
@@ -106,8 +106,8 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, TURecord, TUError> {
         };
         // When & Then
         checkDetached(detached, rows);
-        assertEquals(0, rows[0].getErrors().size());
-        assertEquals(1, detached.getErrors().size());
+        assertEquals(0, rows[0].getEvents().size());
+        assertEquals(1, detached.getEvents().size());
     }
 
     @Test
@@ -145,8 +145,8 @@ class UnitDummy1Tests extends AUnitTest<Dummy1Invoice, TURecord, TUError> {
         };
         // When & Then
         checkValidation(invalid, rows);
-        assertEquals(0, rows[0].getErrors().size());
-        assertEquals(1, invalid.getErrors().size());
+        assertEquals(0, rows[0].getEvents().size());
+        assertEquals(1, invalid.getEvents().size());
     }
 
 }

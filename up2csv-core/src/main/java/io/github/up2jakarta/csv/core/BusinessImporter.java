@@ -3,34 +3,37 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.IType;
+import io.github.up2jakarta.csv.api.hdl.IEventBuilder;
 import io.github.up2jakarta.csv.core.BSOperator.Computer.BSFormat;
 import io.github.up2jakarta.csv.core.BSOperator.Computer.BSMapper;
 import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
 import io.github.up2jakarta.csv.data.*;
-import io.github.up2jakarta.xml.clv.CodeListException;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.core.AccessException;
+import io.github.up2jakarta.lov.core.BeanException;
 
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
+import static io.github.up2jakarta.csv.api.IEvent.EC_COMPLIANCE;
 import static io.github.up2jakarta.csv.core.AccessMode.WO;
-import static io.github.up2jakarta.csv.data.DataType.isValid;
-import static io.github.up2jakarta.csv.data.DataType.message;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.csv.data.DataType.*;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 import static java.util.Arrays.copyOfRange;
-import static java.util.Collections.unmodifiableList;
 import static java.util.Set.of;
 
 /**
  * Base Processor that's able to aggregate and import java-bean from flat-data.
  *
  * @param <T> the business object type
- * @param <B> the input data type
- * @param <I> the input type
+ * @param <B> the business data type
+ * @param <I> the input segment type
  * @param <R> the input record type
- * @param <E> the input error type
+ * @param <E> the event type
  * @see FastImporter
  * @see FullImporter
  * @see UnitImporter
@@ -42,15 +45,15 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
     protected final BusinessTyping typing;
     private final boolean withBusinessId;
 
-    BusinessImporter(Up2Factory<B> factory, ModeType mode, Class<T> type, I rootNode, I[] nodes) throws BeanException {
-        super(factory, type, mode, rootNode, nodes);
-        this.typing = new BusinessTyping(List.of(nodes));
+    BusinessImporter(Up2Factory<B> factory, ModeType mode, Class<T> type, I root, List<I> nodes) throws BeanException {
+        super(factory, type, mode, root, nodes);
+        this.typing = new BusinessTyping(nodes);
         this.withBusinessId = this.check(root);
     }
 
     BusinessImporter(BusinessExporter<B, I, T> exporter) throws BeanException {
         super(exporter);
-        this.typing = new BusinessTyping(super.nodes);
+        this.typing = new BusinessTyping(nodes);
         this.withBusinessId = this.check(root);
     }
 
@@ -70,28 +73,30 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
         return pm.businessId.supports(WO);
     }
 
-    private void link(Entry<?, I, R, B, E> parent, List<Entry<?, I, R, B, E>> nodes) {
+    private void link(Entry<?> parent, List<Entry<?>> nodes) {
         for (final I type : joins.getOrDefault(parent.type, of())) {
             // Finding Children
-            final List<Entry<?, I, R, B, E>> children = new LinkedList<>();
-            for (final Entry<?, I, R, B, E> node : nodes) {
+            final List<Entry<?>> children = new LinkedList<>();
+            for (final Entry<?> node : nodes) {
                 if (node.link(parent, type, this::testPivot)) {
                     children.add(node);
                 }
             }
             // Validating Cardinality
-            if (!isValid(type.getBusinessType(), children.size())) {
-                final String msg = message(type.getBusinessType());
+            final B data = type.getDataType();
+            if (!isValid(data, children.size())) {
                 if (children.isEmpty()) {
-                    parent.handle(type, msg);
+                    parent.handler.handle(type, message(data));
                 } else {
-                    children.forEach(e -> e.handle(type, msg));
+                    children.forEach(e -> e.handle(message(data)));
                 }
             }
             // Linking Children
-            for (final Entry<?, I, R, B, E> child : children) {
-                nodes.remove(child);
-                type.getJoinLinker().link(parent.bean, child.bean);
+            for (final Entry<?> child : children) {
+                child.safe(() -> {
+                    type.link(parent.bean, child.bean);
+                    nodes.remove(child);
+                }, () -> "cannot link with " + parent);
                 if (joins.containsKey(type)) {
                     this.link(child, nodes);
                 }
@@ -99,34 +104,31 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
         }
     }
 
-    private Entry<?, I, R, B, E> entry(I type, R row, boolean isNode) {
-        final BusinessHandler<R, B, E, ?> handler = this.create(row);
-        final BSMapper<Segment, B> mapper = mappers.get(type);
-        if (mapper != null) {
-            final Segment bean = mapper.map(row, (isNode) ? mode.length : offset, isNode, handler);
-            final boolean hasParentId = mapper.hasParentId;
-            final Object parentId = (hasParentId) ? mapper.parentId.get(bean) : null;
-            final Object businessId = (mapper.hasBusinessId) ? mapper.businessId.get(bean) : null;
-            return new Entry<>(mapper, type, bean, handler, hasParentId, parentId, businessId);
-        }
-        return new Entry<>(null, type, null, handler, false, null, null);
-    }
-
     @SuppressWarnings("unchecked")
-    private List<Entry<?, I, R, B, E>> map(Collection<R> rows, Consumer<Entry<T, I, R, B, E>> root, Consumer<Entry<?, I, R, B, E>> node) {
-        final List<Entry<?, I, R, B, E>> result = new ArrayList<>(rows.size());
-        for (final R row : rows) {
-            final I type = row.getType();
-            final boolean isNode = this.root != type;
-            final Entry<?, I, R, B, E> entry = this.entry(type, row, isNode);
-            result.add(entry);
-            if (isNode) {
-                node.accept(entry);
+    private Listable<E> map(Collection<R> records, Consumer<Entry<T>> root, Consumer<Entry<?>> node) {
+        final IEventBuilder<B, R, E> builder = notNull(this.newBuilder(records.size()), this.getClass(), "newBuilder");
+        for (final R record : records) {
+            if (record == null) {
+                continue;
+            }
+            final BusinessHandler<B> handler = notNull(builder.of(record), builder.getClass(), "of");
+            final I type = record.getType();
+            if (type == null) {
+                handler.handle(ERROR, EC_COMPLIANCE, null, mode.typeIdIndex, "must not be null");
+                continue;
+            }
+            final BSMapper<Segment, B> mapper = mappers.get(type);
+            if (mapper == null) {
+                handler.handle(type, DETACHED);
+                continue;
+            }
+            if (this.root != type) {
+                node.accept(new Entry<>(mapper, handler, type, record, true));
             } else {
-                root.accept((Entry<T, I, R, B, E>) entry);
+                root.accept((Entry<T>) new Entry<>(mapper, handler, type, record, false));
             }
         }
-        return unmodifiableList(result);
+        return builder;
     }
 
     @Override
@@ -134,7 +136,7 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
         if (source != null) {
             return new BSMapper<>(source.node.reverse());
         }
-        return factory.build(factory.resolver.or(type.getBusinessType()), type.getClassType());
+        return factory.build(factory.resolver.or(type.getDataType()), type.getClassType());
     }
 
     /**
@@ -151,26 +153,25 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
         } else if (records.isEmpty()) {
             return creator.apply(null, List.of());
         }
-        final List<Entry<T, I, R, B, E>> roots = new ArrayList<>(1);
-        final List<Entry<?, I, R, B, E>> nodes = new ArrayList<>(records.size() - 1);
-        final List<Entry<?, I, R, B, E>> store = this.map(records, roots::add, nodes::add);
+        final List<Entry<T>> roots = new ArrayList<>(1);
+        final List<Entry<?>> nodes = new ArrayList<>(records.size() - 1);
+        final Listable<E> store = this.map(records, roots::add, nodes::add);
         final T invoice = switch (roots.size()) {
             case 1:
-                final Entry<T, I, R, B, E> root = roots.getFirst();
+                final Entry<T> root = roots.getFirst();
                 root.validate(this.offset, this.withBusinessId, this::nullPivot);
                 this.link(root, nodes);
-                nodes.forEach(r -> r.handle(r.type, DataType.DETACHED));
+                nodes.forEach(n -> n.handle(DETACHED));
                 yield root.bean;
             case 0:
-                nodes.forEach(r -> r.handle(r.type, DataType.DETACHED));
+                nodes.forEach(n -> n.handle(DETACHED));
                 yield null;
             default:
-                roots.forEach(r -> r.handle(this.root, message(this.root.getBusinessType())));
+                final String msg = message(this.root.getDataType());
+                roots.forEach(r -> r.handle(msg));
                 yield null;
         };
-        final List<E> errors = new LinkedList<>();
-        store.forEach(r -> r.collect(errors));
-        return creator.apply(invoice, errors);
+        return creator.apply(invoice, store.toList());
     }
 
     /**
@@ -211,12 +212,12 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
     }
 
     /**
-     * Creates and returns new error-collector for the given record.
+     * Creates and returns a new valid event-builder for the specified record's length.
      *
-     * @param record the input record
-     * @return new instance error-collector, must not be <code>null</code>
+     * @param length the length of records, it's helpful for collection size initializing.
+     * @return a new business event-builder, must not be <code>null</code>
      */
-    protected abstract BusinessHandler<R, B, E, ?> create(R record);
+    protected abstract IEventBuilder<B, R, E> newBuilder(int length);
 
     abstract Object nullPivot(T bean, R record);
 
@@ -225,35 +226,59 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
     /**
      * Internal business entry.
      */
-    static final class Entry<S extends Segment, T extends IType<D, T>, R extends IRecord<T>, D extends DataType<D>, E extends IEvent<D>> {
-        private final T type;
+    final class Entry<S extends Segment> {
+        private final I type;
         private final S bean;
         private final R source;
-        private final BSMapper<S, D> mapper;
-        private final BusinessHandler<R, D, E, ?> handler;
+        private final BSMapper<S, B> mapper;
+        private final BusinessHandler<B> handler;
         private final boolean hasParentId;
         private final Object parentId;
         private Object businessId;
 
-        private Entry(BSMapper<S, D> m, T t, S o, BusinessHandler<R, D, E, ?> h, boolean w, Object p, Object b) {
-            this.bean = o;
-            this.type = t;
-            this.mapper = m;
-            this.handler = h;
-            this.parentId = p;
-            this.businessId = b;
-            this.hasParentId = w;
-            this.source = handler.getSource();
+        private Entry(BSMapper<S, B> mapper, BusinessHandler<B> handler, I type, R record, boolean validate) {
+            this.type = type;
+            this.source = record;
+            this.mapper = mapper;
+            this.handler = handler;
+            this.hasParentId = mapper.hasParentId;
+            this.bean = mapper.map(record, (validate) ? mode.length : offset, validate, handler);
+            this.businessId = this.id(mapper.businessId, mapper.hasBusinessId, "business");
+            this.parentId = this.id(mapper.parentId, hasParentId, "parent");
+        }
+
+        void safe(Operation fn, Supplier<String> message) {
+            try {
+                fn.apply();
+            } catch (RuntimeException cause) {
+                handler.handle(type, message.get(), cause);
+            }
+        }
+
+        <V> V safe(Supplier<V> fn, Supplier<String> message) {
+            try {
+                return fn.get();
+            } catch (RuntimeException cause) {
+                handler.handle(type, message.get(), cause);
+                return null;
+            }
+        }
+
+        private Object id(BAccessor<Segment, Object> id, boolean sp, String cn) {
+            if (sp) {
+                return safe(() -> id.get(bean), () -> "cannot retrieve the " + cn + " identifier");
+            }
+            return null;
         }
 
         private void validate(int offset, boolean writable, BiFunction<S, R, Object> setter) {
             if (writable && this.businessId == null) {
-                this.businessId = setter.apply(bean, source);
+                this.businessId = safe(() -> setter.apply(bean, source), () -> "cannot update the business identifier");
             }
             mapper.node.validate(bean, offset, handler);
         }
 
-        private boolean link(Entry<?, T, R, D, E> parent, IType<D, T> expected, BiPredicate<R, R> filter) {
+        private boolean link(Entry<?> parent, IType<B, I> expected, BiPredicate<R, R> filter) {
             if (expected != this.type || !filter.test(source, parent.source)) {
                 return false;
             }
@@ -263,16 +288,18 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
             return true;
         }
 
-        private void collect(List<E> target) {
-            target.addAll(handler.toList());
+        private void handle(String message) {
+            handler.handle(type, message);
         }
 
-        private void handle(IType<D, T> type, String message) {
-            if (type == null) {
-                handler.handle(null, ERROR, ERROR_VALIDATOR, message);
-            } else {
-                handler.handle(type.getBusinessType(), type.getErrorLevel(), type.getErrorCode(), message);
-            }
+        @Override
+        public String toString() {
+            return "Segment#[" + type.getCode() + ']';
+        }
+
+        @FunctionalInterface
+        interface Operation {
+            void apply() throws RuntimeException;
         }
     }
 

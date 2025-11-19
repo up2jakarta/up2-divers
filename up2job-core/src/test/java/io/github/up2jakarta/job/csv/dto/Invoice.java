@@ -12,10 +12,8 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 @Valid
 @SuppressWarnings("unused")
@@ -53,9 +51,9 @@ public class Invoice implements Segment {
     private Party payer;
     private Party payee;
 
-    private Note[] notes = new Note[0];
-    private List<Item> items = new LinkedList<>();
-    private Map<Amount, Amount.Type> amounts = new LinkedHashMap<>();
+    private final List<Item> items = new LinkedList<>();
+    private final List<Note> notes = new LinkedList<>();
+    private final List<Amount> amounts = new LinkedList<>();
 
     public String getReference() {
         return reference;
@@ -133,24 +131,11 @@ public class Invoice implements Segment {
         return items;
     }
 
-    public void setItems(List<Item> items) {
-        this.items = items;
-    }
-
-    public Map<Amount, Amount.Type> getAmounts() {
-        return amounts;
-    }
-
-    public void setAmounts(Map<Amount, Amount.Type> amounts) {
-        this.amounts = amounts;
-    }
-
-    public Note[] getNotes() {
+    public List<Note> getNotes() {
         return notes;
     }
 
-    public void setNotes(Note[] notes) {
-        this.notes = notes;
+    public List<Amount> getAmounts() {
+        return amounts;
     }
-
 }

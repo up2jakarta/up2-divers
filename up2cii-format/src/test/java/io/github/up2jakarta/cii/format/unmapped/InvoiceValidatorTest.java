@@ -1,8 +1,8 @@
 package io.github.up2jakarta.cii.format.unmapped;
 
 import io.github.up2jakarta.cii.InvoiceValidator;
+import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.xml.api.IValidationError;
-import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.api.XValidator;
 import org.junit.jupiter.api.Test;
 
@@ -41,9 +41,9 @@ public class InvoiceValidatorTest {
         List<? extends IValidationError> errors = VALIDATOR.validate(xmlFile);
         assertEquals(1, errors.size());
         final IValidationError error = errors.getFirst();
-        assertEquals(SeverityType.FATAL, error.getSeverity());
+        assertEquals(SeverityType.FATAL, error.getLevel());
         assertEquals(1, error.getLineNumber());
-        assertEquals(1, error.getColumnNumber());
+        assertEquals(1, error.getLineOffset());
         assertEquals("Premature end of file.", error.getMessage());
         assertNotNull(error.getLinkedException());
     }
@@ -55,9 +55,9 @@ public class InvoiceValidatorTest {
         assertEquals(1, errors.size());
         {
             final IValidationError error = errors.getFirst();
-            assertEquals(SeverityType.FATAL, error.getSeverity());
+            assertEquals(SeverityType.FATAL, error.getLevel());
             assertEquals(5, error.getLineNumber());
-            assertEquals(22, error.getColumnNumber());
+            assertEquals(22, error.getLineOffset());
             assertEquals("cvc-complex-type.2.4.a: Invalid content was found starting with element '{ram:UID}'. One of '{ram:ID, ram:Value, ram:SpecifiedDocumentVersion}' is expected.", error.getMessage());
             assertNotNull(error.getLinkedException());
         }
@@ -70,9 +70,9 @@ public class InvoiceValidatorTest {
         assertEquals(1, errors.size());
         {
             final IValidationError error = errors.getFirst();
-            assertEquals(SeverityType.FATAL, error.getSeverity());
+            assertEquals(SeverityType.FATAL, error.getLevel());
             assertEquals(5, error.getLineNumber());
-            assertEquals(21, error.getColumnNumber());
+            assertEquals(21, error.getLineOffset());
             assertEquals("The prefix \"bla\" for element \"bla:ID\" is not bound.", error.getMessage());
             assertNotNull(error.getLinkedException());
         }

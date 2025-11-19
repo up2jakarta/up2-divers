@@ -18,17 +18,13 @@ public @interface Fragment {
     int value();
 
     /**
-     * Enabling the trim processing of embeddable fragments, by default is disabled.
+     * Enabling the trimming to <code>null</code> of the current fragment, by default is disabled.
+     * <p>
+     * This flag takes effect only during the mapping of flat-data to java-beans (parsing).
      * <ul>
-     *     If set to <code>true</code> during the mapping, the fragment value will be <code>null</code> when one of the following assertions is true
-     *     <li>all properties are <code>null</code></li>
-     *     <li>one property with {@link Position#required()} enabled is <code>null</code></li>
-     * </ul>
-     *
-     * <ul>
-     *     During the formatting, the data corresponding to the underlying properties will be <code>null</code> if disabled</code> or else
-     *     <li>the default value configured by {@link Position#defaultValue()} always takes precedence</li>
-     *     <li>the default value provided by the prototype when {@link #defaultValues()} is enabled unless {@link Position#defaultValue()}</li>
+     *     If set to <code>true</code>, the current fragment value will be <code>null</code> in the following cases:
+     *     <li>All underlying properties are <code>null</code></li>
+     *     <li>One property with {@link Position#required()} enabled have <code>null</code> as value</li>
      * </ul>
      *
      * @return the nullable flag
@@ -36,12 +32,16 @@ public @interface Fragment {
     boolean nullable() default false;
 
     /**
-     * Enables the default values initialized by the bean itself after constructed.
+     * Enables the export of default values even if the fragment value is <code>null</code>,
+     * by default is disabled.
      * <p>
-     * The related processing is activated only if {@link #nullable()} enabled
+     * This flag takes effect only during the mapping of java-beans to flat-data (export).
+     * <p>
+     * If enabled and the fragment value is <code>null</code>, the exported flat-data corresponding to the underlying
+     * properties will be {@link Position#defaultValue()} if exists
      *
-     * @return the processing of java default, aka primitive or initial values
+     * @return the prototype flag
      */
-    boolean defaultValues() default false;
+    boolean prototype() default false;
 
 }

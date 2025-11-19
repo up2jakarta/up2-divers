@@ -1,7 +1,7 @@
 package io.github.up2jakarta.xml.adapters;
 
-import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.api.TypeConverter;
+import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.TypeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import java.time.LocalDate;
@@ -17,18 +17,18 @@ public class LocalDateAdapter extends TypeConverter<LocalDate> {
 
     private final DateTimeFormatter formatter;
 
-    public LocalDateAdapter(DateTimeFormatter formatter, String errorCode) {
-        super(LocalDate.class, SeverityType.ERROR, errorCode);
+    public LocalDateAdapter(DateTimeFormatter formatter, String code) {
+        super(LocalDate.class, SeverityType.ERROR, code);
         this.formatter = formatter;
     }
 
     @Override
-    public final LocalDate parse(String value) {
+    protected final LocalDate doParse(String value) {
         return LocalDate.parse(value, formatter);
     }
 
     @Override
-    public final String format(LocalDate value) {
+    protected final String doFormat(LocalDate value) {
         return formatter.format(value);
     }
 

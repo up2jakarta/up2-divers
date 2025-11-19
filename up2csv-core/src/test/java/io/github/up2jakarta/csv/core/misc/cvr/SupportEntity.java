@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.api.Warning;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.*;
 import io.github.up2jakarta.csv.core.misc.ParsedEntity;
-import io.github.up2jakarta.csv.core.misc.clv.*;
+import io.github.up2jakarta.csv.core.misc.lov.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -15,14 +15,15 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 
-import static io.github.up2jakarta.csv.core.misc.clv.CountryConverter.ISO_3166;
-
 @Valid
 @Truncated(1)
 @Entity
 @Table(name = "TB_TESTS")
 @SuppressWarnings("unused")
 public class SupportEntity extends ParsedEntity<Integer> {
+
+    public static final String ISO_4217 = "ISO::4217";
+    public static final String ISO_3166 = "ISO::3166";
 
     @Position(0)
     @Column(name = "TU_ID")
@@ -45,9 +46,9 @@ public class SupportEntity extends ParsedEntity<Integer> {
     @Up2Decimal(2)
     private BigDecimal amount;
 
-    @Position(value = 4, converter = CurrencyConverter.class)
+    @Position(value = 4, converter = @Up2Converter(CurrencyConverter.class))
     @Column(name = "TU_CURRENCY")
-    @Error(value = CurrencyConverter.ISO_4217)
+    @Error(value = ISO_4217)
     private CurrencyCodeType currency;
 
     @Position(5)
@@ -55,7 +56,7 @@ public class SupportEntity extends ParsedEntity<Integer> {
     @Up2Decimal(4)
     private BigDecimal quantity;
 
-    @Position(value = 6, converter = MeasurementUnitConverter.class)
+    @Position(value = 6, converter = @Up2Converter(MeasurementUnitConverter.class))
     @Column(name = "TU_CURRENCY")
     private MeasurementUnitCode unit;
 

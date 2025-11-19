@@ -5,21 +5,21 @@ import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.core.misc.ext.Dummy1Processor;
 import io.github.up2jakarta.csv.core.misc.ext.Dummy3;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.SeverityType;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_PROCESSOR;
+import static io.github.up2jakarta.csv.api.IEvent.EC_PROCESSOR;
 
 @SuppressWarnings("unused")
 public class Test3Processor implements Segment {
 
     @Position(0)
     @Dummy3
-    @Error(value = Dummy1Processor.TU_P_001, severity = SeverityType.WARNING)
+    @Error(value = Dummy1Processor.TU_P_001, level = SeverityType.WARNING)
     private String test;
 
     @Position(1)
     @Dummy3
-    @Error(value = ERROR_PROCESSOR, severity = SeverityType.WARNING)
+    @Error(value = EC_PROCESSOR, level = SeverityType.WARNING)
     private String other;
 
     public String getTest() {

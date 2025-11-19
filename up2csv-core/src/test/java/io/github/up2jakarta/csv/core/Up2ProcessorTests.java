@@ -1,12 +1,10 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.api.ext.BeanContext;
-import io.github.up2jakarta.csv.api.ext.Conversion;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Trim;
+import io.github.up2jakarta.csv.core.BSBuilder.PProcessor;
 import io.github.up2jakarta.csv.core.BSProperty.PAccessor;
-import io.github.up2jakarta.csv.core.BSProperty.PProcessor;
 import io.github.up2jakarta.csv.core.BSProperty.PProperty;
 import io.github.up2jakarta.csv.core.BSProperty.PProperty.POProperty;
 import io.github.up2jakarta.csv.core.hdl.FailureException;
@@ -18,6 +16,11 @@ import io.github.up2jakarta.csv.core.misc.prc.Test6Processor;
 import io.github.up2jakarta.csv.core.misc.prc.Test7Processor;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.prc.TrimProcessor;
+import io.github.up2jakarta.lov.TypeAdapter;
+import io.github.up2jakarta.lov.core.BeanContext;
+import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.StringAdapter;
+import io.github.up2jakarta.lov.core.TypeWrapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +29,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.lang.reflect.Field;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_PROCESSOR;
+import static io.github.up2jakarta.csv.api.IEvent.EC_PROCESSOR;
 import static io.github.up2jakarta.csv.core.Properties.parse;
 import static io.github.up2jakarta.csv.core.Up2ErrorTests.EX_CAUSE;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -51,10 +54,10 @@ public class Up2ProcessorTests {
         final PProcessor<?> processor = BSBuilder.build(context, field, position);
         if (field.getType() == String.class) {
             final PAccessor<?, String> va = Properties.wo(String.class, field);
-            return new POProperty<>(va, null, 0, position, processor, Conversion.NAN);
+            return new POProperty<>(va, null, 0, position, processor, StringAdapter.INSTANCE);
         } else if (field.getType() == Integer.class) {
             final PAccessor<?, Integer> va = Properties.wo(Integer.class, field);
-            final Conversion<Integer> cvr = new Conversion<>(Integer.class, Integer::parseInt, Object::toString);
+            final TypeAdapter<Integer> cvr = new TypeWrapper<>(Integer.class, Integer::parseInt);
             return new POProperty<>(va, null, 0, position, processor, cvr);
         }
         throw new UnsupportedOperationException();
@@ -179,8 +182,8 @@ public class Up2ProcessorTests {
             // THEN
             assertNotNull(thrown.getCause());
             assertInstanceOf(DummyException.class, thrown.getCause());
-            assertEquals(ERROR, thrown.getSeverity());
-            assertEquals(ERROR_PROCESSOR, thrown.getCode());
+            assertEquals(ERROR, thrown.getLevel());
+            assertEquals(EC_PROCESSOR, thrown.getCode());
             assertEquals(1, thrown.getOffset());
             assertEquals(EX_CAUSE + ": dummy message", thrown.getMessage());
         }
@@ -188,8 +191,8 @@ public class Up2ProcessorTests {
             // When
             final FailureException thrown = assertThrows(FailureException.class, () -> mapper.map(""));
             // THEN
-            assertEquals(ERROR_PROCESSOR, thrown.getCode());
-            assertEquals(ERROR, thrown.getSeverity());
+            assertEquals(EC_PROCESSOR, thrown.getCode());
+            assertEquals(ERROR, thrown.getLevel());
             assertInstanceOf(NullPointerException.class, thrown.getCause());
             assertEquals("#[1] throws ERROR[UP2-P001] : java.lang.NullPointerException: null message", thrown.getFormattedMessage());
         }
@@ -197,8 +200,8 @@ public class Up2ProcessorTests {
             // When
             final FailureException thrown = assertThrows(FailureException.class, () -> mapper.map("other"));
             // THEN
-            assertEquals(ERROR_PROCESSOR, thrown.getCode());
-            assertEquals(ERROR, thrown.getSeverity());
+            assertEquals(EC_PROCESSOR, thrown.getCode());
+            assertEquals(ERROR, thrown.getLevel());
             assertInstanceOf(RuntimeException.class, thrown.getCause());
             assertEquals("#[1] throws ERROR[UP2-P001] : java.lang.RuntimeException: other message", thrown.getFormattedMessage());
         }

@@ -1,13 +1,13 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.fmt.misc.AFullTest;
 import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.MyFullAggregator;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.Arrays;
 import static io.github.up2jakarta.csv.core.ModeType.FULL;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.invoice;
 import static io.github.up2jakarta.csv.impl.SegmentType.*;
-import static io.github.up2jakarta.xml.adapters.KeyCoder.encodeInt;
+import static io.github.up2jakarta.lov.core.Codes.encodeInt;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
@@ -92,7 +92,7 @@ class BusinessFullTests extends AFullTest<Invoice, InputRecord, InputError> {
     @Test
     void testDetached() {
         // Given
-        final InputRecord detached = record(S90, "TU2025R0099", "9999", "Warning", "Detached");
+        final InputRecord detached = record(S09, "TU2025R0099", "9999", "Warning", "Detached");
         final InputRecord[] rows = {
                 record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
                 record(S02, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
@@ -129,7 +129,7 @@ class BusinessFullTests extends AFullTest<Invoice, InputRecord, InputError> {
     @Test
     void testValidation() {
         // Given
-        final InputRecord invalid = record(S90, "TU2025R0099", "1199", "Support", null);
+        final InputRecord invalid = record(S09, "TU2025R0099", "1199", "Support", null);
         final InputRecord[] rows = {
                 record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
                 record(S02, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),

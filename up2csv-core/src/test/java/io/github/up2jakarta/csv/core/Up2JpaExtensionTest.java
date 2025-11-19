@@ -1,11 +1,11 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.misc.clv.TestCodeList;
-import io.github.up2jakarta.csv.core.misc.clv.TestCodeListConverter;
 import io.github.up2jakarta.csv.core.misc.jpa.*;
+import io.github.up2jakarta.csv.core.misc.lov.TestCodeList;
+import io.github.up2jakarta.csv.core.misc.lov.TestCodeListConverter;
 import io.github.up2jakarta.csv.impl.*;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +14,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_XML_ENUM;
+import static io.github.up2jakarta.csv.api.IEvent.EC_JPA_ENUM;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.SeverityType.WARNING;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -72,7 +74,7 @@ public class Up2JpaExtensionTest {
             assertSame(row, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
             assertEquals(0, error.getOffset());
-            assertEquals(SeverityType.WARNING, error.getSeverity());
+            assertEquals(WARNING, error.getLevel());
             assertEquals(Test1Bean.JPA_XXX, error.getCode());
             assertEquals("Unknown value [11] for @Enumerated[XML1Enum]", error.getMessage());
             assertNull(error.getTrace());
@@ -82,8 +84,8 @@ public class Up2JpaExtensionTest {
             assertSame(row, error.getKey().getRecord());
             assertEquals(1, error.getKey().getOrder());
             assertEquals(1, error.getOffset());
-            assertEquals(SeverityType.ERROR, error.getSeverity());
-            assertEquals(ERROR_XML_ENUM, error.getCode());
+            assertEquals(ERROR, error.getLevel());
+            assertEquals(EC_JPA_ENUM, error.getCode());
             assertEquals("Unknown value [22] for @Enumerated[XML2Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
@@ -93,7 +95,7 @@ public class Up2JpaExtensionTest {
             assertSame(row, error.getKey().getRecord());
             assertEquals(2, error.getKey().getOrder());
             assertEquals(2, error.getOffset());
-            assertEquals(SeverityType.WARNING, error.getSeverity());
+            assertEquals(WARNING, error.getLevel());
             assertEquals(Test1Bean.JPA_XXX, error.getCode());
             assertEquals("Unknown value [33] for @Enumerated[XML1Enum]", error.getMessage());
             assertNull(error.getTrace());
@@ -103,8 +105,8 @@ public class Up2JpaExtensionTest {
             assertSame(row, error.getKey().getRecord());
             assertEquals(3, error.getKey().getOrder());
             assertEquals(3, error.getOffset());
-            assertEquals(SeverityType.ERROR, error.getSeverity());
-            assertEquals(ERROR_XML_ENUM, error.getCode());
+            assertEquals(ERROR, error.getLevel());
+            assertEquals(EC_JPA_ENUM, error.getCode());
             assertEquals("Unknown value [44] for @Enumerated[XML2Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
@@ -113,7 +115,7 @@ public class Up2JpaExtensionTest {
             assertSame(row, error.getKey().getRecord());
             assertEquals(4, error.getKey().getOrder());
             assertEquals(4, error.getOffset());
-            assertEquals(SeverityType.ERROR, error.getSeverity());
+            assertEquals(ERROR, error.getLevel());
             assertEquals(TestCodeListConverter.TU_001, error.getCode());
             assertEquals("Unknown value [ANY] for CodeList[TestCodeList]", error.getMessage());
             assertNull(error.getTrace());
@@ -138,7 +140,7 @@ public class Up2JpaExtensionTest {
             assertSame(row, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
             assertEquals(0, error.getOffset());
-            assertEquals(SeverityType.WARNING, error.getSeverity());
+            assertEquals(WARNING, error.getLevel());
             assertEquals(Test2Bean.XML_001, error.getCode());
             assertEquals("Unknown value [11] for @Enumerated[XML1Enum]", error.getMessage());
             assertNull(error.getTrace());
@@ -148,7 +150,7 @@ public class Up2JpaExtensionTest {
             assertSame(row, error.getKey().getRecord());
             assertEquals(1, error.getKey().getOrder());
             assertEquals(1, error.getOffset());
-            assertEquals(SeverityType.WARNING, error.getSeverity());
+            assertEquals(WARNING, error.getLevel());
             assertEquals(Test2Bean.XML_002, error.getCode());
             assertEquals("Unknown value [22] for @Enumerated[XML2Enum]", error.getMessage());
             assertNull(error.getTrace());
@@ -158,7 +160,7 @@ public class Up2JpaExtensionTest {
             assertSame(row, error.getKey().getRecord());
             assertEquals(2, error.getKey().getOrder());
             assertEquals(2, error.getOffset());
-            assertEquals(SeverityType.WARNING, error.getSeverity());
+            assertEquals(WARNING, error.getLevel());
             assertEquals(Test2Bean.XML_003, error.getCode());
             assertEquals("Unknown value [ANY] for CodeList[TestCodeList]", error.getMessage());
             assertNull(error.getTrace());
@@ -173,7 +175,7 @@ public class Up2JpaExtensionTest {
         // THEN
         assertEquals(Test3Bean.class, thrown.getSource());
         assertEquals("enum1", thrown.getLocator());
-        assertEquals("Test3Bean[enum1] - @Position[converter] must not be undefined", thrown.getMessage());
+        assertEquals("Test3Bean[enum1] - must be annotated with @Up2Converter or one of those shortcuts", thrown.getMessage());
     }
 
 }

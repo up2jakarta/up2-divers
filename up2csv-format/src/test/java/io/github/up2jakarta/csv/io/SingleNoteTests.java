@@ -1,13 +1,13 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.api.ext.BeanContext;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Format;
 import io.github.up2jakarta.csv.core.Up2Mapper;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.io.dto.Note;
+import io.github.up2jakarta.lov.core.BeanContext;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.Validator;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;

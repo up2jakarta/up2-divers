@@ -14,7 +14,9 @@ import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputCollector;
 import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;
-import io.github.up2jakarta.xml.api.PropertyException;
+import io.github.up2jakarta.lov.PropertyException;
+import io.github.up2jakarta.lov.TypeConverter;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,20 +50,20 @@ public class Up2ErrorTests {
         this.factory = factory;
     }
 
+    static void assertTrace(String buffer, String... expected) {
+        final List<String> lines = Arrays.asList(buffer.split(System.lineSeparator()));
+        assertEquals(expected.length, lines.size());
+        for (var i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], lines.get(i));
+        }
+    }
+
     private void assertContains(String buffer, List<String> expected) {
         List<String> lines = Arrays.asList(buffer.split(System.lineSeparator()));
         for (var pl : expected) {
             assertTrue(lines.contains(pl), pl);
         }
         assertFalse(lines.contains(""), "empty line");
-    }
-
-    private void assertTrace(String buffer, String... expected) {
-        final List<String> lines = Arrays.asList(buffer.split(System.lineSeparator()));
-        assertEquals(expected.length, lines.size());
-        for (var i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], lines.get(i));
-        }
     }
 
     @Test
@@ -283,10 +285,14 @@ public class Up2ErrorTests {
         final InputError error = handler.toList().getFirst();
         assertTrace(error.getTrace(),
                 EX_CAUSE + ": dummy wrapped message",
-                "\t" + DummyConverter.class.getName() + ".parse(DummyConverter.java:24)",
-                "\t" + DummyConverter.class.getName() + ".parse(DummyConverter.java:8)",
-                "\tio.github.up2jakarta.csv.api.ext.PropertyConverter.lambda$of$0(PropertyConverter.java:42)",
-                "java.lang.RuntimeException: NPE message"
+                "\t" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:23)",
+                "\t" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:8)",
+                "\tio.github.up2jakarta.lov.TypeConverter.parse(TypeConverter.java:92)",
+                "Caused by java.lang.RuntimeException: NPE message",
+                "\t" + Dummy1Processor.class.getName() + ".process(Dummy1Processor.java:29)",
+                "\t" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:21)",
+                "\t" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:8)",
+                "\t" + TypeConverter.class.getName() + ".parse(TypeConverter.java:92)"
         );
     }
 

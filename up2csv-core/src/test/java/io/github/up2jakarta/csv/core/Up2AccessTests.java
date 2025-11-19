@@ -7,6 +7,8 @@ import io.github.up2jakarta.csv.core.misc.map.Default1Bean;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.impl.GroupType;
+import io.github.up2jakarta.lov.core.AccessException;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static io.github.up2jakarta.csv.core.Properties.assertUndefined;
 import static io.github.up2jakarta.csv.core.Properties.assertValid;
 import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
-import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
+import static io.github.up2jakarta.lov.SeverityType.WARNING;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -415,11 +417,9 @@ class Up2AccessTests {
     @Test
     void validOptionalBusinessId() throws BeanException {
         // When
-        final BAccessor<Segment, Object> bid1 = factory.build(resolver, BIdOBean.class).businessId;
-        final BAccessor<Segment, Object> bid2 = factory.format(resolver, BIdOBean.class).businessId;
+        final BAccessor<Segment, Object> bid = factory.build(resolver, BIdOptionalBean.class).businessId;
         // Then
-        assertValid(bid1, new BIdOBean());
-        assertValid(bid2, new BIdOBean());
+        assertValid(bid, new BIdOptionalBean());
     }
 
     @Test

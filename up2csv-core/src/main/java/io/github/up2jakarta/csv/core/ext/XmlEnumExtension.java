@@ -1,11 +1,11 @@
 package io.github.up2jakarta.csv.core.ext;
 
-import io.github.up2jakarta.csv.api.ext.*;
+import io.github.up2jakarta.csv.api.ext.TypeExtension;
 import io.github.up2jakarta.csv.cfg.Error;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.api.PropertyException;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.*;
+import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.TypeWrapper;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.persistence.Column;
@@ -18,8 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_XML_ENUM;
+import static io.github.up2jakarta.csv.api.IEvent.EC_XML_ENUM;
+import static io.github.up2jakarta.csv.core.ext.Beans.error;
 import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
+import static java.lang.String.format;
 
 /**
  * {@link XmlType} extension that supports {@link XmlEnum}.
@@ -28,7 +31,7 @@ import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
  */
 @Named
 @Singleton
-public final class XmlEnumExtension extends ConversionExtension<XmlType, XmlEnum> {
+public final class XmlEnumExtension extends TypeExtension<XmlType, XmlEnum> {
 
     public static final String FORMAT = "Unknown value [%s] for @XmlEnum[%s]";
 
@@ -80,23 +83,20 @@ public final class XmlEnumExtension extends ConversionExtension<XmlType, XmlEnum
     }
 
     @Override
-    public <V> Conversion<V> resolve(Field property, Class<V> type, XmlEnum config) throws BeanException {
+    public <V> TypeAdapter<V> resolve(Field property, Class<V> type, XmlEnum config) throws BeanException {
         final Map<String, V> mapping = getConstants(type, property);
-        final Optional<Error> error = ConversionResolver.getError(property, type);
-        final SeverityType level = error.map(Error::severity).orElse(SeverityType.ERROR);
-        final String code = error.map(Error::value).orElse(ERROR_XML_ENUM);
+        final Optional<Error> error = error(property, type);
+        final SeverityType level = error.map(Error::level).orElse(ERROR);
+        final String code = error.map(Error::value).orElse(EC_XML_ENUM);
         final PropertyConverter<V> p = v -> mapping.entrySet().stream().filter(e -> e.getKey().equals(v))
                 .map(Map.Entry::getValue)
                 .findAny()
-                .orElseThrow(() -> {
-                    final String msg = String.format(FORMAT, v, getTypeName(type));
-                    return new PropertyException(level, code, msg);
-                });
+                .orElseThrow(() -> new PropertyException(level, code, format(FORMAT, v, getTypeName(type))));
         final PropertyFormatter<V> f = v -> mapping.entrySet().stream().filter(e -> e.getValue().equals(v))
                 .map(Map.Entry::getKey)
                 .findAny()
                 .orElseGet(v::toString);
-        return new Conversion<>(type, p, f);
+        return new TypeWrapper<>(type, p, f);
     }
 
 }

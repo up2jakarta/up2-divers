@@ -1,22 +1,21 @@
 package io.github.up2jakarta.csv.core.misc.ext;
 
 import io.github.up2jakarta.csv.core.misc.DummyException;
-import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.api.TypeConverter;
+import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.TypeConverter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DummyConverter extends TypeConverter<Integer> {
+public final class DummyConverter extends TypeConverter<Integer> {
 
     public static final String TU_P_005 = "TU-P005";
 
-    protected DummyConverter() {
+    public DummyConverter() {
         super(Integer.class, SeverityType.ERROR, TU_P_005);
     }
 
-
     @Override
-    public Integer parse(String value) {
+    public Integer doParse(String value) {
         if ("dummy".equals(value)) {
             try {
                 Dummy1Processor.process("NPE");
@@ -28,7 +27,7 @@ public class DummyConverter extends TypeConverter<Integer> {
     }
 
     @Override
-    public String format(Integer value) {
+    public String doFormat(Integer value) {
         return String.valueOf(value);
     }
 }

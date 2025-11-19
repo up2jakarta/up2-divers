@@ -16,14 +16,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface FragmentOverride {
 
     /**
-     * The fragment that is being mapped to the segment attribute.
-     * The mapping type will remain the same as is defined in the segment class.
-     * If the offset is negative, the annotated segment will be excluded i.e. its value will be <code>null</code>.
+     * The mapping type will remain the same as is defined in the segment class unless overridden.
+     * <p>
+     * If the offset is negative, the annotated property will be excluded i.e. is not mapped anymore.
+     *
+     * @return the new fragment configuration
      */
     Fragment value() default @Fragment(-1);
 
     /**
-     * The path of the fragment whose mapping is being overridden.
+     * @return the path of the fragment whose mapping is being overridden.
      */
     String[] path();
 

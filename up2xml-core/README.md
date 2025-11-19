@@ -10,17 +10,13 @@
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2xml-core</artifactId>
-        <version>1.5.8</version>
+        <version>1.6.0</version>
     </dependency>
 ```
 
 # Features
 
-## 1. CodeList API
-
-This framework introduces `code-list API` aka `LOV` (List of values)
-
-## 2. Generic XML processing
+## XML processing
 
 - [XBuilder.java](./src/main/java/io/github/up2jakarta/xml/XBuilder.java)
 - [XProcessor.java](./src/main/java/io/github/up2jakarta/xml/XProcessor.java)

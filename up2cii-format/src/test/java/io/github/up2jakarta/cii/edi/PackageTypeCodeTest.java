@@ -6,10 +6,10 @@ import io.github.up2jakarta.cii.format.standard.ram.LineTradeDeliveryType;
 import io.github.up2jakarta.cii.format.standard.ram.SupplyChainPackagingType;
 import io.github.up2jakarta.cii.format.standard.ram.SupplyChainTradeLineItemType;
 import io.github.up2jakarta.cii.format.standard.ram.SupplyChainTradeTransactionType;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.xml.api.IValidationError;
-import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.api.XValidationException;
-import io.github.up2jakarta.xml.clv.CodeListException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,9 +76,9 @@ public class PackageTypeCodeTest extends CodeAdapterTest {
         assertEquals(1, errors.size());
         {
             final IValidationError error = errors.getFirst();
-            assertEquals(SeverityType.ERROR, error.getSeverity());
+            assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(52, error.getLineNumber());
-            assertEquals(53, error.getColumnNumber());
+            assertEquals(53, error.getLineOffset());
             assertEquals("ECE-7065: Unknown value [???] for CodeList[PackageTypeCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());

@@ -1,14 +1,14 @@
 package io.github.up2jakarta.csv.cfg;
 
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.SeverityType;
 
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports {@link io.github.up2jakarta.csv.api.IEvent#getSeverity()}
+ * Up2 Annotation that supports {@link io.github.up2jakarta.csv.api.IEvent#getLevel()}
  * and {@link io.github.up2jakarta.csv.api.IEvent#getCode()}.
  *
- * @see io.github.up2jakarta.csv.api.IEvent ;
+ * @see io.github.up2jakarta.csv.api.IEvent
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -16,16 +16,14 @@ import java.lang.annotation.*;
 public @interface Error {
 
     /**
-     * @return the error code for a specific property.
+     * @return the event code.
      */
     String value();
 
     /**
-     * The error severity for a specific property.
-     *
-     * @return the error severity
+     * @return the event level
      */
-    SeverityType severity() default SeverityType.ERROR;
+    SeverityType level() default SeverityType.ERROR;
 
     /**
      * Interface marker that supports {@link Error} for JSR-303 validation.

@@ -3,7 +3,7 @@ package io.github.up2jakarta.job.zip;
 import io.github.up2jakarta.job.core.BusinessId;
 import io.github.up2jakarta.job.core.BusinessObject;
 import io.github.up2jakarta.job.flux.FluxSupplier;
-import io.github.up2jakarta.xml.adapters.KeyCoder;
+import io.github.up2jakarta.lov.core.Codes;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -19,7 +19,7 @@ public interface EntryDecoder {
 
     static ZipEntry encodeEntry(BusinessObject<?, ?> invoice) {
         final ZipEntry entry = new ZipEntry(encodeName(invoice.getReference()));
-        entry.setComment(KeyCoder.encode(invoice.getKey()));
+        entry.setComment(Codes.encode(invoice.getKey()));
         return entry;
     }
 

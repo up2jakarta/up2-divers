@@ -14,7 +14,7 @@ public final class BId1Bean implements Segment {
     @Fragment(0)
     public AFragment fragment = new AFragment();
 
-    public static final class AFragment implements Segment {
+    public static class AFragment implements Segment {
         @Position(0)
         @Up2Number
         @BusinessId

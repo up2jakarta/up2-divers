@@ -1,12 +1,12 @@
 package io.github.up2jakarta.csv.cfg;
 
-import io.github.up2jakarta.csv.api.ext.Conversion;
-import io.github.up2jakarta.csv.api.ext.ConversionExtension;
+import io.github.up2jakarta.csv.api.ext.TypeExtension;
+import io.github.up2jakarta.lov.core.BeanContext;
 
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports {@link Conversion} for third-party types.
+ * Up2 Annotation that supports {@link io.github.up2jakarta.lov.TypeAdapter} for third-party types.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -15,9 +15,21 @@ import java.lang.annotation.*;
 public @interface Extension {
 
     /**
-     * @return the conversion extension type
+     * The type-extension must be managed by {@link BeanContext}
+     *
+     * @return the class of type-extension
      */
-    Class<? extends ConversionExtension<?, ?>> value();
+    Class<? extends TypeExtension<?, ?>> value();
+
+    /**
+     * Returns the qualified name of the type-extension , by default is <code>null</code>.
+     * <p>
+     * Useful when the {@link BeanContext} contains many beans of the specified type-extension.
+     *
+     * @return the qualified name
+     * @see jakarta.inject.Named
+     */
+    String name() default "";
 
     /**
      * Up2 Annotation that supports {@link Repeatable} {@link Extension}.

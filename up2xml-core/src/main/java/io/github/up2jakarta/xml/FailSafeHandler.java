@@ -22,15 +22,14 @@ public class FailSafeHandler extends AbstractCollector {
 
     @Override
     public boolean handleEvent(ValidationEvent event) {
-        final int severity = computeSeverity(event);
-        var l = event.getLocator().getLineNumber();
-        var c = event.getLocator().getColumnNumber();
-
+        final int level = computeLevel(event);
+        var ln = event.getLocator().getLineNumber();
+        var cn = event.getLocator().getColumnNumber();
         var add = true;
         for (var it = errors.listIterator(); it.hasNext(); ) {
             var e = it.next();
-            if (e.getLineNumber() == l && e.getColumnNumber() == c) {
-                if (e.getSeverity().getLevel() < severity) {
+            if (e.getLineNumber() == ln && e.getLineOffset() == cn) {
+                if (e.getLevel().getAsInt() < level) {
                     it.remove();
                 } else {
                     add = false;
@@ -39,7 +38,7 @@ public class FailSafeHandler extends AbstractCollector {
             }
         }
         if (add) {
-            errors.add(new ValidationError(event, severity, enhancer));
+            errors.add(new ValidationError(event, level, enhancer));
         }
         return true; // continue validation
     }

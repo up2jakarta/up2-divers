@@ -1,18 +1,21 @@
 package io.github.up2jakarta.csv;
 
-import io.github.up2jakarta.csv.api.hdl.ISelfEvent;
-import io.github.up2jakarta.csv.api.hdl.ISelfRecord;
-import io.github.up2jakarta.csv.core.*;
+import io.github.up2jakarta.csv.api.hdl.IMutualRecord;
+import io.github.up2jakarta.csv.core.FastImporter;
+import io.github.up2jakarta.csv.core.FullImporter;
+import io.github.up2jakarta.csv.core.UnitImporter;
+import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.hdl.BusinessEvent;
+import io.github.up2jakarta.csv.data.IMutual;
 import io.github.up2jakarta.csv.fmt.*;
-import io.github.up2jakarta.csv.fmt.misc.CyclicInvoice;
 import io.github.up2jakarta.csv.fmt.misc.Dummy4Invoice;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
-import io.github.up2jakarta.xml.api.IError;
+import io.github.up2jakarta.lov.IError;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +31,11 @@ import java.util.List;
 
 import static io.github.up2jakarta.csv.core.ModeType.*;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.*;
-import static io.github.up2jakarta.csv.impl.SegmentType.*;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
-import static org.junit.jupiter.api.Assertions.*;
+import static io.github.up2jakarta.csv.impl.SegmentType.S01;
+import static io.github.up2jakarta.csv.impl.SegmentType.S41;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
@@ -118,7 +123,7 @@ public class BuilderTests {
         final UnitImporter<GroupType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
                 .unit(Invoice.class)
                 .build(S01)
-                .build(TUError::new, null);
+                .build(TUError::new);
         assertNotNull(importer);
         // THEN
         assertInvoice(importer, unitInvoice(S01, TURecord::new));
@@ -205,7 +210,7 @@ public class BuilderTests {
         final FastImporter<GroupType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
                 .fast(Invoice.class)
                 .build(S01)
-                .build(TUError::new, null);
+                .build(TUError::new);
         assertNotNull(importer);
         // THEN
         assertInvoice(importer, fastInvoice(S01));
@@ -280,7 +285,7 @@ public class BuilderTests {
         final FullImporter<GroupType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
                 .full(Invoice.class)
                 .build(S01)
-                .build(TUError::new, null);
+                .build(TUError::new);
         assertNotNull(importer);
         // THEN
         assertInvoice(importer, fastInvoice(S01));
@@ -300,51 +305,25 @@ public class BuilderTests {
         assertInvoice(importer, rows);
     }
 
-    @Test
-    void testTypingException() {
-        // WHEN
-        final BeanException ex = assertThrows(
-                BeanException.class,
-                () -> factory.builder()
-                        .full(Invoice.class)
-                        .build(S11)
-                        .build((r) -> 0)
-        );
-        assertNotNull(ex);
-        // THEN
-        assertEquals("Invoice[class] - Invalid business typing", ex.getMessage());
-    }
-
-    @Test
-    void testRecursiveException() {
-        // WHEN
-        final BeanException ex = assertThrows(
-                BeanException.class,
-                () -> factory.builder()
-                        .full(CyclicInvoice.class)
-                        .build(S61)
-                        .build()
-        );
-        assertNotNull(ex);
-        // THEN
-        assertEquals("SegmentType[61] - cyclic segment is not allowed: CyclicInvoice > CyclicInvoice.CyclicItem > CyclicInvoice", ex.getMessage());
-    }
-
-    public static class BSRecord extends FullRecord<SegmentType, String> implements ISelfRecord<GroupType, SegmentType, BSError, BSRecord> {
+    public static class BSRecord extends FullRecord<SegmentType, String> implements IMutualRecord<BSError, BSRecord> {
 
         private final List<BSError> errors = new LinkedList<>();
 
+        public BSRecord(SegmentType type, String pivot, String... data) {
+            super(null, type, pivot, data);
+        }
+
         public BSRecord(InputRecord r) {
-            super(r.getKey(), r.getType(), r.getPivot(), r.getColumns());
+            super(r.getKey(), r.getType(), r.getPivot(), r.getData());
         }
 
         @Override
-        public List<BSError> getErrors() {
+        public List<BSError> getEvents() {
             return errors;
         }
     }
 
-    public static class BSError extends BusinessEvent<GroupType, BSRecord> implements ISelfEvent<GroupType, BSRecord, BSError> {
+    public static class BSError extends BusinessEvent<GroupType, BSRecord> implements IMutual<BSRecord, BSError> {
 
         public BSError(BSRecord row, int order, GroupType type, Integer offset, IError cause, String trace) {
             super(row, order, type, offset, cause, trace);

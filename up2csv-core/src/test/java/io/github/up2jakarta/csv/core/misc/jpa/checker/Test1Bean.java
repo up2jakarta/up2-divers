@@ -2,10 +2,10 @@ package io.github.up2jakarta.csv.core.misc.jpa.checker;
 
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2EnableJPA;
-import io.github.up2jakarta.csv.core.misc.clv.TestCodeList;
-import io.github.up2jakarta.csv.core.misc.clv.TestCodeListConverter;
 import io.github.up2jakarta.csv.core.misc.jpa.XML1Enum;
 import io.github.up2jakarta.csv.core.misc.jpa.XML2Enum;
+import io.github.up2jakarta.csv.core.misc.lov.TestCodeList;
+import io.github.up2jakarta.csv.core.misc.lov.TestCodeListConverter;
 import io.github.up2jakarta.csv.data.Segment;
 import jakarta.persistence.*;
 

@@ -1,5 +1,6 @@
 package io.github.up2jakarta.csv.impl.dto;
 
+import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
 import io.github.up2jakarta.csv.cfg.Up2Number;
@@ -14,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Valid
+@Error("CSV-C03")
 @SuppressWarnings("unused")
 public class Item extends Parsable {
 

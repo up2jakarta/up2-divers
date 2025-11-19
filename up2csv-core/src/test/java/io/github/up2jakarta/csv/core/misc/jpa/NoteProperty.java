@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.core.misc.jpa;
 
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.clv.CodeList;
+import io.github.up2jakarta.lov.CodeList;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 

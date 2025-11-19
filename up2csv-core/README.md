@@ -42,7 +42,7 @@ approach.
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.5.8</version>
+        <version>1.6.0</version>
     </dependency>
     <!-- Required JSR-303 Validation Provider -->
     <dependency>
@@ -51,6 +51,72 @@ approach.
     </dependency>
     <!-- Optional JPA Provider -->
     <!-- Optional CDI Provider -->
+```
+
+# Mapping of flat-data
+
+- Without error collecting (fail-fast)
+
+``` java
+@Inject
+private Up2Factory<?> factory;
+
+public void test() {
+    // GIVEN Singleton
+    final Up2Mapper<Up2Segment, ?> mapper = factory.build(Up2Segment.class);
+    // WHEN
+    final Up2Segment bean = mapper.map("Data 1", "Data 2", "...", "Data n");
+    // THEN
+    // Here the bean is full-filled automatically 
+}
+```
+
+- Within error collecting
+
+``` java
+@Inject
+private Up2Factory<DynamicType> factory;
+
+public void test() {
+    // GIVEN Singletons
+    final Up2Mapper<Up2Segment, DynamicType> mapper = factory.build(Up2Segment.class);
+    // GIVEN Prototypes
+    final SimpleCollector<DynamicType> handler = new SimpleCollector<>() ;
+    // WHEN
+    final Up2Segment bean = mapper.map(handler, "Data 1", "Data 2", "...", "Data n");
+    final List<SimpleEvent<DynamicType>> errors = handler.toList();
+    // THEN
+    // Here the bean is full-filled automatically
+    // Here the errors is full-filled automatically
+    // ... Persistence or ETL or whatever processing
+}
+```
+
+# Unmapping of java-bean
+
+During the unmapping of java-bean:
+
+- The `Processor API` are not supported for String properties except the default value without modifying the bean.
+- The JSR-303 validation is not enabled automatically because beans maybe be not full-filled with default values,
+  but the validation can be invoked manually
+- The formatting of properties are done with the same annotations for mapping aka `Resolver API`
+- The annotation `@Truncated` is supported
+- When the flag `@Fragment.nullable` is enabled then export of default values is disabled when fragment is `null`
+
+``` java
+@Inject
+private Up2Factory<?> factory;
+
+public void test() {
+    // GIVEN Singleton
+    final Up2Format<Up2Segment, ?> mapper = factory.format(Up2Segment.class);
+    final Up2Segment bean ; // ... full-fill the bean
+    // WHEN
+    final List<? extends IViolationEvent<?>> violations =  mapper.validate(bean); // manual validation
+    final String[] data = mapper.unmap(bean);
+    // THEN
+    // Here the data is full-filled automatically 
+}
 ```
 
 # Annotations
@@ -65,6 +131,8 @@ public Up2Fragment implements Segment {
 
     @Position(1)
     private String lastName;
+    
+    // ...
 }
 ```
 
@@ -77,13 +145,7 @@ Overrides `@Position` of an embeddable property or a super-property defined in s
 Reuse of java beans in order to avoid code duplication
 
 ``` java
-public Up2Segment implements Segment {
-
-    @Position(0)
-    private String firstName;
-
-    @Position(1)
-    private String lastName;
+public Up2Segment extends Up2Fragment {
 
     // Override the positions defined in Up2Fragment 
     @Fragment(2)
@@ -95,6 +157,18 @@ public Up2Segment implements Segment {
     
     @Position(2 + 2 + 2)
     private String other;
+    
+    // ...
+    
+    public static final class Up2Fragment implements Segment {
+        @Position(0)
+        private String firstName;
+    
+        @Position(1)
+        private String lastName;
+        
+        // ...
+    }
 }
 ```
 
@@ -104,7 +178,7 @@ Overrides `@Fragment` of an embeddable fragment or a super-fragment defined in s
 
 ## @Processor API
 
-Up2 Processor API is useful to create configurable processor activated by annotation on fields.
+Up2 Processor API is useful for creating configurable processor activated by annotation on fields.
 
 Up2 Core comes with 3 built-in shortcut annotations:
 
@@ -117,6 +191,8 @@ public Up2Segment implements Segment {
 
     @Position(value = 0, defaultValue = "*")
     private String code;
+    
+    // ...
 }
 ```
 
@@ -128,6 +204,8 @@ public Up2Segment implements Segment {
     @Position(0)
     @Up2Token
     private String code;
+    
+    // ...
 }
 ```
 
@@ -139,6 +217,8 @@ public Up2Segment implements Segment {
     @Position(0)
     @Up2Trim({"", "-", "null", "undefined"}) 
     private String code;
+    
+    // ...
 }
 ```
 
@@ -151,6 +231,8 @@ public Up2Segment implements Segment {
     @Up2Trim({"", "-", "null", "undefined"}) // 2nd order
     @Up2Token // 3rd order
     private String code;
+    
+    // ...
 }
 ```
 
@@ -163,6 +245,8 @@ public Up2Segment implements Segment {
 
     @Position(value = 0, converter = CurrencyConverter.class)
     private CurrencyCodeType currency;
+    
+    // ...
 }
 ```
 
@@ -184,6 +268,8 @@ public Up2Segment implements Segment {
     @Position(0)
     @Up2Boolean(trueValue = "Yes", falseValue = "No")
     private Boolean flag;
+    
+    // ...
 }
 ```
 
@@ -417,6 +503,8 @@ public TestSegment implements Segment {
     @Position(0)
     @Error(value = TU_P_021, severity = FATAL) // for any error caused by this property
     private String code;
+    
+    // ...
 
 }
 ```
@@ -469,6 +557,8 @@ public TestSegment implements Segment {
     @Position(0)
     @Size(min = 1, max = 3, payload = SeverityFatal.class)
     private String code;
+    
+    // ...
 
 }
 ```
@@ -491,6 +581,8 @@ public TestSegment implements Segment {
     @Size(min = 1, max = 3, payload = SeverityFatal.class, groups = Up2Group.class)
     @Size(min = 1, max = 2, payload = SeverityError.class) // Default
     private String code;
+    
+    // ...
 
 }
 ```
@@ -500,15 +592,19 @@ public TestSegment implements Segment {
 `Up2CSV` is able to gathering all events (errors or warnings) and continue
 processing flat-data within fault-tolerance principle.
 
-- [EventHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/EventHandler.java)
+1. [ComplianceHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/ComplianceHandler.java) for validation
+   only
+    - [ComplianceCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/ComplianceCollector.java)
+2. [EventHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/EventHandler.java) for both validation and
+   mapping modes
     - [FastHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/FastHandler.java)
-    - [ComplianceHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/ComplianceHandler.java)
-    - [BusinessHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/BusinessHandler.java)
+3. [BusinessHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/BusinessHandler.java) for all processing
+   modes include import/aggregation
+    - [EventCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/EventCollector.java)
+    - [EventModeCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/EventModeCollector.java)
         - [BusinessCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/BusinessCollector.java)
-            - [SelfBusinessCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/SelfBusinessCollector.java)
         - [PropertyCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/PropertyCollector.java)
-            - [PropertyFailureCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/PropertyFailureCollector.java)
-            - [SelfPropertyCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/SelfPropertyCollector.java)
+        - [PropertyFailureCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/PropertyFailureCollector.java)
 
 ## @Truncated
 
@@ -595,72 +691,6 @@ See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/impl)
 - [@Definition](./src/main/java/io/github/up2jakarta/csv/data/Definition.java) annotation based definition
 - [DataTypeResolver.dynamic()](./src/main/java/io/github/up2jakarta/csv/data/DataTypeResolver.java) for `@Definition`
 - [DataTypeResolver.empty()](./src/main/java/io/github/up2jakarta/csv/data/DataTypeResolver.java) NoOP implementation
-
-# Mapping of flat-data
-
-- Without error collecting (fail-fast)
-
-``` java
-@Inject
-private Up2Factory<?> factory;
-
-public void test() {
-    // GIVEN Singleton
-    final Up2Mapper<Up2Segment, ?> mapper = factory.build(Up2Segment.class);
-    // WHEN
-    final Up2Segment bean = mapper.map("Data 1", "Data 2", "...", "Data n");
-    // THEN
-    // Here the bean is full-filled automatically 
-}
-```
-
-- Within error collecting
-
-``` java
-@Inject
-private Up2Factory<?> factory;
-
-public void process(final MyRecord row) {
-    // GIVEN Singletons
-    final Up2Mapper<Up2Segment, ?> mapper = factory.build(Up2Segment.class);
-    // GIVEN Prototypes
-    final MyCollector handler = new MyCollector<>(row) ;
-    // WHEN
-    final Up2Segment bean = mapper.map(row, handler);
-    final Collection<MyError> errors = handler.toCollection();
-    // THEN
-    // Here the bean is full-filled automatically
-    // Here the errors is full-filled automatically 
-    // ... Persistence or ETL or whateven processing
-}
-```
-
-# Unmapping of java-bean
-
-During the unmapping of java-bean:
-
-- The `Processor API` are not supported for String properties except the default value without modifying the bean.
-- The JSR-303 validation is not enabled automatically because beans maybe be not full-filled with default values,
-  but the validation can be invoked manually
-- The formatting of properties are done with the same annotations for mapping aka `Resolver API`
-- The annotation `@Truncated` is supported
-- When the flag `@Fragment.nullable` is enabled then export of default values is disabled when fragment is `null`
-
-``` java
-@Inject
-private Up2Factory<?> factory;
-
-public void test() {
-    // GIVEN Singleton
-    final Up2Format<Up2Segment, ?> mapper = factory.format(Up2Segment.class);
-    final Up2Segment bean ; // ... full-fill the bean
-    // WHEN
-    final List<IViolationEvent<?>> violations =  mapper.validate(bean); // manual validation
-    final String[] data = mapper.unmap(bean);
-    // THEN
-    // Here the data is full-filled automatically 
-}
-```
 
 # Format API
 

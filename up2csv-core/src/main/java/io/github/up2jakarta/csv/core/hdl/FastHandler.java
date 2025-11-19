@@ -1,13 +1,14 @@
 package io.github.up2jakarta.csv.core.hdl;
 
-import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.api.hdl.EventCode;
+import io.github.up2jakarta.csv.api.hdl.EventLevel;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.SeverityType;
 import jakarta.validation.ConstraintViolation;
 
 /**
  * Input events handler that implements fail-fast technique.
- * It's fails at the first error having severity equals or greater than {@link FastHandler#level}
+ * It's fails at the first error having level equals or greater than {@link FastHandler#level}
  * <p>
  * It's similar to {@link PropertyCollector} but does not collect events.
  * <p>
@@ -21,14 +22,14 @@ public final class FastHandler<D extends DataType<D>> extends EventHandler<D> {
 
     private final int level;
 
-    private FastHandler(SeverityType severity) {
-        this.level = severity.getLevel();
+    private FastHandler(SeverityType level) {
+        this.level = level.getAsInt();
     }
 
     /**
      * Returns a pre-configured handler that throws any error that is greater or equals tho the given level.
      *
-     * @param level the minimal error level
+     * @param level the fast-failure level
      * @param <D>   the business data-type
      * @return an instance that fails at the first error.
      */
@@ -42,27 +43,18 @@ public final class FastHandler<D extends DataType<D>> extends EventHandler<D> {
     }
 
     @Override
-    public void handle(D data, int offset, SeverityType level, String code, Throwable cause) {
-        if (level.getLevel() >= this.level) {
-            throw new FailureException(data, offset, level, code, cause);
+    public void handle(EventLevel level, EventCode code, D data, int offset, Throwable cause) {
+        final SeverityType event = level.get();
+        if (event.getAsInt() >= this.level) {
+            throw new FailureException(data, offset, event, code.get(), cause);
         }
     }
 
     @Override
-    public void handle(D data, int offset, Exception exception, Error config) {
-        final SeverityType type = level(exception, config);
-        if (type.getLevel() >= level) {
-            final String code = code(exception, config);
-            throw new FailureException(data, offset, type, code, exception);
-        }
-    }
-
-    @Override
-    public void handle(D data, Integer offset, ConstraintViolation<?> violation, Error config) {
-        final SeverityType type = level(violation, config);
-        if (type.getLevel() >= level) {
-            final String code = code(violation, config);
-            throw new FailureException(data, offset, type, code, violation.getMessage());
+    public void handle(EventLevel level, EventCode code, D data, Integer offset, ConstraintViolation<?> cause) {
+        final SeverityType event = level.get();
+        if (event.getAsInt() >= this.level) {
+            throw new FailureException(data, offset, event, code.get(), cause.getMessage());
         }
     }
 

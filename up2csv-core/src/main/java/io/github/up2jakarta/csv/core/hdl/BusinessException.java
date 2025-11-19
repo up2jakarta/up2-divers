@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.core.hdl;
 
-import io.github.up2jakarta.xml.api.IException;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.IException;
+import io.github.up2jakarta.lov.SeverityType;
 
 public final class BusinessException implements IException {
 
@@ -18,7 +18,7 @@ public final class BusinessException implements IException {
     }
 
     @Override
-    public SeverityType getSeverity() {
+    public SeverityType getLevel() {
         return level;
     }
 

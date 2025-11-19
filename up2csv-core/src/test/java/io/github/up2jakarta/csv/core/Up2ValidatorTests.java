@@ -4,9 +4,10 @@ import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
 import io.github.up2jakarta.csv.core.BSContext.BVContext;
 import io.github.up2jakarta.csv.core.BSProperty.FProperty;
-import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
+import io.github.up2jakarta.csv.core.misc.lov.CurrencyConverter;
 import io.github.up2jakarta.csv.core.misc.vld.*;
 import io.github.up2jakarta.csv.impl.*;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_CONVERTER;
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
+import static io.github.up2jakarta.csv.api.IEvent.EC_COMPLIANCE;
+import static io.github.up2jakarta.csv.api.IEvent.EC_CONVERTER;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
-import static io.github.up2jakarta.xml.api.SeverityType.*;
+import static io.github.up2jakarta.lov.SeverityType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -49,8 +50,8 @@ class Up2ValidatorTests {
         final InputError error = errors.getFirst();
         assertSame(row, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
-        assertEquals(ERROR, error.getSeverity());
-        assertEquals(ERROR_CONVERTER, error.getCode());
+        assertEquals(ERROR, error.getLevel());
+        assertEquals(EC_CONVERTER, error.getCode());
         assertEquals("No digits found.", error.getMessage());
     }
 
@@ -71,8 +72,8 @@ class Up2ValidatorTests {
         final InputError error = errors.getFirst();
         assertSame(row, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
-        assertEquals(WARNING, error.getSeverity());
-        assertEquals(ERROR_VALIDATOR, error.getCode());
+        assertEquals(WARNING, error.getLevel());
+        assertEquals(EC_COMPLIANCE, error.getCode());
         assertEquals("size must be between 1 and 3", error.getMessage());
     }
 
@@ -93,7 +94,7 @@ class Up2ValidatorTests {
         final InputError error = errors.getFirst();
         assertSame(row, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
-        assertEquals(ERROR, error.getSeverity());
+        assertEquals(ERROR, error.getLevel());
         assertEquals(CurrencyConverter.ISO_4217, error.getCode());
         assertEquals("size must be between 0 and 3", error.getMessage());
     }
@@ -114,11 +115,11 @@ class Up2ValidatorTests {
         for (final InputError error : errors) {
             assertSame(row, error.getKey().getRecord());
             assertTrue(error.getKey().getOrder() >= 0);
-            assertEquals(ERROR_VALIDATOR, error.getCode());
-            if (error.getSeverity() == FATAL) {
+            assertEquals(EC_COMPLIANCE, error.getCode());
+            if (error.getLevel() == FATAL) {
                 assertEquals("must not be empty", error.getMessage());
             } else {
-                assertEquals(WARNING, error.getSeverity());
+                assertEquals(WARNING, error.getLevel());
                 assertEquals("size must be between 1 and 3", error.getMessage());
             }
         }
@@ -132,7 +133,7 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator4Bean bean = mapper.map(row, handler);
-        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
@@ -147,7 +148,7 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator5Bean bean = mapper.map(row, handler);
-        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
@@ -163,7 +164,7 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator6Bean bean = mapper.map(row, handler);
-        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
@@ -179,7 +180,7 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator7Bean bean = mapper.map(row, handler);
-        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
@@ -195,7 +196,7 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator8Bean bean = mapper.map(row, handler);
-        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
@@ -211,7 +212,7 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator9Bean bean = mapper.map(row, handler);
-        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
@@ -227,7 +228,7 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator10Bean bean = mapper.map(row, handler);
-        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
@@ -243,7 +244,7 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator11Bean bean = mapper.map(row, handler);
-        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
@@ -259,7 +260,7 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator12Bean bean = mapper.map(row, handler);
-        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
@@ -275,7 +276,7 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator13Bean bean = mapper.map(row, handler);
-        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
@@ -293,7 +294,7 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator14Bean bean = mapper.map(row, handler);
-        final List<IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());

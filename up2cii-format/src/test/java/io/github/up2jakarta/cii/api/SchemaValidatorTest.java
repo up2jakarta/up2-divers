@@ -1,9 +1,9 @@
 package io.github.up2jakarta.cii.api;
 
 import io.github.up2jakarta.cii.TUConfiguration;
+import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.xml.SchemaValidator;
 import io.github.up2jakarta.xml.api.IValidationError;
-import io.github.up2jakarta.xml.api.SeverityType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +44,10 @@ public class SchemaValidatorTest {
         List<IValidationError> errors = validator.validate(xmlFile);
         assertEquals(1, errors.size());
         final IValidationError error = errors.getFirst();
-        assertEquals(SeverityType.FATAL, error.getSeverity());
+        assertEquals(SeverityType.FATAL, error.getLevel());
         assertEquals(1, error.getLineNumber());
-        assertEquals(1, error.getColumnNumber());
-        assertNotNull(error.getMessage());
+        assertEquals(1, error.getLineOffset());
+        assertEquals("Premature end of file.", error.getMessage());
         assertNotNull(error.getLinkedException());
     }
 
@@ -57,9 +57,9 @@ public class SchemaValidatorTest {
         List<IValidationError> errors = validator.validate(xmlFile);
         assertEquals(1, errors.size());
         final IValidationError error = errors.getFirst();
-        assertEquals(SeverityType.ERROR, error.getSeverity());
+        assertEquals(SeverityType.ERROR, error.getLevel());
         assertEquals(5, error.getLineNumber());
-        assertEquals(22, error.getColumnNumber());
+        assertEquals(22, error.getLineOffset());
         assertNotNull(error.getMessage());
         assertNotNull(error.getLinkedException());
     }
@@ -70,9 +70,9 @@ public class SchemaValidatorTest {
         List<IValidationError> errors = validator.validate(xmlFile);
         assertEquals(1, errors.size());
         final IValidationError error = errors.getFirst();
-        assertEquals(SeverityType.FATAL, error.getSeverity());
+        assertEquals(SeverityType.FATAL, error.getLevel());
         assertEquals(5, error.getLineNumber());
-        assertEquals(21, error.getColumnNumber());
+        assertEquals(21, error.getLineOffset());
         assertNotNull(error.getMessage());
         assertNotNull(error.getLinkedException());
     }

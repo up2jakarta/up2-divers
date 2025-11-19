@@ -1,18 +1,19 @@
 package io.github.up2jakarta.xml.api;
 
-import io.github.up2jakarta.xml.clv.CodeListException;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.SeverityType;
 import jakarta.xml.bind.ValidationEvent;
 
 public class ValidationError implements IValidationError {
 
-    private final SeverityType severity;
+    private final SeverityType level;
     private final ValidationEvent event;
     private final String message;
     private final Throwable linkedException;
 
-    public ValidationError(ValidationEvent event, int severity, MessageEnhancer enhancer) {
+    public ValidationError(ValidationEvent event, int level, MessageEnhancer enhancer) {
         this.event = event;
-        this.severity = SeverityType.of(severity);
+        this.level = SeverityType.of(level);
         final Throwable cause = MessageEnhancer.getCause(event.getLinkedException(), CodeListException.class);
         if (cause == null) {
             this.linkedException = event.getLinkedException();
@@ -24,8 +25,8 @@ public class ValidationError implements IValidationError {
     }
 
     @Override
-    public SeverityType getSeverity() {
-        return severity;
+    public SeverityType getLevel() {
+        return level;
     }
 
     @Override
@@ -39,7 +40,7 @@ public class ValidationError implements IValidationError {
     }
 
     @Override
-    public int getColumnNumber() {
+    public int getLineOffset() {
         return event.getLocator().getColumnNumber();
     }
 

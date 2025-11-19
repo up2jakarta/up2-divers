@@ -35,7 +35,7 @@ public class AUnitTester<R extends IRecord<SegmentType>> {
         for (var it = output.listIterator(); it.hasNext(); ) {
             final R row = it.next();
             final String type = row.getType().getCode();
-            final String[] source = row.getColumns();
+            final String[] source = row.getData();
             final int offset = offset(mode, row.getType());
             if (type.equals(data[mode.getTypeIdIndex()]) && data.length == (source.length + offset)) {
                 for (var i = 0; i < source.length; i++) {

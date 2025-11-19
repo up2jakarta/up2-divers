@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.core.ext;
 
-import io.github.up2jakarta.csv.api.ext.CheckerContext;
-import io.github.up2jakarta.csv.api.ext.SegmentListener;
+import io.github.up2jakarta.csv.api.ext.TypeContext;
+import io.github.up2jakarta.csv.api.ext.TypeListener;
 import io.github.up2jakarta.csv.core.AccessMode;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
@@ -17,14 +17,14 @@ import java.util.List;
  */
 @Named
 @Singleton
-public final class UniqueOffsetChecker implements SegmentListener {
+public final class UniqueOffsetChecker implements TypeListener {
 
     @Override
-    public CheckerContext beforeSegment(AccessMode mode, Class<? extends Segment> type) {
+    public TypeContext beforeSegment(AccessMode mode, Class<? extends Segment> type) {
         return new ContextImpl();
     }
 
-    private static class ContextImpl implements CheckerContext {
+    private static class ContextImpl implements TypeContext {
         private final List<Integer> offsets = new LinkedList<>();
 
         @Override

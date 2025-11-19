@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static io.github.up2jakarta.cii.CII.*;
-import static io.github.up2jakarta.xml.api.SeverityType.FATAL;
+import static io.github.up2jakarta.lov.SeverityType.FATAL;
 import static java.util.Collections.singletonList;
 
 /**

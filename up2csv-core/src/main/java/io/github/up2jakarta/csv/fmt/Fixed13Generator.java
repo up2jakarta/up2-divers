@@ -7,8 +7,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
-import static io.github.up2jakarta.xml.adapters.KeyCoder.decode;
-import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
+import static io.github.up2jakarta.lov.core.Codes.decode;
+import static io.github.up2jakarta.lov.core.Codes.fixed;
 
 /**
  * Simple record-id generator that produces fixed-length of 16 characters.

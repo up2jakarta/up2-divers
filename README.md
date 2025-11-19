@@ -23,7 +23,8 @@ mvn clean install
 2. [Up2CSV Format](./up2csv-format/README.md) Framework for reading and writing business-objects to CSV like format.
 3. [Up2XML Core](./up2xml-core/README.md) Framework for validating, reading and writing XML documents.
 4. [Up2CII Format](./up2cii-format/README.md) Framework for validating, reading and writing CII e-invoicing format.
-5. [Up2Job Core](./up2job-core/README.md) Spring-batch extensions.
+5. [Up2LOV Core](./up2lov-core/README.md) CodeList/LOV (List of values) API .
+6. [Up2Job Core](./up2job-core/README.md) Spring-batch extensions.
 
 ## License
 

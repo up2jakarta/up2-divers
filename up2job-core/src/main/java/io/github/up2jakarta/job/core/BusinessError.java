@@ -1,6 +1,6 @@
 package io.github.up2jakarta.job.core;
 
-import io.github.up2jakarta.xml.clv.CodeList;
+import io.github.up2jakarta.lov.CodeList;
 
 @SuppressWarnings("unused")
 public interface BusinessError<T extends BusinessError<T>> extends CodeList<T> {

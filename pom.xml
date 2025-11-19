@@ -4,7 +4,7 @@
 
     <groupId>io.github.up2jakarta</groupId>
     <artifactId>up2-divers</artifactId>
-    <version>1.5.8</version>
+    <version>1.6.0</version>
     <packaging>pom</packaging>
 
     <name>Up2Jakarta :: Divers</name>
@@ -40,6 +40,7 @@
     </scm>
 
     <modules>
+        <module>up2lov-core</module>
         <module>up2xml-core</module>
         <module>up2csv-core</module>
         <module>up2job-core</module>
@@ -64,27 +65,32 @@
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2cii-format</artifactId>
-                <version>1.5.8</version>
+                <version>1.6.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2csv-core</artifactId>
-                <version>1.5.8</version>
+                <version>1.6.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2csv-format</artifactId>
-                <version>1.5.8</version>
+                <version>1.6.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2job-core</artifactId>
-                <version>1.5.8</version>
+                <version>1.6.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2xml-core</artifactId>
-                <version>1.5.8</version>
+                <version>1.6.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.up2jakarta</groupId>
+                <artifactId>up2lov-core</artifactId>
+                <version>1.6.0</version>
             </dependency>
             <!-- Dependencies -->
             <dependency>
@@ -131,6 +137,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.13.0</version>
                     <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
                         <parameters>true</parameters>
                     </configuration>
                 </plugin>

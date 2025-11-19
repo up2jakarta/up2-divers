@@ -1,7 +1,11 @@
 package io.github.up2jakarta.cii.edi;
 
+import io.github.up2jakarta.cii.Documented;
+import io.github.up2jakarta.cii.core.Agency;
 import io.github.up2jakarta.cii.edi.adapters.ContactTypeCodeAdapter;
-import io.github.up2jakarta.xml.clv.*;
+import io.github.up2jakarta.lov.CodeList;
+import io.github.up2jakarta.lov.Schema;
+import io.github.up2jakarta.lov.SubList;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import javax.annotation.processing.Generated;

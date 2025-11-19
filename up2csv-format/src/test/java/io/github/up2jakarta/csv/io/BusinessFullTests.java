@@ -1,11 +1,11 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.io.impl.InvoiceFullImporter;
 import io.github.up2jakarta.csv.io.impl.InvoiceFullReader;
 import io.github.up2jakarta.csv.io.impl.InvoiceFullWriter;
 import io.github.up2jakarta.csv.io.misc.AFullTests;
 import io.github.up2jakarta.csv.io.misc.InputRecord;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

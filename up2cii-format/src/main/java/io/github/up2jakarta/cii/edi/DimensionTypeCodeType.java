@@ -1,10 +1,10 @@
 package io.github.up2jakarta.cii.edi;
 
+import io.github.up2jakarta.cii.Documented;
+import io.github.up2jakarta.cii.core.Agency;
 import io.github.up2jakarta.cii.edi.adapters.DimensionTypeCodeAdapter;
-import io.github.up2jakarta.xml.clv.Agency;
-import io.github.up2jakarta.xml.clv.CodeList;
-import io.github.up2jakarta.xml.clv.Documented;
-import io.github.up2jakarta.xml.clv.Schema;
+import io.github.up2jakarta.lov.CodeList;
+import io.github.up2jakarta.lov.Schema;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import javax.annotation.processing.Generated;

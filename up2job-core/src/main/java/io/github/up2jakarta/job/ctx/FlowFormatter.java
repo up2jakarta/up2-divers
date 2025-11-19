@@ -9,17 +9,17 @@ public class FlowFormatter {
     // Format
     private static final String FORMAT = "%s exits with (%d) %s(s)";
 
-    private final String severity;
+    private final String level;
 
-    private FlowFormatter(String severity) {
-        this.severity = severity;
+    private FlowFormatter(String level) {
+        this.level = level;
     }
 
     public String format(FlowSource source, long count) {
         if (source == null) {
             source = FlowSource.JOB;
         }
-        return String.format(FORMAT, source.getName(), count, severity);
+        return String.format(FORMAT, source.getName(), count, level);
     }
 
 }

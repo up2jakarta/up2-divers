@@ -1,9 +1,9 @@
 package io.github.up2jakarta.xml;
 
+import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.xml.api.IValidationError;
 import io.github.up2jakarta.xml.api.MessageEnhancer;
 import io.github.up2jakarta.xml.api.SAXParseError;
-import io.github.up2jakarta.xml.api.SeverityType;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 
@@ -36,8 +36,8 @@ public class SchemaCollector implements ErrorHandler {
         handle(SeverityType.FATAL, ex);
     }
 
-    protected void handle(SeverityType iErrorLevel, SAXParseException e) {
-        errors.add(new SAXParseError(iErrorLevel, e, enhancer));
+    protected void handle(SeverityType level, SAXParseException e) {
+        errors.add(new SAXParseError(level, e, enhancer));
     }
 
     public List<IValidationError> getErrors() {

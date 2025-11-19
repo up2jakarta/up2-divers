@@ -1,6 +1,5 @@
 package io.github.up2jakarta.job.csv;
 
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.data.Up2Result;
@@ -12,6 +11,7 @@ import io.github.up2jakarta.job.csv.impl.unit.InputError;
 import io.github.up2jakarta.job.csv.impl.unit.InvoiceImporter;
 import io.github.up2jakarta.job.csv.impl.unit.InvoiceReader;
 import io.github.up2jakarta.job.csv.impl.unit.InvoiceWriter;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;

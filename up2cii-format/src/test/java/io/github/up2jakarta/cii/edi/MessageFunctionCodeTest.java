@@ -3,10 +3,10 @@ package io.github.up2jakarta.cii.edi;
 import io.github.up2jakarta.cii.TUConfiguration;
 import io.github.up2jakarta.cii.api.CodeAdapterTest;
 import io.github.up2jakarta.cii.format.standard.ram.ExchangedDocumentType;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.xml.api.IValidationError;
-import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.api.XValidationException;
-import io.github.up2jakarta.xml.clv.CodeListException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +57,9 @@ public class MessageFunctionCodeTest extends CodeAdapterTest {
         assertEquals(1, errors.size());
         {
             final IValidationError error = errors.getFirst();
-            assertEquals(SeverityType.ERROR, error.getSeverity());
+            assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(17, error.getLineNumber());
-            assertEquals(47, error.getColumnNumber());
+            assertEquals(47, error.getLineOffset());
             assertEquals("ECE-1225: Unknown value [???] for CodeList[MessageFunctionCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());

@@ -4,12 +4,13 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IFastRecord;
 import io.github.up2jakarta.csv.api.IFullRecord;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.api.hdl.ISelfEvent;
-import io.github.up2jakarta.csv.api.hdl.ISelfRecord;
+import io.github.up2jakarta.csv.api.hdl.IMutualRecord;
 import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.*;
 import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
 import io.github.up2jakarta.csv.core.hdl.PropertyFailureCollector;
+import io.github.up2jakarta.csv.data.IMutual;
+import io.github.up2jakarta.csv.data.Up2ListParser;
 import io.github.up2jakarta.csv.fmt.Fixed06Generator;
 import io.github.up2jakarta.csv.fmt.FullRecord;
 import io.github.up2jakarta.csv.fmt.UnitRecord;
@@ -18,8 +19,9 @@ import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
 import io.github.up2jakarta.csv.impl.dto.Item;
-import io.github.up2jakarta.xml.api.PropertyException;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.PropertyException;
+import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.core.BeanException;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -33,15 +35,17 @@ import static io.github.up2jakarta.csv.fmt.Fixed06Generator.FV_SM;
 import static io.github.up2jakarta.csv.fmt.misc.ABusinessTest.assertValid;
 import static io.github.up2jakarta.csv.impl.GroupType.D001;
 import static io.github.up2jakarta.csv.impl.SegmentType.S01;
-import static io.github.up2jakarta.csv.impl.SegmentType.S90;
-import static io.github.up2jakarta.xml.adapters.KeyCoder.encodeInt;
-import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
+import static io.github.up2jakarta.csv.impl.SegmentType.S09;
+import static io.github.up2jakarta.lov.DefaultProvider.values;
+import static io.github.up2jakarta.lov.core.Codes.encodeInt;
+import static io.github.up2jakarta.lov.core.Codes.fixed;
 import static java.util.Arrays.copyOfRange;
 import static org.junit.jupiter.api.Assertions.*;
 
 public final class Tests {
 
     public static final String ERROR_CODE = "TU-V001";
+    public static final Up2ListParser<SegmentType> PARSER = new Up2ListParser<>(SegmentType.class, values(S01));
 
     public static final String[][] FAST_INVOICE = {
             new String[]{"01", "TU2025R0099", "2025-03-12", "120", "100", "20"},
@@ -88,13 +92,13 @@ public final class Tests {
 
     private static SegmentType type(String code, SegmentType target) {
         if ("90".equals(code)) {
-            return S90;
+            return S09;
         }
         if (target == S01) {
-            return SegmentType.valueOf('S' + code);
+            return PARSER.parse(code);
         }
-        final char[] result = new char[]{'S', target.getCode().charAt(0), code.charAt(1)};
-        return SegmentType.valueOf(new String(result));
+        final char[] result = new char[]{target.getCode().charAt(0), code.charAt(1)};
+        return PARSER.parse(new String(result));
     }
 
     private static String[] columns(ModeType mode, SegmentType type, final String[] data) {
@@ -145,7 +149,7 @@ public final class Tests {
     }
 
     public static int offset(ModeType mode, SegmentType type) {
-        if (type.getBusinessType() == D001 && !type.getClassType().isAnnotationPresent(Truncated.class)) {
+        if (type.getDataType() == D001 && !type.getClassType().isAnnotationPresent(Truncated.class)) {
             // keep the invoice key for roots
             return mode.getBeanIdIndex();
         }
@@ -230,13 +234,13 @@ public final class Tests {
         tc.assertEmpty();
     }
 
-    public static class TUCollector extends PropertyFailureCollector<TURecord, GroupType, TUError> {
+    public static class TUCollector extends PropertyFailureCollector<GroupType, TURecord, TUError> {
         public TUCollector(TURecord row) {
             super(row, TUError::new, SeverityType.FATAL);
         }
     }
 
-    public static class TURecord extends FullRecord<SegmentType, String> implements ISelfRecord<GroupType, SegmentType, TUError, TURecord> {
+    public static class TURecord extends FullRecord<SegmentType, String> implements IMutualRecord<TUError, TURecord> {
 
         private final List<TUError> errors = new LinkedList<>();
 
@@ -251,12 +255,12 @@ public final class Tests {
         }
 
         @Override
-        public List<TUError> getErrors() {
+        public List<TUError> getEvents() {
             return errors;
         }
     }
 
-    public static class TUError extends PropertyEvent<GroupType, TURecord> implements ISelfEvent<GroupType, TURecord, TUError> {
+    public static class TUError extends PropertyEvent<GroupType, TURecord> implements IMutual<TURecord, TUError> {
 
         public TUError(TURecord row, Integer offset, GroupType type, PropertyException cause) {
             super(row, offset, type, cause);

@@ -1,13 +1,12 @@
 package io.github.up2jakarta.csv.cfg;
 
-import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.prc.DefaultProcessor;
-import io.github.up2jakarta.xml.api.TypeConverter;
+import io.github.up2jakarta.lov.core.StringAdapter;
 
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports the index of data in {@link io.github.up2jakarta.csv.api.IRecord#getColumns()}.
+ * Up2 Annotation that supports the index of data in {@link io.github.up2jakarta.csv.api.IRecord#getData()}.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -16,18 +15,19 @@ import java.lang.annotation.*;
 public @interface Position {
 
     /**
-     * The column offset in the input row that is being mapped automatically.
+     * The column offset in the input record that is being mapped automatically.
      *
      * @return the column offset
      */
     int value();
 
     /**
-     * The converter must be managed by {@link BeanContext}
+     * This configuration always takes precedence over the annotation on the property level because
+     * {@link PositionOverride}, by default is <code>undefined</code>.
      *
-     * @return the class of the processor
+     * @return the configuration of property converter
      */
-    Class<? extends TypeConverter<?>> converter() default NaN.class;
+    Up2Converter converter() default @Up2Converter(StringAdapter.class);
 
     /**
      * @return the default value, by default is <code>null</code>
@@ -73,25 +73,5 @@ public @interface Position {
      * @return the nullable flag
      */
     boolean required() default false;
-
-    /**
-     * Undefined implementation used only as default value for Position.
-     */
-    final class NaN extends TypeConverter<Void> {
-
-        private NaN() {
-            super(void.class, null, null);
-        }
-
-        @Override
-        public Void parse(String value) {
-            return null;
-        }
-
-        @Override
-        public String format(Void value) {
-            return null;
-        }
-    }
 
 }

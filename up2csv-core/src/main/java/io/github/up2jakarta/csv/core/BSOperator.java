@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.cfg.Truncated;
+import io.github.up2jakarta.csv.core.BSBuilder.EP;
+import io.github.up2jakarta.csv.core.BSBuilder.ST;
 import io.github.up2jakarta.csv.core.BSNode.BFNode;
 import io.github.up2jakarta.csv.core.BSNode.BPNode;
 import io.github.up2jakarta.csv.core.BSOperator.Computer;
@@ -13,12 +13,14 @@ import io.github.up2jakarta.csv.core.BSProperty.PAccessor;
 import io.github.up2jakarta.csv.core.BSProperty.PAccessor.PPAccessor.PNAccessor;
 import io.github.up2jakarta.csv.core.BSProperty.PProperty;
 import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
-import io.github.up2jakarta.csv.core.hdl.EventHandler;
 import io.github.up2jakarta.csv.data.*;
 import io.github.up2jakarta.csv.slv.CodeListResolver;
-import io.github.up2jakarta.xml.api.Wrapper;
+import io.github.up2jakarta.lov.IException;
+import io.github.up2jakarta.lov.core.*;
 import jakarta.validation.Validator;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -34,8 +36,7 @@ import static io.github.up2jakarta.csv.core.BSOperator.Computer.BSFormat;
 import static io.github.up2jakarta.csv.core.BSOperator.Computer.BSMapper;
 import static io.github.up2jakarta.csv.core.ext.Beans.*;
 import static io.github.up2jakarta.csv.core.ext.PPath.getOverride;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
+import static java.util.Collections.*;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
@@ -53,10 +54,10 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
     final Map<IType<B, I>, Set<I>> joins;
     final BAccessor<Segment, Object> bid;
 
-    BSOperator(Up2Factory<B> factory, Class<?> type, ModeType mode, I root, I[] nodes) throws BeanException {
+    BSOperator(Up2Factory<B> factory, Class<?> type, ModeType mode, I root, List<I> nodes) throws BeanException {
         requireNonNull(factory, "factory is required");
         requireNonNull(root, "root is required");
-        this.nodes = List.of(nodes);
+        this.nodes = unmodifiableList(nodes);
         CodeListResolver.checkUnique(type, this.nodes);
         if (!type.equals(root.getClassType())) {
             throw new BeanException(type, "Invalid business typing");
@@ -83,7 +84,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
         this.mappers = this.joins(root, source.mappers);
     }
 
-    private static int offset(Processor<?, ?, ?> mapper, ModeType mode) throws BeanException {
+    private static int offset(BProcessor<?, ?, ?> mapper, ModeType mode) throws BeanException {
         final int min = mode.getBeanIdIndex();
         if (mapper.offset != 0) {
             if (mapper.offset < min) {
@@ -114,7 +115,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             if (rn.holds(node)) {
                 if (cp.contains(node)) {
                     final String p = cp.stream().map(i -> getTypeName(i.getClassType())).collect(joining(" > "));
-                    throw new BeanException(node.getClass(), node.getCode(), "cyclic segment is not allowed: " + p);
+                    throw new BeanException(rn.getClass(), rn.getCode(), "cyclic segment is not allowed: " + p);
                 }
                 children.add(node);
                 final Map<IType<B, I>, P> mappers = this.joins(cp, node, cb);
@@ -131,12 +132,12 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
     /**
      * Internal Segment Processor.
      */
-    abstract sealed static class Processor<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> permits Up2Mapper, Up2Format, Computer {
+    abstract sealed static class BProcessor<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> implements EP permits Up2Mapper, Up2Format, Computer {
         final int length;
         final int offset;
         final T node;
 
-        Processor(T node) throws BeanException {
+        BProcessor(T node) throws BeanException {
             this.node = node;
             this.length = max(node) + 1;
             final Truncated truncated = getOverride(node.type, Truncated.class);
@@ -179,6 +180,8 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
      * Internal Business Factory.
      */
     static sealed abstract class Factory permits Up2Factory {
+        private static final List<String> CN_ENTRIES = getPermittedTypes(EP.class).toList();
+        private static final List<String> EXCLUSIONS = getPermittedTypes(EP.class, ST.class, Beans.class).toList();
 
         final BeanContext context;
         final Validator validator;
@@ -186,6 +189,52 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
         Factory(BeanContext context, Validator validator) {
             this.validator = requireNonNull(validator);
             this.context = requireNonNull(context);
+        }
+
+        /**
+         * Builds and returns the stack trace of the cause of the specified event.
+         *
+         * @param event the source event
+         * @return the stack-trace if exists
+         */
+        public static Optional<String> trace(IException event) {
+            while (event.getCause() instanceof IException cause) {
+                event = cause;
+            }
+            return Optional.ofNullable(event.getCause()).map(c -> stackTrace(CN_ENTRIES, c).trim());
+        }
+
+        /**
+         * Returns the stack trace of the specified <code>cause</code> exception.
+         * <p>
+         * Notes that the stack elements will be truncated from the given <code>cns</code> entry-point class names
+         *
+         * @param cause       the cause exception
+         * @param entryPoints the list class names of entry-points
+         * @return the stack trace
+         */
+        public static String stackTrace(List<String> entryPoints, Throwable cause) {
+            final StringWriter writer = new StringWriter();
+            stackTrace(entryPoints, cause, "", new PrintWriter(writer));
+            return writer.toString();
+        }
+
+        private static void stackTrace(List<String> cns, Throwable cause, String prefix, PrintWriter printer) {
+            printer.println(prefix + cause);
+            final StackTraceElement[] traces = cause.getStackTrace();
+            for (final StackTraceElement element : traces) {
+                final String cn = element.getClassName();
+                if (!EXCLUSIONS.contains(cn)) {
+                    printer.println("\t" + element);
+                }
+                if (cns.contains(cn)) {
+                    break;
+                }
+            }
+            cause = cause.getCause();
+            if (cause != null) {
+                stackTrace(cns, cause, "Caused by ", printer);
+            }
         }
 
         <S extends Segment, B extends DataType<B>> BSMapper<S, B> build(DataTypeResolver<B> dr, Class<S> type) throws BeanException {
@@ -200,7 +249,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
     /**
      * Internal Business Processor.
      */
-    static abstract sealed class Computer<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> extends Processor<S, D, T> permits BSMapper, BSFormat {
+    static abstract sealed class Computer<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> extends BProcessor<S, D, T> permits BSMapper, BSFormat {
         final BAccessor<Segment, Object> businessId;
         final boolean hasBusinessId;
 
@@ -243,15 +292,12 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
                 this.hasParentId = parentId.supports(RO);
             }
 
-            <R extends IRecord<?>, E extends IEvent<D>> S map(R r, int o, boolean v, BusinessHandler<R, D, E, ?> h) {
-                if (r == null || r.getColumns() == null) {
-                    return null;
+            <R extends IRecord<?>> S map(R r, int o, boolean v, BusinessHandler<D> h) {
+                var data = r.getData();
+                if (data == null) {
+                    data = new String[0];
                 }
-                if (h.getSource() != r) {
-                    throw new AccessException(EventHandler.class, "source", "does not match with the specified record");
-                }
-                requireNonNull(h, "handler is required");
-                final S bean = node.parse(h, o, r.getColumns());
+                final S bean = node.parse(h, o, data);
                 node.update(bean, r);
                 if (v) {
                     node.validate(bean, o, h);
@@ -264,7 +310,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
     /**
      * Internal Business ID Accessor.
      */
-    abstract sealed static class BAccessor<S extends Segment, K> permits BOAccessor, BUAccessor, BRAccessor, BPAccessor {
+    abstract sealed static class BAccessor<S extends Segment, K> implements EP permits BOAccessor, BUAccessor, BRAccessor, BPAccessor {
         private final Class<K> type;
         private final String locator;
 

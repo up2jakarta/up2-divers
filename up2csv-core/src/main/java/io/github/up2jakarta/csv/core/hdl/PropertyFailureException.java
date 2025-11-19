@@ -6,8 +6,8 @@ import io.github.up2jakarta.csv.api.hdl.IPropertyEvent;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Listable;
-import io.github.up2jakarta.xml.api.PropertyException;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.PropertyException;
+import io.github.up2jakarta.lov.SeverityType;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -27,7 +27,7 @@ public class PropertyFailureException extends FailureException implements Listab
     private final List<IEvent<?>> events;
 
     PropertyFailureException(DataType<?> type, Integer offset, PropertyException cause, List<? extends IEvent<?>> events) {
-        super(type, offset, cause.getSeverity(), cause.getCode(), cause);
+        super(type, offset, cause.getLevel(), cause.getCode(), cause);
         this.events = List.copyOf(events);
     }
 
@@ -35,8 +35,8 @@ public class PropertyFailureException extends FailureException implements Listab
         println.accept("Multiple events have been occurred:");
         var i = 0;
         for (final IEvent<?> event : events) {
-            final String type = (event.getSeverity() == SeverityType.WARNING) ? "warning" : "error";
-            println.accept(String.format(ERROR, ++i, event.getOffset(), type, event.getCode(), event.getMessage()));
+            final String name = (event.getLevel() == SeverityType.WARNING) ? "warning" : "error";
+            println.accept(String.format(ERROR, ++i, event.getOffset(), name, event.getCode(), event.getMessage()));
             if (event instanceof IBusinessEvent<?, ?, ?> t && t.getTrace() != null) {
                 println.accept(t.getTrace());
             } else if (event instanceof IPropertyEvent<?, ?> c) {

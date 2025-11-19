@@ -7,8 +7,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
-import static io.github.up2jakarta.xml.adapters.KeyCoder.decodeInt;
-import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
+import static io.github.up2jakarta.lov.core.Codes.decodeInt;
+import static io.github.up2jakarta.lov.core.Codes.fixed;
 
 /**
  * Simple record-id generator that produces fixed-length of 8 characters.

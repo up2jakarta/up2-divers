@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.core.misc.cvr;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2CodeList;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.clv.CodeList;
+import io.github.up2jakarta.lov.CodeList;
 
 @SuppressWarnings("unused")
 public class Test3Resolver implements Segment {

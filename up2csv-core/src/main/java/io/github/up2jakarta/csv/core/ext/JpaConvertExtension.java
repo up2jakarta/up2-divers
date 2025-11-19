@@ -1,11 +1,9 @@
 package io.github.up2jakarta.csv.core.ext;
 
-import io.github.up2jakarta.csv.api.ext.Conversion;
-import io.github.up2jakarta.csv.api.ext.ConversionExtension;
-import io.github.up2jakarta.csv.api.ext.ConversionResolver;
-import io.github.up2jakarta.csv.cfg.Error;
-import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.csv.api.ext.TypeExtension;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.TypeAdapter;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -29,14 +27,14 @@ import static java.util.Arrays.stream;
  */
 @Named
 @Singleton
-public final class JpaConvertExtension extends ConversionExtension<Entity, Convert> {
+@SuppressWarnings("unchecked")
+public final class JpaConvertExtension extends TypeExtension<Entity, Convert> {
 
     @Inject
     JpaConvertExtension() {
         super(Entity.class);
     }
 
-    @SuppressWarnings("unchecked")
     private void check(Field p, Class<?> type, Convert jpa) throws BeanException {
         if (!AttributeConverter.class.isAssignableFrom(jpa.converter())) {
             throw new BeanException(p, "@Convert[converter] must extends AttributeConverter");
@@ -49,7 +47,6 @@ public final class JpaConvertExtension extends ConversionExtension<Entity, Conve
         }
     }
 
-    @SuppressWarnings("unchecked")
     private Optional<Convert> from(Class<? extends Segment> st, Field field, Class<?> type) throws BeanException {
         final Convert result = this.from(st, field.getName());
         if (result != null) {
@@ -99,12 +96,13 @@ public final class JpaConvertExtension extends ConversionExtension<Entity, Conve
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <V> Conversion<V> resolve(Field property, Class<V> type, Convert config) throws BeanException {
+    public <V> TypeAdapter<V> resolve(Field property, Class<V> type, Convert config) throws BeanException {
         final Class<? extends AttributeConverter<V, String>> converterType = config.converter();
-        final Optional<Error> error = ConversionResolver.getError(property, type);
-        final AttributeConverter<V, String> converter = this.getBean(converterType);
-        return new Conversion<>(type, converter::convertToEntityAttribute, converter::convertToDatabaseColumn, error);
+        final AttributeConverter<V, String> converter = this.getBean(converterType, "");
+        if (converter instanceof TypeAdapter<?> pa) {
+            return (TypeAdapter<V>) pa;
+        }
+        return new JpaWrapper<>(type, converter);
     }
 
 }

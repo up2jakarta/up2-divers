@@ -1,12 +1,11 @@
 package io.github.up2jakarta.csv.cfg;
 
-import io.github.up2jakarta.csv.api.ext.Conversion;
 import io.github.up2jakarta.csv.slv.Base64Resolver;
 
 import java.lang.annotation.*;
 
 /**
- * Up2 {@link Conversion} resolver that Base64 {@link Byte[]} types.
+ * Up2 {@link io.github.up2jakarta.lov.TypeAdapter} resolver that Base64 {@link Byte[]} types.
  *
  * @see java.util.Base64#getDecoder()
  */

@@ -6,12 +6,19 @@ import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.api.hdl.*;
 import io.github.up2jakarta.csv.core.*;
-import io.github.up2jakarta.csv.core.hdl.*;
+import io.github.up2jakarta.csv.core.hdl.BusinessCollector;
+import io.github.up2jakarta.csv.core.hdl.PropertyCollector;
+import io.github.up2jakarta.csv.core.hdl.PropertyFailureCollector;
 import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.IMutual;
 import io.github.up2jakarta.csv.data.Identifiable;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.fmt.*;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.DefaultProvider;
+import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.core.BeanException;
+
+import java.util.List;
 
 /**
  * Base Business builder with provided {@link Up2Factory}.
@@ -19,7 +26,6 @@ import io.github.up2jakarta.xml.api.SeverityType;
  * @param <B> the business data type
  */
 public class BusinessBuilder<B extends DataType<B>> {
-
     public static final SeverityType MAX_LEVEL = SeverityType.FATAL;
 
     private final Up2Factory<B> factory;
@@ -62,7 +68,6 @@ public class BusinessBuilder<B extends DataType<B>> {
     }
 
     public final class UnitBuilder<T extends Segment> {
-
         private final Class<T> type;
 
         private UnitBuilder(Class<T> type) {
@@ -70,37 +75,35 @@ public class BusinessBuilder<B extends DataType<B>> {
         }
 
         /**
-         * Creates new preconfigured builder for full processor aka segregation and aggregation.
+         * Creates new preconfigured builder for import and export processing.
          *
-         * @param rootType  the root node related to business-object type
-         * @param nodeTypes the list of nodes
-         * @param <I>       the segment type
+         * @param root  the root node related to business-object type
+         * @param nodes the list of nodes
+         * @param <I>   the input segment type
          * @return new preconfigured final builder
          */
-        public <I extends IType<B, I>> FinalBuilder<I> build(I rootType, I[] nodeTypes) {
-            return new FinalBuilder<>(rootType, nodeTypes);
+        public <I extends IType<B, I>> FinalBuilder<I> build(I root, List<I> nodes) {
+            return new FinalBuilder<>(root, nodes);
         }
 
         /**
-         * Creates new preconfigured builder for full processor aka segregation and aggregation.
+         * Creates new preconfigured builder for import and export processing.
          *
-         * @param rootType the root node related to business-object type
-         * @param <I>      the segment type
+         * @param root the root node related to business-object type
+         * @param <I>  the input segment type
          * @return new preconfigured final builder
          */
-        @SuppressWarnings("unchecked")
-        public <I extends Enum<I> & IType<B, I>> FinalBuilder<I> build(I rootType) {
-            return this.build(rootType, ((Class<I>) rootType.getClass()).getEnumConstants());
+        public <I extends IType<B, I>> FinalBuilder<I> build(I root) {
+            return this.build(root, DefaultProvider.values(root));
         }
 
         public final class FinalBuilder<I extends IType<B, I>> {
+            private final I root;
+            private final List<I> nodes;
 
-            private final I rootType;
-            private final I[] nodeTypes;
-
-            private FinalBuilder(I rootType, I[] nodeTypes) {
-                this.rootType = rootType;
-                this.nodeTypes = nodeTypes;
+            private FinalBuilder(I root, List<I> nodes) {
+                this.root = root;
+                this.nodes = nodes;
             }
 
             /**
@@ -110,98 +113,104 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @throws BeanException for any missing or wrong java-beans configuration
              */
             public SimpleUnitExporter<T, B, I> format() throws BeanException {
-                return new SimpleUnitExporter<>(factory, type, rootType, nodeTypes);
+                return new SimpleUnitExporter<>(factory, type, root, nodes);
             }
 
             /**
-             * Creates new preconfigured instance for {@link SimpleUnitImporter} with default fast-failure severity.
+             * Creates new preconfigured instance for {@link SimpleUnitImporter}.
              *
              * @return new simple unit-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
             public SimpleUnitImporter<T, B, I> build() throws BeanException {
-                return new SimpleUnitImporter<>(factory, type, rootType, nodeTypes);
+                return new SimpleUnitImporter<>(factory, type, root, nodes);
             }
 
             /**
-             * Creates new preconfigured instance for {@link UnitImporter} with the given fast-failure severity.
+             * Creates new preconfigured instance for {@link UnitImporter} with the specified event-creator.
              *
-             * @param creator   the error creator
-             * @param failLevel the fast-failure severity
+             * @param creator the event creator
              * @return new unit-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IRecord<I>, E extends IPropertyEvent<R, B>> UnitImporter<B, I, T, R, E> build(IPropertyCreator<R, B, E> creator, SeverityType failLevel) throws BeanException {
-                if (failLevel == null) {
-                    return new UnitImporter<>(factory, type, rootType, nodeTypes) {
-                        @Override
-                        protected PropertyCollector<R, B, E> create(R row) {
-                            return new PropertyCollector<>(row, creator);
-                        }
-                    };
-                }
-                return new UnitImporter<>(factory, type, rootType, nodeTypes) {
+            public <R extends IRecord<I>, E extends IPropertyEvent<B, R>> UnitImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator) throws BeanException {
+                return new UnitImporter<>(factory, type, root, nodes) {
                     @Override
-                    protected PropertyCollector<R, B, E> create(R row) {
-                        return new PropertyFailureCollector<>(row, creator, failLevel);
+                    protected PropertyCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new PropertyCollector.Builder<>(size, creator);
                     }
                 };
             }
 
             /**
-             * Creates new preconfigured instance for {@link UnitImporter} with the given fast-failure severity.
+             * Creates new preconfigured instance for {@link UnitImporter} with the specified fast-failure level.
              *
-             * @param creator the error creator
+             * @param creator the event creator
+             * @param level   the fast-failure level
              * @return new unit-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends ISelfRecord<B, I, E, R>, E extends IPropertyEvent<R, B> & ISelfEvent<B, R, E>> UnitImporter<B, I, T, R, E> build(IPropertyCreator<R, B, E> creator) throws BeanException {
-                return new UnitImporter<>(factory, type, rootType, nodeTypes) {
+            public <R extends IRecord<I>, E extends IPropertyEvent<B, R>> UnitImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator, SeverityType level) throws BeanException {
+                return new UnitImporter<>(factory, type, root, nodes) {
                     @Override
-                    protected SelfPropertyCollector<B, R, E> create(R row) {
-                        return new SelfPropertyCollector<>(row, creator);
+                    protected PropertyFailureCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new PropertyFailureCollector.Builder<>(size, creator, level);
                     }
                 };
             }
 
             /**
-             * Creates new preconfigured instance for {@link UnitImporter} with the given creator and repository.
+             * Creates new preconfigured instance for {@link UnitImporter} with the specified event-creator.
              *
-             * @param creator the error creator
+             * @param creator the event creator
+             * @return new unit-importer
+             * @throws BeanException for any missing or wrong java-beans configuration
+             */
+            public <R extends IRecord<I> & IMutualRecord<E, R>, E extends IPropertyEvent<B, R> & IMutual<R, E>> UnitImporter<B, I, T, R, E> build(IMutualPropertyCreator<B, R, E> creator) throws BeanException {
+                return new UnitImporter<>(factory, type, root, nodes) {
+                    @Override
+                    protected PropertyCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new PropertyCollector.Builder<>(size, creator);
+                    }
+                };
+            }
+
+            /**
+             * Creates new preconfigured instance for {@link UnitImporter} with the specified event-creator.
+             *
+             * @param creator the event creator
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IRecord<I> & ISelfRecord<B, I, E, R> & Identifiable<?>, E extends IBusinessEvent<B, R, ?> & ISelfEvent<B, R, E>> UnitImporter<B, I, T, R, E> build(IBusinessCreator<B, R, E> creator) throws BeanException {
-                return new UnitImporter<>(factory, type, rootType, nodeTypes) {
+            public <R extends IRecord<I> & IMutualRecord<E, R> & Identifiable<?>, E extends IBusinessEvent<B, R, ?> & IMutual<R, E>> UnitImporter<B, I, T, R, E> build(IMutualBusinessCreator<B, R, E> creator) throws BeanException {
+                return new UnitImporter<>(factory, type, root, nodes) {
                     @Override
-                    protected SelfBusinessCollector<B, R, E> create(R row) {
-                        return new SelfBusinessCollector<>(row, creator, (r) -> 0);
+                    protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new BusinessCollector.Builder<>(size, creator, (r) -> 0);
                     }
                 };
             }
 
             /**
-             * Creates new preconfigured instance for {@link UnitImporter} with the given creator and repository.
+             * Creates new preconfigured instance for {@link UnitImporter} with the specified event-creator and repository.
              *
-             * @param creator    the error creator
-             * @param repository the error-order initial-value finder
+             * @param creator    the event creator
+             * @param repository the max-order finder to be used as initial value for {@link IBusinessEvent} key-order
              * @return new unit-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
             public <R extends IRecord<I> & Identifiable<?>, E extends IBusinessEvent<B, R, ?>> UnitImporter<B, I, T, R, E> build(IBusinessCreator<B, R, E> creator, IBusinessRepository<R> repository) throws BeanException {
-                return new UnitImporter<>(factory, type, rootType, nodeTypes) {
+                return new UnitImporter<>(factory, type, root, nodes) {
                     @Override
-                    protected BusinessCollector<B, R, E> create(R row) {
-                        return new BusinessCollector<>(row, creator, repository);
+                    protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new BusinessCollector.Builder<>(size, creator, repository);
                     }
                 };
             }
-
         }
     }
 
     public final class FastBuilder<T extends Segment> {
-
         private final Class<T> type;
 
         private FastBuilder(Class<T> type) {
@@ -209,37 +218,35 @@ public class BusinessBuilder<B extends DataType<B>> {
         }
 
         /**
-         * Creates new preconfigured builder for full processor aka segregation and aggregation.
+         * Creates new preconfigured builder for import and export processing.
          *
-         * @param rootType  the root node related to business-object type
-         * @param nodeTypes the list of nodes
-         * @param <I>       the segment type
+         * @param root  the root node related to business-object type
+         * @param nodes the list of nodes
+         * @param <I>   the input segment type
          * @return new preconfigured final builder
          */
-        public <I extends IType<B, I>> FinalBuilder<I> build(I rootType, I[] nodeTypes) {
-            return new FinalBuilder<>(rootType, nodeTypes);
+        public <I extends IType<B, I>> FinalBuilder<I> build(I root, List<I> nodes) {
+            return new FinalBuilder<>(root, nodes);
         }
 
         /**
-         * Creates new preconfigured builder for full processor aka segregation and aggregation.
+         * Creates new preconfigured builder for import and export processing.
          *
-         * @param rootType the root node related to business-object type
-         * @param <I>      the segment type
+         * @param root the root node related to business-object type
+         * @param <I>  the input segment type
          * @return new preconfigured final builder
          */
-        @SuppressWarnings("unchecked")
-        public <I extends Enum<I> & IType<B, I>> FinalBuilder<I> build(I rootType) {
-            return this.build(rootType, ((Class<I>) rootType.getClass()).getEnumConstants());
+        public <I extends IType<B, I>> FinalBuilder<I> build(I root) {
+            return this.build(root, DefaultProvider.values(root));
         }
 
         public final class FinalBuilder<I extends IType<B, I>> {
+            private final I root;
+            private final List<I> nodes;
 
-            private final I rootType;
-            private final I[] nodeTypes;
-
-            private FinalBuilder(I rootType, I[] nodeTypes) {
-                this.rootType = rootType;
-                this.nodeTypes = nodeTypes;
+            private FinalBuilder(I root, List<I> nodes) {
+                this.root = root;
+                this.nodes = nodes;
             }
 
             /**
@@ -249,98 +256,104 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @throws BeanException for any missing or wrong java-beans configuration
              */
             public SimpleFastExporter<T, B, I> format() throws BeanException {
-                return new SimpleFastExporter<>(factory, type, rootType, nodeTypes);
+                return new SimpleFastExporter<>(factory, type, root, nodes);
             }
 
             /**
-             * Creates new preconfigured instance for {@link SimpleFastImporter} with default fast-failure severity.
+             * Creates new preconfigured instance for {@link SimpleFastImporter}.
              *
              * @return new simple fast-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
             public SimpleFastImporter<T, B, I> build() throws BeanException {
-                return new SimpleFastImporter<>(factory, type, rootType, nodeTypes);
+                return new SimpleFastImporter<>(factory, type, root, nodes);
             }
 
             /**
-             * Creates new preconfigured instance for {@link FastImporter} with the given fast-failure severity.
+             * Creates new preconfigured instance for {@link FastImporter} with the specified event-creator.
              *
-             * @param creator   the error creator
-             * @param failLevel the fast-failure severity
+             * @param creator the event creator
              * @return new fast-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFastRecord<I, ?>, E extends IPropertyEvent<R, B>> FastImporter<B, I, T, R, E> build(IPropertyCreator<R, B, E> creator, SeverityType failLevel) throws BeanException {
-                if (failLevel == null) {
-                    return new FastImporter<>(factory, type, rootType, nodeTypes) {
-                        @Override
-                        protected PropertyCollector<R, B, E> create(R row) {
-                            return new PropertyCollector<>(row, creator);
-                        }
-                    };
-                }
-                return new FastImporter<>(factory, type, rootType, nodeTypes) {
+            public <R extends IFastRecord<I, ?>, E extends IPropertyEvent<B, R>> FastImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator) throws BeanException {
+                return new FastImporter<>(factory, type, root, nodes) {
                     @Override
-                    protected PropertyCollector<R, B, E> create(R row) {
-                        return new PropertyFailureCollector<>(row, creator, failLevel);
+                    protected PropertyCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new PropertyCollector.Builder<>(size, creator);
                     }
                 };
             }
 
             /**
-             * Creates new preconfigured instance for {@link FastImporter} with default fast-failure severity.
+             * Creates new preconfigured instance for {@link FastImporter} with the specified fast-failure level.
              *
-             * @param creator the error creator
+             * @param creator the event creator
+             * @param level   the fast-failure level
              * @return new fast-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFastRecord<I, ?> & ISelfRecord<B, I, E, R>, E extends IPropertyEvent<R, B> & ISelfEvent<B, R, E>> FastImporter<B, I, T, R, E> build(IPropertyCreator<R, B, E> creator) throws BeanException {
-                return new FastImporter<>(factory, type, rootType, nodeTypes) {
+            public <R extends IFastRecord<I, ?>, E extends IPropertyEvent<B, R>> FastImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator, SeverityType level) throws BeanException {
+                return new FastImporter<>(factory, type, root, nodes) {
                     @Override
-                    protected SelfPropertyCollector<B, R, E> create(R row) {
-                        return new SelfPropertyCollector<>(row, creator);
+                    protected PropertyFailureCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new PropertyFailureCollector.Builder<>(size, creator, level);
                     }
                 };
             }
 
             /**
-             * Creates new preconfigured instance for {@link FastImporter} with the given creator and repository.
+             * Creates new preconfigured instance for {@link FastImporter} with the specified event-creator.
              *
-             * @param creator the error creator
+             * @param creator the event creator
+             * @return new fast-importer
+             * @throws BeanException for any missing or wrong java-beans configuration
+             */
+            public <R extends IFastRecord<I, ?> & IMutualRecord<E, R>, E extends IPropertyEvent<B, R> & IMutual<R, E>> FastImporter<B, I, T, R, E> build(IMutualPropertyCreator<B, R, E> creator) throws BeanException {
+                return new FastImporter<>(factory, type, root, nodes) {
+                    @Override
+                    protected PropertyCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new PropertyCollector.Builder<>(size, creator);
+                    }
+                };
+            }
+
+            /**
+             * Creates new preconfigured instance for {@link FastImporter} with the specified event-creator.
+             *
+             * @param creator the event creator
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFastRecord<I, ?> & ISelfRecord<B, I, E, R> & Identifiable<?>, E extends IBusinessEvent<B, R, ?> & ISelfEvent<B, R, E>> FastImporter<B, I, T, R, E> build(IBusinessCreator<B, R, E> creator) throws BeanException {
-                return new FastImporter<>(factory, type, rootType, nodeTypes) {
+            public <R extends IFastRecord<I, ?> & IMutualRecord<E, R> & Identifiable<?>, E extends IBusinessEvent<B, R, ?> & IMutual<R, E>> FastImporter<B, I, T, R, E> build(IMutualBusinessCreator<B, R, E> creator) throws BeanException {
+                return new FastImporter<>(factory, type, root, nodes) {
                     @Override
-                    protected SelfBusinessCollector<B, R, E> create(R row) {
-                        return new SelfBusinessCollector<>(row, creator, (r) -> 0);
+                    protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new BusinessCollector.Builder<>(size, creator, (r) -> 0);
                     }
                 };
             }
 
             /**
-             * Creates new preconfigured instance for {@link FastImporter} with the given creator and repository.
+             * Creates new preconfigured instance for {@link FastImporter} with the specified event-creator and repository.
              *
-             * @param creator    the error creator
-             * @param repository the error-order initial-value finder
+             * @param creator    the event creator
+             * @param repository the max-order finder to be used as initial value for {@link IBusinessEvent} key-order
              * @return new fast-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
             public <R extends IFastRecord<I, ?> & Identifiable<?>, E extends IBusinessEvent<B, R, ?>> FastImporter<B, I, T, R, E> build(IBusinessCreator<B, R, E> creator, IBusinessRepository<R> repository) throws BeanException {
-                return new FastImporter<>(factory, type, rootType, nodeTypes) {
+                return new FastImporter<>(factory, type, root, nodes) {
                     @Override
-                    protected BusinessCollector<B, R, E> create(R row) {
-                        return new BusinessCollector<>(row, creator, repository);
+                    protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new BusinessCollector.Builder<>(size, creator, repository);
                     }
                 };
             }
-
         }
     }
 
     public final class FullBuilder<T extends Segment> {
-
         private final Class<T> type;
 
         private FullBuilder(Class<T> type) {
@@ -348,37 +361,35 @@ public class BusinessBuilder<B extends DataType<B>> {
         }
 
         /**
-         * Creates new preconfigured builder for full processor aka segregation and aggregation.
+         * Creates new preconfigured builder for import and export processing.
          *
-         * @param rootType  the root node related to business-object type
-         * @param nodeTypes the list of nodes
-         * @param <I>       the segment type
+         * @param root  the root node related to business-object type
+         * @param nodes the list of nodes
+         * @param <I>   the input segment type
          * @return new preconfigured final builder
          */
-        public <I extends IType<B, I>> FinalBuilder<I> build(I rootType, I[] nodeTypes) {
-            return new FinalBuilder<>(rootType, nodeTypes);
+        public <I extends IType<B, I>> FinalBuilder<I> build(I root, List<I> nodes) {
+            return new FinalBuilder<>(root, nodes);
         }
 
         /**
-         * Creates new preconfigured builder for full processor aka segregation and aggregation.
+         * Creates new preconfigured builder for import and export processing.
          *
-         * @param rootType the root node related to business-object type
-         * @param <I>      the segment type
+         * @param root the root node related to business-object type
+         * @param <I>  the input segment type
          * @return new preconfigured final builder
          */
-        @SuppressWarnings("unchecked")
-        public <I extends Enum<I> & IType<B, I>> FinalBuilder<I> build(I rootType) {
-            return this.build(rootType, ((Class<I>) rootType.getClass()).getEnumConstants());
+        public <I extends IType<B, I>> FinalBuilder<I> build(I root) {
+            return this.build(root, DefaultProvider.values(root));
         }
 
         public final class FinalBuilder<I extends IType<B, I>> {
+            private final I root;
+            private final List<I> nodes;
 
-            private final I rootType;
-            private final I[] nodeTypes;
-
-            private FinalBuilder(I rootType, I[] nodeTypes) {
-                this.rootType = rootType;
-                this.nodeTypes = nodeTypes;
+            private FinalBuilder(I root, List<I> nodes) {
+                this.root = root;
+                this.nodes = nodes;
             }
 
             /**
@@ -388,87 +399,95 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @throws BeanException for any missing or wrong java-beans configuration
              */
             public SimpleFullExporter<T, B, I> format() throws BeanException {
-                return new SimpleFullExporter<>(factory, type, rootType, nodeTypes);
+                return new SimpleFullExporter<>(factory, type, root, nodes);
             }
 
             /**
-             * Creates new preconfigured instance for {@link FullImporter} with the given creator and repository.
+             * Creates new preconfigured instance for {@link FullImporter} with the specified event-creator.
              *
-             * @param creator   the error creator
-             * @param failLevel fast-failure severity
+             * @param creator the event creator
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFullRecord<I, ?>, E extends IPropertyEvent<R, B>> FullImporter<B, I, T, R, E> build(IPropertyCreator<R, B, E> creator, SeverityType failLevel) throws BeanException {
-                if (failLevel == null) {
-                    return new FullImporter<>(factory, type, rootType, nodeTypes) {
-                        @Override
-                        protected PropertyCollector<R, B, E> create(R row) {
-                            return new PropertyCollector<>(row, creator);
-                        }
-                    };
-                }
-                return new FullImporter<>(factory, type, rootType, nodeTypes) {
+            public <R extends IFullRecord<I, ?>, E extends IPropertyEvent<B, R>> FullImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator) throws BeanException {
+                return new FullImporter<>(factory, type, root, nodes) {
                     @Override
-                    protected PropertyCollector<R, B, E> create(R row) {
-                        return new PropertyFailureCollector<>(row, creator, failLevel);
+                    protected PropertyCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new PropertyCollector.Builder<>(size, creator);
                     }
                 };
             }
 
             /**
-             * Creates new preconfigured instance for {@link FullImporter} with the given creator and repository.
+             * Creates new preconfigured instance for {@link FullImporter} with the fast-failure level.
              *
-             * @param creator the error creator
+             * @param creator the event creator
+             * @param level   fast-failure level
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFullRecord<I, ?> & ISelfRecord<B, I, E, R>, E extends IPropertyEvent<R, B> & ISelfEvent<B, R, E>> FullImporter<B, I, T, R, E> build(IPropertyCreator<R, B, E> creator) throws BeanException {
-                return new FullImporter<>(factory, type, rootType, nodeTypes) {
+            public <R extends IFullRecord<I, ?>, E extends IPropertyEvent<B, R>> FullImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator, SeverityType level) throws BeanException {
+                return new FullImporter<>(factory, type, root, nodes) {
                     @Override
-                    protected SelfPropertyCollector<B, R, E> create(R row) {
-                        return new SelfPropertyCollector<>(row, creator);
+                    protected PropertyFailureCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new PropertyFailureCollector.Builder<>(size, creator, level);
                     }
                 };
             }
 
             /**
-             * Creates new preconfigured instance for {@link FullImporter} with the given creator and repository.
+             * Creates new preconfigured instance for {@link FullImporter} with the specified event-creator.
              *
-             * @param creator the error creator
+             * @param creator the event creator
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFullRecord<I, ?> & ISelfRecord<B, I, E, R> & Identifiable<?>, E extends IBusinessEvent<B, R, ?> & ISelfEvent<B, R, E>> FullImporter<B, I, T, R, E> build(IBusinessCreator<B, R, E> creator) throws BeanException {
-                return new FullImporter<>(factory, type, rootType, nodeTypes) {
+            public <R extends IFullRecord<I, ?> & IMutualRecord<E, R>, E extends IPropertyEvent<B, R> & IMutual<R, E>> FullImporter<B, I, T, R, E> build(IMutualPropertyCreator<B, R, E> creator) throws BeanException {
+                return new FullImporter<>(factory, type, root, nodes) {
                     @Override
-                    protected SelfBusinessCollector<B, R, E> create(R row) {
-                        return new SelfBusinessCollector<>(row, creator, (r) -> 0);
+                    protected PropertyCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new PropertyCollector.Builder<>(size, creator);
                     }
                 };
             }
 
             /**
-             * Creates new preconfigured instance for {@link FullImporter} with the given creator and repository.
+             * Creates new preconfigured instance for {@link FullImporter} with the specified event-creator.
              *
-             * @param creator    the error creator
-             * @param repository the error-order initial-value finder
+             * @param creator the event creator
+             * @return new full-importer
+             * @throws BeanException for any missing or wrong java-beans configuration
+             */
+            public <R extends IFullRecord<I, ?> & IMutualRecord<E, R> & Identifiable<?>, E extends IBusinessEvent<B, R, ?> & IMutual<R, E>> FullImporter<B, I, T, R, E> build(IMutualBusinessCreator<B, R, E> creator) throws BeanException {
+                return new FullImporter<>(factory, type, root, nodes) {
+                    @Override
+                    protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new BusinessCollector.Builder<>(size, creator, (r) -> 0);
+                    }
+                };
+            }
+
+            /**
+             * Creates new preconfigured instance for {@link FullImporter} with the specified event-creator and repository.
+             *
+             * @param creator    the event creator
+             * @param repository the max-order finder to be used as initial value for {@link IBusinessEvent} key-order
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
             public <R extends IFullRecord<I, ?> & Identifiable<?>, E extends IBusinessEvent<B, R, ?>> FullImporter<B, I, T, R, E> build(IBusinessCreator<B, R, E> creator, IBusinessRepository<R> repository) throws BeanException {
-                return new FullImporter<>(factory, type, rootType, nodeTypes) {
+                return new FullImporter<>(factory, type, root, nodes) {
                     @Override
-                    protected BusinessCollector<B, R, E> create(R row) {
-                        return new BusinessCollector<>(row, creator, repository);
+                    protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
+                        return new BusinessCollector.Builder<>(size, creator, repository);
                     }
                 };
             }
 
             /**
-             * Creates new preconfigured instance for {@link FullImporter} with the given creator and repository.
+             * Creates new preconfigured instance for {@link FullImporter} with the specified repository.
              *
-             * @param repository the error-order initial-value finder
+             * @param repository the max-order finder to be used as initial value for {@link IBusinessEvent} key-order
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
@@ -477,17 +496,15 @@ public class BusinessBuilder<B extends DataType<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link SimpleFullImporter} with the given creator and repository.
+             * Creates new preconfigured instance for {@link SimpleFullImporter}.
              *
              * @return new simple full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
             public SimpleFullImporter<T, B, I> build() throws BeanException {
-                return new SimpleFullImporter<>(factory, type, rootType, nodeTypes);
+                return new SimpleFullImporter<>(factory, type, root, nodes);
             }
-
         }
-
     }
 
 }

@@ -9,6 +9,8 @@ import io.github.up2jakarta.csv.fmt.FastRecord;
 import io.github.up2jakarta.csv.fmt.SimpleFastImporter;
 import org.apache.commons.csv.CSVFormat;
 
+import static io.github.up2jakarta.lov.core.Codes.token;
+
 /**
  * Base CSV file {@link ModeType#FAST} reader implementation.
  *
@@ -25,7 +27,7 @@ public final class SimpleFastReader<T extends Segment, B extends DataType<B>, I 
 
     @Override
     protected FastRecord<I, String> create(I type, String beanId, String[] data) {
-        return new FastRecord<>(type, beanId, data);
+        return new FastRecord<>(type, token(beanId), data);
     }
 
 }

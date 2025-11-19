@@ -1,13 +1,13 @@
 package io.github.up2jakarta.csv.data;
 
-import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.lov.core.BeanException;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.Stack;
 
 /**
- * The business resolver data type.
+ * The business resolver of data types.
  *
  * @param <D> the business data type
  * @see io.github.up2jakarta.csv.api.IEvent#getType()
@@ -43,12 +43,12 @@ public abstract class DataTypeResolver<D extends DataType<D>> {
     }
 
     /**
-     * Returns the optional data type, if the given field is annotated with.
+     * Returns the optional business data type, if the given field is annotated with.
      *
      * @param stack the stack of segment-types
      * @param path  the path of the property from the root segment
      * @param field the property that is being scanned automatically
-     * @return the optional data type
+     * @return the optional business data type
      * @throws BeanException for any missing or wrong bean configuration
      */
     public abstract Optional<D> get(Stack<Class<? extends Segment>> stack, Field[] path, Field field) throws BeanException;
@@ -61,7 +61,7 @@ public abstract class DataTypeResolver<D extends DataType<D>> {
      */
     public final void check(DataType<?> value) throws BeanException {
         if (value != null && !type.isAssignableFrom(value.getClass())) {
-            throw new BeanException(value.getClass(), "class", "invalid data type");
+            throw new BeanException(value.getClass(), "class", "invalid business data type");
         }
     }
 

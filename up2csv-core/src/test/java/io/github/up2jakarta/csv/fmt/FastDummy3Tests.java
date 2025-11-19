@@ -1,13 +1,13 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.fmt.misc.AFastTest;
 import io.github.up2jakarta.csv.fmt.misc.Dummy3Invoice;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
-import io.github.up2jakarta.xml.clv.CodeListException;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +88,7 @@ class FastDummy3Tests extends AFastTest<Dummy3Invoice, TURecord, TUError> {
     @Test
     void testDetached() {
         // Given
-        final TURecord detached = record(S90, "TU2025R0099", "9999", "Warning", "Detached");
+        final TURecord detached = record(S09, "TU2025R0099", "9999", "Warning", "Detached");
         final TURecord[] rows = new TURecord[]{
                 record(S31, "TU2025R0099", "2025-03-12", "120", "100", "20"),
                 record(S32, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
@@ -125,7 +125,7 @@ class FastDummy3Tests extends AFastTest<Dummy3Invoice, TURecord, TUError> {
     @Test
     void testValidation() {
         // Given
-        final TURecord invalid = record(S90, "TU2025R0099", "1199", "Support", null);
+        final TURecord invalid = record(S09, "TU2025R0099", "1199", "Support", null);
         final TURecord[] rows = new TURecord[]{
                 record(S31, "TU2025R0099", "2025-03-12", "120", "100", "20"),
                 record(S32, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),

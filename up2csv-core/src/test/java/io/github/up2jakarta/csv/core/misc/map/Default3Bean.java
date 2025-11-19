@@ -14,7 +14,7 @@ public class Default3Bean implements Segment {
     @Position(0)
     private String code;
 
-    @Fragment(value = 1, defaultValues = true)
+    @Fragment(value = 1, prototype = true)
     private InnerBean bean;
 
     public InnerBean getBean() {
@@ -25,7 +25,8 @@ public class Default3Bean implements Segment {
 
         @Position(0)
         @Up2Number
-        private int id;//primitive default 0
+        private int id;
+
         @Position(value = 1, defaultValue = "Up2J")
         private String code = "Java"; // Ignored
 
@@ -33,6 +34,6 @@ public class Default3Bean implements Segment {
         private String value;
 
         @Position(3)
-        private String source = "Java";
+        private String source;
     }
 }

@@ -1,14 +1,14 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
 import io.github.up2jakarta.csv.fmt.misc.AUnitTest;
 import io.github.up2jakarta.csv.fmt.misc.Dummy4Invoice;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
-import io.github.up2jakarta.xml.clv.CodeListException;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

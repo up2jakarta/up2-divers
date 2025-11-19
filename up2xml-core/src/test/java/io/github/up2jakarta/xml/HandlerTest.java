@@ -6,7 +6,7 @@ import jakarta.xml.bind.helpers.ValidationEventLocatorImpl;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXParseException;
 
-import static io.github.up2jakarta.xml.api.SeverityType.*;
+import static io.github.up2jakarta.lov.SeverityType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HandlerTest {
@@ -25,9 +25,9 @@ public class HandlerTest {
         var error = errors.getFirst();
         assertNotNull(error);
         assertEquals(exception, error.getLinkedException());
-        assertEquals(FATAL, error.getSeverity());
+        assertEquals(FATAL, error.getLevel());
         assertEquals("MSG", error.getMessage());
-        assertEquals(10, error.getColumnNumber());
+        assertEquals(10, error.getLineOffset());
         assertEquals(1, error.getLineNumber());
     }
 
@@ -45,9 +45,9 @@ public class HandlerTest {
         var error = errors.getFirst();
         assertNotNull(error);
         assertEquals(exception, error.getLinkedException());
-        assertEquals(ERROR, error.getSeverity());
+        assertEquals(ERROR, error.getLevel());
         assertEquals("MSG", error.getMessage());
-        assertEquals(10, error.getColumnNumber());
+        assertEquals(10, error.getLineOffset());
         assertEquals(1, error.getLineNumber());
     }
 
@@ -65,9 +65,9 @@ public class HandlerTest {
         var error = errors.getFirst();
         assertNotNull(error);
         assertEquals(exception, error.getLinkedException());
-        assertEquals(WARNING, error.getSeverity());
+        assertEquals(WARNING, error.getLevel());
         assertEquals("MSG", error.getMessage());
-        assertEquals(10, error.getColumnNumber());
+        assertEquals(10, error.getLineOffset());
         assertEquals(1, error.getLineNumber());
     }
 
@@ -113,7 +113,7 @@ public class HandlerTest {
         var handler = new FailSafeHandler((e, m) -> m, false);
         var exception = new SAXParseException("MSG", "P", "S", 1, 10);
         var locator = new ValidationEventLocatorImpl(exception);
-        var warningEvent = new NotIdentifiableEventImpl(WARNING.getLevel(), "unexpected element", locator, npe);
+        var warningEvent = new NotIdentifiableEventImpl(WARNING.getAsInt(), "unexpected element", locator, npe);
         {
             // When
             handler.handleEvent(warningEvent);
@@ -123,7 +123,7 @@ public class HandlerTest {
             assertEquals(1, errors.size());
             var error = errors.getFirst();
             assertNotNull(error);
-            assertEquals(WARNING, error.getSeverity());
+            assertEquals(WARNING, error.getLevel());
             assertEquals(npe, error.getLinkedException());
             try {
                 handler.throwValidationExceptionWhenError();
@@ -142,19 +142,19 @@ public class HandlerTest {
         }
         {
             // When ADD another error in the same (line, column)
-            var errorEvent = new NotIdentifiableEventImpl(ERROR.getLevel(), "", locator, npe);
+            var errorEvent = new NotIdentifiableEventImpl(ERROR.getAsInt(), "", locator, npe);
             handler.handleEvent(errorEvent);
             var errors = handler.getErrors();
             // Then
             assertEquals(1, errors.size());
             var error = errors.getFirst();
             assertNotNull(error);
-            assertEquals(ERROR, error.getSeverity());
+            assertEquals(ERROR, error.getLevel());
             assertEquals(npe, error.getLinkedException());
         }
         {
             // When ADD another error in the same (line, column)
-            var errorEvent = new NotIdentifiableEventImpl(FATAL.getLevel(), "", locator, npe);
+            var errorEvent = new NotIdentifiableEventImpl(FATAL.getAsInt(), "", locator, npe);
             handler.handleEvent(errorEvent);
             var errors = handler.getErrors();
             // Then
@@ -162,7 +162,7 @@ public class HandlerTest {
             assertEquals(1, errors.size());
             var error = errors.getFirst();
             assertNotNull(error);
-            assertEquals(FATAL, error.getSeverity());
+            assertEquals(FATAL, error.getLevel());
             assertEquals(npe, error.getLinkedException());
         }
     }
@@ -174,7 +174,7 @@ public class HandlerTest {
         var handler = new FailSafeHandler((e, m) -> m, true);
         var exception = new SAXParseException("MSG", "P", "S", 1, 10);
         var locator = new ValidationEventLocatorImpl(exception);
-        var warningEvent = new NotIdentifiableEventImpl(ERROR.getLevel(), "unexpected element", locator, npe);
+        var warningEvent = new NotIdentifiableEventImpl(ERROR.getAsInt(), "unexpected element", locator, npe);
         // When
         handler.handleEvent(warningEvent);
         var errors = handler.getErrors();
@@ -183,7 +183,7 @@ public class HandlerTest {
         assertEquals(1, errors.size());
         var error = errors.getFirst();
         assertNotNull(error);
-        assertEquals(WARNING, error.getSeverity());
+        assertEquals(WARNING, error.getLevel());
         assertEquals(npe, error.getLinkedException());
         handler.throwValidationExceptionWhenError();
     }

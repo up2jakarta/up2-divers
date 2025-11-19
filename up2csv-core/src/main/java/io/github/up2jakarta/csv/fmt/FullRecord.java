@@ -1,26 +1,26 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.api.IFullRecord;
-import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.data.Definition;
 import io.github.up2jakarta.csv.data.Identifiable;
+import io.github.up2jakarta.lov.CodeList;
 
-import static io.github.up2jakarta.xml.adapters.KeyCoder.token;
+import static io.github.up2jakarta.lov.core.Codes.token;
 
 /**
  * Simple implementation of input record,
  * basically it's compatible with {@link io.github.up2jakarta.csv.core.ModeType#FULL}.
  *
- * @param <I> the input type definition
- * @param <P> the pivot type
+ * @param <T> the input segment type
+ * @param <P> the input pivot type
  * @see FullError
  */
-public class FullRecord<I extends IType<?, I>, P extends Comparable<P>> extends FastRecord<I, P> implements IFullRecord<I, P>, Identifiable<String> {
+public class FullRecord<T extends CodeList<T>, P extends Comparable<P>> extends FastRecord<T, P> implements IFullRecord<T, P>, Identifiable<String> {
 
     @Definition(code = "RID", value = "Record")
     protected final String key;
 
-    public FullRecord(String key, I type, P pivot, String[] data) {
+    public FullRecord(String key, T type, P pivot, String[] data) {
         super(type, pivot, data);
         this.key = token(key);
     }

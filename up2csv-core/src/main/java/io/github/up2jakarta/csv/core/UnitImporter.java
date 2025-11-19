@@ -6,22 +6,30 @@ import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.core.BeanException;
 
+import java.util.List;
 import java.util.Objects;
+
+import static io.github.up2jakarta.lov.DefaultProvider.values;
 
 /**
  * {@link ModeType#UNIT} Processor that's able to aggregate and import java-bean from flat-data.
  *
  * @param <T> the business object type
- * @param <B> the data type
- * @param <I> the segment type
- * @param <R> the record type
- * @param <E> the error type
+ * @param <B> the business data type
+ * @param <I> the input segment type
+ * @param <R> the input record type
+ * @param <E> the event type
  */
 public abstract non-sealed class UnitImporter<B extends DataType<B>, I extends IType<B, I>, T extends Segment, R extends IRecord<I>, E extends IEvent<B>> extends BusinessImporter<B, I, T, R, E> {
 
-    protected UnitImporter(Up2Factory<B> factory, Class<T> type, I rootNode, I[] nodes) throws BeanException {
-        super(factory, ModeType.UNIT, type, rootNode, nodes);
+    protected UnitImporter(Up2Factory<B> factory, Class<T> type, I root) throws BeanException {
+        this(factory, type, root, values(root));
+    }
+
+    protected UnitImporter(Up2Factory<B> factory, Class<T> type, I root, List<I> nodes) throws BeanException {
+        super(factory, ModeType.UNIT, type, root, nodes);
     }
 
     protected UnitImporter(UnitExporter<B, I, T> source) throws BeanException {

@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.core.ext;
 
-import io.github.up2jakarta.csv.api.ext.CheckerContext;
-import io.github.up2jakarta.csv.api.ext.SegmentListener;
+import io.github.up2jakarta.csv.api.ext.TypeContext;
+import io.github.up2jakarta.csv.api.ext.TypeListener;
 import io.github.up2jakarta.csv.core.AccessMode;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.persistence.*;
@@ -17,7 +17,7 @@ import java.util.*;
  */
 @Named
 @Singleton
-public final class JpaTableChecker implements SegmentListener {
+public final class JpaTableChecker implements TypeListener {
 
     private static void throwBeanException(AnnotatedElement source, String message) throws BeanException {
         if (source instanceof Package p) {
@@ -108,12 +108,12 @@ public final class JpaTableChecker implements SegmentListener {
     }
 
     @Override
-    public CheckerContext beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException {
+    public TypeContext beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException {
         checkEntity(type);
         return new JpaTableContext(type);
     }
 
-    private static class JpaTableContext implements CheckerContext {
+    private static class JpaTableContext implements TypeContext {
 
         private final Stack<Class<?>> stack = new Stack<>();
 

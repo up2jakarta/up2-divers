@@ -1,5 +1,6 @@
 package io.github.up2jakarta.xml.api;
 
+import io.github.up2jakarta.lov.SeverityType;
 import jakarta.xml.bind.ValidationEvent;
 import jakarta.xml.bind.ValidationEventHandler;
 
@@ -13,7 +14,7 @@ public abstract class AbstractCollector implements ValidationEventHandler {
         this.lenient = strict;
     }
 
-    protected int computeSeverity(ValidationEvent event) {
+    protected int computeLevel(ValidationEvent event) {
         var level = event.getSeverity();
         if (lenient && event.getMessage().startsWith("unexpected element")) {
             level = ValidationEvent.WARNING;
@@ -24,7 +25,7 @@ public abstract class AbstractCollector implements ValidationEventHandler {
     public void throwValidationExceptionWhenError() throws XValidationException {
         List<IValidationError> errors = getErrors();
         if (lenient) {
-            errors = errors.stream().filter(e -> e.getSeverity() != SeverityType.WARNING).toList();
+            errors = errors.stream().filter(e -> e.getLevel() != SeverityType.WARNING).toList();
         }
         if (!errors.isEmpty()) {
             final XValidationException cause = new XValidationException(errors.getFirst());

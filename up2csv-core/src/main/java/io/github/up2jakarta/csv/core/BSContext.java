@@ -1,8 +1,9 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.api.ext.*;
-import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.api.ext.TypeExtension;
+import io.github.up2jakarta.csv.api.ext.TypeResolver;
 import io.github.up2jakarta.csv.cfg.*;
+import io.github.up2jakarta.csv.core.BSBuilder.PProcessor;
 import io.github.up2jakarta.csv.core.BSNode.BFNode;
 import io.github.up2jakarta.csv.core.BSNode.BPNode;
 import io.github.up2jakarta.csv.core.BSNode.BPNode.BMNode;
@@ -12,7 +13,6 @@ import io.github.up2jakarta.csv.core.BSProperty.FProperty;
 import io.github.up2jakarta.csv.core.BSProperty.FProperty.FOProperty;
 import io.github.up2jakarta.csv.core.BSProperty.FProperty.FWProperty;
 import io.github.up2jakarta.csv.core.BSProperty.PAccessor;
-import io.github.up2jakarta.csv.core.BSProperty.PProcessor;
 import io.github.up2jakarta.csv.core.BSProperty.PProperty;
 import io.github.up2jakarta.csv.core.BSProperty.PProperty.POProperty;
 import io.github.up2jakarta.csv.core.BSProperty.PProperty.PWProperty;
@@ -21,21 +21,29 @@ import io.github.up2jakarta.csv.core.ext.PPath;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.api.TypeConverter;
+import io.github.up2jakarta.lov.CodeList;
+import io.github.up2jakarta.lov.TypeAdapter;
+import io.github.up2jakarta.lov.core.BeanContext;
+import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.Defaults;
+import io.github.up2jakarta.lov.core.StringAdapter;
 import jakarta.persistence.AccessType;
 import jakarta.validation.Valid;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.math.BigDecimal;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAmount;
 import java.util.*;
 import java.util.function.Predicate;
 
 import static io.github.up2jakarta.csv.core.AccessMode.RO;
 import static io.github.up2jakarta.csv.core.AccessMode.WO;
-import static io.github.up2jakarta.csv.core.BeanException.of;
 import static io.github.up2jakarta.csv.core.ext.Beans.*;
 import static io.github.up2jakarta.csv.core.ext.PPath.addOverride;
 import static io.github.up2jakarta.csv.core.ext.PPath.getOverride;
+import static io.github.up2jakarta.lov.core.BeanException.of;
 import static jakarta.persistence.AccessType.PROPERTY;
 import static java.lang.String.join;
 import static java.util.Arrays.asList;
@@ -50,15 +58,15 @@ final class BSContext<D extends DataType<D>> {
     private final Map<PPath, FragmentOverride> fragments = new LinkedHashMap<>();
     private final Map<PPath, ValidOverride> validations = new LinkedHashMap<>();
     private final Stack<Class<? extends Segment>> stack = new Stack<>();
-    private final ConversionExtension<?, Annotation>[] extensions;
     private final LinkedList<Field> path = new LinkedList<>();
+    private final TypeExtension<?, Annotation>[] extensions;
     private final Class<? extends Segment> type;
     private final DataTypeResolver<D> resolver;
     private final Optional<AccessType> access;
     private final BSBuilder.WChecker checker;
-    private final Factory factory;
     private final BVContext context;
     private final Type[] arguments;
+    private final Factory factory;
     private final AccessMode mode;
     private final int offset;
 
@@ -68,7 +76,7 @@ final class BSContext<D extends DataType<D>> {
         addOverride(ValidOverride.class, t, this.validations::put, ValidOverride::path);
         this.access = BSBuilder.getAccessType(Optional.empty(), t);
         this.checker = BSBuilder.WChecker.of(t, f.context);
-        this.extensions = ext(t, f.context);
+        this.extensions = extension(t, f.context);
         this.context = BVContext.from(t);
         this.arguments = NO_TYPES;
         this.resolver = d;
@@ -97,16 +105,50 @@ final class BSContext<D extends DataType<D>> {
     }
 
     @SuppressWarnings("unchecked")
-    private static ConversionExtension<?, Annotation>[] ext(Class<? extends Segment> st, BeanContext bc) throws BeanException {
+    private static TypeExtension<?, Annotation>[] extension(Class<? extends Segment> st, BeanContext bc) throws BeanException {
         final Extension[] extensions = BSBuilder.getAnnotationsByType(Extension.class, st).toArray(Extension[]::new);
-        final List<ConversionExtension<?, ? extends Annotation>> result = new LinkedList<>();
+        final List<TypeExtension<?, ? extends Annotation>> result = new LinkedList<>();
         for (final Extension extension : extensions) {
-            final ConversionExtension<?, ?> bean = getBean(bc, extension.value());
+            final TypeExtension<?, ?> bean = getBean(bc, extension.value(), extension.name());
             if (bean.isActivated(st)) {
                 result.add(bean);
             }
         }
-        return (ConversionExtension<?, Annotation>[]) result.toArray(ConversionExtension<?, ?>[]::new);
+        return (TypeExtension<?, Annotation>[]) result.toArray(TypeExtension<?, ?>[]::new);
+    }
+
+    private static Up2Converter converter(Field field, Position config) {
+        if (config.converter().value() != StringAdapter.class) {
+            return config.converter();
+        }
+        return field.getAnnotation(Up2Converter.class);
+    }
+
+    private static BeanException translate(Class<?> type, Field field) {
+        final Class<?> wrapper = Defaults.wrap(type);
+        if (Boolean.class.equals(wrapper)) {
+            return new BeanException(field, "should be annotated with @" + Up2Boolean.class.getSimpleName());
+        }
+        if (CodeList.class.isAssignableFrom(wrapper)) {
+            return new BeanException(field, "should be annotated with @" + Up2CodeList.class.getSimpleName());
+        }
+        if (Temporal.class.isAssignableFrom(wrapper)) {
+            return new BeanException(field, "should be annotated with @" + Up2Temporal.class.getSimpleName());
+        }
+        if (TemporalAmount.class.isAssignableFrom(wrapper)) {
+            return new BeanException(field, "should be annotated with @" + Up2TemporalAmount.class.getSimpleName());
+        }
+        if (Number.class.isAssignableFrom(wrapper)) {
+            if (List.of(BigDecimal.class, Double.class, Float.class).contains(wrapper)) {
+                return new BeanException(field, "should be annotated with @" + Up2Decimal.class.getSimpleName());
+            }
+            return new BeanException(field, "should be annotated with @" + Up2Number.class.getSimpleName());
+        }
+        if (byte[].class.isAssignableFrom(wrapper)) {
+            return new BeanException(field, "should be annotated with @" + Up2Base64.class.getSimpleName());
+        }
+        final String cn = Up2Converter.class.getSimpleName();
+        return new BeanException(field, "must be annotated with @" + cn + " or one of those shortcuts");
     }
 
     static <D extends DataType<D>, S extends Segment> BPNode<S, D, ?> build(Class<S> t, Factory f, DataTypeResolver<D> r) throws BeanException {
@@ -148,36 +190,34 @@ final class BSContext<D extends DataType<D>> {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> Conversion<T> conversion(Field field, Class<T> type, Position position) throws BeanException {
+    private <T> TypeAdapter<T> adapter(Field field, Class<T> type, Position position) throws BeanException {
         if (CharSequence.class == type || type == String.class) {
-            return (Conversion<T>) Conversion.NAN;
+            return (TypeAdapter<T>) StringAdapter.INSTANCE;
         }
-        final Error error = field.getAnnotation(Error.class);
-        if (position.converter() != Position.NaN.class) {
-            final TypeConverter<T> tConverter = getBean(factory.context, position.converter());
-            if (!tConverter.getSupportedType().isAssignableFrom(type)) {
+        final Up2Converter pc = converter(field, position);
+        if (pc != null) {
+            final TypeAdapter<T> adapter = getBean(factory.context, pc.value(), pc.name());
+            if (!adapter.getSupportedType().isAssignableFrom(type)) {
                 throw new BeanException(field, "@Position[converter] does not support " + type);
             }
-            return Conversion.of(tConverter, error);
+            return adapter;
         }
         for (final Annotation config : field.getAnnotations()) {
             final Resolver resolver = config.annotationType().getAnnotation(Resolver.class);
             if (resolver != null) {
-                final ConversionResolver<Annotation> cr = getBean(factory.context, resolver.value());
-                final PropertyFormatter<T> f = (PropertyFormatter<T>) cr.forFormatting(config, field, type);
-                final PropertyConverter<T> p = (PropertyConverter<T>) cr.forParsing(config, field, type);
-                return new Conversion<>(type, p, f, error);
+                final TypeResolver<Annotation> cr = getBean(factory.context, resolver.value(), resolver.name());
+                return (TypeAdapter<T>) cr.resolve(field, type, config);
             }
         }
         final Field[] fieldPath = path.toArray(Field[]::new);
-        for (final ConversionExtension<?, Annotation> extension : extensions) {
+        for (final TypeExtension<?, Annotation> extension : extensions) {
             final Class<? extends Segment> segmentType = getSegmentType(stack);
             final Optional<Annotation> config = extension.get(segmentType, field, type, fieldPath);
             if (config.isPresent()) {
                 return extension.resolve(field, type, config.get());
             }
         }
-        throw new BeanException(field, "@Position[converter] must not be undefined");
+        throw translate(type, field);
     }
 
     private <S extends Segment> BSNode<S, D> node(Field fp, Class<S> ft, BVContext vc, Fragment fr, List<BSProperty<?, ?, D>> ps) throws BeanException {
@@ -274,12 +314,12 @@ final class BSContext<D extends DataType<D>> {
         checker.positionProperty(pf, pt, offset + pc.value());
         final PProcessor<D> ps = BSBuilder.build(factory.context, pf, pc);
         final D dataType = this.dataType(pf);
-        final Conversion<T> cv = this.conversion(pf, pt, pc);
+        final TypeAdapter<T> adapter = this.adapter(pf, pt, pc);
         if (Optional.class.isAssignableFrom(pf.getType())) {
             final PAccessor<?, Optional<T>> va = this.accessor(cast(pt), pf);
-            return new PWProperty<>(va, dataType, offset, pc, ps, cv);
+            return new PWProperty<>(va, dataType, offset, pc, ps, adapter);
         }
-        return new POProperty<>(this.accessor(pt, pf), dataType, offset, pc, ps, cv);
+        return new POProperty<>(this.accessor(pt, pf), dataType, offset, pc, ps, adapter);
     }
 
     Type fieldType(Field field) {

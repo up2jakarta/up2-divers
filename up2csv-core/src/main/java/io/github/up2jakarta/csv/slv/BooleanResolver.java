@@ -1,52 +1,46 @@
 package io.github.up2jakarta.csv.slv;
 
-import io.github.up2jakarta.csv.api.ext.ConversionResolver;
-import io.github.up2jakarta.csv.api.ext.PropertyConverter;
-import io.github.up2jakarta.csv.api.ext.PropertyFormatter;
+import io.github.up2jakarta.csv.api.ext.TypeResolver;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Up2Boolean;
-import io.github.up2jakarta.csv.core.BeanException;
-import io.github.up2jakarta.xml.api.PropertyException;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.*;
+import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.TypeWrapper;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_BOOLEAN;
+import static io.github.up2jakarta.csv.api.IEvent.EC_BOOLEAN;
+import static io.github.up2jakarta.csv.core.ext.Beans.error;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
 
 @Named
 @Singleton
-public final class BooleanResolver extends ConversionResolver<Up2Boolean> {
+public final class BooleanResolver extends TypeResolver<Up2Boolean> {
 
     @Override
-    public PropertyConverter<? extends Boolean> forParsing(Up2Boolean config, Field property, Class<?> type) throws BeanException {
+    public TypeAdapter<Boolean> resolve(Field property, Class<?> type, Up2Boolean config) throws BeanException {
         if (type == Boolean.class || type == boolean.class) {
-            return v -> {
-                if (config.trueValue().equals(v)) {
+            final Optional<Error> error = error(property, type);
+            final SeverityType level = error.map(Error::level).orElse(ERROR);
+            final String code = error.map(Error::value).orElse(EC_BOOLEAN);
+            final String trueValue = config.trueValue();
+            final String falseValue = config.falseValue();
+            final PropertyConverter<Boolean> parser = (v) -> {
+                if (trueValue.equals(v)) {
                     return true;
                 }
-                if (config.falseValue().equals(v)) {
+                if (falseValue.equals(v)) {
                     return false;
                 }
-                final Optional<Error> error = getError(property, type);
-                final SeverityType level = error.map(Error::severity).orElse(SeverityType.ERROR);
-                final String code = error.map(Error::value).orElse(ERROR_BOOLEAN);
                 throw new PropertyException(level, code, "Unknown value [" + v + "] for Boolean");
             };
+            final PropertyFormatter<Boolean> format = (v) -> (v) ? trueValue : falseValue;
+            return new TypeWrapper<>(Boolean.class, parser, format);
         }
         throw new BeanException(property, "must not be annotated by @Up2Boolean");
-    }
-
-    @Override
-    public PropertyFormatter<Boolean> forFormatting(Up2Boolean config, Field property, Class<?> type) {
-        return v -> {
-            if (v) {
-                return config.trueValue();
-            }
-            return config.falseValue();
-        };
     }
 
 }

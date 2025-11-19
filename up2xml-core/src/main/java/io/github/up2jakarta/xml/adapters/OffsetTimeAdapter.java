@@ -1,7 +1,7 @@
 package io.github.up2jakarta.xml.adapters;
 
-import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.api.TypeConverter;
+import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.TypeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import java.time.LocalTime;
@@ -21,22 +21,22 @@ public class OffsetTimeAdapter extends TypeConverter<OffsetTime> {
 
     private final DateTimeFormatter formatter;
 
-    public OffsetTimeAdapter(DateTimeFormatter formatter, String errorCode) {
-        super(OffsetTime.class, SeverityType.ERROR, errorCode);
+    public OffsetTimeAdapter(DateTimeFormatter formatter, String code) {
+        super(OffsetTime.class, SeverityType.ERROR, code);
         this.formatter = formatter;
     }
 
     @Override
-    public final OffsetTime parse(String value) {
+    protected final OffsetTime doParse(String value) {
         final TemporalAccessor ta = formatter.parseBest(value, OffsetTime::from, LocalTime::from);
-        if (ta instanceof OffsetTime) {
-            return ((OffsetTime) ta);
+        if (ta instanceof OffsetTime ot) {
+            return ot;
         }
         return ((LocalTime) ta).atOffset(defaultOffset());
     }
 
     @Override
-    public final String format(OffsetTime value) {
+    protected final String doFormat(OffsetTime value) {
         return formatter.format(value);
     }
 

@@ -1,14 +1,14 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.fmt.misc.AFullTest;
 import io.github.up2jakarta.csv.fmt.misc.Dummy1Invoice;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
-import io.github.up2jakarta.xml.clv.CodeListException;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +18,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.IOException;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_CODE_LIST;
+import static io.github.up2jakarta.csv.api.IEvent.EC_CODE_LIST;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.invoice;
 import static io.github.up2jakarta.csv.impl.SegmentType.*;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -57,8 +57,8 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType, S
             pingPong.parse(List.of(row));
         });
         // Then
-        assertEquals(ERROR_CODE_LIST, error.getCode());
-        assertEquals(ERROR, error.getSeverity());
+        assertEquals(EC_CODE_LIST, error.getCode());
+        assertEquals(ERROR, error.getLevel());
         assertEquals("Unknown value [RT] for CodeList[SegmentType]", error.getMessage());
     }
 
@@ -112,7 +112,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType, S
     @Test
     void testDetached() {
         // Given
-        final io.github.up2jakarta.csv.impl.InputRecord detached = record(S90, "9999", "Warning", "Detached");
+        final io.github.up2jakarta.csv.impl.InputRecord detached = record(S09, "9999", "Warning", "Detached");
         final io.github.up2jakarta.csv.impl.InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
                 record(S12, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
@@ -149,7 +149,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType, S
     @Test
     void testValidation() {
         // Given
-        final io.github.up2jakarta.csv.impl.InputRecord invalid = record(S90, "1199", "Support", null);
+        final io.github.up2jakarta.csv.impl.InputRecord invalid = record(S09, "1199", "Support", null);
         final io.github.up2jakarta.csv.impl.InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
                 record(S12, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),

@@ -7,9 +7,8 @@ import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.fmt.FullError;
 import io.github.up2jakarta.csv.fmt.FullRecord;
 import io.github.up2jakarta.csv.fmt.SimpleFullImporter;
+import io.github.up2jakarta.lov.core.Codes;
 import org.apache.commons.csv.CSVFormat;
-
-import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
 
 /**
  * Base CSV file {@link ModeType#FULL} reader implementation.
@@ -26,11 +25,11 @@ public final class SimpleFullReader<T extends Segment, B extends DataType<B>, I 
     }
 
     @Override
-    protected FullRecord<I, String> create(long lineId, String recordKey, I type, String beanKey, String[] data) {
+    protected FullRecord<I, String> create(long lineId, String recordKey, I type, String beanId, String[] data) {
         if (recordKey == null) {
-            recordKey = fixed(lineId);
+            recordKey = Codes.fixed(lineId);
         }
-        return new FullRecord<>(recordKey, type, beanKey, data);
+        return new FullRecord<>(recordKey, type, Codes.token(beanId), data);
     }
 
 }

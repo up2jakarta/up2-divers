@@ -6,10 +6,10 @@ import io.github.up2jakarta.csv.data.Segment;
 import jakarta.validation.ConstraintViolation;
 
 /**
- * Contact interface for an input error with {@link ConstraintViolation} property, useful for JSR-303 validation.
+ * Contact interface for an input event with {@link ConstraintViolation} property, useful for JSR-303 validation.
  *
- * @param <D> the input data type
- * @see io.github.up2jakarta.csv.core.hdl.ComplianceHandler
+ * @param <D> the business data type
+ * @see io.github.up2jakarta.csv.core.hdl.ComplianceCollector
  * @see io.github.up2jakarta.csv.core.Up2Format#validate(Segment)
  * @see io.github.up2jakarta.csv.core.Up2Format#validate(Segment, int)
  */

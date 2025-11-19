@@ -1,9 +1,10 @@
 package io.github.up2jakarta.csv.slv;
 
-import io.github.up2jakarta.csv.api.ext.ConversionResolver;
-import io.github.up2jakarta.csv.api.ext.PropertyConverter;
+import io.github.up2jakarta.csv.api.ext.TypeResolver;
 import io.github.up2jakarta.csv.cfg.Up2TemporalAmount;
-import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.lov.TypeAdapter;
+import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.TypeWrapper;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
@@ -14,15 +15,15 @@ import java.time.temporal.TemporalAmount;
 
 @Named
 @Singleton
-public final class TemporalAmountResolver extends ConversionResolver<Up2TemporalAmount> {
+public final class TemporalAmountResolver extends TypeResolver<Up2TemporalAmount> {
 
     @Override
-    public PropertyConverter<? extends TemporalAmount> forParsing(Up2TemporalAmount config, Field property, Class<?> type) throws BeanException {
+    public TypeAdapter<? extends TemporalAmount> resolve(Field property, Class<?> type, Up2TemporalAmount config) throws BeanException {
         if (type == Period.class) {
-            return Period::parse;
+            return new TypeWrapper<>(Period.class, Period::parse);
         }
         if (type == Duration.class) {
-            return Duration::parse;
+            return new TypeWrapper<>(Duration.class, Duration::parse);
         }
         throw new BeanException(property, "must not be annotated by @Up2TemporalAmount");
     }

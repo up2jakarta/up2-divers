@@ -2,7 +2,6 @@ package io.github.up2jakarta.csv.io.misc;
 
 import io.github.up2jakarta.csv.api.IFastRecord;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.UnitImporter;
 import io.github.up2jakarta.csv.io.UnitFileReader;
@@ -10,6 +9,7 @@ import io.github.up2jakarta.csv.io.UnitFileWriter;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.apache.commons.csv.CSVFormat;
 
 import java.io.IOException;

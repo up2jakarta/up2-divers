@@ -1,6 +1,5 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.fmt.SimpleUnitImporter;
 import io.github.up2jakarta.csv.fmt.UnitRecord;
@@ -8,6 +7,7 @@ import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
 import io.github.up2jakarta.csv.io.misc.AUnitTests;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

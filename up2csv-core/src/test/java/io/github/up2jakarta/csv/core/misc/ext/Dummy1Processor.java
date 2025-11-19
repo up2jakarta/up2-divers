@@ -2,8 +2,8 @@ package io.github.up2jakarta.csv.core.misc.ext;
 
 import io.github.up2jakarta.csv.api.ext.InputProcessor;
 import io.github.up2jakarta.csv.core.misc.DummyException;
-import io.github.up2jakarta.xml.api.PropertyException;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.PropertyException;
+import io.github.up2jakarta.lov.SeverityType;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 

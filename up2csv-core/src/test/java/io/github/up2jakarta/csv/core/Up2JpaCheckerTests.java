@@ -3,6 +3,7 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.core.misc.jpa.checker.base.*;
 import io.github.up2jakarta.csv.impl.GroupType;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

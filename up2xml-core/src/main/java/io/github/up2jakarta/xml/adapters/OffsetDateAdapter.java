@@ -1,7 +1,7 @@
 package io.github.up2jakarta.xml.adapters;
 
-import io.github.up2jakarta.xml.api.SeverityType;
-import io.github.up2jakarta.xml.api.TypeConverter;
+import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.TypeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import java.time.LocalDate;
@@ -20,22 +20,22 @@ public class OffsetDateAdapter extends TypeConverter<LocalDate> {
 
     private final DateTimeFormatter formatter;
 
-    public OffsetDateAdapter(DateTimeFormatter formatter, String errorCode) {
-        super(LocalDate.class, SeverityType.ERROR, errorCode);
+    public OffsetDateAdapter(DateTimeFormatter formatter, String code) {
+        super(LocalDate.class, SeverityType.ERROR, code);
         this.formatter = formatter;
     }
 
     @Override
-    public final LocalDate parse(String value) {
+    protected final LocalDate doParse(String value) {
         var ta = ISO_OFFSET_DATE.parseBest(value, OffsetDateTime::from, LocalDate::from);
-        if (ta instanceof OffsetDateTime) {
-            return ((OffsetDateTime) ta).toLocalDate();
+        if (ta instanceof OffsetDateTime odt) {
+            return odt.toLocalDate();
         }
         return (LocalDate) ta;
     }
 
     @Override
-    public final String format(LocalDate value) {
+    protected final String doFormat(LocalDate value) {
         return formatter.format(value);
     }
 

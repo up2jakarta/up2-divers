@@ -1,5 +1,6 @@
 package io.github.up2jakarta.csv.impl.dto;
 
+import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
 import io.github.up2jakarta.csv.cfg.Up2Number;
@@ -11,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Valid
+@Error("CSV-C06")
 @SuppressWarnings("unused")
 public class Amount extends Parsable {
 

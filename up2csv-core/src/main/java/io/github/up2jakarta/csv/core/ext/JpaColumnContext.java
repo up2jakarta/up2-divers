@@ -1,12 +1,12 @@
 package io.github.up2jakarta.csv.core.ext;
 
-import io.github.up2jakarta.csv.api.ext.CheckerContext;
+import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
 import io.github.up2jakarta.csv.cfg.Up2Number;
 import io.github.up2jakarta.csv.core.AccessMode;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 import static io.github.up2jakarta.csv.core.ext.JpaTableChecker.checkName;
 import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
 
-final class JpaColumnContext implements CheckerContext {
+final class JpaColumnContext implements TypeContext {
 
     private final String prefix;
 

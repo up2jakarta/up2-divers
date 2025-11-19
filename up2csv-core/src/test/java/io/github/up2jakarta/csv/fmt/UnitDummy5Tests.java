@@ -1,14 +1,14 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
 import io.github.up2jakarta.csv.fmt.misc.AUnitTest;
 import io.github.up2jakarta.csv.fmt.misc.Dummy5Invoice;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
-import io.github.up2jakarta.xml.clv.CodeListException;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +19,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_CODE_LIST;
+import static io.github.up2jakarta.csv.api.IEvent.EC_CODE_LIST;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.unitInvoice;
 import static io.github.up2jakarta.csv.impl.SegmentType.*;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -53,8 +53,8 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, UnitRecord<SegmentType>, 
         // When
         final CodeListException error = assertThrows(CodeListException.class, () -> pingPong.parse(rows));
         // Then
-        assertEquals(ERROR_CODE_LIST, error.getCode());
-        assertEquals(ERROR, error.getSeverity());
+        assertEquals(EC_CODE_LIST, error.getCode());
+        assertEquals(ERROR, error.getLevel());
         assertEquals("Unknown value [RT] for CodeList[SegmentType]", error.getMessage());
     }
 

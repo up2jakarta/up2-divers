@@ -1,7 +1,11 @@
 package io.github.up2jakarta.cii.edi;
 
+import io.github.up2jakarta.cii.Documented;
+import io.github.up2jakarta.cii.core.Agency;
 import io.github.up2jakarta.cii.edi.adapters.FreightChargeTypeIDAdapter;
-import io.github.up2jakarta.xml.clv.*;
+import io.github.up2jakarta.lov.CodeList;
+import io.github.up2jakarta.lov.Duplicated;
+import io.github.up2jakarta.lov.Schema;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import javax.annotation.processing.Generated;

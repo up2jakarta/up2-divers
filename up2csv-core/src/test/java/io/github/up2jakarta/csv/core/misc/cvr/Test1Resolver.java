@@ -4,14 +4,14 @@ import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2CodeList;
 import io.github.up2jakarta.csv.cfg.Up2TemporalAmount;
-import io.github.up2jakarta.csv.core.misc.clv.CurrencyCodeType;
-import io.github.up2jakarta.csv.core.misc.clv.MeasurementUnitCode;
+import io.github.up2jakarta.csv.core.misc.lov.CurrencyCodeType;
+import io.github.up2jakarta.csv.core.misc.lov.MeasurementUnitCode;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.SeverityType;
 
 import java.time.Duration;
 
-import static io.github.up2jakarta.csv.core.misc.clv.MeasurementUnitConverter.EDI_R_20;
+import static io.github.up2jakarta.csv.core.misc.lov.MeasurementUnitConverter.EDI_R_20;
 
 @SuppressWarnings("unused")
 public class Test1Resolver implements Segment {
@@ -21,7 +21,7 @@ public class Test1Resolver implements Segment {
     private CurrencyCodeType currency;
 
     @Position(1)
-    @Error(value = EDI_R_20, severity = SeverityType.ERROR)
+    @Error(value = EDI_R_20, level = SeverityType.ERROR)
     @Up2CodeList
     private MeasurementUnitCode unit;
 

@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.prc;
 
 import io.github.up2jakarta.csv.api.ext.InputProcessor;
 import io.github.up2jakarta.csv.cfg.Up2Token;
-import io.github.up2jakarta.xml.adapters.KeyCoder;
+import io.github.up2jakarta.lov.core.Codes;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
@@ -16,7 +16,7 @@ public final class TokenProcessor extends InputProcessor<Up2Token> {
 
     @Override
     public String process(String value, Up2Token ignore) {
-        return KeyCoder.token(value);
+        return Codes.token(value);
     }
 
 }

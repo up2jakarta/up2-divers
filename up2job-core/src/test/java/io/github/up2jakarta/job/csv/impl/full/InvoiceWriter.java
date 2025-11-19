@@ -1,6 +1,5 @@
 package io.github.up2jakarta.job.csv.impl.full;
 
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.csv.fmt.Fixed06Generator;
 import io.github.up2jakarta.csv.io.FullFileWriter;
@@ -8,6 +7,7 @@ import io.github.up2jakarta.job.ConditionalWriter;
 import io.github.up2jakarta.job.core.SafeTranslator;
 import io.github.up2jakarta.job.core.SafeUtil;
 import io.github.up2jakarta.job.csv.dto.Invoice;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.apache.commons.csv.CSVFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,13 +44,13 @@ public class InvoiceWriter extends ConditionalWriter<Up2Result<Invoice, InputErr
 
     @Override
     public boolean isTransient(Up2Result<Invoice, InputError> item) {
-        return item.getBean() != null && !item.getErrors().isEmpty();
+        return item.get() != null && !item.toList().isEmpty();
     }
 
     @Override
     public void write(Up2Result<Invoice, InputError> item) throws IOException {
-        LOG.debug("#Invoice[{}] has been imported successfully", item.getBean().getReference());
-        delegate.write(item.getBean());
+        LOG.debug("#Invoice[{}] has been imported successfully", item.get().getReference());
+        delegate.write(item.get());
     }
 
     @Override

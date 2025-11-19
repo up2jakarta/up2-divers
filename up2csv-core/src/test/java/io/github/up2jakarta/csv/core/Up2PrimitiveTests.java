@@ -1,16 +1,27 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
+import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.core.misc.Test1Primitive;
 import io.github.up2jakarta.csv.core.misc.Test2Primitive;
 import io.github.up2jakarta.csv.core.misc.Test3Primitive;
 import io.github.up2jakarta.csv.core.misc.Test4Primitive;
+import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.impl.GroupType;
+import io.github.up2jakarta.lov.CodeList;
+import io.github.up2jakarta.lov.DefaultProvider;
+import io.github.up2jakarta.lov.core.BeanException;
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,6 +33,18 @@ public class Up2PrimitiveTests {
     @Autowired
     Up2PrimitiveTests(Up2Factory<GroupType> f) {
         this.factory = f;
+    }
+
+    @Test
+    void testCodeList() {
+        // Given
+        final Class<AccessMode> lovType = AccessMode.class;
+        // When
+        final List<AccessMode> modes = DefaultProvider.INSTANCE.values(lovType);
+        // Then
+        assertEquals(2, modes.size());
+        assertTrue(modes.contains(AccessMode.RO));
+        assertTrue(modes.contains(AccessMode.WO));
     }
 
     @Test
@@ -83,6 +106,118 @@ public class Up2PrimitiveTests {
         // Then
         assertEquals("3.14", out[0]);
         assertEquals("3.1114", out[1]);
+    }
+
+    @Test
+    void testBeanWithNumber() {
+        // GIVEN
+        @Access(AccessType.FIELD)
+        final class Bean implements Segment {
+            @Position(0)
+            public @SuppressWarnings("unused") int value;
+        }
+        // WHEN
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        // THEN
+        assertEquals(Bean.class, thrown.getSource());
+        assertEquals("value", thrown.getLocator());
+        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2Number", thrown.getMessage());
+    }
+
+    @Test
+    void testBeanWithDecimal() {
+        // GIVEN
+        @Access(AccessType.FIELD)
+        final class Bean implements Segment {
+            @Position(0)
+            public @SuppressWarnings("unused") double value;
+        }
+        // WHEN
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        // THEN
+        assertEquals(Bean.class, thrown.getSource());
+        assertEquals("value", thrown.getLocator());
+        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2Decimal", thrown.getMessage());
+    }
+
+    @Test
+    void testBeanWithBoolean() {
+        // GIVEN
+        @Access(AccessType.FIELD)
+        final class Bean implements Segment {
+            @Position(0)
+            public @SuppressWarnings("unused") boolean value;
+        }
+        // WHEN
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        // THEN
+        assertEquals(Bean.class, thrown.getSource());
+        assertEquals("value", thrown.getLocator());
+        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2Boolean", thrown.getMessage());
+    }
+
+    @Test
+    void testBeanWithCodeList() {
+        // GIVEN
+        @Access(AccessType.FIELD)
+        final class Bean implements Segment {
+            @Position(0)
+            public @SuppressWarnings("unused") CodeList<?> value;
+        }
+        // WHEN
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        // THEN
+        assertEquals(Bean.class, thrown.getSource());
+        assertEquals("value", thrown.getLocator());
+        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2CodeList", thrown.getMessage());
+    }
+
+    @Test
+    void testBeanWithTemporal() {
+        // GIVEN
+        @Access(AccessType.FIELD)
+        final class Bean implements Segment {
+            @Position(0)
+            public @SuppressWarnings("unused") LocalDate value;
+        }
+        // WHEN
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        // THEN
+        assertEquals(Bean.class, thrown.getSource());
+        assertEquals("value", thrown.getLocator());
+        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2Temporal", thrown.getMessage());
+    }
+
+    @Test
+    void testBeanWithTemporalUnit() {
+        // GIVEN
+        @Access(AccessType.FIELD)
+        final class Bean implements Segment {
+            @Position(0)
+            public @SuppressWarnings("unused") Period value;
+        }
+        // WHEN
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        // THEN
+        assertEquals(Bean.class, thrown.getSource());
+        assertEquals("value", thrown.getLocator());
+        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2TemporalAmount", thrown.getMessage());
+    }
+
+    @Test
+    void testBeanWithByteArray() {
+        // GIVEN
+        @Access(AccessType.FIELD)
+        final class Bean implements Segment {
+            @Position(0)
+            public @SuppressWarnings("unused") byte[] value;
+        }
+        // WHEN
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        // THEN
+        assertEquals(Bean.class, thrown.getSource());
+        assertEquals("value", thrown.getLocator());
+        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2Base64", thrown.getMessage());
     }
 
 }

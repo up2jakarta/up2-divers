@@ -7,10 +7,10 @@ import io.github.up2jakarta.cii.format.standard.ram.SupplyChainTradeTransactionT
 import io.github.up2jakarta.cii.format.standard.ram.TradePartyType;
 import io.github.up2jakarta.cii.format.standard.ram.UniversalCommunicationType;
 import io.github.up2jakarta.cii.format.standard.udt.UriIDType;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.xml.api.IValidationError;
-import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.api.XValidationException;
-import io.github.up2jakarta.xml.clv.CodeListException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +74,9 @@ public class EASchemeIDTest extends CodeAdapterTest {
         assertEquals(1, errors.size());
         {
             final IValidationError error = errors.getFirst();
-            assertEquals(SeverityType.ERROR, error.getSeverity());
+            assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(121, error.getLineNumber());
-            assertEquals(47, error.getColumnNumber());
+            assertEquals(47, error.getLineOffset());
             assertEquals("PPF-BR63: Unknown value [???] for CodeList[EASchemeIDType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());

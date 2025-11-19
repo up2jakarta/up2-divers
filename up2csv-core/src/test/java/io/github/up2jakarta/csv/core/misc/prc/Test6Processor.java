@@ -6,7 +6,7 @@ import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.misc.ext.Dummy1;
 import io.github.up2jakarta.csv.data.Segment;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_PROCESSOR;
+import static io.github.up2jakarta.csv.api.IEvent.EC_PROCESSOR;
 
 @Truncated(1)
 @SuppressWarnings("unused")
@@ -14,7 +14,7 @@ public class Test6Processor implements Segment {
 
     @Position(0)
     @Dummy1
-    @Error(value = ERROR_PROCESSOR)
+    @Error(value = EC_PROCESSOR)
     private String test;
 
     public String getTest() {

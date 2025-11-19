@@ -4,10 +4,11 @@ import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
 import io.github.up2jakarta.csv.core.BSProperty.FProperty;
 import io.github.up2jakarta.csv.core.hdl.FailureException;
-import io.github.up2jakarta.csv.core.misc.acs.BIdOBean;
-import io.github.up2jakarta.csv.core.misc.clv.CountryCodeType;
-import io.github.up2jakarta.csv.core.misc.clv.CurrencyCodeType;
+import io.github.up2jakarta.csv.core.misc.acs.BIdOptionalBean;
+import io.github.up2jakarta.csv.core.misc.acs.Optional8Bean;
 import io.github.up2jakarta.csv.core.misc.jpa.NoteEntity;
+import io.github.up2jakarta.csv.core.misc.lov.CountryCodeType;
+import io.github.up2jakarta.csv.core.misc.lov.CurrencyCodeType;
 import io.github.up2jakarta.csv.core.misc.map.*;
 import io.github.up2jakarta.csv.core.misc.map.Inner1Segment.InnerFragment;
 import io.github.up2jakarta.csv.core.misc.map.oneshot.AbstractAddress;
@@ -22,6 +23,8 @@ import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputCollector;
 import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.SegmentType;
+import io.github.up2jakarta.lov.core.AccessException;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +34,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_CONVERTER;
+import static io.github.up2jakarta.csv.api.IEvent.EC_CONVERTER;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -64,16 +67,13 @@ class Up2MapperTests {
         final String[] data = null;
         final Up2Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
         final InputRecord row3 = record(SegmentType.S00, data);
-        final InputCollector handler2 = new InputCollector(null);
         final InputCollector handler3 = new InputCollector(row3);
         // When
         final ValidBean bean1 = mapper.map(data);
-        final ValidBean bean2 = mapper.map(null, handler2);
         final ValidBean bean3 = mapper.map(null, handler3);
         final ValidBean bean4 = mapper.map(row3, handler3);
         // Then
         assertNull(bean1);
-        assertNull(bean2);
         assertNull(bean3);
         assertNull(bean4);
     }
@@ -90,8 +90,8 @@ class Up2MapperTests {
         assertNotNull(error.getCause());
         assertInstanceOf(NumberFormatException.class, error.getCause());
         // Then Error
-        assertEquals(ERROR, error.getSeverity());
-        assertEquals(ERROR_CONVERTER, error.getCode());
+        assertEquals(ERROR, error.getLevel());
+        assertEquals(EC_CONVERTER, error.getCode());
         assertEquals("java.lang.NumberFormatException: No digits found.", error.getMessage());
     }
 
@@ -488,16 +488,6 @@ class Up2MapperTests {
     }
 
     @Test
-    void testBeanWithInteger() {
-        // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(BeanWithInteger.class));
-        // THEN
-        assertEquals(BeanWithInteger.class, thrown.getSource());
-        assertEquals("id", thrown.getLocator());
-        assertEquals("BeanWithInteger[id] - @Position[converter] must not be undefined", thrown.getMessage());
-    }
-
-    @Test
     void testFragment() {
         // WHEN
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test1Segment.class));
@@ -640,7 +630,7 @@ class Up2MapperTests {
         final String[] data = new String[]{"ZZZ", "Content", null, "???", "T2", "EUR"};
         // When
         final NoteEntity segment = mapper.map(data);
-        final List<IComplianceEvent<GroupType>> violations = mapper.toFormat().validate(segment);
+        final List<? extends IComplianceEvent<GroupType>> violations = mapper.toFormat().validate(segment);
         // Then
         assertNotNull(segment);
         assertEquals(0, violations.size());
@@ -687,14 +677,25 @@ class Up2MapperTests {
     @Test
     void testOptional() throws BeanException {
         // Given
-        final Up2Mapper<BIdOBean, ?> mapper = factory.build(BIdOBean.class);
+        final Up2Mapper<BIdOptionalBean, ?> mapper = factory.build(BIdOptionalBean.class);
         // When
-        final BIdOBean bean = mapper.map();
+        final BIdOptionalBean bean = mapper.map();
         // Then
         assertNotNull(bean.fragment);
         assertFalse(bean.fragment.isEmpty());
         assertNotNull(bean.fragment.get().id);
         assertTrue(bean.fragment.get().id.isEmpty());
+    }
+
+    @Test
+    void testNullableOptional() throws BeanException {
+        // Given
+        final Up2Mapper<Optional8Bean, ?> mapper = factory.build(Optional8Bean.class);
+        // When
+        final Optional8Bean bean = mapper.map();
+        // Then
+        assertNotNull(bean.fragment);
+        assertTrue(bean.fragment.isEmpty());
     }
 
 }

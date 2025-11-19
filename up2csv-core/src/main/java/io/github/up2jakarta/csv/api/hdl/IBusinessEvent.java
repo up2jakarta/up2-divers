@@ -7,25 +7,25 @@ import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Identifiable;
 
 /**
- * Contact interface for an input error with trace property instead of exception, useful for error persistence.
+ * Contact interface for an input event with trace property instead of exception, useful for events persistence.
  *
- * @param <R> the record type
- * @param <K> the error key type
- * @param <D> the input record type
+ * @param <R> the input record type
+ * @param <K> the event key type
+ * @param <D> the business data type
  * @see IBusinessCreator
- * @see io.github.up2jakarta.csv.core.hdl.BusinessHandler#BUSINESS_MODE
+ * @see io.github.up2jakarta.csv.core.hdl.BusinessCollector#MODE
  */
 public interface IBusinessEvent<D extends DataType<D>, R extends IRecord<?>, K extends IKey<R>> extends IEvent<D>, Identifiable<K> {
 
     /**
-     * @return the the error stack trace
+     * @return the event stack trace
      */
     String getTrace();
 
     /**
-     * Contact interface for input error identifier.
+     * Contact interface for input event identifier.
      *
-     * @param <R> the input row type
+     * @param <R> the input record type
      */
     interface IKey<R extends IRecord<?>> {
 

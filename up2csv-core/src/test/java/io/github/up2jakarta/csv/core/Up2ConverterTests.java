@@ -1,14 +1,15 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.misc.clv.CountryCodeType;
-import io.github.up2jakarta.csv.core.misc.clv.CurrencyCodeType;
-import io.github.up2jakarta.csv.core.misc.clv.MeasurementUnitCode;
 import io.github.up2jakarta.csv.core.misc.cvr.*;
+import io.github.up2jakarta.csv.core.misc.lov.CountryCodeType;
+import io.github.up2jakarta.csv.core.misc.lov.CurrencyCodeType;
+import io.github.up2jakarta.csv.core.misc.lov.MeasurementUnitCode;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputCollector;
 import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,10 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
+import static io.github.up2jakarta.csv.api.IEvent.EC_COMPLIANCE;
 import static io.github.up2jakarta.csv.impl.SegmentType.S00;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
-import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.SeverityType.WARNING;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -97,8 +98,8 @@ class Up2ConverterTests {
         final InputError error = errors.getFirst();
         assertEquals(row, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
-        assertEquals(WARNING, error.getSeverity());
-        assertEquals(ERROR_VALIDATOR, error.getCode());
+        assertEquals(WARNING, error.getLevel());
+        assertEquals(EC_COMPLIANCE, error.getCode());
         assertEquals(1 + 1, error.getOffset());
         assertEquals("size must be between 0 and 8", error.getMessage());
         assertNull(error.getTrace());
@@ -132,8 +133,8 @@ class Up2ConverterTests {
             final InputError error = errors.getFirst();
             assertEquals(row, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
-            assertEquals(ERROR, error.getSeverity());
-            assertEquals("ISO-4217", error.getCode());
+            assertEquals(ERROR, error.getLevel());
+            assertEquals(SupportEntity.ISO_4217, error.getCode());
             assertEquals(1 + 4, error.getOffset());
             assertEquals("Unknown value [ILS] for CodeList[CurrencyCodeType]", error.getMessage());
             assertNull(error.getTrace());
@@ -143,8 +144,8 @@ class Up2ConverterTests {
             final InputError error = errors.get(1);
             assertEquals(row, error.getKey().getRecord());
             assertEquals(1, error.getKey().getOrder());
-            assertEquals(ERROR, error.getSeverity());
-            assertEquals("ISO-3166", error.getCode());
+            assertEquals(ERROR, error.getLevel());
+            assertEquals(SupportEntity.ISO_3166, error.getCode());
             assertEquals(1 + 9, error.getOffset());
             assertEquals("Unknown value [IL] for CodeList[CountryCodeType]", error.getMessage());
             assertNull(error.getTrace());

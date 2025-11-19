@@ -1,13 +1,14 @@
 package io.github.up2jakarta.job.csv.impl;
 
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.core.BeanLinker;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.SeverityType;
+
+import java.util.Collection;
 
 import static io.github.up2jakarta.job.csv.impl.GroupType.*;
 import static io.github.up2jakarta.job.csv.impl.SegmentLinker.*;
-import static io.github.up2jakarta.xml.api.SeverityType.*;
+import static io.github.up2jakarta.lov.SeverityType.*;
 
 @SuppressWarnings("unused")
 public enum SegmentType implements IType<GroupType, SegmentType> {
@@ -23,15 +24,16 @@ public enum SegmentType implements IType<GroupType, SegmentType> {
     S09("09", attributes(), D09, WARNING),
     ;
 
-    private final SegmentLinker<?, ?> linker;
+    private final SegmentLinker<Segment, Segment> linker;
     private final GroupType groupType;
     private final SeverityType level;
     private final String code;
 
-    <P extends Segment, T extends Segment> SegmentType(String code, SegmentLinker<P, T> linker, GroupType type, SeverityType level) {
+    @SuppressWarnings("unchecked")
+    SegmentType(String code, SegmentLinker<?, ?> linker, GroupType type, SeverityType level) {
         this.code = code;
         this.level = level;
-        this.linker = linker;
+        this.linker = (SegmentLinker<Segment, Segment>) linker;
         this.groupType = type;
     }
 
@@ -46,29 +48,38 @@ public enum SegmentType implements IType<GroupType, SegmentType> {
     }
 
     @Override
-    public GroupType getBusinessType() {
+    public GroupType getDataType() {
         return groupType;
     }
 
     @Override
-    public String getErrorCode() {
-        return "CSV-" + this.name();
+    public String getEventCode() {
+        return "CSV-" + groupType.name();
     }
 
     @Override
-    public SeverityType getErrorLevel() {
+    public SeverityType getEventLevel() {
         return level;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public BeanLinker<?, ?> getJoinLinker() {
-        return linker;
+    public Class<Segment> getClassType() {
+        return linker.classType;
     }
 
     @Override
-    public String toString() {
-        return "#S[" + code + ']';
+    public Class<Segment> getParentType() {
+        return linker.parentType;
+    }
+
+    @Override
+    public Collection<Segment> from(Segment parent) {
+        return linker.from(parent);
+    }
+
+    @Override
+    public void link(Segment parent, Segment child) {
+        linker.link(parent, child);
     }
 
 }

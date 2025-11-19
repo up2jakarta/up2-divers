@@ -1,8 +1,13 @@
 package io.github.up2jakarta.cii.api;
 
+import io.github.up2jakarta.cii.Documented;
 import io.github.up2jakarta.cii.InvoiceValidator;
+import io.github.up2jakarta.cii.core.Agency;
+import io.github.up2jakarta.lov.CodeList;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.Schema;
+import io.github.up2jakarta.lov.SubList;
 import io.github.up2jakarta.xml.api.*;
-import io.github.up2jakarta.xml.clv.*;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -21,7 +26,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static io.github.up2jakarta.cii.CII.getLoader;
-import static io.github.up2jakarta.xml.adapters.KeyCoder.token;
+import static io.github.up2jakarta.lov.core.Codes.token;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Named

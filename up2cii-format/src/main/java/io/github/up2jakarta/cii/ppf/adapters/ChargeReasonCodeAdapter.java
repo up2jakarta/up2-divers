@@ -4,11 +4,10 @@ import io.github.up2jakarta.cii.core.TokenType;
 import io.github.up2jakarta.cii.edi.adapters.AllowanceChargeIdentificationCodeAdapter;
 import io.github.up2jakarta.cii.edi.adapters.AllowanceChargeReasonCodeAdapter;
 import io.github.up2jakarta.cii.ppf.ChargeReasonCodeType;
-import io.github.up2jakarta.xml.api.TypeConverter;
-import io.github.up2jakarta.xml.clv.CodeListException;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.TypeConverter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import static java.util.Optional.ofNullable;
@@ -22,7 +21,7 @@ import static java.util.Optional.ofNullable;
  */
 @Named
 @Singleton
-public class ChargeReasonCodeAdapter extends TypeConverter<ChargeReasonCodeType<?>> {
+public final class ChargeReasonCodeAdapter extends TypeConverter<ChargeReasonCodeType<?>> {
 
     ChargeReasonCodeAdapter() {
         super(null, null, null);
@@ -48,12 +47,12 @@ public class ChargeReasonCodeAdapter extends TypeConverter<ChargeReasonCodeType<
     }
 
     @Override
-    public ChargeReasonCodeType<?> parse(String value) throws CodeListException {
+    protected ChargeReasonCodeType<?> doParse(String value) throws CodeListException {
         return TokenType.from(value);
     }
 
     @Override
-    public String format(@NotNull ChargeReasonCodeType<?> value) {
+    protected String doFormat(ChargeReasonCodeType<?> value) {
         return value.getCode();
     }
 

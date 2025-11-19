@@ -1,12 +1,11 @@
 package io.github.up2jakarta.csv.cfg;
 
-import io.github.up2jakarta.csv.api.ext.Conversion;
 import io.github.up2jakarta.csv.slv.BooleanResolver;
 
 import java.lang.annotation.*;
 
 /**
- * Up2 {@link Conversion} resolver that supports {@link Boolean} types.
+ * Up2 {@link io.github.up2jakarta.lov.TypeAdapter} resolver that supports {@link Boolean} types.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -25,4 +24,3 @@ public @interface Up2Boolean {
     String falseValue() default "false";
 
 }
-

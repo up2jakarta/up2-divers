@@ -10,7 +10,7 @@ public class Default1Bean implements Segment {
     @Position(value = 0, defaultValue = "*")
     private String code;
 
-    @Fragment(1)
+    @Fragment(value = 1, prototype = true)
     private InnerBean reference;
 
     public String getCode() {

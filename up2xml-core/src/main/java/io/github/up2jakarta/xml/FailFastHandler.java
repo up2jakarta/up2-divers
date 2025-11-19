@@ -1,10 +1,10 @@
 package io.github.up2jakarta.xml;
 
 
+import io.github.up2jakarta.lov.CodeListException;
 import io.github.up2jakarta.xml.api.AbstractCollector;
 import io.github.up2jakarta.xml.api.IValidationError;
 import io.github.up2jakarta.xml.api.XValidationException;
-import io.github.up2jakarta.xml.clv.CodeListException;
 import jakarta.xml.bind.ValidationEvent;
 
 import java.util.Collections;
@@ -23,8 +23,8 @@ public class FailFastHandler extends AbstractCollector {
 
     @Override
     public boolean handleEvent(ValidationEvent event) {
-        final int severity = computeSeverity(event);
-        if (lenient && severity == ValidationEvent.WARNING) {
+        final int level = computeLevel(event);
+        if (lenient && level == ValidationEvent.WARNING) {
             return true;
         }
         final CodeListException cause = getCause(event.getLinkedException(), CodeListException.class);

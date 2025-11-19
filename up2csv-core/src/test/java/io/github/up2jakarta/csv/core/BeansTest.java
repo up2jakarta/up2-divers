@@ -1,12 +1,13 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.core.misc.TestConverter;
-import io.github.up2jakarta.csv.core.misc.clv.CurrencyCodeType;
-import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
 import io.github.up2jakarta.csv.core.misc.cvr.SupportEntity;
+import io.github.up2jakarta.csv.core.misc.lov.CurrencyCodeType;
+import io.github.up2jakarta.csv.core.misc.lov.CurrencyConverter;
 import io.github.up2jakarta.csv.data.Recordable;
 import io.github.up2jakarta.csv.impl.InputRecord;
-import io.github.up2jakarta.xml.clv.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListConverter;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.persistence.AttributeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.ext.Beans.getTypeArguments;
+import static io.github.up2jakarta.lov.core.Beans.getTypeArguments;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

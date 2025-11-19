@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Base CSV reader for multi-segments format.
  *
- * @param <R> the record type
+ * @param <R> the input record type
  */
 public abstract class Up2Aggregator<R extends Segment> implements Iterator<List<R>> {
 

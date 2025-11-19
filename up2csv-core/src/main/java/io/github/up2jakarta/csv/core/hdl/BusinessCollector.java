@@ -9,23 +9,17 @@ import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Identifiable;
 import io.github.up2jakarta.csv.data.LazyCounter;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import static java.util.Objects.requireNonNull;
 
 /**
- * Input events collector that is responsible for create the final Event to be collected during the mapping/parsing,
- * useful for error persistence.
- * <p>
- * This collector is the default mode for {@link io.github.up2jakarta.csv.BusinessBuilder} when working with
- * {@link IBusinessCreator} and {@link IBusinessRepository}, it's compatible for all modes.
+ * Input events collector of {@link BusinessHandler} that collects all events in {@link #events}.
  *
- * @param <R> the row type
- * @param <D> the data type
- * @param <E> the error type
+ * @param <R> the input record type
+ * @param <D> the business data type
+ * @param <E> the event type
  */
-public non-sealed class BusinessCollector<D extends DataType<D>, R extends IRecord<?> & Identifiable<?>, E extends IBusinessEvent<D, R, ?>> extends BusinessHandler<R, D, E, BusinessException> {
+public class BusinessCollector<D extends DataType<D>, R extends IRecord<?> & Identifiable<?>, E extends IBusinessEvent<D, R, ?>> extends EventModeCollector<D, R, E, BusinessException> {
+    public static final EventModeType<BusinessException> MODE = BusinessModeType.INSTANCE;
 
     private final IBusinessCreator<D, R, E> creator;
     private final LazyCounter counter;
@@ -38,21 +32,35 @@ public non-sealed class BusinessCollector<D extends DataType<D>, R extends IReco
      * @param repository the input repository
      */
     public BusinessCollector(R source, IBusinessCreator<D, R, E> creator, IBusinessRepository<R> repository) {
-        this(source, new LinkedList<>(), creator, repository);
-    }
-
-    public BusinessCollector(R row, List<E> collector, IBusinessCreator<D, R, E> creator, IBusinessRepository<R> repository) {
-        super(row, collector, BUSINESS_MODE);
+        super(source, creator, MODE);
         requireNonNull(repository);
         this.creator = requireNonNull(creator);
-        this.counter = new LazyCounter(() -> repository.max(row));
+        this.counter = new LazyCounter(() -> repository.max(source));
     }
 
     @Override
-    final E create(D type, Integer offset, BusinessException cause) {
+    protected final E newEvent(D type, Integer offset, BusinessException cause) {
         final int order = counter.getAsInt() + events.size();
         final String trace = Up2Factory.trace(cause).orElse(null);
-        return creator.create(source, order, type, offset, cause, trace);
+        return creator.apply(source, order, type, offset, cause, trace);
     }
 
+    /**
+     * {@link BusinessCollector} builder.
+     */
+    public static final class Builder<D extends DataType<D>, R extends IRecord<?> & Identifiable<?>, E extends IBusinessEvent<D, R, ?>> extends EventModeBuilder<D, R, E> {
+        private final IBusinessCreator<D, R, E> creator;
+        private final IBusinessRepository<R> repository;
+
+        public Builder(int size, IBusinessCreator<D, R, E> creator, IBusinessRepository<R> repository) {
+            super(size);
+            this.creator = creator;
+            this.repository = repository;
+        }
+
+        @Override
+        protected BusinessCollector<D, R, E> newHandler(R record) {
+            return new BusinessCollector<>(record, creator, repository);
+        }
+    }
 }

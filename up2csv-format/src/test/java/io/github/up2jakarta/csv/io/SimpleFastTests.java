@@ -1,6 +1,5 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.fmt.FastRecord;
 import io.github.up2jakarta.csv.fmt.SimpleFastImporter;
@@ -8,6 +7,7 @@ import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
 import io.github.up2jakarta.csv.io.misc.AFastTests;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +23,7 @@ public class SimpleFastTests extends AFastTests<FastRecord<SegmentType, String>,
 
     @Autowired
     SimpleFastTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
-        super(new SimpleFastImporter<>(factory, Invoice.class, SegmentType.S01, SegmentType.values()), format);
+        super(new SimpleFastImporter<>(factory, Invoice.class, SegmentType.S01), format);
     }
 
     @Override

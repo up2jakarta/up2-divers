@@ -1,10 +1,8 @@
 package io.github.up2jakarta.csv;
 
-import io.github.up2jakarta.csv.api.ext.BeanContext;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.core.misc.clv.CurrencyConverter;
 import io.github.up2jakarta.csv.core.misc.ext.DummyConverter;
+import io.github.up2jakarta.csv.core.misc.lov.CurrencyConverter;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.MyFastAggregator;
@@ -12,6 +10,8 @@ import io.github.up2jakarta.csv.impl.MyFullAggregator;
 import io.github.up2jakarta.csv.impl.MyUnitAggregator;
 import io.github.up2jakarta.csv.prc.TokenProcessor;
 import io.github.up2jakarta.csv.slv.DecimalResolver;
+import io.github.up2jakarta.lov.core.BeanContext;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.Validator;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.springframework.context.ApplicationContext;
@@ -43,7 +43,17 @@ public class TUConfiguration {
 
     @Bean
     public BeanContext beanContext(final ApplicationContext context) {
-        return context::getBean;
+        return new BeanContext() {
+            @Override
+            public <B> B getBean(Class<B> type) {
+                return context.getBean(type);
+            }
+
+            @Override
+            public <B> B getBean(Class<B> type, String name) {
+                return context.getBean(name, type);
+            }
+        };
     }
 
     @Bean

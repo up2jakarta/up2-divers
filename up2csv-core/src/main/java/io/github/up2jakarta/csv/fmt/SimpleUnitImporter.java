@@ -2,14 +2,18 @@ package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.api.hdl.IPropertyCreator;
-import io.github.up2jakarta.csv.core.*;
-import io.github.up2jakarta.csv.core.hdl.PropertyCollector;
+import io.github.up2jakarta.csv.core.ModeType;
+import io.github.up2jakarta.csv.core.UnitImporter;
+import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.core.hdl.PropertyCollector.Builder;
 import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.RecordTransformer;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.data.Up2Result;
-import io.github.up2jakarta.xml.clv.CodeListException;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.core.AccessException;
+import io.github.up2jakarta.lov.core.BeanException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +22,8 @@ import java.util.List;
  * {@link ModeType#UNIT} Processor that's able to aggregate and import java-bean from flat-data.
  *
  * @param <T> the business object type
- * @param <B> the data type
- * @param <I> the segment type
+ * @param <B> the business data type
+ * @param <I> the input segment type
  * @see FastRecord
  * @see PropertyEvent
  */
@@ -27,13 +31,12 @@ public final class SimpleUnitImporter<T extends Segment, B extends DataType<B>, 
         extends UnitImporter<B, I, T, UnitRecord<I>, PropertyEvent<B, UnitRecord<I>>>
         implements RecordTransformer<UnitRecord<I>> {
 
-    @SuppressWarnings("unchecked")
-    public <E extends Enum<E> & IType<B, I>> SimpleUnitImporter(Up2Factory<B> mf, Class<T> type, E rootNode) throws BeanException {
-        this(mf, type, (I) rootNode, ((Class<I>) rootNode.getClass()).getEnumConstants());
+    public SimpleUnitImporter(Up2Factory<B> factory, Class<T> type, I root) throws BeanException {
+        super(factory, type, root);
     }
 
-    public SimpleUnitImporter(Up2Factory<B> mf, Class<T> type, I rootNode, I[] nodes) throws BeanException {
-        super(mf, type, rootNode, nodes);
+    public SimpleUnitImporter(Up2Factory<B> factory, Class<T> type, I root, List<I> nodes) throws BeanException {
+        super(factory, type, root, nodes);
     }
 
     public SimpleUnitImporter(SimpleUnitExporter<T, B, I> source) throws BeanException {
@@ -41,9 +44,9 @@ public final class SimpleUnitImporter<T extends Segment, B extends DataType<B>, 
     }
 
     @Override
-    protected PropertyCollector<UnitRecord<I>, B, PropertyEvent<B, UnitRecord<I>>> create(UnitRecord<I> row) {
-        final IPropertyCreator<UnitRecord<I>, B, PropertyEvent<B, UnitRecord<I>>> creator = PropertyEvent::new;
-        return new PropertyCollector<>(row, creator);
+    protected Builder<B, UnitRecord<I>, PropertyEvent<B, UnitRecord<I>>> newBuilder(int size) {
+        final IPropertyCreator<B, UnitRecord<I>, PropertyEvent<B, UnitRecord<I>>> creator = PropertyEvent::new;
+        return new Builder<>(size, creator);
     }
 
     @Override
@@ -53,23 +56,16 @@ public final class SimpleUnitImporter<T extends Segment, B extends DataType<B>, 
         return new UnitRecord<>(type, data);
     }
 
-    /**
-     * Parses and returns the business-object created from the given records source.
-     *
-     * @param rows the records source
-     * @return the parsed business-object with all collected errors
-     * @throws AccessException   for any problem when setting properties of java-beans from input record
-     * @throws CodeListException if type of one record is unknown
-     */
-    public Up2Result<T, PropertyEvent<B, UnitRecord<I>>> parse(List<String[]> rows) throws AccessException {
-        final List<UnitRecord<I>> records = new ArrayList<>(rows.size());
-        for (final String[] row : rows) {
-            if (row == null || row.length <= mode.getTypeIdIndex()) {
+    @Override
+    public Up2Result<T, PropertyEvent<B, UnitRecord<I>>> parse(List<String[]> records) throws AccessException {
+        final List<UnitRecord<I>> result = new ArrayList<>(records.size());
+        for (final String[] record : records) {
+            if (record == null || record.length <= mode.getTypeIdIndex()) {
                 continue;
             }
-            records.add(this.transform(row));
+            result.add(this.transform(record));
         }
-        return this.parse(records);
+        return this.parse(result);
     }
 
     @Override

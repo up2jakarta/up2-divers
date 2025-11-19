@@ -2,7 +2,7 @@ package io.github.up2jakarta.cii.ppf.adapters;
 
 import io.github.up2jakarta.cii.ppf.ChargeReasonCodeType;
 import io.github.up2jakarta.cii.ppf.SpecialServiceDescriptionCodeType;
-import io.github.up2jakarta.xml.clv.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListConverter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -10,7 +10,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import java.util.List;
 
 import static io.github.up2jakarta.cii.ppf.SpecialServiceDescriptionCodeType.values;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static java.util.Arrays.asList;
 
 /**

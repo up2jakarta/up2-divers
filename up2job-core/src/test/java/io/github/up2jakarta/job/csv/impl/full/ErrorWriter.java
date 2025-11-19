@@ -43,14 +43,14 @@ public class ErrorWriter extends ConditionalWriter<Up2Result<Invoice, InputError
 
     @Override
     public boolean isTransient(Up2Result<Invoice, InputError> item) {
-        return !item.getErrors().isEmpty();
+        return !item.toList().isEmpty();
     }
 
     @Override
     public void write(Up2Result<Invoice, InputError> item) throws IOException {
-        final String invoiceNumber = item.getErrors().getFirst().getKey().getRecord().getPivot();
-        LOG.warn("#Invoice[{}] has ({}) errors", invoiceNumber, item.getErrors().size());
-        delegate.write(item.getErrors());
+        final String invoiceNumber = item.toList().getFirst().getKey().getRecord().getPivot();
+        LOG.warn("#Invoice[{}] has ({}) errors", invoiceNumber, item.toList().size());
+        delegate.write(item.toList());
     }
 
     @Override

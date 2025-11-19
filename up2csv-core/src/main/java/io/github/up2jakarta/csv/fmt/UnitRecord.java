@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.cfg.Up2CodeList;
 import io.github.up2jakarta.csv.data.Definition;
+import io.github.up2jakarta.lov.CodeList;
 
 import java.util.Arrays;
 
@@ -13,9 +13,9 @@ import static java.util.Objects.requireNonNull;
  * Simple implementation of input record,
  * basically it's compatible with {@link io.github.up2jakarta.csv.core.ModeType#UNIT} mode.
  *
- * @param <T> the segment type
+ * @param <T> the input segment type
  */
-public class UnitRecord<T extends IType<?, T>> implements IRecord<T> {
+public class UnitRecord<T extends CodeList<T>> implements IRecord<T> {
 
     @Up2CodeList
     @Definition(code = "TID", value = "Type")
@@ -33,7 +33,7 @@ public class UnitRecord<T extends IType<?, T>> implements IRecord<T> {
     }
 
     @Override
-    public final String[] getColumns() {
+    public final String[] getData() {
         return data;
     }
 

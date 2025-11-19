@@ -2,7 +2,7 @@ package io.github.up2jakarta.job.zip;
 
 import io.github.up2jakarta.job.core.BusinessId;
 import io.github.up2jakarta.job.flux.FluxSupplier;
-import io.github.up2jakarta.xml.adapters.KeyCoder;
+import io.github.up2jakarta.lov.core.Codes;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -31,7 +31,7 @@ public class EntryFastDecoder implements EntryDecoder {
     public Optional<BusinessId> decode(ZipEntry entry, FluxSupplier<InputStream> input) {
         try {
             final String reference = EntryDecoder.decodeEntry(entry);
-            final long id = KeyCoder.decode(entry.getComment());
+            final long id = Codes.decode(entry.getComment());
             return Optional.of(new BusinessId(id, reference));
         } catch (Exception ignore) {
             return Optional.empty();

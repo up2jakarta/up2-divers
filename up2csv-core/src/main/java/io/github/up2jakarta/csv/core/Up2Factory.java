@@ -1,25 +1,21 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.BusinessBuilder;
-import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.core.BSOperator.Factory;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.api.IException;
+import io.github.up2jakarta.lov.core.BeanContext;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.validation.*;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Optional;
-
 /**
  * Up2 Configurable Factory for {@link Up2Mapper} and {@link Up2Format}.
  *
- * @param <D> The input data type
+ * @param <D> The business data type
  */
 @Named
 @Singleton
@@ -31,7 +27,7 @@ public final class Up2Factory<D extends DataType<D>> extends Factory {
      * Constructor with empty resolver.
      *
      * @param context the bean context
-     * @param type    the data type
+     * @param type    the business data type
      */
     public Up2Factory(BeanContext context, Class<D> type) {
         this(context, context.getBean(Validator.class), DataTypeResolver.empty(type));
@@ -63,23 +59,6 @@ public final class Up2Factory<D extends DataType<D>> extends Factory {
         try (final ValidatorFactory factory = cfg.buildValidatorFactory()) {
             return factory.getValidator();
         }
-    }
-
-    /**
-     * Builds and returns the stack trace of the cause of the specified error.
-     *
-     * @param event the source error
-     * @return the stack-trace if exists
-     */
-    public static Optional<String> trace(IException event) {
-        while (event.getCause() instanceof IException cause) {
-            event = cause;
-        }
-        return Optional.ofNullable(event.getCause()).map(c -> {
-            final StringWriter writer = new StringWriter();
-            BSBuilder.stackTrace(c, new PrintWriter(writer));
-            return writer.toString().trim();
-        });
     }
 
     /**

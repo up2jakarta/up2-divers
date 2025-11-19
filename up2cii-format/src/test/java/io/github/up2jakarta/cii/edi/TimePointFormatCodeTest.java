@@ -7,10 +7,10 @@ import io.github.up2jakarta.cii.core.PDurationFormatter;
 import io.github.up2jakarta.cii.core.TemporalFormatter;
 import io.github.up2jakarta.cii.format.standard.udt.DateStringType;
 import io.github.up2jakarta.cii.format.standard.udt.DateTimeType;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.xml.api.IValidationError;
-import io.github.up2jakarta.xml.api.SeverityType;
 import io.github.up2jakarta.xml.api.XValidationException;
-import io.github.up2jakarta.xml.clv.CodeListException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -64,9 +64,9 @@ public class TimePointFormatCodeTest extends CodeAdapterTest {
         assertEquals(1, errors.size());
         {
             final IValidationError error = errors.getFirst();
-            assertEquals(SeverityType.ERROR, error.getSeverity());
+            assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(15, error.getLineNumber());
-            assertEquals(46, error.getColumnNumber());
+            assertEquals(46, error.getLineOffset());
             assertEquals("ECE-2379: Unknown value [???] for CodeList[TimePointFormatCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());

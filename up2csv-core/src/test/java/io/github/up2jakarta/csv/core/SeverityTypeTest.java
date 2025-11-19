@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.SeverityType;
 import jakarta.xml.bind.ValidationEvent;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ class SeverityTypeTest {
         // Given
         final SeverityType severity = SeverityType.WARNING;
         // Then
-        assertEquals(ValidationEvent.WARNING, severity.getLevel());
+        assertEquals(ValidationEvent.WARNING, severity.getAsInt());
         assertEquals("W", severity.getCode());
         assertEquals(severity, SeverityType.of(ValidationEvent.WARNING));
     }
@@ -29,7 +29,7 @@ class SeverityTypeTest {
         // Given
         final SeverityType severity = SeverityType.ERROR;
         // Then
-        assertEquals(ValidationEvent.ERROR, severity.getLevel());
+        assertEquals(ValidationEvent.ERROR, severity.getAsInt());
         assertEquals("E", severity.getCode());
         assertEquals(severity, SeverityType.of(ValidationEvent.ERROR));
     }
@@ -39,7 +39,7 @@ class SeverityTypeTest {
         // Given
         final SeverityType severity = SeverityType.FATAL;
         // Then
-        assertEquals(ValidationEvent.FATAL_ERROR, severity.getLevel());
+        assertEquals(ValidationEvent.FATAL_ERROR, severity.getAsInt());
         assertEquals("F", severity.getCode());
         assertEquals(severity, SeverityType.of(ValidationEvent.FATAL_ERROR));
     }

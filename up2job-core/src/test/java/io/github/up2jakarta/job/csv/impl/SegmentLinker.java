@@ -1,41 +1,29 @@
 package io.github.up2jakarta.job.csv.impl;
 
-import io.github.up2jakarta.csv.api.fct.*;
+import io.github.up2jakarta.csv.api.fct.IJoin;
+import io.github.up2jakarta.csv.api.fct.ILink;
+import io.github.up2jakarta.csv.api.fct.IMapValue;
+import io.github.up2jakarta.csv.api.fct.ISegment;
 import io.github.up2jakarta.csv.core.BeanLinker;
-import io.github.up2jakarta.csv.core.ext.Beans;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.job.csv.dto.*;
 
-import java.util.function.BiConsumer;
-
-import static java.math.BigDecimal.ZERO;
-import static java.util.Optional.ofNullable;
-
 public class SegmentLinker<P extends Segment, T extends Segment> extends BeanLinker<T, P> {
 
-    private SegmentLinker(Class<P> parentType, Class<T> type, CollectionJoin<P, T> getter, BiConsumer<P, T> linker) {
+    private SegmentLinker(Class<P> parentType, Class<T> type, IJoin<P, T> getter, ILink<P, T> linker) {
         super(parentType, type, getter, linker);
     }
 
-    private SegmentLinker(Class<P> parentType, Class<T> type, SingleJoin<P, T> getter, BiConsumer<P, T> linker) {
-        super(parentType, type, getter, linker);
+    private SegmentLinker(Class<P> parentType, Class<T> type, ISegment<P, T> getter, ILink<P, T> linker) {
+        super(parentType, type, getter.many(), linker);
     }
 
-    private SegmentLinker(Class<P> parentType, Class<T> type, ArrayJoin<P, T> getter, BiConsumer<P, T> linker) {
-        super(parentType, type, getter, linker);
-    }
-
-    private SegmentLinker(Class<P> parentType, Class<T> type, MapValueJoin<P, T> getter, BiConsumer<P, T> linker) {
-        super(parentType, type, getter, linker);
-    }
-
-    private SegmentLinker(Class<P> parentType, Class<T> type, MapKeyJoin<P, T> getter, BiConsumer<P, T> linker) {
-        super(parentType, type, getter, linker);
+    private SegmentLinker(Class<P> parentType, Class<T> type, IMapValue<P, T> getter, ILink<P, T> linker) {
+        super(parentType, type, getter.values(), linker);
     }
 
     static SegmentLinker<Invoice, Invoice> invoice() {
-        return new SegmentLinker<>(Invoice.class, Invoice.class, CollectionJoin.empty(), (p, s) -> {
-        });
+        return new SegmentLinker<>(Invoice.class, Invoice.class, IJoin.empty(), ILink.empty());
     }
 
     static SegmentLinker<Invoice, Party> seller() {
@@ -55,26 +43,22 @@ public class SegmentLinker<P extends Segment, T extends Segment> extends BeanLin
     }
 
     static SegmentLinker<Invoice, Item> items() {
-        return new SegmentLinker<>(Invoice.class, Item.class, Invoice::getItems, (i, l) -> i.getItems().add(l));
+        return new SegmentLinker<>(Invoice.class, Item.class, Invoice::getItems, ILink.of(Invoice::getItems));
     }
 
     static SegmentLinker<Item, Attribute> attributes() {
-        return new SegmentLinker<>(Item.class, Attribute.class, Item::getAttributes, (i, a) -> i.getAttributes().put(a.getKey(), a));
+        return new SegmentLinker<>(
+                Item.class, Attribute.class, Item::getAttributes,
+                ILink.of(Item::getAttributes, Attribute::getKey)
+        );
     }
 
     static SegmentLinker<Invoice, Amount> amounts() {
-        return new SegmentLinker<>(Invoice.class, Amount.class, Invoice::getAmounts, (i, a) -> {
-            final Amount.Type at = switch (ofNullable(a.getValue()).orElse(ZERO).signum()) {
-                case 0 -> Amount.Type.NONE;
-                case 1 -> Amount.Type.CHARGE;
-                default -> Amount.Type.ALLOWANCE;
-            };
-            i.getAmounts().put(a, at);
-        });
+        return new SegmentLinker<>(Invoice.class, Amount.class, Invoice::getAmounts, ILink.of(Invoice::getAmounts));
     }
 
     static SegmentLinker<Invoice, Note> notes() {
-        return new SegmentLinker<>(Invoice.class, Note.class, Invoice::getNotes, (i, n) -> i.setNotes(Beans.concat(i.getNotes(), n)));
+        return new SegmentLinker<>(Invoice.class, Note.class, Invoice::getNotes, ILink.of(Invoice::getNotes));
     }
 
 }

@@ -3,10 +3,10 @@ package io.github.up2jakarta.csv.data;
 import io.github.up2jakarta.csv.api.IRecord;
 
 /**
- * Contract marker (target of parsing) for parsed beans managed by Up2CSV engine.
- * This marker tells the engine to setting the source row automatically.
+ * Contract interface for parsed bean that keep tracking of the source of data.
+ * This marker tells the engine to setting the record source automatically.
  *
- * @param <R> the input row type
+ * @param <R> the input record type
  */
 public interface Recordable<R extends IRecord<?>> extends Segment {
 
@@ -16,7 +16,7 @@ public interface Recordable<R extends IRecord<?>> extends Segment {
     R getRecord();
 
     /**
-     * Sets the source row, useful to keep tracking of sources.
+     * Sets the input record source, useful for keep tracking of sources.
      *
      * @param record the input source
      */

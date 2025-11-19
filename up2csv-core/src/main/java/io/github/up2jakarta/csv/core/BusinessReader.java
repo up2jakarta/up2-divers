@@ -4,15 +4,16 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.data.*;
+import io.github.up2jakarta.lov.core.AccessException;
 
 /**
  * Base business reader for multi-segments format, that's able to read business-objects from input stream.
  *
  * @param <T> the business object type
- * @param <B> the input data type
- * @param <I> the input type
+ * @param <B> the business data type
+ * @param <I> the input segment type
  * @param <R> the input record type
- * @param <E> the input error type
+ * @param <E> the event type
  */
 public abstract class BusinessReader<B extends DataType<B>, I extends IType<B, I>, T extends Segment, R extends IRecord<I>, E extends IEvent<B>> extends Up2Aggregator<R> {
 
@@ -43,7 +44,7 @@ public abstract class BusinessReader<B extends DataType<B>, I extends IType<B, I
     /**
      * Parses, validates and aggregates the next business-object.
      *
-     * @return the business-object with collected errors
+     * @return the business-object with collected events
      * @throws AccessException for any problem when setting properties of java-beans from input record
      */
     public final Up2Result<T, E> read() throws AccessException {

@@ -6,11 +6,11 @@ import io.github.up2jakarta.cii.format.standard.ram.ExchangedDocumentContextType
 import io.github.up2jakarta.cii.format.standard.ram.ExchangedDocumentType;
 import io.github.up2jakarta.cii.format.standard.ram.SupplyChainTradeTransactionType;
 import io.github.up2jakarta.cii.format.standard.ram.ValuationBreakdownStatementType;
+import io.github.up2jakarta.lov.CodeList;
 import io.github.up2jakarta.xml.api.XConfigurationException;
 import io.github.up2jakarta.xml.api.XReader;
 import io.github.up2jakarta.xml.api.XValidationException;
 import io.github.up2jakarta.xml.api.XWriter;
-import io.github.up2jakarta.xml.clv.CodeList;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

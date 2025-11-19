@@ -7,6 +7,8 @@ import io.github.up2jakarta.csv.core.BSProperty.PAccessor.PPAccessor.PNAccessor;
 import io.github.up2jakarta.csv.core.BSProperty.PAccessor.PPAccessor.PRAccessor;
 import io.github.up2jakarta.csv.core.BSProperty.PAccessor.PPAccessor.PWAccessor;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.CodeList;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.persistence.AccessType;
 
 import java.lang.reflect.Field;
@@ -15,12 +17,12 @@ import java.lang.reflect.Modifier;
 /**
  * Defines access modes used to test the accessibility of a property.
  */
-public abstract class AccessMode {
+public abstract class AccessMode implements CodeList<AccessMode> {
 
     /**
-     * Property read access.
+     * Property read only access.
      */
-    public static final AccessMode RO = new AccessMode() {
+    public static final AccessMode RO = new AccessMode("RO", "Read only") {
         @Override
         public <V> PAccessor<Field, V> of(AccessType at, Class<? extends Segment> st, Field fp, Class<V> ft) throws BeanException {
             if (AccessType.FIELD == at) {
@@ -30,9 +32,9 @@ public abstract class AccessMode {
         }
     };
     /**
-     * Property write access.
+     * Property write only access.
      */
-    public static final AccessMode WO = new AccessMode() {
+    public static final AccessMode WO = new AccessMode("WO", "Write only") {
         @Override
         public <V> PAccessor<Field, V> of(AccessType at, Class<? extends Segment> st, Field fp, Class<V> ft) throws BeanException {
             if (st.isRecord()) {
@@ -48,7 +50,22 @@ public abstract class AccessMode {
         }
     };
 
-    private AccessMode() {
+    private final String name;
+    private final String code;
+
+    private AccessMode(String name, String code) {
+        this.name = name;
+        this.code = code;
+    }
+
+    @Override
+    public final String getCode() {
+        return code;
+    }
+
+    @Override
+    public final String getName() {
+        return name;
     }
 
     /**

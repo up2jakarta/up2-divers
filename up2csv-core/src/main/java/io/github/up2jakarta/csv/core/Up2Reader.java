@@ -1,9 +1,10 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.core.AccessException;
 
 import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
 
 /**
  * Base reader for mono-segment format, that's able to read segments from input stream.

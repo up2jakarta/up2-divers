@@ -1,22 +1,23 @@
 package io.github.up2jakarta.csv.api;
 
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.CodeList;
 
 /**
- * Contact interface for an input record, it is compatible with {@link io.github.up2jakarta.csv.core.ModeType#UNIT}.
+ * Contact interface for {@link io.github.up2jakarta.csv.cfg.Truncated} input record.
  *
- * @param <I> the input type implementation
+ * @param <T> the input segment type
  */
-public interface IRecord<I extends IType<?, I>> extends Segment {
+public interface IRecord<T extends CodeList<T>> extends Segment {
 
     /**
-     * @return the input type
+     * @return the input segment type
      */
-    I getType();
+    T getType();
 
     /**
-     * @return the input data, it could be truncated to avoid performance issues
+     * @return the input truncated data
      */
-    String[] getColumns();
+    String[] getData();
 
 }

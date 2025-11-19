@@ -6,7 +6,7 @@ import io.github.up2jakarta.csv.cfg.ValidOverride;
 import io.github.up2jakarta.csv.core.misc.vld.Up2NotEmpty;
 import io.github.up2jakarta.csv.core.misc.vld.Up2Warn;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.SeverityType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -19,17 +19,17 @@ public class Test2Validator implements Segment {
     public static final String TU_P_021 = "TU-P021";
 
     @Position(0)
-    @Error(value = TU_P_009, severity = SeverityType.WARNING)
+    @Error(value = TU_P_009, level = SeverityType.WARNING)
     @NotEmpty
     private String sequence;
 
     @Position(1)
-    @Error(value = TU_P_010, severity = SeverityType.WARNING)
+    @Error(value = TU_P_010, level = SeverityType.WARNING)
     @NotNull(payload = Up2Warn.class)
     private String other;
 
     @Position(2)
-    @Error(value = TU_P_021, severity = SeverityType.WARNING)
+    @Error(value = TU_P_021, level = SeverityType.WARNING)
     @Up2NotEmpty(payload = Up2Warn.class)
     private String andMore;
 

@@ -10,7 +10,7 @@ dependency-reduced-pom.xml
 buildNumber.properties
 
 #IntelliJ
-/.idea/
+/.idea/**
 **/*.imp
 *.iml
 

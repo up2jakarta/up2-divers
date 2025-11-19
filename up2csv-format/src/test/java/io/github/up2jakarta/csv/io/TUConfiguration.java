@@ -1,11 +1,11 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.prc.TokenProcessor;
 import io.github.up2jakarta.csv.slv.DecimalResolver;
+import io.github.up2jakarta.lov.core.BeanContext;
 import jakarta.validation.Validator;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.QuoteMode;

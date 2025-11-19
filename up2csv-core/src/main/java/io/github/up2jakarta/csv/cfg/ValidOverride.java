@@ -18,17 +18,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ValidOverride {
 
     /**
-     * @return disable JSR-303 validation for the annotated segment or fragment.
+     * @return the flag that disables JSR-303 validation for the annotated segment or fragment.
      */
     boolean disable() default false;
 
     /**
-     * The path of the property whose mapping is being overridden.
+     * @return the path of the fragment whose configuration is being overridden.
      */
     String[] path() default {};
 
     /**
-     * Set the validation groups (JSR-303).
+     * Returns the validation groups (JSR-303).
      *
      * @return the validation groups
      */

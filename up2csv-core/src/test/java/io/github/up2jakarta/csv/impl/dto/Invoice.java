@@ -1,9 +1,7 @@
 package io.github.up2jakarta.csv.impl.dto;
 
-import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.cfg.Up2Decimal;
-import io.github.up2jakarta.csv.cfg.Up2Temporal;
-import io.github.up2jakarta.csv.cfg.Up2Token;
+import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.cfg.*;
 import io.github.up2jakarta.csv.core.misc.Parsable;
 import io.github.up2jakarta.csv.data.BusinessId;
 import jakarta.validation.Valid;
@@ -12,15 +10,15 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static io.github.up2jakarta.lov.SeverityType.FATAL;
 
 /**
  * {@link io.github.up2jakarta.csv.impl.SegmentType#S01}
  */
 @Valid
+@Error(value = "CSV-C01", level = FATAL)
 @SuppressWarnings("unused")
 public class Invoice extends Parsable {
 
@@ -53,8 +51,8 @@ public class Invoice extends Parsable {
     private Party seller;
     private Party buyer;
 
-    private Party payer;
-    private Party payee;
+    private Optional<Party> payer = Optional.empty();
+    private Optional<Party> payee = Optional.empty();
 
     private Note[] notes = new Note[0];
     private List<Item> items = new LinkedList<>();
@@ -116,19 +114,19 @@ public class Invoice extends Parsable {
         this.buyer = buyer;
     }
 
-    public Party getPayer() {
+    public Optional<Party> getPayer() {
         return payer;
     }
 
-    public void setPayer(Party payer) {
+    public void setPayer(Optional<Party> payer) {
         this.payer = payer;
     }
 
-    public Party getPayee() {
+    public Optional<Party> getPayee() {
         return payee;
     }
 
-    public void setPayee(Party payee) {
+    public void setPayee(Optional<Party> payee) {
         this.payee = payee;
     }
 

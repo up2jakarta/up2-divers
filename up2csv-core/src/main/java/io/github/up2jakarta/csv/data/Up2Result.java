@@ -3,23 +3,32 @@ package io.github.up2jakarta.csv.data;
 import io.github.up2jakarta.csv.api.IEvent;
 
 import java.util.List;
+import java.util.function.Supplier;
 
-public final class Up2Result<T extends Segment, E extends IEvent<?>> {
+/**
+ * Simple {@link BusinessCreator} implementation that wraps the business-object and its related events.
+ *
+ * @param <T> the business-object type
+ * @param <E> the event type
+ */
+public final class Up2Result<T extends Segment, E extends IEvent<?>> implements Supplier<T>, Listable<E> {
 
     private final T bean;
-    private final List<E> errors;
+    private final List<E> events;
 
-    public Up2Result(T bean, List<E> errors) {
+    public Up2Result(T bean, List<E> events) {
         this.bean = bean;
-        this.errors = errors;
+        this.events = events;
     }
 
-    public T getBean() {
+    @Override
+    public T get() {
         return bean;
     }
 
-    public List<E> getErrors() {
-        return errors;
+    @Override
+    public List<E> toList() {
+        return events;
     }
 
 }

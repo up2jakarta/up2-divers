@@ -3,6 +3,7 @@ package io.github.up2jakarta.csv.io.misc;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.BusinessWriter;
 import io.github.up2jakarta.csv.core.ModeType;
+import io.github.up2jakarta.csv.core.hdl.EventModeBuilder;
 import io.github.up2jakarta.csv.core.hdl.PropertyCollector;
 import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
 import io.github.up2jakarta.csv.data.Up2Result;
@@ -11,7 +12,7 @@ import io.github.up2jakarta.csv.io.BaseFileReader;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
-import io.github.up2jakarta.xml.api.PropertyException;
+import io.github.up2jakarta.lov.PropertyException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -32,7 +33,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import static io.github.up2jakarta.csv.fmt.Fixed06Generator.FV_SM;
-import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
+import static io.github.up2jakarta.lov.core.Codes.fixed;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class Tests {
@@ -43,9 +44,20 @@ public abstract class Tests {
         }
     }
 
-    public static class TUHandler extends PropertyCollector<TURecord, GroupType, TUError> {
+    public static class TUHandler extends PropertyCollector<GroupType, TURecord, TUError> {
         public TUHandler(TURecord row) {
             super(row, TUError::new);
+        }
+
+        public static final class Builder extends EventModeBuilder<GroupType, TURecord, TUError> {
+            public Builder(int size) {
+                super(size);
+            }
+
+            @Override
+            protected TUHandler newHandler(TURecord record) {
+                return new TUHandler(record);
+            }
         }
     }
 
@@ -162,9 +174,9 @@ public abstract class Tests {
         private void assertExists(R data, final List<R> origin) {
             for (var it = origin.listIterator(); it.hasNext(); ) {
                 final R source = it.next();
-                if (source.getType() == data.getType() && source.getColumns().length == data.getColumns().length) {
-                    for (var i = 0; i < source.getColumns().length; i++) {
-                        if (!Objects.equals(source.getColumns()[i], data.getColumns()[i])) {
+                if (source.getType() == data.getType() && source.getData().length == data.getData().length) {
+                    for (var i = 0; i < source.getData().length; i++) {
+                        if (!Objects.equals(source.getData()[i], data.getData()[i])) {
                             break;
                         }
                     }
@@ -203,9 +215,9 @@ public abstract class Tests {
         final void copy(BaseFileReader<Invoice, GroupType, SegmentType, R, ?> reader1, BusinessWriter<Invoice> writer) throws IOException {
             while (reader1.hasNext()) {
                 final Up2Result<Invoice, ?> item = reader1.read();
-                assertEquals(0, item.getErrors().size());
-                assertNotNull(item.getBean());
-                writer.write(item.getBean());
+                assertEquals(0, item.toList().size());
+                assertNotNull(item.get());
+                writer.write(item.get());
             }
             reader1.close();
             writer.close();

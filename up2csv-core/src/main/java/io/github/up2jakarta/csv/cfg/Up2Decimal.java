@@ -1,13 +1,12 @@
 package io.github.up2jakarta.csv.cfg;
 
-import io.github.up2jakarta.csv.api.ext.Conversion;
 import io.github.up2jakarta.csv.slv.DecimalResolver;
 
 import java.lang.annotation.*;
 import java.math.RoundingMode;
 
 /**
- * Up2 {@link Conversion} resolver that supports decimal {@link Number} types.
+ * Up2 {@link io.github.up2jakarta.lov.TypeAdapter} resolver that supports decimal {@link Number} types.
  *
  * @see java.math.BigDecimal#setScale(int, RoundingMode)
  */

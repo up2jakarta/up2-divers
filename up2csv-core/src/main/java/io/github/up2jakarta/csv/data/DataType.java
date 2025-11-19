@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.data;
 
-import io.github.up2jakarta.xml.clv.CodeList;
+import io.github.up2jakarta.lov.CodeList;
 
 /**
  * Contract interface for business data types.

@@ -5,10 +5,13 @@ import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.core.BSContext.BVContext;
 import io.github.up2jakarta.csv.core.BSProperty.FProperty;
 import io.github.up2jakarta.csv.core.BSProperty.PProperty;
+import io.github.up2jakarta.csv.core.hdl.ComplianceHandler;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Recordable;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.core.AccessException;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 
@@ -16,15 +19,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.*;
 
+import static io.github.up2jakarta.csv.core.BSBuilder.ST;
 import static io.github.up2jakarta.csv.core.BSNode.BFNode;
 import static io.github.up2jakarta.csv.core.BSNode.BPNode;
 import static io.github.up2jakarta.csv.core.BSNode.BPNode.BMNode;
 import static io.github.up2jakarta.csv.core.BSNode.BPNode.BRNode;
-import static io.github.up2jakarta.csv.core.BSOperator.Processor;
+import static io.github.up2jakarta.csv.core.BSOperator.BProcessor;
 import static io.github.up2jakarta.csv.core.ext.Beans.getDefaultConstructor;
 import static io.github.up2jakarta.csv.core.ext.Beans.newInstance;
-import static io.github.up2jakarta.csv.core.ext.Defaults.EMPTY;
-import static io.github.up2jakarta.csv.core.ext.Defaults.prototype;
+import static io.github.up2jakarta.lov.core.Defaults.EMPTY;
+import static io.github.up2jakarta.lov.core.Defaults.prototype;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 
@@ -32,7 +36,7 @@ import static java.util.Collections.unmodifiableMap;
  * Internal business node.
  */
 @SuppressWarnings("unchecked")
-abstract sealed class BSNode<S extends Segment, D extends DataType<D>> permits BFNode, BPNode {
+abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implements ST permits BFNode, BPNode {
     final List<BSProperty<?, ?, D>> properties;
     final Validator validator;
     final boolean prototype;
@@ -82,7 +86,7 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> permits B
         return property;
     }
 
-    void validate(S b, int o, EventHandler<D> h) {
+    void validate(S b, int o, ComplianceHandler<D> h) {
         if (context.enabled) {
             final Set<ConstraintViolation<Object>> violations = validator.validate(b, context.groups);
             for (final ConstraintViolation<?> cv : violations) {
@@ -106,13 +110,13 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> permits B
         private final int index;
 
         BFNode(int i, Class<S> t, Validator v, BVContext c, Fragment f, List<BSProperty<?, ?, D>> ps) {
-            super(i, t, v, c, f.nullable(), f.defaultValues(), ps);
-            if (nullable) {
+            super(i, t, v, c, f.nullable(), f.prototype(), ps);
+            if (this.prototype) {
+                this.index = BProcessor.min(this);
+                this.values = this.defaultValues(index);
+            } else {
                 this.index = -1;
                 this.values = EMPTY;
-            } else {
-                this.index = Processor.min(this);
-                this.values = this.defaultValues(prototype(t), index);
             }
         }
 
@@ -124,37 +128,38 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> permits B
 
         private BFNode(BPNode<S, D, ?> source) throws BeanException {
             super(source);
-            if (!nullable) {
-                this.index = Processor.min(this);
-                this.values = this.defaultValues(source.defaultValue(), index);
+            if (this.prototype) {
+                this.index = BProcessor.min(this);
+                this.values = this.defaultValues(index);
             } else {
                 this.index = -1;
                 this.values = EMPTY;
             }
         }
 
-        private String[] defaultValues(S bean, int min) {
-            final int length = Processor.max(this) + 1;
+        private String[] defaultValues(int min) {
+            final int length = BProcessor.max(this) + 1;
             if (length != 0 && min >= 0) {
                 final String[] result = new String[length];
-                this.format(result, 0, bean, BSWalker.getInstance(prototype));
+                this.format(result, 0, null);
                 return prototype(result, min);
             }
             return EMPTY;
         }
 
-        private void format(String[] result, int offset, S bean, BSWalker config) {
-            if (bean == null && config.test(result, offset, nullable, index, values)) {
-                return;
-            }
-            for (final BSProperty<?, ?, D> p : properties) {
-                if (p instanceof PProperty<?, ?, ?> pp) {
-                    result[offset + p.offset] = config.format(bean, pp);
-                } else if (p instanceof FProperty<?, ?, ?> fp) {
-                    final BFNode<Segment, D> node = (BFNode<Segment, D>) fp.node;
-                    final Segment value = ((FProperty<Segment, ?, D>) fp).getUnwrapped(bean);
-                    node.format(result, offset, value, config);
+        void format(String[] result, int offset, S bean) {
+            if (bean != null || values == null) {
+                for (final BSProperty<?, ?, D> p : properties) {
+                    if (p instanceof PProperty<?, ?, ?> pp) {
+                        result[offset + p.offset] = pp.getFormatted(bean);
+                    } else if (p instanceof FProperty<?, ?, ?> fp) {
+                        final BFNode<Segment, D> node = (BFNode<Segment, D>) fp.node;
+                        final Segment value = ((FProperty<Segment, ?, D>) fp).getUnwrapped(bean);
+                        node.format(result, offset, value);
+                    }
                 }
+            } else if (values != EMPTY) {
+                System.arraycopy(values, 0, result, offset + index, values.length);
             }
         }
 
@@ -169,11 +174,7 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> permits B
             }
         }
 
-        void format(String[] result, int offset, S bean) {
-            this.format(result, offset, bean, BSWalker.ACWalker.INSTANCE);
-        }
-
-        void validate(EventHandler<D> handler, S bean, int offset) {
+        void validate(ComplianceHandler<D> handler, S bean, int offset) {
             if (bean != null && context.enabled) {
                 for (final BSProperty<?, ?, D> property : properties) {
                     if (property instanceof FProperty<?, ?, ?> fp) {
@@ -194,71 +195,6 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> permits B
                 return new BMNode<>(this);
             }
         }
-
-        /**
-         * Internal Format Walker.
-         */
-        abstract sealed static class BSWalker permits BSWalker.ACWalker, BSWalker.BCWalker {
-            static BSWalker getInstance(boolean prototype) {
-                if (prototype) {
-                    return BCWalker.ENABLED;
-                }
-                return BCWalker.DISABLED;
-            }
-
-            abstract boolean test(String[] result, int offset, boolean nullable, int index, String[] values);
-
-            abstract <T, V> String format(Segment bean, PProperty<T, V, ?> property);
-
-            static final class ACWalker extends BSWalker {
-                private static final ACWalker INSTANCE = new ACWalker();
-
-                private ACWalker() {
-                }
-
-                @Override
-                boolean test(String[] result, int offset, boolean nullable, int index, String[] values) {
-                    if (!(nullable || values.length == 0)) {
-                        System.arraycopy(values, 0, result, offset + index, values.length);
-                    }
-                    return true;
-                }
-
-                @Override
-                <T, V> String format(Segment bean, PProperty<T, V, ?> pp) {
-                    return pp.getFormatted(bean);
-                }
-            }
-
-            static final class BCWalker extends BSWalker {
-                private static final BCWalker ENABLED = new BCWalker(true);
-                private static final BCWalker DISABLED = new BCWalker(false);
-
-                private final boolean enabled;
-
-                private BCWalker(boolean enabled) {
-                    this.enabled = enabled;
-                }
-
-                @Override
-                boolean test(String[] result, int offset, boolean nullable, int index, String[] values) {
-                    if (nullable || values == null || values.length == 0) {
-                        return !enabled;
-                    }
-                    System.arraycopy(values, 0, result, offset + index, values.length);
-                    return true;
-                }
-
-                @Override
-                <T, V> String format(Segment bean, PProperty<T, V, ?> pp) {
-                    try {
-                        return pp.getFormatted(bean, pp.defaultValue, enabled);
-                    } catch (Exception ignore) {
-                        return null;
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -268,7 +204,7 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> permits B
         protected final Constructor<S> constructor;
 
         BPNode(int i, Class<S> t, Validator v, BVContext c, Fragment f, List<BSProperty<?, ?, D>> ps) throws BeanException {
-            super(i, t, v, c, f.nullable(), f.defaultValues(), ps);
+            super(i, t, v, c, f.nullable(), f.prototype(), ps);
             this.constructor = getDefaultConstructor(t);
         }
 
@@ -317,7 +253,7 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> permits B
                 try {
                     ((Recordable<R>) wrapper).setRecord(source);
                 } catch (Exception cause) {
-                    throw new AccessException(Recordable.class, "record", cause);
+                    throw new AccessException(target.getClass(), "setRecord", cause);
                 }
             }
         }
@@ -334,8 +270,6 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> permits B
         protected abstract S parse(List<Segment> stack, EventHandler<D> handler, int offset, String... record);
 
         protected abstract <V> void set(C bean, BSProperty<?, V, D> property, V value);
-
-        protected abstract S defaultValue();
 
         /**
          * Internal Mapper Node for java-beans.
@@ -367,14 +301,6 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> permits B
                 final boolean empty = this.parse(stack, bean, handler, offset, record);
                 stack.removeLast();
                 return empty ? null : bean;
-            }
-
-            @Override
-            protected S defaultValue() {
-                if (offset == -1) {
-                    return newInstance(constructor);
-                }
-                return prototype(type);
             }
 
             @Override
@@ -436,11 +362,6 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> permits B
             protected <V> void set(Object[] arguments, BSProperty<?, V, D> property, V value) {
                 final int index = indexes.get(property);
                 arguments[index] = value;
-            }
-
-            @Override
-            protected S defaultValue() {
-                return newInstance(constructor, prototype);
             }
         }
     }

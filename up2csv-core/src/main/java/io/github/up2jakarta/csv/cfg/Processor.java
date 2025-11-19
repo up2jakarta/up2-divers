@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.cfg;
 
-import io.github.up2jakarta.csv.api.ext.BeanContext;
 import io.github.up2jakarta.csv.api.ext.InputProcessor;
+import io.github.up2jakarta.lov.core.BeanContext;
 
 import java.lang.annotation.*;
 
@@ -14,14 +14,24 @@ import java.lang.annotation.*;
 public @interface Processor {
 
     /**
-     * The processor class must be managed by {@link BeanContext}.
+     * The processor must be managed by {@link BeanContext}.
      *
      * @return the class of the processor
      */
     Class<? extends InputProcessor<?>> value();
 
     /**
-     * @return the top-level error type to be skipped
+     * Returns the qualified name of the processor, by default is <code>null</code>.
+     * <p>
+     * Useful when the {@link BeanContext} contains many beans of the specified processor.
+     *
+     * @return the qualified name
+     * @see jakarta.inject.Named
+     */
+    String name() default "";
+
+    /**
+     * @return the top-level exception to be skipped
      */
     Class<? extends RuntimeException> skip() default RuntimeException.class;
 

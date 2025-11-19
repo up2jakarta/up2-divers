@@ -3,10 +3,10 @@ package io.github.up2jakarta.csv.core.misc.jpa;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2EnableJPA;
-import io.github.up2jakarta.csv.core.misc.clv.TestCodeList;
-import io.github.up2jakarta.csv.core.misc.clv.TestCodeListConverter;
+import io.github.up2jakarta.csv.core.misc.lov.TestCodeList;
+import io.github.up2jakarta.csv.core.misc.lov.TestCodeListConverter;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.SeverityType;
 import jakarta.persistence.*;
 
 @Entity
@@ -20,19 +20,19 @@ public class Test2Bean implements Segment {
     public static final String XML_003 = "JPA-003";
 
     @Position(0)
-    @Error(value = XML_001, severity = SeverityType.WARNING)
+    @Error(value = XML_001, level = SeverityType.WARNING)
     @Enumerated
     @Transient
     private XML1Enum enum1;
 
     @Position(1)
-    @Error(value = XML_002, severity = SeverityType.WARNING)
+    @Error(value = XML_002, level = SeverityType.WARNING)
     @Enumerated
     @Transient
     private XML2Enum enum2;
 
     @Position(2)
-    @Error(value = XML_003, severity = SeverityType.WARNING)
+    @Error(value = XML_003, level = SeverityType.WARNING)
     @Convert(converter = TestCodeListConverter.class)
     @Transient
     private TestCodeList adapter;

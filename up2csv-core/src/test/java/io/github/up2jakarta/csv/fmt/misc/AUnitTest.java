@@ -2,7 +2,6 @@ package io.github.up2jakarta.csv.fmt.misc;
 
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.UnitExporter;
 import io.github.up2jakarta.csv.core.UnitImporter;
@@ -10,6 +9,7 @@ import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
 import io.github.up2jakarta.csv.impl.dto.Item;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -51,8 +51,8 @@ public abstract class AUnitTest<T extends Invoice, R extends IRecord<SegmentType
         });
         // Then
         assertValid(invoice);
-        assertNull(invoice.getPayee());
-        assertNull(invoice.getPayer());
+        assertTrue(invoice.getPayee().isEmpty());
+        assertTrue(invoice.getPayer().isEmpty());
         assertNotNull(invoice.getSeller());
         assertNotNull(invoice.getBuyer());
         assertEquals(2, invoice.getItems().size());

@@ -1,12 +1,12 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.FastImporter;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
 import io.github.up2jakarta.csv.io.misc.AFastTests;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,10 +24,10 @@ public class FastInvoiceTests extends AFastTests<TURecord, FastImporter<GroupTyp
 
     @Autowired
     FastInvoiceTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
-        super(new FastImporter<>(factory, Invoice.class, SegmentType.S01, SegmentType.values()) {
+        super(new FastImporter<>(factory, Invoice.class, SegmentType.S01) {
             @Override
-            protected TUHandler create(TURecord row) {
-                return new TUHandler(row);
+            protected TUHandler.Builder newBuilder(int size) {
+                return new TUHandler.Builder(size);
             }
         }, format);
     }

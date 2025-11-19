@@ -2,9 +2,9 @@ package io.github.up2jakarta.csv.core.hdl;
 
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.xml.api.MessageFormatter;
-import io.github.up2jakarta.xml.api.PropertyException;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.MessageFormatter;
+import io.github.up2jakarta.lov.PropertyException;
+import io.github.up2jakarta.lov.SeverityType;
 
 import java.util.Optional;
 

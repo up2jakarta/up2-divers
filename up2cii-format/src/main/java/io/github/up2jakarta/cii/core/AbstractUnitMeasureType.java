@@ -3,7 +3,7 @@ package io.github.up2jakarta.cii.core;
 import io.github.up2jakarta.cii.format.standard.qdt.LinearUnitMeasureType;
 import io.github.up2jakarta.cii.format.standard.qdt.VolumeUnitMeasureType;
 import io.github.up2jakarta.cii.format.standard.qdt.WeightUnitMeasureType;
-import io.github.up2jakarta.xml.clv.CodeList;
+import io.github.up2jakarta.lov.CodeList;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlSchemaType;
 import jakarta.xml.bind.annotation.XmlTransient;

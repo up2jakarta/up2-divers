@@ -6,7 +6,7 @@ import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.PositionOverride;
 import io.github.up2jakarta.csv.core.hdl.BusinessEvent;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.xml.api.IError;
+import io.github.up2jakarta.lov.IError;
 
 /**
  * Simple implementation of {@link BusinessEvent}, it's well configured as segment to be exportable.
@@ -15,8 +15,8 @@ import io.github.up2jakarta.xml.api.IError;
  * overridden when the segment is used as exportable segment.
  *
  * @param <D> the business data type
- * @param <P> the pivot type
- * @param <R> the record type
+ * @param <P> the input pivot type
+ * @param <R> the input record type
  * @see SimpleFullImporter
  */
 @FragmentOverride(path = {"key"}, value = @Fragment(0))
@@ -26,14 +26,14 @@ import io.github.up2jakarta.xml.api.IError;
 @PositionOverride(path = {"key", "record", "pivot"}, value = @Position(2))
 @PositionOverride(path = "type", value = @Position(3))
 @PositionOverride(path = "offset", value = @Position(4))
-@PositionOverride(path = "severity", value = @Position(5))
+@PositionOverride(path = "level", value = @Position(5))
 @PositionOverride(path = "code", value = @Position(6))
 @PositionOverride(path = "message", value = @Position(7))
 @PositionOverride(path = "trace", value = @Position(8))
 public class FullError<D extends DataType<D>, P extends Comparable<P>, R extends FullRecord<?, P>> extends BusinessEvent<D, R> {
 
-    public FullError(R row, int order, D type, Integer offset, IError cause, String trace) {
-        super(row, order, type, offset, cause, trace);
+    public FullError(R source, int order, D type, Integer offset, IError cause, String trace) {
+        super(source, order, type, offset, cause, trace);
     }
 
 }

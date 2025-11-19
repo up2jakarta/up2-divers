@@ -1,8 +1,8 @@
 package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.CountryIDType;
-import io.github.up2jakarta.xml.clv.CodeListConverter;
-import io.github.up2jakarta.xml.clv.CodeListException;
+import io.github.up2jakarta.lov.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -12,7 +12,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  */
 @Named
 @Singleton
-public class CountryIDAdapter extends CodeListConverter<CountryIDType> {
+public final class CountryIDAdapter extends CodeListConverter<CountryIDType> {
 
     private static final String CODE_GREECE = "EL";
 
@@ -21,11 +21,11 @@ public class CountryIDAdapter extends CodeListConverter<CountryIDType> {
     }
 
     @Override
-    public CountryIDType parse(String value) throws CodeListException {
+    protected CountryIDType doParse(String value) throws CodeListException {
         if (CODE_GREECE.equals(value)) {
             return CountryIDType.GR;
         }
-        return super.parse(value);
+        return super.doParse(value);
     }
 
 }

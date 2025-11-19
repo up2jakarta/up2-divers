@@ -1,34 +1,35 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.api.ext.Conversion;
-import io.github.up2jakarta.csv.api.ext.PropertyConverter;
-import io.github.up2jakarta.csv.api.ext.PropertyFormatter;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.core.BSBuilder.PProcessor;
+import io.github.up2jakarta.csv.core.BSBuilder.ST;
 import io.github.up2jakarta.csv.core.BSOperator.BAccessor.BPAccessor;
 import io.github.up2jakarta.csv.core.ext.Beans;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
-import io.github.up2jakarta.csv.core.hdl.FastHandler;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.TypeAdapter;
+import io.github.up2jakarta.lov.core.AccessException;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.persistence.AccessType;
 
 import java.lang.reflect.*;
 import java.util.List;
 import java.util.Optional;
 
+import static io.github.up2jakarta.csv.core.BSProperty.FProperty;
 import static io.github.up2jakarta.csv.core.BSProperty.FProperty.FOProperty;
 import static io.github.up2jakarta.csv.core.BSProperty.FProperty.FWProperty;
-import static io.github.up2jakarta.csv.core.BSProperty.PAccessor.PFAccessor;
 import static io.github.up2jakarta.csv.core.BSProperty.PAccessor.PFAccessor.FRAccessor;
 import static io.github.up2jakarta.csv.core.BSProperty.PAccessor.PFAccessor.FWAccessor;
-import static io.github.up2jakarta.csv.core.BSProperty.PAccessor.PPAccessor;
 import static io.github.up2jakarta.csv.core.BSProperty.PAccessor.PPAccessor.*;
+import static io.github.up2jakarta.csv.core.BSProperty.PProperty;
 import static io.github.up2jakarta.csv.core.BSProperty.PProperty.POProperty;
 import static io.github.up2jakarta.csv.core.BSProperty.PProperty.PWProperty;
-import static io.github.up2jakarta.csv.core.ext.Beans.*;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.csv.core.ext.Beans.getAccessibleGetter;
+import static io.github.up2jakarta.csv.core.ext.Beans.getAccessibleSetter;
 import static jakarta.persistence.AccessType.PROPERTY;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -36,7 +37,7 @@ import static java.util.Optional.ofNullable;
 /**
  * Internal property representation.
  */
-abstract sealed class BSProperty<T, V, D extends DataType<D>> permits BSProperty.FProperty, BSProperty.PProperty {
+abstract sealed class BSProperty<T, V, D extends DataType<D>> implements ST permits FProperty, PProperty {
     final int offset;
     final D dataType;
     final Error error;
@@ -126,25 +127,6 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> permits BSProperty
         V get(BSProperty<T, V, D> property) throws BeanException;
     }
 
-    @FunctionalInterface
-    interface PProcessor<D extends DataType<D>> {
-
-        default <T> T defaultValue(BSProperty<T, ?, D> pp, PropertyConverter<T> pc) throws BeanException {
-            try {
-                var v = this.process(null, 0, (PProperty<?, ?, D>) pp, FastHandler.of(ERROR));
-                if (v != null) {
-                    return pc.apply(v);
-                }
-                return null;
-            } catch (Exception ex) {
-                throw BeanException.of(pp.getSource(), "@Position[defaultValue] cannot be parsed");
-            }
-        }
-
-        String process(String value, int offset, PProperty<?, ?, D> property, EventHandler<D> handler);
-
-    }
-
     /**
      * Internal {@link Fragment} implementation.
      */
@@ -230,25 +212,22 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> permits BSProperty
     abstract sealed static class PProperty<T, V, D extends DataType<D>> extends BSProperty<T, V, D> permits POProperty, PWProperty {
         final Class<T> type;
         final boolean required;
+        private final TypeAdapter<T> adapter;
         private final PProcessor<D> processor;
-        private final PropertyFormatter<T> formatter;
-        private final PropertyConverter<T> converter;
 
-        private PProperty(PAccessor<?, V> va, D dt, int fo, Position pp, PProcessor<D> ps, Conversion<T> pc, DefaultValue<T, V, D> dv) throws BeanException {
+        private PProperty(PAccessor<?, V> va, D dt, int fo, Position pp, PProcessor<D> ps, TypeAdapter<T> pa, DefaultValue<T, V, D> dv) throws BeanException {
             super(va, dt, fo, pp, dv);
             this.required = pp.required();
-            this.formatter = pc.formatter();
-            this.converter = pc.converter();
-            this.type = pc.type();
+            this.type = pa.getSupportedType();
             this.processor = ps;
+            this.adapter = pa;
         }
 
         private PProperty(PProperty<T, V, D> source, V defaultValue) throws BeanException {
             super(source, defaultValue);
             this.required = source.required;
             this.processor = source.processor;
-            this.formatter = source.formatter;
-            this.converter = source.converter;
+            this.adapter = source.adapter;
             this.type = source.type;
         }
 
@@ -260,7 +239,7 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> permits BSProperty
         final String format(V value) {
             final T unwrapped = this.from(value);
             if (unwrapped != null) {
-                return formatter.apply(unwrapped);
+                return adapter.format(unwrapped);
             }
             return null;
         }
@@ -273,9 +252,9 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> permits BSProperty
             }
             if (data != null) {
                 try {
-                    final T value = converter.apply(data);
+                    final T value = adapter.parse(data);
                     return this.wrap(value);
-                } catch (Exception cause) {
+                } catch (RuntimeException cause) {
                     handler.handle(dataType, offset + this.offset, cause, this.error);
                     return this.wrap(null);
                 }
@@ -286,13 +265,6 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> permits BSProperty
         final String getFormatted(Segment bean) {
             final V value = this.value(bean);
             return this.format(value);
-        }
-
-        final String getFormatted(Segment bean, V defaultValue, boolean prototype) {
-            if (prototype && defaultValue != null) {
-                return this.format(defaultValue);
-            }
-            return this.getFormatted(bean);
         }
 
         final T setValue(PAccessor<?, V> setter, Segment bean, T value) {
@@ -310,8 +282,8 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> permits BSProperty
          * Internal representation for {@link Object} property.
          */
         static final class POProperty<T, D extends DataType<D>> extends PProperty<T, T, D> {
-            POProperty(PAccessor<?, T> va, D type, int fo, Position pp, PProcessor<D> ps, Conversion<T> pc) throws BeanException {
-                super(va, type, fo, pp, ps, pc, (p) -> ps.defaultValue(p, pc.converter()));
+            POProperty(PAccessor<?, T> va, D type, int fo, Position pp, PProcessor<D> ps, TypeAdapter<T> pa) throws BeanException {
+                super(va, type, fo, pp, ps, pa, (p) -> ps.defaultValue(p, pa));
             }
 
             private POProperty(POProperty<T, D> source) throws BeanException {
@@ -338,8 +310,8 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> permits BSProperty
          * Internal representation for {@link Optional <Object>} property.
          */
         static final class PWProperty<T, D extends DataType<D>> extends PProperty<T, Optional<T>, D> {
-            PWProperty(PAccessor<?, Optional<T>> va, D type, int fo, Position pp, PProcessor<D> ps, Conversion<T> pc) throws BeanException {
-                super(va, type, fo, pp, ps, pc, (p) -> Optional.ofNullable(ps.defaultValue(p, pc.converter())));
+            PWProperty(PAccessor<?, Optional<T>> va, D type, int fo, Position pp, PProcessor<D> ps, TypeAdapter<T> pa) throws BeanException {
+                super(va, type, fo, pp, ps, pa, (p) -> Optional.ofNullable(ps.defaultValue(p, pa)));
             }
 
             private PWProperty(PWProperty<T, D> source) throws BeanException {
@@ -366,7 +338,7 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> permits BSProperty
     /**
      * Internal property Accessor.
      */
-    abstract sealed static class PAccessor<S extends AnnotatedElement & Member, V> permits PFAccessor, PPAccessor {
+    abstract sealed static class PAccessor<S extends AnnotatedElement & Member, V> implements ST permits PFAccessor, PPAccessor {
         final S source;
 
         PAccessor(S source) {
@@ -380,7 +352,7 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> permits BSProperty
         abstract sealed static class PFAccessor<V> extends PAccessor<Field, V> permits FWAccessor, FRAccessor {
             private PFAccessor(Field source) {
                 super(source);
-                setAccessible(source);
+                source.setAccessible(true);
             }
 
             static final class FWAccessor<V> extends PFAccessor<V> {

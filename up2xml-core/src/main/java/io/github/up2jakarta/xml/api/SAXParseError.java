@@ -1,23 +1,24 @@
 package io.github.up2jakarta.xml.api;
 
 
+import io.github.up2jakarta.lov.SeverityType;
 import org.xml.sax.SAXParseException;
 
 public class SAXParseError implements IValidationError {
 
-    private final SeverityType severity;
     private final SAXParseException exception;
+    private final SeverityType level;
     private final String message;
 
     public SAXParseError(SeverityType level, SAXParseException exception, MessageEnhancer enhancer) {
-        this.severity = level;
+        this.level = level;
         this.exception = exception;
         this.message = enhancer.enhance(exception, exception.getMessage());
     }
 
     @Override
-    public SeverityType getSeverity() {
-        return severity;
+    public SeverityType getLevel() {
+        return level;
     }
 
     @Override
@@ -31,7 +32,7 @@ public class SAXParseError implements IValidationError {
     }
 
     @Override
-    public int getColumnNumber() {
+    public int getLineOffset() {
         return exception.getColumnNumber();
     }
 

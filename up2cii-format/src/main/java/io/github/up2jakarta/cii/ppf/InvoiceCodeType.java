@@ -1,8 +1,12 @@
 package io.github.up2jakarta.cii.ppf;
 
+import io.github.up2jakarta.cii.Documented;
+import io.github.up2jakarta.cii.core.Agency;
 import io.github.up2jakarta.cii.edi.DocumentCodeType;
 import io.github.up2jakarta.cii.ppf.adapters.InvoiceCodeAdapter;
-import io.github.up2jakarta.xml.clv.*;
+import io.github.up2jakarta.lov.CodeList;
+import io.github.up2jakarta.lov.Schema;
+import io.github.up2jakarta.lov.SubList;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import javax.annotation.processing.Generated;

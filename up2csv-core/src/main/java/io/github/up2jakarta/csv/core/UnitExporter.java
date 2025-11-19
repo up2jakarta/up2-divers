@@ -5,22 +5,25 @@ import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.data.SegmentWriter;
 import io.github.up2jakarta.csv.fmt.SimpleUnitImporter;
+import io.github.up2jakarta.lov.core.AccessException;
+import io.github.up2jakarta.lov.core.BeanException;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
  * {@link ModeType#UNIT} Processor that able to segregate and export java-bean to flat-data.
  *
  * @param <T> the business object type
- * @param <B> the data type
- * @param <I> the segment type
+ * @param <B> the business data type
+ * @param <I> the input segment type
  * @see SimpleUnitImporter
  */
 public non-sealed class UnitExporter<B extends DataType<B>, I extends IType<B, I>, T extends Segment> extends BusinessExporter<B, I, T> {
 
-    public UnitExporter(Up2Factory<B> factory, Class<T> type, I rootNode, I[] nodes) throws BeanException {
-        super(factory, ModeType.UNIT, type, rootNode, nodes);
+    public UnitExporter(Up2Factory<B> factory, Class<T> type, I root, List<I> nodes) throws BeanException {
+        super(factory, ModeType.UNIT, type, root, nodes);
     }
 
     public UnitExporter(UnitImporter<B, I, T, ?, ?> source) throws BeanException {

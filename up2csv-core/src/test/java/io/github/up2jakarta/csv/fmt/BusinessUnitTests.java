@@ -1,14 +1,14 @@
 package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.fmt.misc.AUnitTest;
 import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.MyUnitAggregator;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
-import io.github.up2jakarta.xml.clv.CodeListException;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +89,7 @@ class BusinessUnitTests extends AUnitTest<Invoice, InputRecord, InputError> {
     @Test
     void testDetached() {
         // Given
-        final InputRecord detached = record(S90, "9999", "Warning", "Detached");
+        final InputRecord detached = record(S09, "9999", "Warning", "Detached");
         final InputRecord[] rows = new InputRecord[]{
                 record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
                 record(S02, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
@@ -126,7 +126,7 @@ class BusinessUnitTests extends AUnitTest<Invoice, InputRecord, InputError> {
     @Test
     void testValidation() {
         // Given
-        final InputRecord invalid = record(S90, "1199", "Support", null);
+        final InputRecord invalid = record(S09, "1199", "Support", null);
         final InputRecord[] rows = new InputRecord[]{
                 record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
                 record(S02, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),

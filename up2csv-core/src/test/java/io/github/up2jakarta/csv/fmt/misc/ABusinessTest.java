@@ -4,7 +4,6 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.hdl.IBusinessEvent;
 import io.github.up2jakarta.csv.api.hdl.IPropertyEvent;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.BusinessImporter;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.hdl.PropertyFailureException;
@@ -12,7 +11,8 @@ import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.*;
 import io.github.up2jakarta.csv.impl.dto.Amount.Type;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_VALIDATOR;
+import static io.github.up2jakarta.csv.api.IEvent.EC_COMPLIANCE;
 import static io.github.up2jakarta.csv.impl.GroupType.*;
 import static io.github.up2jakarta.csv.impl.SegmentType.S01;
 import static io.github.up2jakarta.csv.impl.SegmentType.S11;
@@ -92,11 +92,11 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         if (invoice.getBuyer() != null) {
             assertValid(invoice.getBuyer());
         }
-        if (invoice.getPayer() != null) {
-            assertValid(invoice.getPayer());
+        if (invoice.getPayer().isPresent()) {
+            assertValid(invoice.getPayer().get());
         }
-        if (invoice.getPayee() != null) {
-            assertValid(invoice.getPayee());
+        if (invoice.getPayee().isPresent()) {
+            assertValid(invoice.getPayee().get());
         }
         // Amounts
         for (final Map.Entry<Amount, Type> entry : invoice.getAmounts().entrySet()) {
@@ -159,9 +159,9 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertEquals(0, e.toList().size());
         // Then
         assertNull(e.getOffset());
-        assertEquals(S11.getBusinessType(), e.getType());
-        assertEquals(S11.getErrorLevel(), e.getSeverity());
-        assertEquals(S11.getErrorCode(), e.getCode());
+        assertEquals(S11.getDataType(), e.getType());
+        assertEquals(S11.getEventLevel(), e.getLevel());
+        assertEquals(S11.getEventCode(), e.getCode());
         assertNotNull(e.getCause());
         assertNull(e.getCause().getCause());
         assertEquals("cardinality must be 1 and only one", e.getCause().getMessage());
@@ -186,9 +186,9 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
                 assertNull(c.getCause().getCause());
             }
             assertNull(e.getOffset());
-            assertEquals(S01.getBusinessType(), e.getType());
-            assertEquals(S01.getErrorLevel(), e.getSeverity());
-            assertEquals(S01.getErrorCode(), e.getCode());
+            assertEquals(S01.getDataType(), e.getType());
+            assertEquals(S01.getEventLevel(), e.getLevel());
+            assertEquals(S01.getEventCode(), e.getCode());
             assertEquals("cardinality must be 1 and only one", e.getMessage());
         }
     }
@@ -212,7 +212,7 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
                 assertNull(c.getCause().getCause());
             }
             assertNull(e.getOffset());
-            assertEquals(SeverityType.ERROR, e.getSeverity());
+            assertEquals(SeverityType.ERROR, e.getLevel());
             if (e.getType() == D002 || e.getType() == D003) {
                 assertEquals("cardinality must be 1 and only one", e.getMessage());
             } else {
@@ -246,8 +246,8 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
             }
             assertEquals(D002, e.getType());
             assertNull(e.getOffset());
-            assertEquals(type.getErrorCode(), e.getCode());
-            assertEquals(type.getErrorLevel(), e.getSeverity());
+            assertEquals(type.getEventCode(), e.getCode());
+            assertEquals(type.getEventLevel(), e.getLevel());
             assertEquals("cardinality must be 1 and only one", e.getMessage());
         }
     }
@@ -275,8 +275,8 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
             }
             assertEquals(D004, e.getType());
             assertNull(e.getOffset());
-            assertEquals(type.getErrorCode(), e.getCode());
-            assertEquals(type.getErrorLevel(), e.getSeverity());
+            assertEquals(type.getEventCode(), e.getCode());
+            assertEquals(type.getEventLevel(), e.getLevel());
             assertEquals("cardinality must be greater than or equal to 1", e.getMessage());
         }
     }
@@ -310,12 +310,12 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
             }
             assertNull(e.getOffset());
             if (detached.getType() != null) {
-                assertEquals(detached.getType().getErrorLevel(), e.getSeverity());
-                assertEquals(detached.getType().getErrorCode(), e.getCode());
-                assertEquals(detached.getType().getBusinessType(), e.getType());
+                assertEquals(detached.getType().getEventLevel(), e.getLevel());
+                assertEquals(detached.getType().getEventCode(), e.getCode());
+                assertEquals(detached.getType().getDataType(), e.getType());
             } else {
-                assertEquals(SeverityType.ERROR, e.getSeverity());
-                assertEquals(ERROR_VALIDATOR, e.getCode());
+                assertEquals(SeverityType.ERROR, e.getLevel());
+                assertEquals(EC_COMPLIANCE, e.getCode());
                 assertNull(e.getType());
             }
             assertEquals(DETACHED, e.getMessage());
@@ -347,9 +347,9 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
                 assertNull(c.getCause().getCause());
             }
             assertEquals(mode.getLength() + 2, e.getOffset());
-            assertEquals(SeverityType.ERROR, e.getSeverity());
-            Assertions.assertEquals(ERROR_VALIDATOR, e.getCode());
-            assertEquals(invalid.getType().getBusinessType(), e.getType());
+            assertEquals(SeverityType.ERROR, e.getLevel());
+            Assertions.assertEquals(EC_COMPLIANCE, e.getCode());
+            assertEquals(invalid.getType().getDataType(), e.getType());
             assertEquals("must not be empty", e.getMessage());
         }
     }

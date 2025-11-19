@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.core.ext;
 
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.core.BeanException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -15,8 +15,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static io.github.up2jakarta.csv.core.BeanException.of;
-import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
+import static io.github.up2jakarta.lov.core.BeanException.of;
+import static io.github.up2jakarta.lov.core.Beans.getTypeName;
 import static java.util.Arrays.copyOfRange;
 import static java.util.Arrays.stream;
 

@@ -1,9 +1,11 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.api.ext.BeanContext;
+import io.github.up2jakarta.csv.cfg.Fragment;
+import io.github.up2jakarta.csv.cfg.FragmentOverride;
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.core.misc.acs.BIdOBean;
+import io.github.up2jakarta.csv.cfg.PositionOverride;
+import io.github.up2jakarta.csv.core.misc.acs.BIdOptionalBean;
 import io.github.up2jakarta.csv.core.misc.cvr.SupportEntity;
 import io.github.up2jakarta.csv.core.misc.map.*;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
@@ -12,7 +14,11 @@ import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;
-import io.github.up2jakarta.xml.api.PropertyException;
+import io.github.up2jakarta.lov.IError;
+import io.github.up2jakarta.lov.IException;
+import io.github.up2jakarta.lov.PropertyException;
+import io.github.up2jakarta.lov.core.BeanContext;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.validation.Validator;
@@ -27,7 +33,7 @@ import java.util.Optional;
 import static io.github.up2jakarta.csv.impl.GroupType.D001;
 import static io.github.up2jakarta.csv.impl.GroupType.NONE;
 import static io.github.up2jakarta.csv.impl.SegmentType.S11;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -123,7 +129,7 @@ class Up2FormatTests {
         final String[] export = format.header();
         // Then
         assertEquals(9, export.length);
-        assertArrayEquals(new String[]{"Record", "Type", "Pivot", "Data", "Offset", "Severity", "Code", "Message", "Stack"}, export);
+        assertArrayEquals(new String[]{"Record", "Type", "Pivot", "Data", "Offset", "Level", "Code", "Message", "Stack"}, export);
     }
 
     @Test
@@ -180,7 +186,7 @@ class Up2FormatTests {
         assertNotNull(out);
         assertNull(src.getBean());
         assertEquals(5, out.length);
-        assertArrayEquals(new String[]{null, "0", "Up2J", "Up2J", "Java"}, out);
+        assertArrayEquals(new String[]{null, null, "Up2J", "Up2J", null}, out);
         {
             // When Again
             final String[] out2 = mapper.toMapper().toFormat().unmap(src);
@@ -188,7 +194,7 @@ class Up2FormatTests {
             assertNotNull(out2);
             assertNull(src.getBean());
             assertEquals(5, out2.length);
-            assertArrayEquals(new String[]{null, "0", "Up2J", "Up2J", "Java"}, out2);
+            assertArrayEquals(new String[]{null, null, "Up2J", "Up2J", null}, out2);
         }
     }
 
@@ -213,19 +219,52 @@ class Up2FormatTests {
         // Then
         assertNotNull(out);
         assertEquals(6, out.length);
-        assertArrayEquals(new String[]{null, "21", "Up2J", "0", "Up2J-1", "Up2J-2"}, out);
+        assertArrayEquals(new String[]{null, "21", "Up2J", null, "Up2J-1", "Up2J-2"}, out);
     }
 
     @Test
-    void testDefault6PathError() throws BeanException {
+    void testDefault6Values() throws BeanException {
+        // Given
+        final Up2Format<Default6Bean, GroupType> mapper = factory.format(Default6Bean.class);
+        // When
+        final String[] out = mapper.unmap(new Default6Bean());
+        // Then
+        assertNotNull(out);
+        assertEquals(3, out.length);
+        assertArrayEquals(new String[]{"Java", null, null}, out);
+    }
+
+    @Test
+    void testDefault6Input1Error() throws BeanException {
         // Given
         final Up2Format<InputError, GroupType> mapper = factory.format(InputError.class);
         // When
-        final String[] out = mapper.unmap(new InputError(null, 0, NONE, 9, new PropertyException(ERROR, "CSV", "Test"), "Error"));
+        final IException cause = new PropertyException(ERROR, "CSV", "Test");
+        final String[] out = mapper.unmap(new InputError(null, 0, NONE, 9, cause, "Error"));
         // Then
         assertNotNull(out);
         assertEquals(9, out.length);
-        assertArrayEquals(new String[]{null, "00", null, "0000", "9", "E", "CSV", "Test", "Error"}, out);
+        assertArrayEquals(new String[]{null, null, null, "0000", "9", "E", "CSV", "Test", "Error"}, out);
+    }
+
+    @Test
+    void testDefault6Input2Error() throws BeanException {
+        // Given
+        @FragmentOverride(path = {"key", "record"}, value = @Fragment(value = 0, prototype = true))
+        @PositionOverride(path = {"key", "record", "type"}, value = @Position(value = 1, defaultValue = "01"))
+        final class DefaultError extends InputError {
+            public DefaultError(InputRecord row, int order, GroupType type, Integer offset, IError cause, String trace) {
+                super(row, order, type, offset, cause, trace);
+            }
+        }
+        final IException cause = new PropertyException(ERROR, "CSV", "Test");
+        final Up2Format<DefaultError, GroupType> mapper = factory.format(DefaultError.class);
+        // When
+        final String[] out = mapper.unmap(new DefaultError(null, 0, NONE, 9, cause, "Error"));
+        // Then
+        assertNotNull(out);
+        assertEquals(9, out.length);
+        assertArrayEquals(new String[]{null, "01", null, "0000", "9", "E", "CSV", "Test", "Error"}, out);
     }
 
     @Test
@@ -264,9 +303,9 @@ class Up2FormatTests {
     @Test
     void testOptional() throws BeanException {
         // Given
-        final Up2Format<BIdOBean, ?> format = factory.format(BIdOBean.class);
+        final Up2Format<BIdOptionalBean, ?> format = factory.format(BIdOptionalBean.class);
         // When
-        final BIdOBean bean = new BIdOBean();
+        final BIdOptionalBean bean = new BIdOptionalBean();
         // Then Null Fragment
         assertEquals(0, format.validate(bean).size());
         assertArrayEquals(new String[]{null}, format.unmap(bean));
@@ -275,7 +314,7 @@ class Up2FormatTests {
         assertEquals(0, format.validate(bean).size());
         assertArrayEquals(new String[]{null}, format.unmap(bean));
         // Null ID
-        bean.fragment = Optional.of(new BIdOBean.OFragment());
+        bean.fragment = Optional.of(new BIdOptionalBean.OFragment());
         assertEquals(0, format.validate(bean).size());
         assertArrayEquals(new String[]{null}, format.unmap(bean));
         // Empty ID

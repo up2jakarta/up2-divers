@@ -1,14 +1,11 @@
 package io.github.up2jakarta.csv.core.ext;
 
-import io.github.up2jakarta.csv.api.ext.Conversion;
-import io.github.up2jakarta.csv.api.ext.ConversionExtension;
-import io.github.up2jakarta.csv.api.ext.ConversionResolver;
-import io.github.up2jakarta.csv.api.ext.PropertyFormatter;
+import io.github.up2jakarta.csv.api.ext.TypeExtension;
 import io.github.up2jakarta.csv.cfg.Error;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.xml.api.PropertyException;
-import io.github.up2jakarta.xml.api.SeverityType;
+import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.TypeAdapter;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -20,9 +17,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
-import static io.github.up2jakarta.csv.api.IEvent.ERROR_XML_ENUM;
-import static io.github.up2jakarta.csv.core.ext.Beans.getTypeArguments;
-import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
+import static io.github.up2jakarta.csv.api.IEvent.EC_JPA_ENUM;
+import static io.github.up2jakarta.csv.core.ext.Beans.*;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
 
 /**
  * {@link XmlType} extension that supports {@link XmlJavaTypeAdapter}.
@@ -31,7 +28,8 @@ import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
  */
 @Named
 @Singleton
-public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJavaTypeAdapter> {
+@SuppressWarnings("unchecked")
+public final class XmlAdapterExtension extends TypeExtension<XmlType, XmlJavaTypeAdapter> {
 
     @Inject
     XmlAdapterExtension() {
@@ -47,7 +45,6 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Optional<XmlJavaTypeAdapter> get(Class<? extends Segment> st, Field p, Class<?> type, Field... ps) throws BeanException {
         final XmlJavaTypeAdapter xml = getAdapter(p, type);
         if (xml != null) {
@@ -66,21 +63,16 @@ public final class XmlAdapterExtension extends ConversionExtension<XmlType, XmlJ
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <V> Conversion<V> resolve(Field property, Class<V> type, XmlJavaTypeAdapter config) throws BeanException {
+    public <V> TypeAdapter<V> resolve(Field property, Class<V> type, XmlJavaTypeAdapter config) throws BeanException {
         final Class<XmlAdapter<String, V>> adapterType = (Class<XmlAdapter<String, V>>) config.value();
-        final Optional<Error> error = ConversionResolver.getError(property, type);
-        final XmlAdapter<String, V> adapter = this.getBean(adapterType);
-        final PropertyFormatter<V> f = v -> {
-            try {
-                return adapter.marshal(v);
-            } catch (Exception ex) {
-                final SeverityType severityType = error.map(Error::severity).orElse(SeverityType.ERROR);
-                final String code = error.map(Error::value).orElse(ERROR_XML_ENUM);
-                throw PropertyException.of(severityType, code, ex);
-            }
-        };
-        return new Conversion<>(type, adapter::unmarshal, f, error);
+        final XmlAdapter<String, V> adapter = this.getBean(adapterType, "");
+        if (adapter instanceof TypeAdapter<?> pa) {
+            return (TypeAdapter<V>) pa;
+        }
+        final Optional<Error> error = error(property, type);
+        final SeverityType level = error.map(Error::level).orElse(ERROR);
+        final String code = error.map(Error::value).orElse(EC_JPA_ENUM);
+        return new XmlWrapper<>(type, level, code, adapter);
     }
 
 }

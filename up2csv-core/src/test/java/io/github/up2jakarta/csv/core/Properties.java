@@ -8,13 +8,15 @@ import io.github.up2jakarta.csv.core.BSProperty.PProperty.POProperty;
 import io.github.up2jakarta.csv.core.misc.acs.*;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.impl.GroupType;
+import io.github.up2jakarta.lov.core.AccessException;
+import io.github.up2jakarta.lov.core.BeanException;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
 import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
-import static io.github.up2jakarta.xml.api.SeverityType.WARNING;
+import static io.github.up2jakarta.lov.SeverityType.WARNING;
 import static jakarta.persistence.AccessType.PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,7 +46,7 @@ public class Properties {
         return property.parse(value, 0, of(WARNING));
     }
 
-    static void assertValid(BAccessor<Segment, Object> bid, BIdOBean bean) {
+    static void assertValid(BAccessor<Segment, Object> bid, BIdOptionalBean bean) {
         // Support
         assertInstanceOf(BPAccessor.class, bid);
         assertTrue(bid.supports(null));
@@ -58,7 +60,7 @@ public class Properties {
         assertNull(bid.get(bean));
         assertNull(bid.format(bean));
         // Null ID
-        bean.fragment = Optional.of(new BIdOBean.OFragment());
+        bean.fragment = Optional.of(new BIdOptionalBean.OFragment());
         assertNull(bid.get(bean));
         assertNull(bid.format(bean));
         // Empty ID

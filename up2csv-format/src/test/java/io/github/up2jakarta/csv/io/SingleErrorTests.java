@@ -1,7 +1,5 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.api.ext.BeanContext;
-import io.github.up2jakarta.csv.core.BeanException;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Format;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
@@ -9,7 +7,9 @@ import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.fmt.FullError;
 import io.github.up2jakarta.csv.fmt.FullRecord;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
-import io.github.up2jakarta.xml.api.PropertyException;
+import io.github.up2jakarta.lov.PropertyException;
+import io.github.up2jakarta.lov.core.BeanContext;
+import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.Validator;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -27,7 +27,7 @@ import java.util.Iterator;
 
 import static io.github.up2jakarta.csv.io.impl.SegmentType.S01;
 import static io.github.up2jakarta.csv.io.misc.Tests.TUGenerator.path;
-import static io.github.up2jakarta.xml.api.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -109,7 +109,7 @@ public class SingleErrorTests {
         // WHEN Generating file
         this.write(file);
         // THEN
-        var i = read(file, "Record", "Type", "Pivot", "Data", "Offset", "Severity", "Code", "Message", "Stack");
+        var i = read(file, "Record", "Type", "Pivot", "Data", "Offset", "Level", "Code", "Message", "Stack");
         // Checking number of record
         assertEquals(MAX, i - 1);
     }

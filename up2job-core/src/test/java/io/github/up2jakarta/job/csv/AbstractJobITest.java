@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Random;
 
 import static io.github.up2jakarta.csv.fmt.Fixed06Generator.FV_SM;
-import static io.github.up2jakarta.xml.adapters.KeyCoder.fixed;
+import static io.github.up2jakarta.lov.core.Codes.fixed;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

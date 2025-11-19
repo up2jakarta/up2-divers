@@ -1,25 +1,33 @@
 package io.github.up2jakarta.csv.core;
 
+import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.BSOperator.Computer.BSFormat;
 import io.github.up2jakarta.csv.core.BSOperator.Computer.BSMapper;
+import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
+import io.github.up2jakarta.csv.core.hdl.SimpleCollector;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.data.SegmentWriter;
+import io.github.up2jakarta.lov.core.AccessException;
+import io.github.up2jakarta.lov.core.BeanException;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static io.github.up2jakarta.csv.core.AccessMode.RO;
+import static io.github.up2jakarta.csv.data.DataType.isValid;
+import static io.github.up2jakarta.csv.data.DataType.message;
 import static java.util.Set.of;
 
 /**
  * Base Processor that's able to segregate and export java-bean to flat-data.
  *
  * @param <T> the business object type
- * @param <B> the input data type
- * @param <I> the input type
+ * @param <B> the business data type
+ * @param <I> the input segment type
  * @see FastExporter
  * @see FullExporter
  * @see UnitExporter
@@ -30,7 +38,7 @@ public abstract sealed class BusinessExporter<B extends DataType<B>, I extends I
 
     private final boolean hasBusinessId;
 
-    BusinessExporter(Up2Factory<B> factory, ModeType mode, Class<T> type, I root, I[] nodes) throws BeanException {
+    BusinessExporter(Up2Factory<B> factory, ModeType mode, Class<T> type, I root, List<I> nodes) throws BeanException {
         super(factory, type, mode, root, nodes);
         this.hasBusinessId = this.check(type);
     }
@@ -55,7 +63,7 @@ public abstract sealed class BusinessExporter<B extends DataType<B>, I extends I
         format.node.format(data, offset, bean);
         consumer.accept(bean, type, data);
         for (final I node : joins.getOrDefault(type, of())) {
-            final Collection<Segment> values = node.getJoinLinker().from(bean);
+            final Collection<Segment> values = node.from(bean);
             if (values == null) {
                 continue;
             }
@@ -65,15 +73,62 @@ public abstract sealed class BusinessExporter<B extends DataType<B>, I extends I
         }
     }
 
-    protected void format(T bean, Supplier<String> rowId, SegmentWriter callback) throws IOException {
+    private void validate(Segment bean, I type, int offset, BusinessHandler<B> handler) throws AccessException {
+        if (bean == null) {
+            return;
+        }
+        final BSFormat<Segment, B> format = mappers.get(type);
+        format.node.validate(bean, offset, handler);
+        for (final I node : joins.getOrDefault(type, of())) {
+            final Collection<Segment> values = node.from(bean);
+            if (values == null) {
+                continue;
+            }
+            final B data = node.getDataType();
+            if (!isValid(data, values.size())) {
+                handler.handle(type, message(data));
+            }
+            for (var value : values) {
+                if (value == null) {
+                    handler.handle(type, "must not be null");
+                } else {
+                    this.validate(value, node, mode.length, handler);
+                }
+            }
+        }
+    }
+
+    protected void format(T bean, Supplier<String> recordId, SegmentWriter callback) throws IOException {
         if (bean == null) {
             return;
         }
         final String reference = (hasBusinessId) ? bid.format(bean) : null;
-        this.format(bean, this.offset, root, (s, t, d) -> {
-            this.fill(d, rowId, t, reference);
+        this.format(bean, offset, root, (s, t, d) -> {
+            this.fill(d, recordId, t, reference);
             callback.accept(d);
         });
+    }
+
+    /**
+     * Validates the given bean and recursively its embeddable segments and gathering events in the specified handler.
+     *
+     * @param bean    the business-object that is being validated
+     * @param handler the event handler
+     */
+    public void validate(T bean, BusinessHandler<B> handler) throws AccessException {
+        this.validate(bean, root, offset, handler);
+    }
+
+    /**
+     * Validates the given bean and recursively its embeddable segments and returns the collected events.
+     *
+     * @param bean the business-object that is being validated
+     * @return the list of collected events
+     */
+    public List<? extends IEvent<B>> validate(T bean) throws AccessException {
+        final SimpleCollector<B> collector = new SimpleCollector<>();
+        this.validate(bean, root, offset, collector);
+        return collector.toList();
     }
 
     @Override
@@ -81,10 +136,10 @@ public abstract sealed class BusinessExporter<B extends DataType<B>, I extends I
         if (source != null) {
             return new BSFormat<>(source.node.reverse());
         }
-        return factory.format(factory.resolver.or(type.getBusinessType()), type.getClassType());
+        return factory.format(factory.resolver.or(type.getDataType()), type.getClassType());
     }
 
-    abstract void fill(String[] target, Supplier<String> rowId, IType<?, ?> type, String reference);
+    abstract void fill(String[] target, Supplier<String> recordId, IType<?, ?> type, String reference);
 
     @FunctionalInterface
     private interface Filler<I extends IType<?, I>> {

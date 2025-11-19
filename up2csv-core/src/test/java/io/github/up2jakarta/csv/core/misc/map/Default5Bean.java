@@ -14,8 +14,8 @@ public class Default5Bean implements Segment {
 
     @PositionOverride(path = "id", value = @Position(value = 0, defaultValue = "21"))
     @PositionOverride(path = "code", value = @Position(value = 1, defaultValue = "Up2J"))
-    @FragmentOverride(path = "other", value = @Fragment(value = 2, defaultValues = true))
-    @Fragment(value = 1, defaultValues = true)
+    @FragmentOverride(path = "other", value = @Fragment(value = 2, prototype = true))
+    @Fragment(value = 1, prototype = true)
     private Inner1Bean bean;
 
     public Inner1Bean getBean() {

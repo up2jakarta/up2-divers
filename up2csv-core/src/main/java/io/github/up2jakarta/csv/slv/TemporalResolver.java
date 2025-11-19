@@ -1,9 +1,10 @@
 package io.github.up2jakarta.csv.slv;
 
-import io.github.up2jakarta.csv.api.ext.ConversionResolver;
-import io.github.up2jakarta.csv.api.ext.PropertyConverter;
+import io.github.up2jakarta.csv.api.ext.TypeResolver;
 import io.github.up2jakarta.csv.cfg.Up2Temporal;
-import io.github.up2jakarta.csv.core.BeanException;
+import io.github.up2jakarta.lov.TypeAdapter;
+import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.TypeWrapper;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
@@ -13,36 +14,36 @@ import java.time.temporal.Temporal;
 
 @Named
 @Singleton
-public final class TemporalResolver extends ConversionResolver<Up2Temporal> {
+public final class TemporalResolver extends TypeResolver<Up2Temporal> {
 
     @Override
-    public PropertyConverter<? extends Temporal> forParsing(Up2Temporal config, Field property, Class<?> type) throws BeanException {
+    public TypeAdapter<? extends Temporal> resolve(Field property, Class<?> type, Up2Temporal config) throws BeanException {
         if (type == LocalTime.class) {
-            return LocalTime::parse;
+            return new TypeWrapper<>(LocalTime.class, LocalTime::parse);
         }
         if (type == LocalDate.class) {
-            return LocalDate::parse;
+            return new TypeWrapper<>(LocalDate.class, LocalDate::parse);
         }
         if (type == LocalDateTime.class) {
-            return LocalDateTime::parse;
+            return new TypeWrapper<>(LocalDateTime.class, LocalDateTime::parse);
         }
         if (type == OffsetTime.class) {
-            return OffsetTime::parse;
+            return new TypeWrapper<>(OffsetTime.class, OffsetTime::parse);
         }
         if (type == OffsetDateTime.class) {
-            return OffsetDateTime::parse;
+            return new TypeWrapper<>(OffsetDateTime.class, OffsetDateTime::parse);
         }
         if (type == ZonedDateTime.class) {
-            return ZonedDateTime::parse;
-        }
-        if (type == Year.class) {
-            return Year::parse;
-        }
-        if (type == YearMonth.class) {
-            return Year::parse;
+            return new TypeWrapper<>(ZonedDateTime.class, ZonedDateTime::parse);
         }
         if (type == Instant.class) {
-            return Year::parse;
+            return new TypeWrapper<>(Instant.class, Instant::parse);
+        }
+        if (type == YearMonth.class) {
+            return new TypeWrapper<>(YearMonth.class, YearMonth::parse);
+        }
+        if (type == Year.class) {
+            return new TypeWrapper<>(Year.class, Year::parse);
         }
         throw new BeanException(property, "must not be annotated by @Up2Temporal");
     }

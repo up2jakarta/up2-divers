@@ -1,8 +1,9 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.api.ext.CheckerContext;
-import io.github.up2jakarta.csv.api.ext.SegmentListener;
+import io.github.up2jakarta.csv.api.ext.TypeContext;
+import io.github.up2jakarta.csv.api.ext.TypeListener;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.core.BeanException;
 
 import java.lang.reflect.Field;
 
@@ -14,7 +15,7 @@ import static java.lang.reflect.Modifier.isStatic;
 /**
  * Internal technical checker.
  */
-final class BeanChecker implements SegmentListener, CheckerContext {
+final class BeanChecker implements TypeListener, TypeContext {
 
     static final BeanChecker INSTANCE = new BeanChecker();
 
@@ -40,7 +41,7 @@ final class BeanChecker implements SegmentListener, CheckerContext {
     }
 
     @Override
-    public CheckerContext beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException {
+    public TypeContext beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException {
         check(mode, type);
         if (mode == WO && isInnerType(type)) {
             throw new BeanException(type, "inner class is not allowed");
