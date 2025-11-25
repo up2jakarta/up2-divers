@@ -1,7 +1,7 @@
 package io.github.up2jakarta.lov;
 
 /**
- * Up2 base {@link Enum} implementation of LOV (List of Values) that can be identified by {@link CodeList#getCode()}.
+ * Up2J base {@link Enum} implementation of LOV (List of Values) that can be identified by {@link CodeList#getCode()}.
  *
  * @param <T> the type of enum implementation
  */

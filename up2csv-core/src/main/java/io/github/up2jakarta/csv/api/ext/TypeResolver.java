@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 /**
- * Up2 configurable {@link io.github.up2jakarta.csv.cfg.Resolver}
+ * Up2J configurable {@link io.github.up2jakarta.csv.cfg.Resolver}
  * that converts the input data before setting the destination property.
  *
  * @param <A> the annotation type

@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 
 /**
- * Up2 configurable {@link io.github.up2jakarta.csv.cfg.Extension}
+ * Up2J configurable {@link io.github.up2jakarta.csv.cfg.Extension}
  * that converts the input data before setting the destination property.
  *
  * @param <A> the annotation type that activates the extension (on class)

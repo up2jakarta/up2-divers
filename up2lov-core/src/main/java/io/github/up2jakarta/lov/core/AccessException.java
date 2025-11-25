@@ -5,7 +5,7 @@ import io.github.up2jakarta.lov.MessageFormatter;
 import static io.github.up2jakarta.lov.core.Beans.getTypeName;
 
 /**
- * Up2 Bean Access Exception that wraps property access or bean creation exceptions.
+ * Up2J Bean Access Exception that wraps property access or bean creation exceptions.
  */
 public class AccessException extends RuntimeException implements MessageFormatter {
 

@@ -7,7 +7,7 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 /**
- * Up2 Configurable {@link InputProcessor} used by the annotation {@link Up2Token}
+ * Up2J Configurable {@link InputProcessor} used by the annotation {@link Up2Token}
  * to clean up XML <code>xs:token</code>.
  */
 @Named

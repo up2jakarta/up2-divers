@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.core.ext;
 
 import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.api.ext.TypeListener;
-import io.github.up2jakarta.csv.core.AccessMode;
+import io.github.up2jakarta.csv.core.BeanAccess;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.inject.Named;
@@ -22,7 +22,7 @@ public final class JpaColumnChecker implements TypeListener {
     }
 
     @Override
-    public TypeContext beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException {
+    public TypeContext beforeSegment(BeanAccess mode, Class<? extends Segment> type) throws BeanException {
         final String prefix = JpaTableChecker.checkAndGetPrefix(type);
         return new JpaColumnContext(type, prefix);
     }

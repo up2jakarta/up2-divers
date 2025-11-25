@@ -5,7 +5,7 @@ import io.github.up2jakarta.csv.slv.NumberResolver;
 import java.lang.annotation.*;
 
 /**
- * Up2 {@link io.github.up2jakarta.lov.TypeAdapter} resolver that supports non-decimal {@link Number} types.
+ * Up2J {@link io.github.up2jakarta.lov.TypeAdapter} resolver that supports non-decimal {@link Number} types.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

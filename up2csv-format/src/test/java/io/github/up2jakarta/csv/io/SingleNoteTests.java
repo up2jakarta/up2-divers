@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.core.Up2Format;
+import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Mapper;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
@@ -36,7 +36,7 @@ public class SingleNoteTests {
     @Autowired
     SingleNoteTests(BeanContext context, Validator validator, CSVFormat fmt) throws BeanException, IOException {
         final Up2Factory<DynamicType> factory = new Up2Factory<>(context, validator, DataTypeResolver.dynamic());
-        final Up2Format<Note, DynamicType> format = factory.format(Note.class);
+        final Up2Flatter<Note, DynamicType> format = factory.format(Note.class);
         final SingleWriter<Note, DynamicType> writer = new SingleWriter<>(format, fmt);
         final Up2Mapper<Note, DynamicType> mapper = factory.build(Note.class);
         this.reader = new SingleReader<>(mapper, fmt);

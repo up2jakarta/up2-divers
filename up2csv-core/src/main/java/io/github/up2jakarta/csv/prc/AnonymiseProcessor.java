@@ -6,7 +6,7 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 /**
- * Up2 Configurable {@link InputProcessor} used by the annotation {@link Up2Anonymise}
+ * Up2J Configurable {@link InputProcessor} used by the annotation {@link Up2Anonymise}
  * to anonymise confidential data.
  */
 @Named

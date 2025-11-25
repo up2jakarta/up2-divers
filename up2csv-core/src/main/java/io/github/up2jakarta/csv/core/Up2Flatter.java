@@ -2,8 +2,8 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
 import io.github.up2jakarta.csv.cfg.Truncated;
-import io.github.up2jakarta.csv.core.BSNode.BFNode;
-import io.github.up2jakarta.csv.core.BSOperator.BProcessor;
+import io.github.up2jakarta.csv.core.BSNode.Flat;
+import io.github.up2jakarta.csv.core.BSOperator.Computer;
 import io.github.up2jakarta.csv.core.hdl.ComplianceCollector;
 import io.github.up2jakarta.csv.core.hdl.ComplianceHandler;
 import io.github.up2jakarta.csv.data.DataType;
@@ -17,14 +17,13 @@ import java.util.List;
 
 /**
  * Map and validate input data to a configurable bean that supports only {@link String} type.
- * The
  *
  * @param <S> the segment type
  * @param <D> The business data type
  */
-public final class Up2Format<S extends Segment, D extends DataType<D>> extends BProcessor<S, D, BFNode<S, D>> {
+public final class Up2Flatter<S extends Segment, D extends DataType<D>> extends Computer<S, D, Flat<S, D>> {
 
-    Up2Format(BFNode<S, D> node) throws BeanException {
+    Up2Flatter(Flat<S, D> node) throws BeanException {
         super(node);
     }
 
@@ -134,7 +133,7 @@ public final class Up2Format<S extends Segment, D extends DataType<D>> extends B
     }
 
     /**
-     * Converts the current formatter to mapper that is able to map bean-segment to flat-data.
+     * Converts the current mapper to mapper that is able to map bean-segment to flat-data.
      * This method is faster then {@link Up2Factory#build(Class, DataTypeResolver)} when the bean is already scanned.
      *
      * @return preconfigured CSV Mapper for the same segment

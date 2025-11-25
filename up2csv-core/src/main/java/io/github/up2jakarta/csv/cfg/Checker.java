@@ -6,7 +6,7 @@ import io.github.up2jakarta.lov.core.BeanContext;
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports {@link TypeListener} for segment checking.
+ * Up2J Annotation that supports {@link TypeListener} for segment checking.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -32,7 +32,7 @@ public @interface Checker {
     String name() default "";
 
     /**
-     * Up2 Annotation that supports {@link Repeatable} {@link Checker}.
+     * Up2J Annotation that supports {@link Repeatable} {@link Checker}.
      */
     @Documented
     @Retention(RetentionPolicy.RUNTIME)

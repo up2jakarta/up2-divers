@@ -10,7 +10,7 @@
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2lov-core</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.1</version>
     </dependency>
 ```
 

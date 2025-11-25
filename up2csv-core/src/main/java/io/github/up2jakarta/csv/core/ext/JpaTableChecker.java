@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.core.ext;
 
 import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.api.ext.TypeListener;
-import io.github.up2jakarta.csv.core.AccessMode;
+import io.github.up2jakarta.csv.core.BeanAccess;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.inject.Named;
@@ -108,16 +108,16 @@ public final class JpaTableChecker implements TypeListener {
     }
 
     @Override
-    public TypeContext beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException {
+    public TypeContext beforeSegment(BeanAccess mode, Class<? extends Segment> type) throws BeanException {
         checkEntity(type);
-        return new JpaTableContext(type);
+        return new Context(type);
     }
 
-    private static class JpaTableContext implements TypeContext {
+    private static class Context implements TypeContext {
 
         private final Stack<Class<?>> stack = new Stack<>();
 
-        private JpaTableContext(Class<? extends Segment> type) {
+        private Context(Class<? extends Segment> type) {
             stack.push(type);
         }
 
@@ -145,7 +145,7 @@ public final class JpaTableChecker implements TypeListener {
         }
 
         @Override
-        public void beforeFragmentProperty(AccessMode mode, Field fragment, Class<? extends Segment> type) throws BeanException {
+        public void beforeFragmentProperty(BeanAccess mode, Field fragment, Class<? extends Segment> type) throws BeanException {
             stack.push(checkFragment(fragment, type));
             this.unknownProperty(fragment, type);
         }

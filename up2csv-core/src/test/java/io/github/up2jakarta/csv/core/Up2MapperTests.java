@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
-import io.github.up2jakarta.csv.core.BSProperty.FProperty;
+import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.hdl.FailureException;
 import io.github.up2jakarta.csv.core.misc.acs.BIdOptionalBean;
 import io.github.up2jakarta.csv.core.misc.acs.Optional8Bean;
@@ -35,6 +35,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_CONVERTER;
+import static io.github.up2jakarta.csv.core.Properties.assertFinal;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static org.junit.jupiter.api.Assertions.*;
@@ -156,7 +157,7 @@ class Up2MapperTests {
         assertEquals("Building B9", complexAddress.getAddressLine2());
         assertEquals("6th floor, D26", complexAddress.getAddressLine3());
         // When Unmapping
-        final Up2Format<ClientSegment, GroupType> format = factory.format(ClientSegment.class);
+        final Up2Flatter<ClientSegment, GroupType> format = factory.format(ClientSegment.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -200,7 +201,7 @@ class Up2MapperTests {
         assertEquals("ABBESSI", bean.getName());
         assertEquals("Software engineer", bean.getRole());
         // When Unmapping
-        final Up2Format<SimpleSegment, GroupType> format = factory.format(SimpleSegment.class);
+        final Up2Flatter<SimpleSegment, GroupType> format = factory.format(SimpleSegment.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -235,7 +236,7 @@ class Up2MapperTests {
     void validBeanNullColumn() throws BeanException {
         // Given
         final Up2Mapper<SimpleSegment, GroupType> mapper = factory.build(SimpleSegment.class);
-        final Up2Format<SimpleSegment, GroupType> format = factory.format(SimpleSegment.class);
+        final Up2Flatter<SimpleSegment, GroupType> format = factory.format(SimpleSegment.class);
         final String[] data = new String[]{"AAB", "ABBESSI", null};
         // When
         final SimpleSegment bean = mapper.map(data);
@@ -262,7 +263,7 @@ class Up2MapperTests {
         assertEquals("ABBESSI", bean.getName());
         assertEquals("", bean.getRole());
         // When Unmapping
-        final Up2Format<SimpleSegment, GroupType> format = factory.format(SimpleSegment.class);
+        final Up2Flatter<SimpleSegment, GroupType> format = factory.format(SimpleSegment.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -281,7 +282,7 @@ class Up2MapperTests {
         assertEquals("TN", bean.getCountry().getCode());
         assertEquals("Tunisia", bean.getCountry().getName());
         // When Unmapping
-        final Up2Format<ComplexSegment, GroupType> format = factory.format(ComplexSegment.class);
+        final Up2Flatter<ComplexSegment, GroupType> format = factory.format(ComplexSegment.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -299,7 +300,7 @@ class Up2MapperTests {
         assertEquals("TN", bean.getCode());
         assertEquals("Tunisia", bean.getName());
         // When Unmapping
-        final Up2Format<ExtendedCountryBean, GroupType> format = factory.format(ExtendedCountryBean.class);
+        final Up2Flatter<ExtendedCountryBean, GroupType> format = factory.format(ExtendedCountryBean.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -317,7 +318,7 @@ class Up2MapperTests {
         assertEquals("TN", bean.getCode());
         assertEquals("Tunisia", bean.getName());
         // When Unmapping
-        final Up2Format<GenericCountryBean, GroupType> format = factory.format(GenericCountryBean.class);
+        final Up2Flatter<GenericCountryBean, GroupType> format = factory.format(GenericCountryBean.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -382,7 +383,7 @@ class Up2MapperTests {
     @Test
     void testInner1Class() throws BeanException {
         // When
-        final Up2Mapper<Inner1Segment, GroupType> mapper = factory.build(Inner1Segment.class).toFormat().toMapper();
+        final Up2Mapper<Inner1Segment, GroupType> mapper = factory.build(Inner1Segment.class).toFlatter().toMapper();
         final Inner1Segment bean = mapper.map("TU");
         // THEN
         assertNotNull(bean);
@@ -396,9 +397,9 @@ class Up2MapperTests {
         // When
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Inner2Segment.class));
         // THEN
-        assertEquals(Inner2Segment.InnerFragment.class, thrown.getSource());
-        assertEquals("fragment", thrown.getLocator());
-        assertEquals("Inner2Segment.InnerFragment[fragment] - inner class is not allowed outside enclosing segments: Inner2Segment, Inner2Segment.InnerFragment", thrown.getMessage());
+        assertEquals(Inner1Segment.InnerFragment.class, thrown.getSource());
+        assertEquals("class", thrown.getLocator());
+        assertEquals("Inner1Segment.InnerFragment[class] - inner class is not allowed outside enclosing segments: Inner2Segment, Inner2Segment.InnerFragment", thrown.getMessage());
     }
 
     @Test
@@ -414,7 +415,7 @@ class Up2MapperTests {
         assertNotNull(bean.getFragment());
         assertEquals("ABBESSI", bean.getFragment().getName());
         // When Unmapping
-        final Up2Format<Inner3Segment, GroupType> format = factory.format(Inner3Segment.class);
+        final Up2Flatter<Inner3Segment, GroupType> format = factory.format(Inner3Segment.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -422,7 +423,7 @@ class Up2MapperTests {
     @Test
     void testInner4Class() throws BeanException {
         // When
-        final Up2Mapper<Inner4Segment, GroupType> mapper = factory.build(Inner4Segment.class).toFormat().toMapper();
+        final Up2Mapper<Inner4Segment, GroupType> mapper = factory.build(Inner4Segment.class).toFlatter().toMapper();
         final Inner4Segment bean = mapper.map("TU");
         // THEN
         assertNotNull(bean);
@@ -438,7 +439,17 @@ class Up2MapperTests {
         // THEN
         assertEquals(Inner5Segment.class, thrown.getSource());
         assertEquals("fragment", thrown.getLocator());
-        assertEquals("Inner5Segment[fragment] - inner class is not allowed inside enclosing records", thrown.getMessage());
+        assertEquals("Inner5Segment[fragment] - inner class is not allowed inside enclosing record: Inner5Segment", thrown.getMessage());
+    }
+
+    @Test
+    void testInner6Class() {
+        // When
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Inner6Segment.class));
+        // THEN
+        assertEquals(Inner6Segment.SFragment.class, thrown.getSource());
+        assertEquals("class", thrown.getLocator());
+        assertEquals("Inner6Segment.SFragment[class] - inner class is not allowed inside enclosing segment: Inner6Segment", thrown.getMessage());
     }
 
     @Test
@@ -518,13 +529,25 @@ class Up2MapperTests {
     }
 
     @Test
-    void testFieldFinal() {
+    void testValidFinal1() throws Exception {
+        // GIVEN
+        final Up2Mapper<Test6Segment, GroupType> mapper1 = factory.build(Test6Segment.class);
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test6Segment.class));
+        final Up2Mapper<Test6Segment, GroupType> mapper2 = mapper1.toFlatter().toMapper();
         // THEN
-        assertEquals(Test6Segment.class, thrown.getSource());
-        assertEquals("finalField", thrown.getLocator());
-        assertEquals("Test6Segment[finalField] - must not be final", thrown.getMessage());
+        assertFinal(mapper1);
+        assertFinal(mapper2);
+    }
+
+    @Test
+    void testValidFinal2() throws Exception {
+        // GIVEN
+        final Up2Mapper<Test8Segment, GroupType> mapper1 = factory.build(Test8Segment.class);
+        // WHEN
+        final Up2Mapper<Test8Segment, GroupType> mapper2 = mapper1.toFlatter().toMapper();
+        // THEN
+        assertFinal(mapper1);
+        assertFinal(mapper2);
     }
 
     @Test
@@ -559,8 +582,8 @@ class Up2MapperTests {
             final BSProperty<?, ?, GroupType> fragment = fields.get(2);
             assertEquals("fragment", fragment.getName());
             assertEquals(2, fragment.offset);
-            assertInstanceOf(FProperty.class, fragment);
-            final List<BSProperty<?, ?, GroupType>> fProperties = ((FProperty<?, ?, GroupType>) fragment).node.properties;
+            assertInstanceOf(PFragment.class, fragment);
+            final List<BSProperty<?, ?, GroupType>> fProperties = ((PFragment<?, ?, GroupType>) fragment).node.properties;
             assertEquals(2, fProperties.size());
             {
                 final BSProperty<?, ?, GroupType> property = fProperties.getFirst();
@@ -630,7 +653,7 @@ class Up2MapperTests {
         final String[] data = new String[]{"ZZZ", "Content", null, "???", "T2", "EUR"};
         // When
         final NoteEntity segment = mapper.map(data);
-        final List<? extends IComplianceEvent<GroupType>> violations = mapper.toFormat().validate(segment);
+        final List<? extends IComplianceEvent<GroupType>> violations = mapper.toFlatter().validate(segment);
         // Then
         assertNotNull(segment);
         assertEquals(0, violations.size());

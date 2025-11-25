@@ -5,6 +5,7 @@ import io.github.up2jakarta.csv.core.BSOperator.Factory;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.data.WrapperValueExtractor;
 import io.github.up2jakarta.lov.core.BeanContext;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.inject.Inject;
@@ -13,7 +14,7 @@ import jakarta.inject.Singleton;
 import jakarta.validation.*;
 
 /**
- * Up2 Configurable Factory for {@link Up2Mapper} and {@link Up2Format}.
+ * Up2J Configurable Factory for {@link Up2Mapper} and {@link Up2Flatter}.
  *
  * @param <D> The business data type
  */
@@ -55,6 +56,7 @@ public final class Up2Factory<D extends DataType<D>> extends Factory {
     public static Validator validator(MessageInterpolator interpolator) {
         final Configuration<?> cfg = Validation.byDefaultProvider()
                 .configure()
+                .addValueExtractor(new WrapperValueExtractor())
                 .messageInterpolator(interpolator);
         try (final ValidatorFactory factory = cfg.buildValidatorFactory()) {
             return factory.getValidator();
@@ -77,7 +79,7 @@ public final class Up2Factory<D extends DataType<D>> extends Factory {
     /**
      * Build a preconfigured CSV Mapper that is able to map flat-data to bean-segment.
      * <p>
-     * If the bean is already scanned for mapping, {@link Up2Format#toMapper()} is much faster
+     * If the bean is already scanned for mapping, {@link Up2Flatter#toMapper()} is much faster
      *
      * @param type the type of segment that is being mapped
      * @param dtr  the {@link DataType} resolver
@@ -98,14 +100,14 @@ public final class Up2Factory<D extends DataType<D>> extends Factory {
      * @throws BeanException for any missing or wrong bean configuration
      * @see Up2Factory#format(Class, DataTypeResolver)
      */
-    public <S extends Segment> Up2Format<S, D> format(final Class<S> type) throws BeanException {
-        return new Up2Format<>(BSContext.format(type, this, resolver));
+    public <S extends Segment> Up2Flatter<S, D> format(final Class<S> type) throws BeanException {
+        return new Up2Flatter<>(BSContext.format(type, this, resolver));
     }
 
     /**
      * Build a preconfigured CSV Format that is able to map bean-segment to flat-data.
      * <p>
-     * If the bean is already scanned for mapping, {@link Up2Mapper#toFormat()} is much faster
+     * If the bean is already scanned for mapping, {@link Up2Mapper#toFlatter()} is much faster
      *
      * @param type the type of segment that is being mapped
      * @param dtr  the {@link DataType} resolver
@@ -113,8 +115,8 @@ public final class Up2Factory<D extends DataType<D>> extends Factory {
      * @return the CSV Format
      * @throws BeanException for any missing or wrong bean configuration
      */
-    public <S extends Segment, B extends DataType<B>> Up2Format<S, B> format(Class<S> type, DataTypeResolver<B> dtr) throws BeanException {
-        return new Up2Format<>(BSContext.format(type, this, dtr));
+    public <S extends Segment, B extends DataType<B>> Up2Flatter<S, B> format(Class<S> type, DataTypeResolver<B> dtr) throws BeanException {
+        return new Up2Flatter<>(BSContext.format(type, this, dtr));
     }
 
     /**

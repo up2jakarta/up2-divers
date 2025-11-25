@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.api.ext;
 
-import io.github.up2jakarta.csv.core.AccessMode;
+import io.github.up2jakarta.csv.core.BeanAccess;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.core.BeanException;
 
@@ -29,7 +29,7 @@ public interface TypeListener {
      * @return the checker context for the given <code>segment</code>.
      * @throws BeanException for any missing or wrong bean configuration
      */
-    TypeContext beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException;
+    TypeContext beforeSegment(BeanAccess mode, Class<? extends Segment> type) throws BeanException;
 
     /**
      * Listener callback after the completion of scanning the segment.

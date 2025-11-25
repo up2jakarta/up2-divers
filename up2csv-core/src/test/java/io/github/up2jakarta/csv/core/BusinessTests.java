@@ -380,7 +380,7 @@ public class BusinessTests {
         final UnitExporter<GroupType, SegmentType, DummyReference> importer = factory.builder()
                 .unit(DummyReference.class)
                 .build(S71)
-                .format();
+                .export();
         // WHEN
         final SimpleCollector<GroupType> collector = new SimpleCollector<>();
         importer.validate(null, collector);
@@ -394,7 +394,7 @@ public class BusinessTests {
         final UnitExporter<GroupType, SegmentType, DummyReference> importer = factory.builder()
                 .unit(DummyReference.class)
                 .build(S71)
-                .format();
+                .export();
         final DummyReference bean = new DummyReference();
         {
             bean.getAttributes().add(null);
@@ -418,7 +418,7 @@ public class BusinessTests {
         final UnitExporter<GroupType, SegmentType, DummyReference> importer = factory.builder()
                 .unit(DummyReference.class)
                 .build(S71)
-                .format();
+                .export();
         final DummyReference bean = new DummyReference();
         {
             bean.getAttributes().add(new DummyAttribute());

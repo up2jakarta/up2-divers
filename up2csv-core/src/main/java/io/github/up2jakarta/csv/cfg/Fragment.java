@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.cfg;
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports embeddable types in order to override {@link Position#value()}.
+ * Up2J Annotation that supports embeddable types in order to override {@link Position#value()}.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

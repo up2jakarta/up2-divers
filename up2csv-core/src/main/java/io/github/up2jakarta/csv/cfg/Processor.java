@@ -6,7 +6,7 @@ import io.github.up2jakarta.lov.core.BeanContext;
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports {@link InputProcessor} used for processor's shortcut annotations.
+ * Up2J Annotation that supports {@link InputProcessor} used for processor's shortcut annotations.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

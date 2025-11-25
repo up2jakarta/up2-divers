@@ -30,7 +30,7 @@ public @interface FragmentOverride {
     String[] path();
 
     /**
-     * Up2 Annotation that supports {@link Repeatable} {@link FragmentOverride}.
+     * Up2J Annotation that supports {@link Repeatable} {@link FragmentOverride}.
      */
     @Retention(RUNTIME)
     @Target({FIELD, TYPE})

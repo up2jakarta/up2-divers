@@ -5,7 +5,7 @@ import io.github.up2jakarta.csv.prc.AnonymiseProcessor;
 import java.lang.annotation.*;
 
 /**
- * Up2 Shortcut Annotation for {@link Processor} that anonymise confidential data like IBAN and CB.
+ * Up2J Shortcut Annotation for {@link Processor} that anonymise confidential data like IBAN and CB.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

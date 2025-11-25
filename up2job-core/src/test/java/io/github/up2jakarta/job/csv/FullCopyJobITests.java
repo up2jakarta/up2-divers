@@ -2,7 +2,7 @@ package io.github.up2jakarta.job.csv;
 
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.core.Up2Format;
+import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.job.CompositeWriter;
@@ -45,7 +45,7 @@ class FullCopyJobITests extends AbstractJobITest {
     }
 
     private ErrorWriter errorWriter(Up2Factory<GroupType> factory, CSVFormat format) throws BeanException {
-        final Up2Format<InputError, DynamicType> mapper = factory.format(InputError.class, dynamic());
+        final Up2Flatter<InputError, DynamicType> mapper = factory.format(InputError.class, dynamic());
         return new ErrorWriter(mapper, format);
     }
 

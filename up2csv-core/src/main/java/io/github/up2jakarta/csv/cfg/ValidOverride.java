@@ -7,7 +7,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Up2 Shortcut Annotation of JSR-303 {@link jakarta.validation.Valid} that validation activation and groups.
+ * Up2J Shortcut Annotation of JSR-303 {@link jakarta.validation.Valid} that validation activation and groups.
  *
  * @see jakarta.validation.Validator#validate(Object, Class[])
  */
@@ -35,7 +35,7 @@ public @interface ValidOverride {
     Class<?>[] groups() default {};
 
     /**
-     * Up2 Annotation that supports {@link Repeatable} {@link ValidOverride}.
+     * Up2J Annotation that supports {@link Repeatable} {@link ValidOverride}.
      */
     @Retention(RUNTIME)
     @Target({FIELD, TYPE})

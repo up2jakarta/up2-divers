@@ -12,7 +12,7 @@ import io.github.up2jakarta.lov.core.AccessException;
 
 import java.util.Collection;
 
-import static io.github.up2jakarta.csv.core.BSBuilder.EP;
+import static io.github.up2jakarta.csv.core.BSBuilder.MEP;
 import static io.github.up2jakarta.lov.core.Beans.cast;
 import static java.util.Objects.requireNonNull;
 
@@ -22,7 +22,7 @@ import static java.util.Objects.requireNonNull;
  * @param <T> the child type
  * @param <P> the parent type
  */
-public non-sealed abstract class BeanLinker<T extends Segment, P extends Segment> implements ILinker<T, P>, EP {
+public non-sealed abstract class BeanLinker<T extends Segment, P extends Segment> implements ILinker<T, P>, MEP {
 
     public final Class<T> classType;
     public final Class<P> parentType;

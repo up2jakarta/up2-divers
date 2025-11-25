@@ -19,7 +19,7 @@ public abstract class BusinessReader<B extends DataType<B>, I extends IType<B, I
 
     protected final I root;
     protected final ModeType mode;
-    protected final BusinessImporter<B, I, T, ?, ?>.BusinessTyping typing;
+    protected final BusinessImporter<B, I, T, ?, ?>.Typing typing;
     private final BusinessImporter<B, I, T, R, E> exporter;
 
     protected BusinessReader(BusinessImporter<B, I, T, R, E> exporter) {

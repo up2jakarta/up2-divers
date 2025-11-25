@@ -6,7 +6,7 @@ import io.github.up2jakarta.lov.core.BeanAware;
 import java.lang.annotation.Annotation;
 
 /**
- * Up2 configurable {@link Processor} that processes the input data before setting the destination property.
+ * Up2J configurable {@link Processor} that processes the input data before setting the destination property.
  *
  * @param <A> the annotation type
  */

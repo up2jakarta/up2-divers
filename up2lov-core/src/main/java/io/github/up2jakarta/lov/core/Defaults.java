@@ -3,10 +3,7 @@ package io.github.up2jakarta.lov.core;
 import java.lang.reflect.Array;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Parameter;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public final class Defaults {
 
@@ -77,8 +74,16 @@ public final class Defaults {
                 arguments[i] = CACHE.get(type);
             } else if (type.isArray()) {
                 arguments[i] = Array.newInstance(type.getComponentType(), 0);
+            } else if (Wrapper.class.isAssignableFrom(type)) {
+                arguments[i] = new Wrapper<>();
             } else if (Optional.class.isAssignableFrom(type)) {
                 arguments[i] = Optional.empty();
+            } else if (OptionalInt.class.isAssignableFrom(type)) {
+                arguments[i] = OptionalInt.empty();
+            } else if (OptionalLong.class.isAssignableFrom(type)) {
+                arguments[i] = OptionalLong.empty();
+            } else if (OptionalDouble.class.isAssignableFrom(type)) {
+                arguments[i] = OptionalDouble.empty();
             } else if (List.class.isAssignableFrom(type)) {
                 arguments[i] = List.of();
             } else if (Set.class.isAssignableFrom(type)) {

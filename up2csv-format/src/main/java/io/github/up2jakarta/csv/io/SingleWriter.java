@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.io;
 
-import io.github.up2jakarta.csv.core.Up2Format;
+import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Writer;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
@@ -20,7 +20,7 @@ public final class SingleWriter<S extends Segment, D extends DataType<D>> extend
     private CSVPrinter printer;
     private FileWriter writer;
 
-    public SingleWriter(Up2Format<S, D> mapper, CSVFormat format) {
+    public SingleWriter(Up2Flatter<S, D> mapper, CSVFormat format) {
         super(mapper);
         this.format = format;
     }

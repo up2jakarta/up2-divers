@@ -8,7 +8,7 @@
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-format</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.1</version>
     </dependency>
     <!-- Required JSR-303 Validation Provider -->
     <dependency>

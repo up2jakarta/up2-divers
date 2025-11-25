@@ -5,7 +5,7 @@ import io.github.up2jakarta.lov.SeverityType;
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports {@link io.github.up2jakarta.csv.api.IEvent#getLevel()}
+ * Up2J Annotation that supports {@link io.github.up2jakarta.csv.api.IEvent#getLevel()}
  * and {@link io.github.up2jakarta.csv.api.IEvent#getCode()}.
  *
  * @see io.github.up2jakarta.csv.api.IEvent

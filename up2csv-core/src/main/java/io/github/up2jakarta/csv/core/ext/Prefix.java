@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.core.ext;
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation resolver that supports database prefix checking for :
+ * Up2J Annotation resolver that supports database prefix checking for :
  * <ul>
  *   <li>{@link jakarta.persistence.Table#name()}</li>
  *   <li>{@link jakarta.persistence.Column#name()}</li>

@@ -7,7 +7,7 @@ import io.github.up2jakarta.lov.core.BeanException;
 
 import java.lang.reflect.Field;
 
-import static io.github.up2jakarta.csv.core.AccessMode.WO;
+import static io.github.up2jakarta.csv.core.BeanAccess.WO;
 import static io.github.up2jakarta.csv.core.ext.Beans.isInnerType;
 import static java.lang.reflect.Modifier.isAbstract;
 import static java.lang.reflect.Modifier.isStatic;
@@ -28,7 +28,7 @@ final class BeanChecker implements TypeListener, TypeContext {
         }
     }
 
-    private static void check(AccessMode mode, Class<? extends Segment> type) throws BeanException {
+    private static void check(BeanAccess mode, Class<? extends Segment> type) throws BeanException {
         if (mode == WO && type.isLocalClass()) {
             throw new BeanException(type, "local class is not allowed");
         }
@@ -41,7 +41,7 @@ final class BeanChecker implements TypeListener, TypeContext {
     }
 
     @Override
-    public TypeContext beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException {
+    public TypeContext beforeSegment(BeanAccess mode, Class<? extends Segment> type) throws BeanException {
         check(mode, type);
         if (mode == WO && isInnerType(type)) {
             throw new BeanException(type, "inner class is not allowed");
@@ -55,7 +55,7 @@ final class BeanChecker implements TypeListener, TypeContext {
     }
 
     @Override
-    public void beforeFragmentProperty(AccessMode mode, Field fragment, Class<? extends Segment> fragmentType) throws BeanException {
+    public void beforeFragmentProperty(BeanAccess mode, Field fragment, Class<? extends Segment> fragmentType) throws BeanException {
         check(mode, fragmentType);
         check(fragment);
     }

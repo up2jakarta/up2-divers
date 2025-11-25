@@ -4,8 +4,8 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.api.hdl.IEventBuilder;
-import io.github.up2jakarta.csv.core.BSOperator.Computer.BSFormat;
-import io.github.up2jakarta.csv.core.BSOperator.Computer.BSMapper;
+import io.github.up2jakarta.csv.core.BSOperator.OPS.Format;
+import io.github.up2jakarta.csv.core.BSOperator.OPS.Mapper;
 import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
 import io.github.up2jakarta.csv.data.*;
 import io.github.up2jakarta.lov.CodeListException;
@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_COMPLIANCE;
-import static io.github.up2jakarta.csv.core.AccessMode.WO;
+import static io.github.up2jakarta.csv.core.BeanAccess.WO;
 import static io.github.up2jakarta.csv.data.DataType.*;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.lov.core.AccessException.notNull;
@@ -39,28 +39,28 @@ import static java.util.Set.of;
  * @see UnitImporter
  */
 public abstract sealed class BusinessImporter<B extends DataType<B>, I extends IType<B, I>, T extends Segment, R extends IRecord<I>, E extends IEvent<B>>
-        extends BSOperator<B, I, BSMapper<Segment, B>, BSFormat<Segment, B>>
+        extends BSOperator<B, I, Mapper<Segment, B>, Format<Segment, B>>
         permits UnitImporter, FastImporter, FullImporter {
 
-    protected final BusinessTyping typing;
+    protected final Typing typing;
     private final boolean withBusinessId;
 
     BusinessImporter(Up2Factory<B> factory, ModeType mode, Class<T> type, I root, List<I> nodes) throws BeanException {
         super(factory, type, mode, root, nodes);
-        this.typing = new BusinessTyping(nodes);
+        this.typing = new Typing(nodes);
         this.withBusinessId = this.check(root);
     }
 
     BusinessImporter(BusinessExporter<B, I, T> exporter) throws BeanException {
         super(exporter);
-        this.typing = new BusinessTyping(nodes);
+        this.typing = new Typing(nodes);
         this.withBusinessId = this.check(root);
     }
 
     private boolean check(I parent) throws BeanException {
-        final BSMapper<Segment, B> pm = mappers.get(parent);
+        final Mapper<Segment, B> pm = mappers.get(parent);
         for (final I child : joins.getOrDefault(parent, of())) {
-            final BSMapper<Segment, B> cm = mappers.get(child);
+            final Mapper<Segment, B> cm = mappers.get(child);
             if (cm.hasParentId) {
                 if (!pm.hasBusinessId) {
                     final Class<?> type = parent.getClassType();
@@ -117,7 +117,7 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
                 handler.handle(ERROR, EC_COMPLIANCE, null, mode.typeIdIndex, "must not be null");
                 continue;
             }
-            final BSMapper<Segment, B> mapper = mappers.get(type);
+            final Mapper<Segment, B> mapper = mappers.get(type);
             if (mapper == null) {
                 handler.handle(type, DETACHED);
                 continue;
@@ -132,9 +132,9 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
     }
 
     @Override
-    final BSMapper<Segment, B> build(Up2Factory<B> factory, I type, BSFormat<Segment, B> source) throws BeanException {
+    final Mapper<Segment, B> build(Up2Factory<B> factory, I type, Format<Segment, B> source) throws BeanException {
         if (source != null) {
-            return new BSMapper<>(source.node.reverse());
+            return new Mapper<>(source.node.reverse());
         }
         return factory.build(factory.resolver.or(type.getDataType()), type.getClassType());
     }
@@ -223,6 +223,11 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
 
     abstract boolean testPivot(R root, R record);
 
+    @FunctionalInterface
+    interface Operation {
+        void apply() throws RuntimeException;
+    }
+
     /**
      * Internal business entry.
      */
@@ -230,13 +235,13 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
         private final I type;
         private final S bean;
         private final R source;
-        private final BSMapper<S, B> mapper;
+        private final Mapper<S, B> mapper;
         private final BusinessHandler<B> handler;
         private final boolean hasParentId;
         private final Object parentId;
         private Object businessId;
 
-        private Entry(BSMapper<S, B> mapper, BusinessHandler<B> handler, I type, R record, boolean validate) {
+        private Entry(Mapper<S, B> mapper, BusinessHandler<B> handler, I type, R record, boolean validate) {
             this.type = type;
             this.source = record;
             this.mapper = mapper;
@@ -264,7 +269,7 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
             }
         }
 
-        private Object id(BAccessor<Segment, Object> id, boolean sp, String cn) {
+        private Object id(BId<Segment, Object> id, boolean sp, String cn) {
             if (sp) {
                 return safe(() -> id.get(bean), () -> "cannot retrieve the " + cn + " identifier");
             }
@@ -296,18 +301,13 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
         public String toString() {
             return "Segment#[" + type.getCode() + ']';
         }
-
-        @FunctionalInterface
-        interface Operation {
-            void apply() throws RuntimeException;
-        }
     }
 
-    public class BusinessTyping {
+    public class Typing {
         private final Up2ListParser<I> parser;
 
         @SuppressWarnings("unchecked")
-        private BusinessTyping(List<I> nodes) {
+        private Typing(List<I> nodes) {
             this.parser = new Up2ListParser<>((Class<I>) root.getClass(), nodes);
         }
 

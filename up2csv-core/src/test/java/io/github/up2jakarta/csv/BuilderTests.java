@@ -62,7 +62,7 @@ public class BuilderTests {
         final SimpleUnitExporter<Invoice, GroupType, SegmentType> exporter = factory.builder()
                 .unit(Invoice.class)
                 .build(S01)
-                .format();
+                .export();
         assertNotNull(exporter);
         // THEN
         final String[] root = UNIT_INVOICE[0];
@@ -149,7 +149,7 @@ public class BuilderTests {
         final SimpleFastExporter<Invoice, GroupType, SegmentType> exporter = factory.builder()
                 .fast(Invoice.class)
                 .build(S01)
-                .format();
+                .export();
         assertNotNull(exporter);
         // THEN
         final String[] root = FAST_INVOICE[0];
@@ -236,7 +236,7 @@ public class BuilderTests {
         final SimpleFullExporter<Invoice, GroupType, SegmentType> exporter = factory.builder()
                 .full(Invoice.class)
                 .build(S01)
-                .format();
+                .export();
         assertNotNull(exporter);
         // THEN
         final String[] root = FULL_INVOICE[0];

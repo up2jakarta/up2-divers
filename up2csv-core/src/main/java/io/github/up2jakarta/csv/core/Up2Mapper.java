@@ -3,8 +3,8 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Truncated;
-import io.github.up2jakarta.csv.core.BSNode.BPNode;
-import io.github.up2jakarta.csv.core.BSOperator.BProcessor;
+import io.github.up2jakarta.csv.core.BSNode.Bean;
+import io.github.up2jakarta.csv.core.BSOperator.Computer;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
 import io.github.up2jakarta.csv.core.hdl.FailureException;
 import io.github.up2jakarta.csv.core.hdl.FastHandler;
@@ -25,10 +25,11 @@ import static java.util.Objects.requireNonNull;
  * @param <S> the segment type
  * @param <D> The business data type
  */
-public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends BProcessor<S, D, BPNode<S, D, ?>> {
+public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends Computer<S, D, Bean<S, D, ?>> {
 
-    Up2Mapper(BPNode<S, D, ?> node) throws BeanException {
+    Up2Mapper(Bean<S, D, ?> node) throws BeanException {
         super(node);
+        check(node);
     }
 
     /**
@@ -127,14 +128,14 @@ public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends B
     }
 
     /**
-     * Converts the current mapper to formatter that is able to map bean-segment to flat-data.
+     * Converts the current mapper to flatter that is able to map bean-segment to flat-data.
      * This method is faster then {@link Up2Factory#format(Class, DataTypeResolver)} when the bean is already scanned.
      *
      * @return preconfigured CSV Format for the same segment
      * @throws BeanException if any property is not accessible for read
      */
-    public Up2Format<S, D> toFormat() throws BeanException {
-        return new Up2Format<>(node.reverse());
+    public Up2Flatter<S, D> toFlatter() throws BeanException {
+        return new Up2Flatter<>(node.reverse());
     }
 
 }

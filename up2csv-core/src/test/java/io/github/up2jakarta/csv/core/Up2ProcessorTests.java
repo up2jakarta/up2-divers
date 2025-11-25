@@ -3,10 +3,10 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Trim;
-import io.github.up2jakarta.csv.core.BSBuilder.PProcessor;
-import io.github.up2jakarta.csv.core.BSProperty.PAccessor;
-import io.github.up2jakarta.csv.core.BSProperty.PProperty;
-import io.github.up2jakarta.csv.core.BSProperty.PProperty.POProperty;
+import io.github.up2jakarta.csv.core.BSBuilder.Input;
+import io.github.up2jakarta.csv.core.BSProperty.Accessor;
+import io.github.up2jakarta.csv.core.BSProperty.PPosition;
+import io.github.up2jakarta.csv.core.BSProperty.PPosition.PS;
 import io.github.up2jakarta.csv.core.hdl.FailureException;
 import io.github.up2jakarta.csv.core.misc.DummyException;
 import io.github.up2jakarta.csv.core.misc.ext.Dummy4;
@@ -48,17 +48,17 @@ public class Up2ProcessorTests {
         this.factory = factory;
     }
 
-    private PProperty<?, ?, ?> property(String property) throws Exception {
+    private PPosition<?, ?, ?> property(String property) throws Exception {
         final Field field = Test7Processor.class.getDeclaredField(property);
         final Position position = field.getAnnotation(Position.class);
-        final PProcessor<?> processor = BSBuilder.build(context, field, position);
+        final Input<?> processor = BSBuilder.build(context, field, position);
         if (field.getType() == String.class) {
-            final PAccessor<?, String> va = Properties.wo(String.class, field);
-            return new POProperty<>(va, null, 0, position, processor, StringAdapter.INSTANCE);
+            final Accessor<String> va = Properties.wo(String.class, field);
+            return new PS<>(va, null, 0, position, processor, StringAdapter.INSTANCE);
         } else if (field.getType() == Integer.class) {
-            final PAccessor<?, Integer> va = Properties.wo(Integer.class, field);
+            final Accessor<Integer> va = Properties.wo(Integer.class, field);
             final TypeAdapter<Integer> cvr = new TypeWrapper<>(Integer.class, Integer::parseInt);
-            return new POProperty<>(va, null, 0, position, processor, cvr);
+            return new PS<>(va, null, 0, position, processor, cvr);
         }
         throw new UnsupportedOperationException();
     }
@@ -98,7 +98,7 @@ public class Up2ProcessorTests {
         }
         final Field field = TestProcessor.class.getDeclaredField("attribute");
         // When
-        final PProcessor<?> processor = BSBuilder.build(context, field, field.getAnnotation(Position.class));
+        final Input<?> processor = BSBuilder.build(context, field, field.getAnnotation(Position.class));
         // Then
         assertNull(processor.process(null, 0, null, null));
         assertNull(processor.process("", 0, null, null));
@@ -116,7 +116,7 @@ public class Up2ProcessorTests {
         }
         final Field field = TestProcessor.class.getDeclaredField("attribute");
         // When
-        final PProcessor<?> processor = BSBuilder.build(context, field, field.getAnnotation(Position.class));
+        final Input<?> processor = BSBuilder.build(context, field, field.getAnnotation(Position.class));
         // Then
         assertNull(processor.process(null, 0, null, null));
         assertNull(processor.process("", 0, null, null));
@@ -127,7 +127,7 @@ public class Up2ProcessorTests {
     @Test
     void testSDefaultValue() throws Exception {
         //Given
-        final PProperty<?, ?, ?> property = property("value");
+        final PPosition<?, ?, ?> property = property("value");
         {
             // When null
             final Object value = parse(property, null);
@@ -151,7 +151,7 @@ public class Up2ProcessorTests {
     @Test
     void testODefaultValue() throws Exception {
         //Given
-        final PProperty<?, ?, ?> property = property("number");
+        final PPosition<?, ?, ?> property = property("number");
         {
             // When null
             final Object value = parse(property, null);

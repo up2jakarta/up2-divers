@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
 import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.core.AccessMode;
+import io.github.up2jakarta.csv.core.BeanAccess;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.persistence.*;
@@ -150,7 +150,7 @@ final class JpaColumnContext implements TypeContext {
     }
 
     @Override
-    public void beforeFragmentProperty(AccessMode mode, Field fragment, Class<? extends Segment> type) throws BeanException {
+    public void beforeFragmentProperty(BeanAccess mode, Field fragment, Class<? extends Segment> type) throws BeanException {
         final PrimaryKeyJoinColumn column = type.getAnnotation(PrimaryKeyJoinColumn.class);
         if (column != null) {
             checkName(type, column.name(), prefix, "@PrimaryKeyJoinColumn[name]");

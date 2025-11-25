@@ -10,8 +10,8 @@ import jakarta.validation.ConstraintViolation;
  *
  * @param <D> the business data type
  * @see io.github.up2jakarta.csv.core.hdl.ComplianceCollector
- * @see io.github.up2jakarta.csv.core.Up2Format#validate(Segment)
- * @see io.github.up2jakarta.csv.core.Up2Format#validate(Segment, int)
+ * @see io.github.up2jakarta.csv.core.Up2Flatter#validate(Segment)
+ * @see io.github.up2jakarta.csv.core.Up2Flatter#validate(Segment, int)
  */
 public interface IComplianceEvent<D extends DataType<D>> extends IEvent<D> {
 

@@ -30,7 +30,7 @@ public @interface PositionOverride {
     String[] path();
 
     /**
-     * Up2 Annotation that supports {@link Repeatable} {@link PositionOverride}.
+     * Up2J Annotation that supports {@link Repeatable} {@link PositionOverride}.
      */
     @Retention(RUNTIME)
     @Target({FIELD, TYPE})

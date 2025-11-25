@@ -17,9 +17,9 @@ import java.util.Collection;
  */
 public abstract class Up2Writer<S extends Segment, D extends DataType<D>> implements Closeable, Flushable {
 
-    private final Up2Format<S, D> mapper;
+    private final Up2Flatter<S, D> mapper;
 
-    public Up2Writer(Up2Format<S, D> mapper) {
+    public Up2Writer(Up2Flatter<S, D> mapper) {
         this.mapper = mapper;
     }
 

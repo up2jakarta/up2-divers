@@ -47,7 +47,7 @@ public class Up2XmlExtensionTests {
         assertEquals(CurrencyCodeType.TND, bean.getAdapter1());
         assertEquals(TestCodeList.ANY, bean.getAdapter2());
         // When Unmapping
-        final Up2Format<Test1Bean, GroupType> format = factory.format(Test1Bean.class);
+        final Up2Flatter<Test1Bean, GroupType> format = factory.format(Test1Bean.class);
         final String[] out = format.unmap(bean);
         // Then
         assertNotNull(out);

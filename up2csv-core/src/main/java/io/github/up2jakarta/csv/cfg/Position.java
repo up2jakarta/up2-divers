@@ -6,7 +6,7 @@ import io.github.up2jakarta.lov.core.StringAdapter;
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports the index of data in {@link io.github.up2jakarta.csv.api.IRecord#getData()}.
+ * Up2J Annotation that supports the index of data in {@link io.github.up2jakarta.csv.api.IRecord#getData()}.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

@@ -3,21 +3,13 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.api.ext.TypeExtension;
 import io.github.up2jakarta.csv.api.ext.TypeResolver;
 import io.github.up2jakarta.csv.cfg.*;
-import io.github.up2jakarta.csv.core.BSBuilder.PProcessor;
-import io.github.up2jakarta.csv.core.BSNode.BFNode;
-import io.github.up2jakarta.csv.core.BSNode.BPNode;
-import io.github.up2jakarta.csv.core.BSNode.BPNode.BMNode;
-import io.github.up2jakarta.csv.core.BSNode.BPNode.BRNode;
+import io.github.up2jakarta.csv.core.BSBuilder.Input;
+import io.github.up2jakarta.csv.core.BSNode.Bean;
+import io.github.up2jakarta.csv.core.BSNode.Flat;
 import io.github.up2jakarta.csv.core.BSOperator.Factory;
-import io.github.up2jakarta.csv.core.BSProperty.FProperty;
-import io.github.up2jakarta.csv.core.BSProperty.FProperty.FOProperty;
-import io.github.up2jakarta.csv.core.BSProperty.FProperty.FWProperty;
-import io.github.up2jakarta.csv.core.BSProperty.PAccessor;
-import io.github.up2jakarta.csv.core.BSProperty.PProperty;
-import io.github.up2jakarta.csv.core.BSProperty.PProperty.POProperty;
-import io.github.up2jakarta.csv.core.BSProperty.PProperty.PWProperty;
-import io.github.up2jakarta.csv.core.ext.Beans;
-import io.github.up2jakarta.csv.core.ext.PPath;
+import io.github.up2jakarta.csv.core.BSProperty.Accessor;
+import io.github.up2jakarta.csv.core.BSProperty.PFragment;
+import io.github.up2jakarta.csv.core.BSProperty.PPosition;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
@@ -25,8 +17,8 @@ import io.github.up2jakarta.lov.CodeList;
 import io.github.up2jakarta.lov.TypeAdapter;
 import io.github.up2jakarta.lov.core.BeanContext;
 import io.github.up2jakarta.lov.core.BeanException;
-import io.github.up2jakarta.lov.core.Defaults;
 import io.github.up2jakarta.lov.core.StringAdapter;
+import io.github.up2jakarta.lov.core.Wrapper;
 import jakarta.persistence.AccessType;
 import jakarta.validation.Valid;
 
@@ -36,17 +28,12 @@ import java.math.BigDecimal;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
-import java.util.function.Predicate;
 
-import static io.github.up2jakarta.csv.core.AccessMode.RO;
-import static io.github.up2jakarta.csv.core.AccessMode.WO;
 import static io.github.up2jakarta.csv.core.ext.Beans.*;
-import static io.github.up2jakarta.csv.core.ext.PPath.addOverride;
-import static io.github.up2jakarta.csv.core.ext.PPath.getOverride;
-import static io.github.up2jakarta.lov.core.BeanException.of;
-import static jakarta.persistence.AccessType.PROPERTY;
-import static java.lang.String.join;
+import static io.github.up2jakarta.lov.core.Defaults.wrap;
+import static io.github.up2jakarta.lov.core.Overrides.*;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static java.util.Collections.unmodifiableList;
 
 /**
@@ -54,30 +41,30 @@ import static java.util.Collections.unmodifiableList;
  */
 final class BSContext<D extends DataType<D>> {
 
-    private final Map<PPath, PositionOverride> positions = new LinkedHashMap<>();
-    private final Map<PPath, FragmentOverride> fragments = new LinkedHashMap<>();
-    private final Map<PPath, ValidOverride> validations = new LinkedHashMap<>();
+    private final Map<Path, PositionOverride> positions = new LinkedHashMap<>();
+    private final Map<Path, FragmentOverride> fragments = new LinkedHashMap<>();
+    private final Map<Path, ValidOverride> validations = new LinkedHashMap<>();
     private final Stack<Class<? extends Segment>> stack = new Stack<>();
     private final LinkedList<Field> path = new LinkedList<>();
     private final TypeExtension<?, Annotation>[] extensions;
     private final Class<? extends Segment> type;
     private final DataTypeResolver<D> resolver;
     private final Optional<AccessType> access;
-    private final BSBuilder.WChecker checker;
-    private final BVContext context;
+    private final BSBuilder.Listener checker;
+    private final VContext context;
     private final Type[] arguments;
     private final Factory factory;
-    private final AccessMode mode;
+    private final BeanAccess mode;
     private final int offset;
 
-    private BSContext(Factory f, Class<? extends Segment> t, AccessMode m, DataTypeResolver<D> d) throws BeanException {
-        addOverride(PositionOverride.class, t, this.positions::put, PositionOverride::path);
-        addOverride(FragmentOverride.class, t, this.fragments::put, FragmentOverride::path);
-        addOverride(ValidOverride.class, t, this.validations::put, ValidOverride::path);
+    private BSContext(Factory f, Class<? extends Segment> t, BeanAccess m, DataTypeResolver<D> d) throws BeanException {
+        add(PositionOverride.class, t, this.positions::put, PositionOverride::path);
+        add(FragmentOverride.class, t, this.fragments::put, FragmentOverride::path);
+        add(ValidOverride.class, t, this.validations::put, ValidOverride::path);
         this.access = BSBuilder.getAccessType(Optional.empty(), t);
-        this.checker = BSBuilder.WChecker.of(t, f.context);
+        this.checker = BSBuilder.Listener.of(t, f.context);
         this.extensions = extension(t, f.context);
-        this.context = BVContext.from(t);
+        this.context = VContext.from(t);
         this.arguments = NO_TYPES;
         this.resolver = d;
         this.factory = f;
@@ -87,9 +74,9 @@ final class BSContext<D extends DataType<D>> {
     }
 
     private BSContext(BSContext<D> origin, int offset, Class<? extends Segment> type, Type... arguments) throws BeanException {
-        addOverride(PositionOverride.class, type, this.positions::put, PositionOverride::path);
-        addOverride(FragmentOverride.class, type, this.fragments::put, FragmentOverride::path);
-        addOverride(ValidOverride.class, type, this.validations::put, ValidOverride::path);
+        add(PositionOverride.class, type, this.positions::put, PositionOverride::path);
+        add(FragmentOverride.class, type, this.fragments::put, FragmentOverride::path);
+        add(ValidOverride.class, type, this.validations::put, ValidOverride::path);
         this.access = BSBuilder.getAccessType(origin.access, type);
         origin.path.forEach(this.path::addLast);
         origin.stack.forEach(this.stack::push);
@@ -125,7 +112,7 @@ final class BSContext<D extends DataType<D>> {
     }
 
     private static BeanException translate(Class<?> type, Field field) {
-        final Class<?> wrapper = Defaults.wrap(type);
+        final Class<?> wrapper = wrap(type);
         if (Boolean.class.equals(wrapper)) {
             return new BeanException(field, "should be annotated with @" + Up2Boolean.class.getSimpleName());
         }
@@ -151,22 +138,50 @@ final class BSContext<D extends DataType<D>> {
         return new BeanException(field, "must be annotated with @" + cn + " or one of those shortcuts");
     }
 
-    static <D extends DataType<D>, S extends Segment> BPNode<S, D, ?> build(Class<S> t, Factory f, DataTypeResolver<D> r) throws BeanException {
-        final BSContext<D> mc = new BSContext<>(f, t, WO, r);
-        if (t.isRecord()) {
-            return new BRNode<>(t, f.validator, mc.context, mc.build());
+    @SuppressWarnings("unchecked")
+    static <S extends Segment, D extends DataType<D>> Constructor<S> from(Class<S> t, List<BSProperty<?, ?, D>> ps) throws BeanException {
+        final long fc = ps.stream().filter(BSProperty::isFinal).count();
+        if (fc == 0) {
+            return null;
         }
-        return new BMNode<>(t, f.validator, mc.context, mc.build());
+        if (fc == ps.size()) {
+            final Constructor<S>[] dcs = (Constructor<S>[]) t.getDeclaredConstructors();
+            final List<Constructor<S>> cs = stream(dcs).filter(c -> c.isAnnotationPresent(Creator.class)).toList();
+            if (cs.size() == 1) {
+                return setAccessible(cs.getFirst());
+            }
+            if (t.isRecord()) {
+                return null;
+            }
+            if (dcs.length == 1) {
+                return setAccessible(dcs[0]);
+            }
+            throw new BeanException(t, "one and only one constructor must be annotated by @Creator");
+        }
+        throw new BeanException(t, "mix final and writable properties is not allowed");
     }
 
-    static <D extends DataType<D>, S extends Segment> BFNode<S, D> format(Class<S> t, Factory f, DataTypeResolver<D> r) throws BeanException {
-        final BSContext<D> mc = new BSContext<>(f, t, RO, r);
-        return new BFNode<>(t, f.validator, mc.context, mc.build());
+    static <D extends DataType<D>, S extends Segment> Bean<S, D, ?> build(Class<S> t, Factory f, DataTypeResolver<D> r) throws BeanException {
+        final BSContext<D> mc = new BSContext<>(f, t, BeanAccess.WO, r);
+        final List<BSProperty<?, ?, D>> ps = mc.build();
+        final Constructor<S> cs = from(t, ps);
+        if (cs == null) {
+            if (t.isRecord()) {
+                return new Bean.JR<>(t, f.validator, mc.context, ps);
+            }
+            return new Bean.BM<>(t, f.validator, mc.context, ps);
+        }
+        return new Bean.JB<>(t, f.validator, mc.context, ps, cs);
     }
 
-    private <V> PAccessor<Field, V> accessor(Class<V> type, Field field) throws BeanException {
+    static <D extends DataType<D>, S extends Segment> Flat<S, D> format(Class<S> t, Factory f, DataTypeResolver<D> r) throws BeanException {
+        final BSContext<D> mc = new BSContext<>(f, t, BeanAccess.RO, r);
+        return new Flat<>(t, f.validator, mc.context, mc.build());
+    }
+
+    private <V> Accessor<V> accessor(Class<V> type, Field field) throws BeanException {
         final Class<? extends Segment> container = getSegmentType(stack);
-        final AccessType access = BSBuilder.getAccessType(field, this.access).orElse(PROPERTY);
+        final AccessType access = BSBuilder.getAccessType(field, this.access).orElse(AccessType.PROPERTY);
         return mode.of(access, container, field, type);
     }
 
@@ -220,26 +235,28 @@ final class BSContext<D extends DataType<D>> {
         throw translate(type, field);
     }
 
-    private <S extends Segment> BSNode<S, D> node(Field fp, Class<S> ft, BVContext vc, Fragment fr, List<BSProperty<?, ?, D>> ps) throws BeanException {
+    private <S extends Segment> BSNode<S, D> node(Field fp, Class<S> ft, VContext vc, Fragment fr, List<BSProperty<?, ?, D>> ps) throws BeanException {
         final int index;
         if (isInnerType(ft)) {
-            index = stack.lastIndexOf(ft.getEnclosingClass());
-            if (index == -1) {
-                var cn = stack.stream().filter(Predicate.not(Class::isRecord)).map(Beans::getTypeName).toList();
-                throw new BeanException(fp, "inner class is not allowed outside enclosing segments: " + join(", ", cn));
+            final Class<?> ec = ft.getEnclosingClass();
+            if (ec.isRecord()) {
+                throw new BeanException(fp, "inner class is not allowed inside enclosing record: " + getTypeName(ec));
             }
-            if (stack.get(index).isRecord()) {
-                throw new BeanException(fp, "inner class is not allowed inside enclosing records");
-            }
+            index = stack.lastIndexOf(ec);
         } else {
             index = -1;
         }
-        if (mode == RO) {
-            return new BFNode<>(index, ft, factory.validator, vc, fr, ps);
-        } else if (ft.isRecord()) {
-            return new BRNode<>(ft, factory.validator, vc, fr, ps);
+        if (mode == BeanAccess.RO) {
+            return new Flat<>(index, ft, factory.validator, vc, fr, ps);
         }
-        return new BMNode<>(index, ft, factory.validator, vc, fr, ps);
+        final Constructor<S> cs = from(ft, ps);
+        if (cs == null) {
+            if (ft.isRecord()) {
+                return new Bean.JR<>(ft, factory.validator, vc, fr, ps);
+            }
+            return new Bean.BM<>(index, ft, factory.validator, vc, fr, ps);
+        }
+        return new Bean.JB<>(index, ft, factory.validator, vc, fr, ps, cs);
     }
 
     boolean push(Class<? extends Segment> beanType) {
@@ -261,12 +278,12 @@ final class BSContext<D extends DataType<D>> {
         final BSContext<D> result = new BSContext<>(this, offset, segmentType, arguments);
         result.path.addLast(field);
         final String name = field.getName();
-        this.positions.forEach((o, p) -> addOverride(o, p, name, result.positions::put));
-        this.fragments.forEach((o, p) -> addOverride(o, p, name, result.fragments::put));
-        this.validations.forEach((o, p) -> addOverride(o, p, name, result.validations::put));
-        addOverride(PositionOverride.class, field, result.positions::putIfAbsent, PositionOverride::path);
-        addOverride(FragmentOverride.class, field, result.fragments::putIfAbsent, FragmentOverride::path);
-        addOverride(ValidOverride.class, field, result.validations::putIfAbsent, ValidOverride::path);
+        this.positions.forEach((o, p) -> add(o, p, name, result.positions::put));
+        this.fragments.forEach((o, p) -> add(o, p, name, result.fragments::put));
+        this.validations.forEach((o, p) -> add(o, p, name, result.validations::put));
+        add(PositionOverride.class, field, result.positions::putIfAbsent, PositionOverride::path);
+        add(FragmentOverride.class, field, result.fragments::putIfAbsent, FragmentOverride::path);
+        add(ValidOverride.class, field, result.validations::putIfAbsent, ValidOverride::path);
         return result;
     }
 
@@ -290,40 +307,48 @@ final class BSContext<D extends DataType<D>> {
     }
 
     Position position(Field field) {
-        return getOverride(Position.class, positions, field, PositionOverride::value, p -> p.value() >= 0);
+        return get(Position.class, positions, field, PositionOverride::value, p -> p.value() >= 0);
     }
 
     Fragment fragment(Field field) {
-        return getOverride(Fragment.class, fragments, field, FragmentOverride::value, p -> p.value() >= 0);
+        return get(Fragment.class, fragments, field, FragmentOverride::value, p -> p.value() >= 0);
     }
 
-    <S extends Segment> FProperty<S, ?, D> node(Class<S> ft, Field ff, Fragment fr, List<BSProperty<?, ?, D>> ps) throws BeanException {
+    <S extends Segment> PFragment<S, ?, D> node(Class<S> ft, Field ff, Fragment fr, List<BSProperty<?, ?, D>> ps) throws BeanException {
         checker.afterFragmentProperty(ff, ft);
-        final ValidOverride override = getOverride(ValidOverride.class, validations, ff, ValidOverride::path);
+        final ValidOverride override = get(ValidOverride.class, validations, ff, ValidOverride::path);
+        final VContext vc = context.build(ff, ft, override);
         if (Optional.class.isAssignableFrom(ff.getType())) {
-            final AnnotatedType at = ((AnnotatedParameterizedType) ff.getAnnotatedType()).getAnnotatedActualTypeArguments()[0];
-            final BSNode<S, D> node = this.node(ff, ft, context.build(ff, ft, at, override), fr, ps);
-            final PAccessor<?, Optional<S>> va = this.accessor(cast(ft), ff);
-            return new FWProperty<>(node, va, this.dataType(ff), offset, fr);
+            final Accessor<Optional<S>> va = this.accessor(cast(ft), ff);
+            return new PFragment.FO<>(this.node(ff, ft, vc, fr, ps), va, this.dataType(ff), offset, fr);
         }
-        final BSNode<S, D> node = this.node(ff, ft, context.build(ff, ft, ff.getAnnotatedType(), override), fr, ps);
-        return new FOProperty<>(node, this.accessor(ft, ff), this.dataType(ff), offset, fr);
+        if (Wrapper.class.isAssignableFrom(ff.getType())) {
+            final Accessor<Wrapper<S>> va = this.accessor(cast(ft), ff);
+            return new PFragment.FW<>(this.node(ff, ft, vc, fr, ps), va, this.dataType(ff), offset, fr);
+        }
+        final BSNode<S, D> node = this.node(ff, ft, vc, fr, ps);
+        return new PFragment.FS<>(node, this.accessor(ft, ff), this.dataType(ff), offset, fr);
     }
 
-    <T> PProperty<T, ?, D> property(Class<T> pt, Field pf, Position pc) throws BeanException {
+    <T> PPosition<T, ?, D> property(Class<T> pt, Field pf, Position pc) throws BeanException {
         checker.positionProperty(pf, pt, offset + pc.value());
-        final PProcessor<D> ps = BSBuilder.build(factory.context, pf, pc);
+        final Input<D> ps = BSBuilder.build(factory.context, pf, pc);
         final D dataType = this.dataType(pf);
         final TypeAdapter<T> adapter = this.adapter(pf, pt, pc);
         if (Optional.class.isAssignableFrom(pf.getType())) {
-            final PAccessor<?, Optional<T>> va = this.accessor(cast(pt), pf);
-            return new PWProperty<>(va, dataType, offset, pc, ps, adapter);
+            final Accessor<Optional<T>> va = this.accessor(cast(pt), pf);
+            return new PPosition.PO<>(va, dataType, offset, pc, ps, adapter);
         }
-        return new POProperty<>(this.accessor(pt, pf), dataType, offset, pc, ps, adapter);
+        if (Wrapper.class.isAssignableFrom(pf.getType())) {
+            final Accessor<Wrapper<T>> va = this.accessor(cast(pt), pf);
+            return new PPosition.PW<>(va, dataType, offset, pc, ps, adapter);
+        }
+        return new PPosition.PS<>(this.accessor(pt, pf), dataType, offset, pc, ps, adapter);
     }
 
     Type fieldType(Field field) {
-        if (Optional.class.isAssignableFrom(field.getType())) {
+        final Class<?> type = field.getType();
+        if (Optional.class.isAssignableFrom(type) || Wrapper.class.isAssignableFrom(type)) {
             return getPropertyArguments(field, this.arguments)[0];
         }
         return getPropertyType(field, arguments);
@@ -332,26 +357,27 @@ final class BSContext<D extends DataType<D>> {
     /**
      * Internal Context for JSR-303 validation.
      */
-    static class BVContext {
-        private static final BVContext DISABLED = new BVContext(false);
-        private static final BVContext DEFAULT = new BVContext(true);
+    static class VContext {
+        private static final VContext DISABLED = new VContext(false);
+        private static final VContext DEFAULT = new VContext(true);
 
         final boolean enabled;
         final Class<?>[] groups;
 
-        private BVContext(boolean enabled, Class<?>... groups) {
+        private VContext(boolean enabled, Class<?>... groups) {
             this.enabled = enabled;
             this.groups = groups;
         }
 
         private static Class<?>[] checkGroups(Class<?>[] groups, AnnotatedElement source) throws BeanException {
             if (source.isAnnotationPresent(Valid.class)) {
-                throw of(source, "must not be annotated by @Valid");
+                throw BeanException.of(source, "must not be annotated by @Valid");
             }
             final Set<Class<?>> result = new HashSet<>(groups.length);
             for (final Class<?> group : groups) {
                 if (!group.isInterface()) {
-                    throw of(source, "@ValidOverride[value = " + group.getName() + ".class must be an interface]");
+                    final String cn = group.getName();
+                    throw BeanException.of(source, "@ValidOverride[value = " + cn + ".class must be an interface]");
                 }
                 result.add(group);
             }
@@ -359,16 +385,16 @@ final class BSContext<D extends DataType<D>> {
         }
 
         @SuppressWarnings("unchecked")
-        private static BVContext from(Class<? extends Segment> type) throws BeanException {
+        private static VContext from(Class<? extends Segment> type) throws BeanException {
             while (type != Segment.class && Segment.class.isAssignableFrom(type)) {
-                final ValidOverride override = getOverride(ValidOverride.class, type, ValidOverride::path);
+                final ValidOverride override = get(ValidOverride.class, type, ValidOverride::path);
                 if (override != null) {
                     if (override.disable()) {
                         return DISABLED;
                     } else if (override.groups().length == 0) {
                         return DEFAULT;
                     }
-                    return new BVContext(true, checkGroups(override.groups(), type));
+                    return new VContext(true, checkGroups(override.groups(), type));
                 }
                 if (type.isAnnotationPresent(Valid.class)) {
                     return DEFAULT;
@@ -378,12 +404,20 @@ final class BSContext<D extends DataType<D>> {
             return DISABLED;
         }
 
-        private BVContext build(Field f, Class<? extends Segment> ft, AnnotatedType at, ValidOverride vo) throws BeanException {
+        private static AnnotatedType type(Field field) {
+            if (field.getAnnotatedType() instanceof AnnotatedParameterizedType apt) {
+                return apt.getAnnotatedActualTypeArguments()[0];
+            }
+            return field.getAnnotatedType();
+        }
+
+        private VContext build(Field f, Class<? extends Segment> ft, ValidOverride vo) throws BeanException {
+            final AnnotatedType at = type(f);
             if (enabled) {
                 final boolean hasValid = f.isAnnotationPresent(Valid.class) || at.isAnnotationPresent(Valid.class);
                 final Set<Class<?>> groups = new HashSet<>(asList(this.groups));
                 if (vo == null) {
-                    final BVContext ctx = from(ft);
+                    final VContext ctx = from(ft);
                     if (hasValid && ctx.enabled && groups.containsAll(asList(ctx.groups))) {
                         return DISABLED;
                     }
@@ -392,7 +426,7 @@ final class BSContext<D extends DataType<D>> {
                     if (hasValid && groups.containsAll(asList(vo.groups()))) {
                         return DISABLED;
                     }
-                    return new BVContext(true, checkGroups(vo.groups(), f));
+                    return new VContext(true, checkGroups(vo.groups(), f));
                 }
             }
             return DISABLED;

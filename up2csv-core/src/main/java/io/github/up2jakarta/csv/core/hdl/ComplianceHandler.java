@@ -21,8 +21,8 @@ import static java.util.Optional.ofNullable;
  * Input events handler that accepts compliance events only.
  *
  * @param <D> the business data type
- * @see io.github.up2jakarta.csv.core.Up2Format#validate(Segment, ComplianceHandler)
- * @see io.github.up2jakarta.csv.core.Up2Format#validate(Segment, int, ComplianceHandler)
+ * @see io.github.up2jakarta.csv.core.Up2Flatter#validate(Segment, ComplianceHandler)
+ * @see io.github.up2jakarta.csv.core.Up2Flatter#validate(Segment, int, ComplianceHandler)
  */
 public abstract class ComplianceHandler<D extends DataType<D>> {
 

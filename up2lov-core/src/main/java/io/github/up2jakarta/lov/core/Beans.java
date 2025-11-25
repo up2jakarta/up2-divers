@@ -1,20 +1,20 @@
 package io.github.up2jakarta.lov.core;
 
 import java.lang.reflect.*;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Arrays.copyOf;
 import static java.util.Arrays.stream;
 
 public abstract class Beans {
 
     public static final Type[] NO_TYPES = {};
 
-    private static String getName(Class<?> type) {
+    private static String typeName(Class<?> type) {
         if (type.isAnonymousClass()) {
             final String name = type.getName();
             final int i = name.lastIndexOf('$');
@@ -23,24 +23,24 @@ public abstract class Beans {
         return type.getSimpleName();
     }
 
-    private static StringBuilder getTypeName(Class<?> type, char delimiter) {
-        final StringBuilder sb = new StringBuilder(getName(type));
+    private static StringBuilder typeName(Class<?> type, char delimiter) {
+        final StringBuilder sb = new StringBuilder(typeName(type));
         while ((type = type.getEnclosingClass()) != null) {
-            sb.insert(0, delimiter).insert(0, getName(type));
+            sb.insert(0, delimiter).insert(0, typeName(type));
         }
         return sb;
     }
 
-    private static void getPermittedTypes(Class<?>[] types, Consumer<Class<?>> collector) {
+    private static void permittedTypes(Class<?>[] types, Consumer<Class<?>> collector) {
         if (types != null) {
             for (final Class<?> type : types) {
                 collector.accept(type);
-                getPermittedTypes(type.getPermittedSubclasses(), collector);
+                permittedTypes(type.getPermittedSubclasses(), collector);
             }
         }
     }
 
-    private static AccessException of(Member origin, Throwable cause) {
+    private static AccessException translate(Member origin, Throwable cause) {
         if (cause instanceof InvocationTargetException ex) {
             cause = ex.getTargetException();
         }
@@ -55,67 +55,72 @@ public abstract class Beans {
         return new AccessException(source, locator, cause);
     }
 
-    public static CharSequence getTypeName(Class<?> type) {
-        return getTypeName(type, '.');
-    }
-
-    public static String getClassName(Class<?> type) {
-        return getTypeName(type, '$').insert(0, ".").insert(0, type.getPackageName()).toString();
-    }
-
-    public static Stream<String> getPermittedTypes(Class<?>... types) {
-        final List<Class<?>> result = new LinkedList<>();
-        getPermittedTypes(types, result::add);
-        return result.stream().map(Beans::getClassName);
-    }
-
-    public static Type[] getInterfaceArguments(Class<?> beanType, Class<?> finalType, final Type... typeArguments) {
+    private static Type[] resolveIArguments(Class<?> type, Class<?> expected, final Type... arguments) {
         // Safe findFirst: Java 17 does not support multiple generic interfaces
-        return stream(beanType.getGenericInterfaces())
+        return stream(type.getGenericInterfaces())
                 .filter(i -> i instanceof ParameterizedType)
                 .map(i -> (ParameterizedType) i)
-                .filter(i -> finalType.isAssignableFrom((Class<?>) i.getRawType()))
+                .filter(i -> expected.isAssignableFrom((Class<?>) i.getRawType()))
                 .findFirst()
                 .map(c -> {
-                    var cArguments = resolveArguments(beanType, c, typeArguments);
-                    return getClassArguments((Class<?>) c.getRawType(), finalType, cArguments);
+                    var cArguments = resolveArguments(type, c, arguments);
+                    return resolveTArguments((Class<?>) c.getRawType(), expected, cArguments);
                 }).orElseGet(() -> {
-                    var cArguments = typeArguments;
-                    final Type superType = beanType.getGenericSuperclass();
+                    var cArguments = arguments;
+                    final Type superType = type.getGenericSuperclass();
                     if (superType != null) {
-                        if (beanType.getGenericSuperclass() instanceof ParameterizedType pType) {
-                            cArguments = resolveArguments(beanType, pType, typeArguments);
+                        if (type.getGenericSuperclass() instanceof ParameterizedType pType) {
+                            cArguments = resolveArguments(type, pType, arguments);
                         }
-                        return getInterfaceArguments(beanType.getSuperclass(), finalType, cArguments);
+                        return resolveIArguments(type.getSuperclass(), expected, cArguments);
                     }
                     return NO_TYPES;
                 });
     }
 
-    public static Type[] getClassArguments(Class<?> beanType, Class<?> finalType, Type... typeArguments) {
-        final Class<?> superType = beanType.getSuperclass();
-        if (beanType == finalType) {
-            return typeArguments;
+    private static Type[] resolveTArguments(Class<?> type, Class<?> expected, Type... arguments) {
+        final Class<?> superType = type.getSuperclass();
+        if (type == expected) {
+            return arguments;
         }
-        final Type gType = beanType.getGenericSuperclass();
+        final Type gType = type.getGenericSuperclass();
         if (gType instanceof ParameterizedType pType) {
-            typeArguments = resolveArguments(beanType, pType, typeArguments);
+            arguments = resolveArguments(type, pType, arguments);
         }
-        if (finalType == superType) {
-            return typeArguments;
+        if (expected == superType) {
+            return arguments;
         }
         if (superType == null) {
-            return getInterfaceArguments(beanType, finalType, typeArguments);
+            return resolveIArguments(type, expected, arguments);
         }
-        return getClassArguments(superType, finalType, typeArguments);
+        return resolveTArguments(superType, expected, arguments);
     }
 
-    @SuppressWarnings("unchecked")
-    public static <E> Class<E> cast(Class<?> type) {
-        return (Class<E>) type;
+    public static CharSequence getTypeName(Class<?> type) {
+        return typeName(type, '.');
     }
 
-    public static Type[] resolveArguments(Class<?> type, ParameterizedType pType, Type[] typeArguments) {
+    public static String getClassName(Class<?> type) {
+        return typeName(type, '$').insert(0, ".").insert(0, type.getPackageName()).toString();
+    }
+
+    public static Stream<String> getPermittedTypes(Class<?>... types) {
+        final List<Class<?>> result = new LinkedList<>();
+        permittedTypes(types, result::add);
+        return result.stream().map(Beans::getClassName);
+    }
+
+    public static String capitalize(String fieldName) {
+        return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+    }
+
+    public static <T> T[] concat(T[] source, T value) {
+        final T[] values = copyOf(source, source.length + 1);
+        values[source.length] = value;
+        return values;
+    }
+
+    public static Type[] resolveArguments(Class<?> type, ParameterizedType pType, Type... arguments) {
         final Type[] typeParameters = type.getTypeParameters();
         var actualArguments = pType.getActualTypeArguments();
         final Type[] result = new Type[actualArguments.length];
@@ -125,7 +130,7 @@ public abstract class Beans {
                 for (var j = 0; j < typeParameters.length; j++) {
                     final Type parameter = typeParameters[j];
                     if (parameter == argument) {
-                        result[i] = typeArguments[j];
+                        result[i] = arguments[j];
                     }
                 }
             } else {
@@ -150,7 +155,7 @@ public abstract class Beans {
         return void.class;
     }
 
-    public static Type getPropertyType(AccessibleObject property, Type... typeArguments) {
+    public static Type getPropertyType(AccessibleObject property, Type... arguments) {
         final Type propertyType;
         final Class<?> propertyClass;
         final Class<?> defaultClass;
@@ -169,14 +174,14 @@ public abstract class Beans {
             final Type[] typeParameters = propertyClass.getTypeParameters();
             for (var i = 0; i < typeParameters.length; i++) {
                 if (typeParameters[i] == propertyType) {
-                    return typeArguments[i];
+                    return arguments[i];
                 }
             }
         }
         return defaultClass;
     }
 
-    public static Type[] getPropertyArguments(AccessibleObject property, Type[] arguments) {
+    public static Type[] getPropertyArguments(AccessibleObject property, Type... arguments) {
         if (property instanceof Field field) {
             if (field.getGenericType() instanceof ParameterizedType type) {
                 return resolveArguments(field.getDeclaringClass(), type, arguments);
@@ -189,21 +194,17 @@ public abstract class Beans {
         return NO_TYPES;
     }
 
-    public static String capitalize(String fieldName) {
-        return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
-    }
-
-    public static Type[] getTypeArguments(Class<?> beanType, Class<?> finalType) throws BeanException {
-        if (finalType.getTypeParameters().length == 0 || beanType == Object.class) {
+    public static <F> Type[] getTypeArguments(Class<?> type, Class<F> expected, Type... arguments) {
+        if (expected.getTypeParameters().length == 0) {
             return NO_TYPES;
         }
-        if (beanType.getTypeParameters().length != 0) {
-            throw new BeanException(beanType, "the root bean can not be generic");
+        if (!expected.isAssignableFrom(type) || type.getTypeParameters().length != arguments.length) {
+            return expected.getTypeParameters();
         }
-        if (finalType.isInterface()) {
-            return getInterfaceArguments(beanType, finalType);
+        if (expected.isInterface()) {
+            return resolveIArguments(type, expected, arguments);
         }
-        return getClassArguments(beanType, finalType);
+        return resolveTArguments(type, expected, arguments);
     }
 
     public static Type[] getTypeArguments(Type beanType) {
@@ -226,19 +227,6 @@ public abstract class Beans {
             return method;
         } catch (Exception ex) {
             throw new BeanException(type, attr, desc + " not found");
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T getBean(BeanContext context, Class<?> type, String name) throws BeanException {
-        try {
-            final T bean = (T) ((name.isEmpty()) ? context.getBean(type) : context.getBean(type, name));
-            if (bean instanceof BeanAware bc) {
-                bc.setContext(context);
-            }
-            return bean;
-        } catch (Exception e) {
-            throw new BeanException(type, "qualified bean must be found");
         }
     }
 
@@ -271,15 +259,31 @@ public abstract class Beans {
         return type.getEnclosingClass() != null && !isStatic(type.getModifiers());
     }
 
+    public static <A extends AccessibleObject & Member> A setAccessible(A source) {
+        try {
+            source.setAccessible(true);
+            return source;
+        } catch (Exception cause) {
+            final String locator = (source instanceof Constructor<?>) ? "new" : source.getName();
+            throw new AccessException(source.getDeclaringClass(), locator, cause.getMessage());
+        }
+    }
+
+    public static <T> Constructor<T> getDeclaredConstructor(Class<T> type, Class<?>... types) throws BeanException {
+        try {
+            final Constructor<T> constructor = type.getDeclaredConstructor(types);
+            constructor.setAccessible(true);
+            return constructor;
+        } catch (Exception cause) {
+            throw new BeanException(type, "new", cause.getMessage());
+        }
+    }
+
     public static <T> Constructor<T> getDefaultConstructor(Class<T> type) throws BeanException {
         try {
             final Constructor<T> constructor;
             if (type.isRecord()) {
-                final Field[] fields = type.getDeclaredFields();
-                final Class<?>[] types = new Class<?>[fields.length];
-                for (var i = 0; i < fields.length; i++) {
-                    types[i] = fields[i].getType();
-                }
+                final Class<?>[] types = stream(type.getDeclaredFields()).map(Field::getType).toArray(Class<?>[]::new);
                 constructor = type.getDeclaredConstructor(types);
             } else if (isInnerType(type)) {
                 constructor = type.getDeclaredConstructor(type.getEnclosingClass());
@@ -293,17 +297,11 @@ public abstract class Beans {
         }
     }
 
-    public static <T> T[] concat(T[] source, T value) {
-        final T[] values = Arrays.copyOf(source, source.length + 1);
-        values[source.length] = value;
-        return values;
-    }
-
     public static <T> T newInstance(Constructor<T> constructor, Object... arguments) throws AccessException {
         try {
             return constructor.newInstance(arguments);
         } catch (Exception ex) {
-            throw of(constructor, ex);
+            throw translate(constructor, ex);
         }
     }
 
@@ -311,7 +309,15 @@ public abstract class Beans {
         try {
             setter.invoke(bean, value);
         } catch (Exception cause) {
-            throw of(setter, cause);
+            throw translate(setter, cause);
+        }
+    }
+
+    public static <V> void setValue(Object bean, V value, Field field) throws AccessException {
+        try {
+            field.set(bean, value);
+        } catch (Exception cause) {
+            throw translate(field, cause);
         }
     }
 
@@ -320,15 +326,7 @@ public abstract class Beans {
         try {
             return (V) getter.invoke(bean);
         } catch (Exception cause) {
-            throw of(getter, cause);
-        }
-    }
-
-    public static <V> void setValue(Object bean, V value, Field field) throws AccessException {
-        try {
-            field.set(bean, value);
-        } catch (Exception cause) {
-            throw of(field, cause);
+            throw translate(getter, cause);
         }
     }
 
@@ -337,8 +335,26 @@ public abstract class Beans {
         try {
             return (V) field.get(bean);
         } catch (Exception cause) {
-            throw of(field, cause);
+            throw translate(field, cause);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getBean(BeanContext context, Class<?> type, String name) throws BeanException {
+        try {
+            final T bean = (T) ((name.isEmpty()) ? context.getBean(type) : context.getBean(type, name));
+            if (bean instanceof BeanAware bc) {
+                bc.setContext(context);
+            }
+            return bean;
+        } catch (Exception e) {
+            throw new BeanException(type, "qualified bean must be found");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <E> Class<E> cast(Class<?> type) {
+        return (Class<E>) type;
     }
 
 }

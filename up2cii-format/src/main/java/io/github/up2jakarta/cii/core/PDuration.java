@@ -51,7 +51,7 @@ public class PDuration<T extends Temporal> implements TemporalAmount, Serializab
         final Temporal until = endExclusive.get();
         if (start.isSupported(tu) && until.isSupported(tu)) {
             final int diff = (int) start.until(until, tu);
-            endExclusive.set(until.minus(diff, tu));
+            endExclusive.accept(until.minus(diff, tu));
             return diff;
         }
         return 0;

@@ -7,7 +7,7 @@ import io.github.up2jakarta.lov.core.BeanContext;
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports {@link TypeConverter}.
+ * Up2J Annotation that supports {@link TypeConverter}.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

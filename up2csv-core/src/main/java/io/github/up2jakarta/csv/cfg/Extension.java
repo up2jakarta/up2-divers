@@ -6,7 +6,7 @@ import io.github.up2jakarta.lov.core.BeanContext;
 import java.lang.annotation.*;
 
 /**
- * Up2 Annotation that supports {@link io.github.up2jakarta.lov.TypeAdapter} for third-party types.
+ * Up2J Annotation that supports {@link io.github.up2jakarta.lov.TypeAdapter} for third-party types.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -32,7 +32,7 @@ public @interface Extension {
     String name() default "";
 
     /**
-     * Up2 Annotation that supports {@link Repeatable} {@link Extension}.
+     * Up2J Annotation that supports {@link Repeatable} {@link Extension}.
      */
     @Documented
     @Retention(RetentionPolicy.RUNTIME)

@@ -9,7 +9,6 @@ import io.github.up2jakarta.csv.core.misc.Test4Primitive;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.lov.CodeList;
-import io.github.up2jakarta.lov.DefaultProvider;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
@@ -21,7 +20,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,18 +31,6 @@ public class Up2PrimitiveTests {
     @Autowired
     Up2PrimitiveTests(Up2Factory<GroupType> f) {
         this.factory = f;
-    }
-
-    @Test
-    void testCodeList() {
-        // Given
-        final Class<AccessMode> lovType = AccessMode.class;
-        // When
-        final List<AccessMode> modes = DefaultProvider.INSTANCE.values(lovType);
-        // Then
-        assertEquals(2, modes.size());
-        assertTrue(modes.contains(AccessMode.RO));
-        assertTrue(modes.contains(AccessMode.WO));
     }
 
     @Test
@@ -96,7 +82,7 @@ public class Up2PrimitiveTests {
     @Test
     void testUnmapDecimal() throws BeanException {
         // Given
-        final Up2Format<Test3Primitive, GroupType> format = factory.format(Test3Primitive.class);
+        final Up2Flatter<Test3Primitive, GroupType> format = factory.format(Test3Primitive.class);
         final Test3Primitive bean = new Test3Primitive() {{
             setAFloat(3.140009F);
             setADouble(3.111409D);

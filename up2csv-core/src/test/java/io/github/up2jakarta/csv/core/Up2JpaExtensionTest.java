@@ -46,7 +46,7 @@ public class Up2JpaExtensionTest {
         assertEquals(XML2Enum.TWO, bean.getEnum4());
         assertEquals(TestCodeList.ANY, bean.getAdapter());
         // When Unmapping
-        final Up2Format<Test1Bean, GroupType> format = factory.format(Test1Bean.class);
+        final Up2Flatter<Test1Bean, GroupType> format = factory.format(Test1Bean.class);
         final String[] out = format.unmap(bean);
         // Then
         assertNotNull(out);

@@ -2,7 +2,6 @@ package io.github.up2jakarta.lov;
 
 import io.github.up2jakarta.lov.cl.AccessMode30;
 import io.github.up2jakarta.lov.cl.AccessMode32;
-import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Type;
@@ -11,33 +10,39 @@ import java.util.List;
 
 import static io.github.up2jakarta.lov.core.Beans.getTypeArguments;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BeansTest {
 
     @Test
-    @SuppressWarnings("ALL")
-    void testSupportGeneric() {
-        // GIVEN
-        final Class<? extends List> beanType = ArrayList.class;
+    void testUnknown() {
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> getTypeArguments(beanType, CodeListConverter.class));
+        final Type[] arguments = getTypeArguments(ArrayList.class, List.class);
         // THEN
-        assertEquals("ArrayList[class] - the root bean can not be generic", thrown.getMessage());
+        assertEquals(1, arguments.length);
+        assertEquals("E", arguments[0].getTypeName());
     }
 
     @Test
-    void testDummyObject() throws BeanException {
+    void testGeneric() {
+        // WHEN
+        final Type[] arguments = getTypeArguments(ArrayList.class, List.class, String.class);
+        // THEN
+        assertEquals(1, arguments.length);
+        assertEquals(String.class, arguments[0]);
+    }
+
+    @Test
+    void testObject() {
         // GIVEN
         final Class<?> beanType = Object.class;
         // WHEN
-        final Type[] arguments = getTypeArguments(beanType, List.class);
+        final Type[] arguments = getTypeArguments(beanType, String.class);
         // THEN
         assertEquals(0, arguments.length);
     }
 
     @Test
-    void testGetSimpleCodeListArguments() throws BeanException {
+    void testCodeList() {
         // Given
         final Class<? extends CodeList<?>> beanType = AccessMode32.class;
         // When

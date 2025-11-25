@@ -2,8 +2,8 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
-import io.github.up2jakarta.csv.core.BSContext.BVContext;
-import io.github.up2jakarta.csv.core.BSProperty.FProperty;
+import io.github.up2jakarta.csv.core.BSContext.VContext;
+import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.misc.lov.CurrencyConverter;
 import io.github.up2jakarta.csv.core.misc.vld.*;
 import io.github.up2jakarta.csv.impl.*;
@@ -133,11 +133,11 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator4Bean bean = mapper.map(row, handler);
-        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFlatter().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
-        assertFalse(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+        assertFalse(((PFragment<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
     }
 
     @Test
@@ -148,12 +148,12 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator5Bean bean = mapper.map(row, handler);
-        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFlatter().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
         // Context
-        assertFalse(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+        assertFalse(((PFragment<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
     }
 
     @Test
@@ -164,12 +164,12 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator6Bean bean = mapper.map(row, handler);
-        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFlatter().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
         // Context
-        assertTrue(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+        assertTrue(((PFragment<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
     }
 
     @Test
@@ -180,12 +180,12 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator7Bean bean = mapper.map(row, handler);
-        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFlatter().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
         // Context
-        assertTrue(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+        assertTrue(((PFragment<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
     }
 
     @Test
@@ -196,12 +196,12 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator8Bean bean = mapper.map(row, handler);
-        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFlatter().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
         // Context
-        assertTrue(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+        assertTrue(((PFragment<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
     }
 
     @Test
@@ -212,12 +212,12 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator9Bean bean = mapper.map(row, handler);
-        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFlatter().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
         // Context
-        assertTrue(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+        assertTrue(((PFragment<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
     }
 
     @Test
@@ -228,12 +228,12 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator10Bean bean = mapper.map(row, handler);
-        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFlatter().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
         // Context
-        assertTrue(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+        assertTrue(((PFragment<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
     }
 
     @Test
@@ -244,12 +244,12 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator11Bean bean = mapper.map(row, handler);
-        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFlatter().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
         // Context
-        assertFalse(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+        assertFalse(((PFragment<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
     }
 
     @Test
@@ -260,12 +260,12 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator12Bean bean = mapper.map(row, handler);
-        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFlatter().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
         // Context
-        assertTrue(((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
+        assertTrue(((PFragment<?, ?, ?>) mapper.node.properties.getFirst()).node.context.enabled);
     }
 
     @Test
@@ -276,12 +276,12 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator13Bean bean = mapper.map(row, handler);
-        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFlatter().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
         // Context
-        final BVContext context = ((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context;
+        final VContext context = ((PFragment<?, ?, ?>) mapper.node.properties.getFirst()).node.context;
         assertEquals(1, context.groups.length);
         assertTrue(context.enabled);
     }
@@ -294,12 +294,12 @@ class Up2ValidatorTests {
         // When
         final InputCollector handler = new InputCollector(row);
         final Validator14Bean bean = mapper.map(row, handler);
-        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFormat().validate(bean);
+        final List<? extends IComplianceEvent<GroupType>> evs = mapper.toFlatter().validate(bean);
         // Then
         assertEquals(1, evs.size());
         assertEquals(evs.size(), handler.toList().size());
         // Context
-        final BVContext context = ((FProperty<?, ?, ?>) mapper.node.properties.getFirst()).node.context;
+        final VContext context = ((PFragment<?, ?, ?>) mapper.node.properties.getFirst()).node.context;
         assertEquals(2, mapper.node.context.groups.length);
         assertFalse(context.enabled);
     }

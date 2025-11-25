@@ -2,8 +2,8 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.core.BSOperator.Computer.BSFormat;
-import io.github.up2jakarta.csv.core.BSOperator.Computer.BSMapper;
+import io.github.up2jakarta.csv.core.BSOperator.OPS.Format;
+import io.github.up2jakarta.csv.core.BSOperator.OPS.Mapper;
 import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
 import io.github.up2jakarta.csv.core.hdl.SimpleCollector;
 import io.github.up2jakarta.csv.data.DataType;
@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static io.github.up2jakarta.csv.core.AccessMode.RO;
+import static io.github.up2jakarta.csv.core.BeanAccess.RO;
 import static io.github.up2jakarta.csv.data.DataType.isValid;
 import static io.github.up2jakarta.csv.data.DataType.message;
 import static java.util.Set.of;
@@ -33,7 +33,7 @@ import static java.util.Set.of;
  * @see UnitExporter
  */
 public abstract sealed class BusinessExporter<B extends DataType<B>, I extends IType<B, I>, T extends Segment>
-        extends BSOperator<B, I, BSFormat<Segment, B>, BSMapper<Segment, B>>
+        extends BSOperator<B, I, Format<Segment, B>, Mapper<Segment, B>>
         permits UnitExporter, FastExporter, FullExporter {
 
     private final boolean hasBusinessId;
@@ -45,7 +45,7 @@ public abstract sealed class BusinessExporter<B extends DataType<B>, I extends I
 
     BusinessExporter(BusinessImporter<B, I, T, ?, ?> importer) throws BeanException {
         super(importer);
-        final BSFormat<Segment, B> rootMapper = mappers.get(root);
+        final Format<Segment, B> rootMapper = mappers.get(root);
         this.hasBusinessId = this.check(rootMapper.node.type);
     }
 
@@ -58,7 +58,7 @@ public abstract sealed class BusinessExporter<B extends DataType<B>, I extends I
     }
 
     private void format(Segment bean, int offset, I type, Filler<I> consumer) throws IOException {
-        final BSFormat<Segment, B> format = mappers.get(type);
+        final Format<Segment, B> format = mappers.get(type);
         final String[] data = new String[offset + format.length];
         format.node.format(data, offset, bean);
         consumer.accept(bean, type, data);
@@ -77,7 +77,7 @@ public abstract sealed class BusinessExporter<B extends DataType<B>, I extends I
         if (bean == null) {
             return;
         }
-        final BSFormat<Segment, B> format = mappers.get(type);
+        final Format<Segment, B> format = mappers.get(type);
         format.node.validate(bean, offset, handler);
         for (final I node : joins.getOrDefault(type, of())) {
             final Collection<Segment> values = node.from(bean);
@@ -132,9 +132,9 @@ public abstract sealed class BusinessExporter<B extends DataType<B>, I extends I
     }
 
     @Override
-    final BSFormat<Segment, B> build(Up2Factory<B> factory, I type, BSMapper<Segment, B> source) throws BeanException {
+    final Format<Segment, B> build(Up2Factory<B> factory, I type, Mapper<Segment, B> source) throws BeanException {
         if (source != null) {
-            return new BSFormat<>(source.node.reverse());
+            return new Format<>(source.node.reverse());
         }
         return factory.format(factory.resolver.or(type.getDataType()), type.getClassType());
     }

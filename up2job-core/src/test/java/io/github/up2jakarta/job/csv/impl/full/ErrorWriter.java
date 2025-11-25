@@ -1,6 +1,6 @@
 package io.github.up2jakarta.job.csv.impl.full;
 
-import io.github.up2jakarta.csv.core.Up2Format;
+import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.csv.io.SingleWriter;
@@ -27,7 +27,7 @@ public class ErrorWriter extends ConditionalWriter<Up2Result<Invoice, InputError
     private static final Logger LOG = LoggerFactory.getLogger(ErrorWriter.class);
     private final SingleWriter<InputError, DynamicType> delegate;
 
-    public ErrorWriter(Up2Format<InputError, DynamicType> mapper, CSVFormat format) {
+    public ErrorWriter(Up2Flatter<InputError, DynamicType> mapper, CSVFormat format) {
         this.delegate = new SingleWriter<>(mapper, format);
     }
 

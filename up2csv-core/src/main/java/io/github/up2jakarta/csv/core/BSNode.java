@@ -2,9 +2,9 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.cfg.Fragment;
-import io.github.up2jakarta.csv.core.BSContext.BVContext;
-import io.github.up2jakarta.csv.core.BSProperty.FProperty;
-import io.github.up2jakarta.csv.core.BSProperty.PProperty;
+import io.github.up2jakarta.csv.core.BSContext.VContext;
+import io.github.up2jakarta.csv.core.BSProperty.PFragment;
+import io.github.up2jakarta.csv.core.BSProperty.PPosition;
 import io.github.up2jakarta.csv.core.hdl.ComplianceHandler;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
 import io.github.up2jakarta.csv.data.DataType;
@@ -16,15 +16,14 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.*;
 
-import static io.github.up2jakarta.csv.core.BSBuilder.ST;
-import static io.github.up2jakarta.csv.core.BSNode.BFNode;
-import static io.github.up2jakarta.csv.core.BSNode.BPNode;
-import static io.github.up2jakarta.csv.core.BSNode.BPNode.BMNode;
-import static io.github.up2jakarta.csv.core.BSNode.BPNode.BRNode;
-import static io.github.up2jakarta.csv.core.BSOperator.BProcessor;
+import static io.github.up2jakarta.csv.core.BSBuilder.MST;
+import static io.github.up2jakarta.csv.core.BSNode.Bean.*;
+import static io.github.up2jakarta.csv.core.BSNode.Flat;
+import static io.github.up2jakarta.csv.core.BSOperator.Computer;
 import static io.github.up2jakarta.csv.core.ext.Beans.getDefaultConstructor;
 import static io.github.up2jakarta.csv.core.ext.Beans.newInstance;
 import static io.github.up2jakarta.lov.core.Defaults.EMPTY;
@@ -36,16 +35,16 @@ import static java.util.Collections.unmodifiableMap;
  * Internal business node.
  */
 @SuppressWarnings("unchecked")
-abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implements ST permits BFNode, BPNode {
+abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implements MST permits Flat, Bean {
     final List<BSProperty<?, ?, D>> properties;
     final Validator validator;
     final boolean prototype;
     final boolean nullable;
-    final BVContext context;
+    final VContext context;
     final Class<S> type;
     final int offset;
 
-    BSNode(int i, Class<S> type, Validator v, BVContext c, boolean n, boolean p, List<BSProperty<?, ?, D>> ps) {
+    BSNode(int i, Class<S> type, Validator v, VContext c, boolean n, boolean p, List<BSProperty<?, ?, D>> ps) {
         this.properties = ps;
         this.offset = i;
         this.validator = v;
@@ -77,8 +76,8 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         List<BSProperty<?, ?, D>> properties = this.properties;
         for (final String fieldName : fieldNames) {
             property = properties.stream().filter(p -> fieldName.equals(p.getName())).findFirst().orElse(null);
-            if (property instanceof FProperty<?, ?, ?> fp) {
-                properties = ((FProperty<?, ?, D>) fp).node.properties;
+            if (property instanceof PFragment<?, ?, ?> fp) {
+                properties = ((PFragment<?, ?, D>) fp).node.properties;
             } else {
                 return property;
             }
@@ -103,70 +102,80 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
     abstract BSNode<S, D> reverse() throws BeanException;
 
     /**
-     * Internal Format Node.
+     * Internal Flat Node.
      */
-    static final class BFNode<S extends Segment, D extends DataType<D>> extends BSNode<S, D> {
-        private final String[] values;
+    static final class Flat<S extends Segment, D extends DataType<D>> extends BSNode<S, D> {
+        private final String[] cache;
         private final int index;
 
-        BFNode(int i, Class<S> t, Validator v, BVContext c, Fragment f, List<BSProperty<?, ?, D>> ps) {
+        Flat(int i, Class<S> t, Validator v, VContext c, Fragment f, List<BSProperty<?, ?, D>> ps) {
             super(i, t, v, c, f.nullable(), f.prototype(), ps);
             if (this.prototype) {
-                this.index = BProcessor.min(this);
-                this.values = this.defaultValues(index);
+                this.index = Computer.min(this);
+                this.cache = this.defaultValues(index);
             } else {
                 this.index = -1;
-                this.values = EMPTY;
+                this.cache = EMPTY;
             }
         }
 
-        BFNode(Class<S> type, Validator validator, BVContext context, List<BSProperty<?, ?, D>> ps) {
+        Flat(Class<S> type, Validator validator, VContext context, List<BSProperty<?, ?, D>> ps) {
             super(-1, type, validator, context, false, false, ps);
-            this.values = EMPTY;
+            this.cache = EMPTY;
             this.index = -1;
         }
 
-        private BFNode(BPNode<S, D, ?> source) throws BeanException {
+        private Flat(Bean<S, D, ?> source) throws BeanException {
             super(source);
             if (this.prototype) {
-                this.index = BProcessor.min(this);
-                this.values = this.defaultValues(index);
+                this.index = Computer.min(this);
+                this.cache = this.defaultValues(index);
             } else {
                 this.index = -1;
-                this.values = EMPTY;
+                this.cache = EMPTY;
             }
         }
 
         private String[] defaultValues(int min) {
-            final int length = BProcessor.max(this) + 1;
+            final int length = Computer.max(this) + 1;
             if (length != 0 && min >= 0) {
                 final String[] result = new String[length];
-                this.format(result, 0, null);
+                for (final BSProperty<?, ?, D> p : properties) {
+                    if (p instanceof PPosition<?, ?, ?> pp) {
+                        result[p.offset] = pp.formatted;
+                    } else if (p instanceof PFragment<?, ?, ?> fp) {
+                        final Flat<Segment, D> node = (Flat<Segment, D>) fp.node;
+                        final String[] values = node.cache;
+                        if (values != EMPTY) {
+                            System.arraycopy(values, 0, result, node.index, values.length);
+                        }
+                    }
+                }
                 return prototype(result, min);
             }
             return EMPTY;
         }
 
         void format(String[] result, int offset, S bean) {
-            if (bean != null || values == null) {
+            if (bean != null) {
                 for (final BSProperty<?, ?, D> p : properties) {
-                    if (p instanceof PProperty<?, ?, ?> pp) {
-                        result[offset + p.offset] = pp.getFormatted(bean);
-                    } else if (p instanceof FProperty<?, ?, ?> fp) {
-                        final BFNode<Segment, D> node = (BFNode<Segment, D>) fp.node;
-                        final Segment value = ((FProperty<Segment, ?, D>) fp).getUnwrapped(bean);
+                    if (p instanceof PPosition<?, ?, ?> pp) {
+                        result[offset + p.offset] = pp.toString(bean);
+                    } else if (p instanceof PFragment<?, ?, ?> fp) {
+                        final Flat<Segment, D> node = (Flat<Segment, D>) fp.node;
+                        final Segment value = ((PFragment<Segment, ?, D>) fp).value(bean);
                         node.format(result, offset, value);
                     }
                 }
-            } else if (values != EMPTY) {
-                System.arraycopy(values, 0, result, offset + index, values.length);
+            } else if (cache != EMPTY) {
+                System.arraycopy(cache, 0, result, offset + index, cache.length);
             }
         }
 
         void header(String[] header, int offset) {
             for (final BSProperty<?, ?, D> p : properties) {
-                if (p instanceof FProperty<?, ?, ?> fp) {
-                    final BFNode<Segment, D> node = (BFNode<Segment, D>) fp.node;
+                if (p instanceof PFragment<?, ?, ?> fp) {
+                    final Flat<Segment, D> node = (Flat<Segment, D>) fp.node;
                     node.header(header, offset);
                 } else if (p.dataType != null) {
                     header[offset + p.offset] = p.dataType.getName();
@@ -177,9 +186,9 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         void validate(ComplianceHandler<D> handler, S bean, int offset) {
             if (bean != null && context.enabled) {
                 for (final BSProperty<?, ?, D> property : properties) {
-                    if (property instanceof FProperty<?, ?, ?> fp) {
-                        final BFNode<Segment, D> node = (BFNode<Segment, D>) fp.node;
-                        final Segment value = ((FProperty<Segment, ?, D>) fp).getUnwrapped(bean);
+                    if (property instanceof PFragment<?, ?, ?> fp) {
+                        final Flat<Segment, D> node = (Flat<Segment, D>) fp.node;
+                        final Segment value = ((PFragment<Segment, ?, D>) fp).value(bean);
                         node.validate(handler, value, offset);
                     }
                 }
@@ -188,34 +197,37 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         }
 
         @Override
-        BPNode<S, D, ?> reverse() throws BeanException {
-            if (type.isRecord()) {
-                return new BRNode<>(this);
-            } else {
-                return new BMNode<>(this);
+        Bean<S, D, ?> reverse() throws BeanException {
+            final Constructor<S> cs = BSContext.from(type, properties);
+            if (cs == null) {
+                if (type.isRecord()) {
+                    return new Bean.JR<>(this);
+                }
+                return new Bean.BM<>(this);
             }
+            return new Bean.JB<>(this, cs);
         }
     }
 
     /**
      * Internal Mapper Node.
      */
-    static abstract sealed class BPNode<S extends Segment, D extends DataType<D>, C> extends BSNode<S, D> permits BMNode, BRNode {
+    static abstract sealed class Bean<S extends Segment, D extends DataType<D>, C> extends BSNode<S, D> permits BM, BC {
         protected final Constructor<S> constructor;
 
-        BPNode(int i, Class<S> t, Validator v, BVContext c, Fragment f, List<BSProperty<?, ?, D>> ps) throws BeanException {
+        Bean(int i, Class<S> t, Validator v, VContext c, Fragment f, List<BSProperty<?, ?, D>> ps, Constructor<S> cs) {
             super(i, t, v, c, f.nullable(), f.prototype(), ps);
-            this.constructor = getDefaultConstructor(t);
+            this.constructor = cs;
         }
 
-        BPNode(Class<S> type, Validator validator, BVContext context, List<BSProperty<?, ?, D>> ps) throws BeanException {
+        Bean(Class<S> type, Validator validator, VContext context, List<BSProperty<?, ?, D>> ps, Constructor<S> cs) {
             super(-1, type, validator, context, false, false, ps);
-            this.constructor = getDefaultConstructor(type);
+            this.constructor = cs;
         }
 
-        private BPNode(BFNode<S, D> source) throws BeanException {
+        private Bean(Flat<S, D> source, Constructor<S> cs) throws BeanException {
             super(source);
-            this.constructor = getDefaultConstructor(source.type);
+            this.constructor = cs;
         }
 
         protected boolean parse(List<Segment> stack, C args, EventHandler<D> hdl, int offset, String... record) {
@@ -224,21 +236,21 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
             }
             var empty = true;
             for (final BSProperty<?, ?, D> property : properties) {
-                if (property instanceof FProperty<?, ?, ?>) {
-                    final FProperty<Segment, Object, D> fp = (FProperty<Segment, Object, D>) property;
-                    final Segment value = ((BPNode<?, D, C>) fp.node).parse(stack, hdl, offset, record);
+                if (property instanceof PFragment<?, ?, ?>) {
+                    final PFragment<Segment, Object, D> fp = (PFragment<Segment, Object, D>) property;
+                    final Segment value = ((Bean<?, D, C>) fp.node).parse(stack, hdl, offset, record);
                     this.set(args, fp, fp.wrap(value));
                     if (value != null) {
                         fp.node.validate(value, offset, hdl);
                         empty = false;
                     }
                 } else {
-                    final PProperty<?, Object, D> pp = (PProperty<?, Object, D>) property;
+                    final PPosition<Object, Object, D> pp = (PPosition<Object, Object, D>) property;
                     final int index = property.offset;
                     final String data = (index < record.length) ? record[index] : null;
                     final Object value = pp.parse(data, offset, hdl);
+                    this.set(args, pp, pp.wrap(value));
                     if (value != null) {
-                        this.set(args, pp, value);
                         empty = false;
                     } else if (nullable && pp.required) {
                         return true;
@@ -259,8 +271,8 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         }
 
         @Override
-        protected final BFNode<S, D> reverse() throws BeanException {
-            return new BFNode<>(this);
+        protected final Flat<S, D> reverse() throws BeanException {
+            return new Flat<>(this);
         }
 
         protected final S parse(EventHandler<D> handler, int offset, String... record) {
@@ -274,17 +286,17 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         /**
          * Internal Mapper Node for java-beans.
          */
-        static final class BMNode<S extends Segment, D extends DataType<D>> extends BPNode<S, D, S> {
-            BMNode(int i, Class<S> t, Validator v, BVContext c, Fragment f, List<BSProperty<?, ?, D>> ps) throws BeanException {
-                super(i, t, v, c, f, ps);
+        static final class BM<S extends Segment, D extends DataType<D>> extends Bean<S, D, S> {
+            BM(int i, Class<S> t, Validator v, VContext c, Fragment f, List<BSProperty<?, ?, D>> ps) throws BeanException {
+                super(i, t, v, c, f, ps, getDefaultConstructor(t));
             }
 
-            BMNode(Class<S> type, Validator validator, BVContext context, List<BSProperty<?, ?, D>> ps) throws BeanException {
-                super(type, validator, context, ps);
+            BM(Class<S> type, Validator validator, VContext context, List<BSProperty<?, ?, D>> ps) throws BeanException {
+                super(type, validator, context, ps, getDefaultConstructor(type));
             }
 
-            BMNode(BFNode<S, D> source) throws BeanException {
-                super(source);
+            BM(Flat<S, D> source) throws BeanException {
+                super(source, getDefaultConstructor(source.type));
             }
 
             private S init(List<? extends Segment> stack) {
@@ -310,48 +322,39 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         }
 
         /**
-         * Internal Mapper Node for java-records.
+         * Internal Mapper Node for java-beans within constructor setters.
          */
-        static final class BRNode<S extends Segment, D extends DataType<D>> extends BPNode<S, D, Object[]> {
+        static abstract sealed class BC<S extends Segment, D extends DataType<D>> extends Bean<S, D, Object[]> permits JR, JB {
             private final Map<BSProperty<?, ?, D>, Integer> indexes;
             private final Object[] prototype;
 
-            BRNode(Class<S> type, Validator v, BVContext c, Fragment f, List<BSProperty<?, ?, D>> ps) throws BeanException {
-                super(-1, type, v, c, f, ps);
+            BC(int i, Class<S> type, Validator v, VContext c, Fragment f, List<BSProperty<?, ?, D>> ps, Constructor<S> cs) throws BeanException {
+                super(i, type, v, c, f, ps, cs);
                 this.prototype = prototype(constructor);
-                this.indexes = this.indexes(type);
+                this.indexes = this.indexes();
             }
 
-            BRNode(Class<S> type, Validator validator, BVContext context, List<BSProperty<?, ?, D>> ps) throws BeanException {
-                super(type, validator, context, ps);
+            BC(Class<S> type, Validator validator, VContext context, List<BSProperty<?, ?, D>> ps, Constructor<S> cs) throws BeanException {
+                super(type, validator, context, ps, cs);
                 this.prototype = prototype(constructor);
-                this.indexes = this.indexes(type);
+                this.indexes = this.indexes();
             }
 
-            private BRNode(BFNode<S, D> source) throws BeanException {
-                super(source);
+            BC(Flat<S, D> source, Constructor<S> cs) throws BeanException {
+                super(source, cs);
                 this.prototype = prototype(constructor);
-                this.indexes = this.indexes(source.type);
+                this.indexes = this.indexes();
             }
 
-            private Map<BSProperty<?, ?, D>, Integer> indexes(Class<S> type) {
-                final Map<BSProperty<?, ?, D>, Integer> indexes = new HashMap<>(properties.size());
-                final Field[] fields = type.getDeclaredFields();
-                final Iterator<BSProperty<?, ?, D>> it = properties.iterator();
-                for (var i = 0; it.hasNext() && i < fields.length; ) {
-                    final BSProperty<?, ?, D> property = it.next();
-                    for (var field = fields[i]; !field.equals(property.getSource()) && ++i < fields.length; ) {
-                        field = fields[i];
-                    }
-                    indexes.put(property, i);
-                }
-                return unmodifiableMap(indexes);
-            }
+            abstract Map<BSProperty<?, ?, D>, Integer> indexes() throws BeanException;
 
             @Override
-            protected S parse(List<Segment> stack, EventHandler<D> handler, int offset, String... record) {
+            protected final S parse(List<Segment> stack, EventHandler<D> handler, int offset, String... record) {
                 final Object[] arguments = new Object[prototype.length];
                 System.arraycopy(prototype, 0, arguments, 0, prototype.length);
+                if (this.offset != -1) {
+                    arguments[0] = stack.get(offset);
+                }
                 stack.addLast(null);
                 final boolean empty = this.parse(stack, arguments, handler, offset, record);
                 stack.removeLast();
@@ -359,9 +362,86 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
             }
 
             @Override
-            protected <V> void set(Object[] arguments, BSProperty<?, V, D> property, V value) {
-                final int index = indexes.get(property);
-                arguments[index] = value;
+            protected final <V> void set(Object[] arguments, BSProperty<?, V, D> property, V value) {
+                if (value != null) {
+                    final int index = indexes.get(property);
+                    arguments[index] = value;
+                }
+            }
+        }
+
+        /**
+         * Internal Mapper Node for java-records.
+         */
+        static final class JR<S extends Segment, D extends DataType<D>> extends BC<S, D> {
+
+            JR(Class<S> type, Validator v, VContext c, Fragment f, List<BSProperty<?, ?, D>> ps) throws BeanException {
+                super(-1, type, v, c, f, ps, getDefaultConstructor(type));
+            }
+
+            JR(Class<S> type, Validator validator, VContext context, List<BSProperty<?, ?, D>> ps) throws BeanException {
+                super(type, validator, context, ps, getDefaultConstructor(type));
+            }
+
+            private JR(Flat<S, D> source) throws BeanException {
+                super(source, getDefaultConstructor(source.type));
+            }
+
+            @Override
+            protected Map<BSProperty<?, ?, D>, Integer> indexes() {
+                final Map<BSProperty<?, ?, D>, Integer> indexes = new HashMap<>(properties.size());
+                final Parameter[] parameters = constructor.getParameters();
+                final Iterator<BSProperty<?, ?, D>> it = properties.iterator();
+                for (var i = 0; it.hasNext() && i < parameters.length; ) {
+                    final BSProperty<?, ?, D> p = it.next();
+                    for (var pm = parameters[i]; !pm.getName().equals(p.getName()) && ++i < parameters.length; ) {
+                        pm = parameters[i];
+                    }
+                    indexes.put(p, i);
+                }
+                return unmodifiableMap(indexes);
+            }
+        }
+
+        /**
+         * Internal Mapper Node for immutable java-beans.
+         */
+        static final class JB<S extends Segment, D extends DataType<D>> extends BC<S, D> {
+
+            JB(int i, Class<S> type, Validator v, VContext c, Fragment f, List<BSProperty<?, ?, D>> ps, Constructor<S> cs) throws BeanException {
+                super(i, type, v, c, f, ps, cs);
+            }
+
+            JB(Class<S> type, Validator validator, VContext context, List<BSProperty<?, ?, D>> ps, Constructor<S> cs) throws BeanException {
+                super(type, validator, context, ps, cs);
+            }
+
+            private JB(Flat<S, D> source, Constructor<S> cs) throws BeanException {
+                super(source, cs);
+            }
+
+            @Override
+            protected Map<BSProperty<?, ?, D>, Integer> indexes() throws BeanException {
+                final Map<BSProperty<?, ?, D>, Integer> indexes = new HashMap<>(properties.size());
+                final Parameter[] parameters = constructor.getParameters();
+                for (BSProperty<?, ?, D> p : properties) {
+                    indexes.put(p, this.index(parameters, p));
+                }
+                return unmodifiableMap(indexes);
+            }
+
+            private int index(Parameter[] parameters, BSProperty<?, ?, D> p) throws BeanException {
+                for (var i = 0; i < parameters.length; i++) {
+                    final Parameter pm = parameters[i];
+                    if (pm.getName().equals(p.getName())) {
+                        final Type pt = parameters[i].getParameterizedType();
+                        if (!pt.equals(p.getGenericType())) {
+                            throw new BeanException(p.getSource(), "should be of type " + pt.getTypeName());
+                        }
+                        return i;
+                    }
+                }
+                throw new BeanException(p.getSource(), "must be in constructor arguments");
             }
         }
     }

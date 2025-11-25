@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * Up2 configurable converter that converts the input data {@link String} to the target property type {@link T}.
+ * Up2J configurable converter that converts the input data {@link String} to the target property type {@link T}.
  * <p>
  * It's compatible with JAXB {@link XmlAdapter} and JPA {@link AttributeConverter}.
  *

@@ -15,8 +15,8 @@ import java.util.List;
  * Simple compliance-handler implementation that collects events in {@link #toList()}.
  *
  * @param <D> the business data type
- * @see io.github.up2jakarta.csv.core.Up2Format#validate(Segment)
- * @see io.github.up2jakarta.csv.core.Up2Format#validate(Segment, int)
+ * @see io.github.up2jakarta.csv.core.Up2Flatter#validate(Segment)
+ * @see io.github.up2jakarta.csv.core.Up2Flatter#validate(Segment, int)
  */
 public final class ComplianceCollector<D extends DataType<D>> extends ComplianceHandler<D> implements Listable<IComplianceEvent<D>> {
 

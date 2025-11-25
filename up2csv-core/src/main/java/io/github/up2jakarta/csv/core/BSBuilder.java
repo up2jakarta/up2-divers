@@ -5,17 +5,13 @@ import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.api.ext.TypeListener;
 import io.github.up2jakarta.csv.api.hdl.EventLevel;
 import io.github.up2jakarta.csv.cfg.*;
-import io.github.up2jakarta.csv.core.BSBuilder.PProcessor.LWrapper;
-import io.github.up2jakarta.csv.core.BSBuilder.PProcessor.PWrapper;
-import io.github.up2jakarta.csv.core.BSOperator.BProcessor;
-import io.github.up2jakarta.csv.core.BSProperty.FProperty;
-import io.github.up2jakarta.csv.core.BSProperty.PProperty;
+import io.github.up2jakarta.csv.core.BSProperty.PFragment;
+import io.github.up2jakarta.csv.core.BSProperty.PPosition;
 import io.github.up2jakarta.csv.core.ext.Beans;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
-import io.github.up2jakarta.csv.core.hdl.FastHandler;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.lov.PropertyConverter;
+import io.github.up2jakarta.lov.TypeAdapter;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanContext;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -25,17 +21,15 @@ import jakarta.validation.Valid;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_PROCESSOR;
-import static io.github.up2jakarta.csv.core.AccessMode.WO;
-import static io.github.up2jakarta.csv.core.BSBuilder.PProcessor.NWrapper;
-import static io.github.up2jakarta.csv.core.BSOperator.BAccessor;
-import static io.github.up2jakarta.csv.core.BSProperty.PAccessor;
+import static io.github.up2jakarta.csv.core.BSBuilder.Input.*;
+import static io.github.up2jakarta.csv.core.BSOperator.BId;
+import static io.github.up2jakarta.csv.core.BSOperator.Computer;
+import static io.github.up2jakarta.csv.core.BSProperty.Accessor;
+import static io.github.up2jakarta.csv.core.BeanAccess.WO;
 import static io.github.up2jakarta.csv.core.ext.Beans.*;
 import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
@@ -86,7 +80,7 @@ final class BSBuilder {
         throw new BeanException(field, "type must implements Segment");
     }
 
-    static <D extends DataType<D>> PWrapper<?, D> build(BeanContext ctx, Annotation ppa) throws BeanException {
+    static <D extends DataType<D>> WP<?, D> build(BeanContext ctx, Annotation ppa) throws BeanException {
         final Class<? extends Annotation> type = ppa.annotationType();
         final Processor processor = type.getAnnotation(Processor.class);
         final Class<? extends InputProcessor<?>> pType = processor.value();
@@ -96,11 +90,11 @@ final class BSBuilder {
             throw new BeanException(type, "@Processor[value] must implements InputProcessor<" + cn + ">");
         }
         final InputProcessor<Annotation> delegate = getBean(ctx, pType, processor.name());
-        return new PWrapper<>(delegate, processor.skip(), ppa);
+        return new WP<>(delegate, processor.skip(), ppa);
     }
 
-    static <D extends DataType<D>> PProcessor<D> build(BeanContext ctx, Field pf, Position pc) throws BeanException {
-        final List<PWrapper<?, D>> result = new LinkedList<>();
+    static <D extends DataType<D>> Input<D> build(BeanContext ctx, Field pf, Position pc) throws BeanException {
+        final List<WP<?, D>> result = new LinkedList<>();
         if (!undefined(pc)) {
             result.addFirst(build(ctx, pc));
         }
@@ -111,12 +105,12 @@ final class BSBuilder {
             }
         }
         if (result.isEmpty()) {
-            return (PProcessor<D>) NWrapper.INSTANCE;
+            return (Input<D>) NP.INSTANCE;
         }
         if (result.size() == 1) {
             return result.getFirst();
         }
-        return new LWrapper<>(result);
+        return new CP<>(result);
     }
 
     static Optional<AccessType> getAccessType(Optional<AccessType> first, Class<? extends Segment> type) {
@@ -159,25 +153,24 @@ final class BSBuilder {
         return result;
     }
 
-    static <A extends Annotation> void id(AccessMode mode, BSNode<?, ?> pn, Class<A> ct, BIdPath bc, FProperty<Segment, ?, ?>... pp) throws BeanException {
+    static <A extends Annotation> void id(BeanAccess mode, BSNode<?, ?> pn, Class<A> ct, BIdPath bc, PFragment<Segment, ?, ?>... pp) throws BeanException {
         for (final BSProperty<?, ?, ?> p : pn.properties) {
-            final AnnotatedElement field = p.getSource();
-            final A annotation = field.getAnnotation(ct);
-            if (p instanceof FProperty<?, ?, ?> fp) {
+            final A annotation = p.getAnnotation(ct);
+            if (p instanceof PFragment<?, ?, ?> fp) {
                 if (annotation != null) {
-                    throw BeanException.of(field, "must not be annotated with @" + getTypeName(ct));
+                    throw new BeanException(p.getSource(), "must not be annotated with @" + getTypeName(ct));
                 }
-                id(mode, fp.node, ct, bc, concat(pp, (FProperty<Segment, ?, ?>) fp));
+                id(mode, fp.node, ct, bc, concat(pp, (PFragment<Segment, ?, ?>) fp));
             } else if (annotation != null) {
                 if (mode == WO) {
-                    final List<FProperty<Segment, ?, ?>> path = new ArrayList<>(pp.length);
-                    for (final FProperty<Segment, ?, ?> fp : pp) {
+                    final List<PFragment<Segment, ?, ?>> path = new ArrayList<>(pp.length);
+                    for (final PFragment<Segment, ?, ?> fp : pp) {
                         path.add(fp.reverse());
                     }
                     final BSProperty<Object, Object, ?> pr = ((BSProperty<Object, Object, ?>) p).reverse();
-                    bc.accept(unmodifiableList(path), (PProperty<Object, Object, ?>) pr);
+                    bc.accept(unmodifiableList(path), (PPosition<Object, Object, ?>) pr);
                 } else {
-                    bc.accept(Arrays.asList(pp), (PProperty<Object, Object, ?>) p);
+                    bc.accept(Arrays.asList(pp), (PPosition<Object, Object, ?>) p);
                 }
             }
         }
@@ -224,53 +217,64 @@ final class BSBuilder {
     }
 
     interface BIdPath {
-        void accept(List<FProperty<Segment, ?, ?>> path, PProperty<Object, Object, ?> property) throws BeanException;
+        void accept(List<PFragment<Segment, ?, ?>> path, PPosition<Object, Object, ?> property) throws BeanException;
     }
 
     /**
      * Class Marker for Stack Trace.
      */
-    sealed interface ST permits BSProperty, PProcessor, PAccessor, BSNode {
+    sealed interface MST permits BSProperty, Input, Accessor, BSNode {
     }
 
     /**
      * Class Marker for Entry Point.
      */
-    sealed interface EP permits BProcessor, BAccessor, BeanLinker {
+    sealed interface MEP permits Computer, BId, BeanLinker {
     }
 
     /**
      * Internal Property processor.
      */
-    static abstract sealed class PProcessor<D extends DataType<D>> implements ST permits PWrapper, LWrapper, NWrapper {
+    static abstract sealed class Input<D extends DataType<D>> implements MST permits WP, CP, NP {
 
-        final <T> T defaultValue(BSProperty<T, ?, D> pp, PropertyConverter<T> adapter) throws BeanException {
+        final <T, V> T parse(PPosition<T, V, D> p, TypeAdapter<T> adapter) throws BeanException {
             try {
-                var v = this.process(null, 0, (PProperty<?, ?, D>) pp, FastHandler.of(ERROR));
-                if (v != null) {
-                    return adapter.parse(v);
+                final String value = this.process(null, 0, p, null);
+                if (value != null) {
+                    return adapter.parse(value);
                 }
                 return null;
-            } catch (Exception ex) {
-                throw BeanException.of(pp.getSource(), "@Position[defaultValue] cannot be parsed");
+            } catch (Exception cause) {
+                throw new BeanException(p.getSource(), "@Position[defaultValue] cannot be parsed");
             }
         }
 
-        abstract String process(String value, int offset, PProperty<?, ?, D> property, EventHandler<D> handler);
+        final <T> String format(Member source, T value, TypeAdapter<T> adapter) throws BeanException {
+            try {
+                if (value != null) {
+                    return adapter.format(value);
+                }
+                return null;
+            } catch (Exception cause) {
+                throw new BeanException(source, "@Position[defaultValue] cannot be formatted");
+            }
+        }
+
+        abstract String process(String value, int offset, PPosition<?, ?, D> property, EventHandler<D> handler);
 
         /**
          * Internal composite processor.
          */
-        static final class LWrapper<D extends DataType<D>> extends PProcessor<D> {
-            private final List<PWrapper<?, D>> processors;
+        static final class CP<D extends DataType<D>> extends Input<D> {
+            private final List<WP<?, D>> processors;
 
-            private LWrapper(List<PWrapper<?, D>> processors) {
+            private CP(List<WP<?, D>> processors) {
                 this.processors = unmodifiableList(processors);
             }
 
             @Override
-            public String process(String value, int offset, PProperty<?, ?, D> property, EventHandler<D> handler) {
-                for (final PWrapper<?, D> processor : processors) {
+            public String process(String value, int offset, PPosition<?, ?, D> property, EventHandler<D> handler) {
+                for (final WP<?, D> processor : processors) {
                     value = processor.process(value, offset, property, handler);
                 }
                 return value;
@@ -280,19 +284,19 @@ final class BSBuilder {
         /**
          * Internal processor wrapper.
          */
-        static final class PWrapper<A extends Annotation, D extends DataType<D>> extends PProcessor<D> {
+        static final class WP<A extends Annotation, D extends DataType<D>> extends Input<D> {
             private final A config;
             private final InputProcessor<A> delegate;
             private final Class<? extends RuntimeException> skip;
 
-            private PWrapper(InputProcessor<A> delegate, Class<? extends RuntimeException> skip, A config) {
+            private WP(InputProcessor<A> delegate, Class<? extends RuntimeException> skip, A config) {
                 this.delegate = delegate;
                 this.config = config;
                 this.skip = skip;
             }
 
             @Override
-            public String process(String value, int offset, PProperty<?, ?, D> pp, EventHandler<D> handler) {
+            public String process(String value, int offset, PPosition<?, ?, D> pp, EventHandler<D> handler) {
                 try {
                     return delegate.process(value, config);
                 } catch (RuntimeException cause) {
@@ -311,14 +315,14 @@ final class BSBuilder {
         /**
          * Internal Null wrapper.
          */
-        static final class NWrapper<D extends DataType<D>> extends PProcessor<D> {
-            private static final NWrapper<?> INSTANCE = new NWrapper<>();
+        static final class NP<D extends DataType<D>> extends Input<D> {
+            private static final NP<?> INSTANCE = new NP<>();
 
-            private NWrapper() {
+            private NP() {
             }
 
             @Override
-            public String process(String value, int offset, PProperty<?, ?, D> pp, EventHandler<D> handler) {
+            public String process(String value, int offset, PPosition<?, ?, D> pp, EventHandler<D> handler) {
                 return value;
             }
         }
@@ -327,17 +331,17 @@ final class BSBuilder {
     /**
      * Internal composite checker.
      */
-    static final class WChecker implements TypeContext, TypeListener {
+    static final class Listener implements TypeContext, TypeListener {
 
         private final TypeListener[] listeners;
         private final TypeContext[] contexts;
 
-        private WChecker(TypeListener[] listeners, TypeContext[] contexts) {
+        private Listener(TypeListener[] listeners, TypeContext[] contexts) {
             this.listeners = listeners;
             this.contexts = contexts;
         }
 
-        static WChecker of(Class<? extends Segment> type, BeanContext context) throws BeanException {
+        static Listener of(Class<? extends Segment> type, BeanContext context) throws BeanException {
             if (type.getTypeParameters().length != 0) {
                 throw new BeanException(type, "generic class is not allowed");
             }
@@ -352,11 +356,11 @@ final class BSBuilder {
             }
             final TypeListener[] listeners = result.toArray(TypeListener[]::new);
             final TypeContext[] contexts = new TypeContext[listeners.length];
-            return new WChecker(listeners, contexts);
+            return new Listener(listeners, contexts);
         }
 
         @Override
-        public WChecker beforeSegment(AccessMode mode, Class<? extends Segment> type) throws BeanException {
+        public Listener beforeSegment(BeanAccess mode, Class<? extends Segment> type) throws BeanException {
             for (var i = 0; i < listeners.length; i++) {
                 contexts[i] = listeners[i].beforeSegment(mode, type);
             }
@@ -386,7 +390,7 @@ final class BSBuilder {
         }
 
         @Override
-        public void beforeFragmentProperty(AccessMode mode, Field fragment, Class<? extends Segment> type) throws BeanException {
+        public void beforeFragmentProperty(BeanAccess mode, Field fragment, Class<? extends Segment> type) throws BeanException {
             for (final TypeContext context : contexts) {
                 context.beforeFragmentProperty(mode, fragment, type);
             }

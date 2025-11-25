@@ -5,7 +5,7 @@ import io.github.up2jakarta.csv.slv.TemporalAmountResolver;
 import java.lang.annotation.*;
 
 /**
- * Up2 {@link io.github.up2jakarta.lov.TypeAdapter} resolver that supports {@link java.time.temporal.TemporalAmount} types.
+ * Up2J {@link io.github.up2jakarta.lov.TypeAdapter} resolver that supports {@link java.time.temporal.TemporalAmount} types.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

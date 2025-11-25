@@ -1,11 +1,12 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.core.BSOperator.BAccessor;
-import io.github.up2jakarta.csv.core.BSOperator.BAccessor.BPAccessor;
-import io.github.up2jakarta.csv.core.BSProperty.PAccessor;
-import io.github.up2jakarta.csv.core.BSProperty.PProperty;
-import io.github.up2jakarta.csv.core.BSProperty.PProperty.POProperty;
+import io.github.up2jakarta.csv.core.BSOperator.BId;
+import io.github.up2jakarta.csv.core.BSProperty.Accessor;
+import io.github.up2jakarta.csv.core.BSProperty.PPosition;
+import io.github.up2jakarta.csv.core.BSProperty.PPosition.PS;
 import io.github.up2jakarta.csv.core.misc.acs.*;
+import io.github.up2jakarta.csv.core.misc.map.Test6Segment;
+import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.lov.core.AccessException;
@@ -15,8 +16,10 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
+import static io.github.up2jakarta.csv.core.BSProperty.isFinal;
 import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
 import static io.github.up2jakarta.lov.SeverityType.WARNING;
+import static io.github.up2jakarta.lov.core.Beans.getTypeName;
 import static jakarta.persistence.AccessType.PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,9 +28,9 @@ public class Properties {
 
     static void assertBean(Segment bean, List<BSProperty<?, ?, GroupType>> fields) throws Exception {
         for (final BSProperty<?, ?, GroupType> p : fields) {
-            assertInstanceOf(POProperty.class, p);
+            assertInstanceOf(PS.class, p);
             assertEquals(String.class, p.getType());
-            final POProperty<String, GroupType> sp = (POProperty<String, GroupType>) p;
+            final PS<String, GroupType> sp = (PS<String, GroupType>) p;
             final Field field = (Field) sp.getSource();
             field.setAccessible(true);
             assertEquals("V", field.get(bean));
@@ -38,20 +41,35 @@ public class Properties {
         }
     }
 
-    static <V> PAccessor<Field, V> wo(Class<V> type, Field field) throws BeanException {
-        return AccessMode.WO.of(PROPERTY, (Class<? extends Segment>) field.getDeclaringClass(), field, type);
+    static <S extends Test6Segment, D extends DataType<D>> void assertFinal(Up2Mapper<S, D> mapper) {
+        // GIVEN
+        final List<BSProperty<?, ?, D>> ps = mapper.node.properties;
+        assertEquals(1, ps.size());
+        final PS<String, D> code = assertInstanceOf(PS.class, ps.getFirst());
+        assertEquals("code", code.getName());
+        assertTrue(isFinal(code));
+        // WHEN
+        final Test6Segment bean = mapper.map("TU");
+        final AccessException thrown = assertThrows(AccessException.class, () -> code.value(bean, "*"));
+        assertEquals(getTypeName(bean.getClass()) + "[code] - unsupported write operation", thrown.getMessage());
+        // THEN
+        assertEquals("TU", bean.getCode());
     }
 
-    static Object parse(final PProperty<?, ?, ?> property, String value) {
+    static <V> Accessor<V> wo(Class<V> type, Field field) throws BeanException {
+        return BeanAccess.WO.of(PROPERTY, (Class<? extends Segment>) field.getDeclaringClass(), field, type);
+    }
+
+    static Object parse(final PPosition<?, ?, ?> property, String value) {
         return property.parse(value, 0, of(WARNING));
     }
 
-    static void assertValid(BAccessor<Segment, Object> bid, BIdOptionalBean bean) {
+    static void assertValid(BId<Segment, Object> bid, BIdOptionalBean bean) {
         // Support
-        assertInstanceOf(BPAccessor.class, bid);
+        assertInstanceOf(BId.DP.class, bid);
         assertTrue(bid.supports(null));
-        assertTrue(bid.supports(AccessMode.RO));
-        assertTrue(bid.supports(AccessMode.WO));
+        assertTrue(bid.supports(BeanAccess.RO));
+        assertTrue(bid.supports(BeanAccess.WO));
         // Null Fragment
         assertNull(bid.get(bean));
         assertNull(bid.format(bean));
@@ -76,14 +94,14 @@ public class Properties {
         assertEquals("100", bid.format(bean));
     }
 
-    static void assertValid(BAccessor<Segment, Object> bid, BId1Bean bean) {
+    static void assertValid(BId<Segment, Object> bid, BId1Bean bean) {
         // When
         bean.fragment.id = 99;
         // Then
-        assertInstanceOf(BPAccessor.class, bid);
+        assertInstanceOf(BId.DP.class, bid);
         assertTrue(bid.supports(null));
-        assertTrue(bid.supports(AccessMode.RO));
-        assertTrue(bid.supports(AccessMode.WO));
+        assertTrue(bid.supports(BeanAccess.RO));
+        assertTrue(bid.supports(BeanAccess.WO));
         assertEquals(99, bid.get(bean));
         // Write
         bid.set(bean, 100);
@@ -91,13 +109,13 @@ public class Properties {
         assertEquals("100", bid.format(bean));
     }
 
-    static void assertValid(BAccessor<Segment, Object> bid, BId2Bean bean) {
+    static void assertValid(BId<Segment, Object> bid, BId2Bean bean) {
         // When
         bean.setReference(99);
         // Then
         assertTrue(bid.supports(null));
-        assertTrue(bid.supports(AccessMode.RO));
-        assertTrue(bid.supports(AccessMode.WO));
+        assertTrue(bid.supports(BeanAccess.RO));
+        assertTrue(bid.supports(BeanAccess.WO));
         assertEquals(99, bid.get(bean));
         // Write
         bid.set(bean, 100);
@@ -105,31 +123,31 @@ public class Properties {
         assertEquals("100", bid.format(bean));
     }
 
-    static void assertValid(BAccessor<Segment, Object> bid, BId3Bean bean) {
+    static void assertValid(BId<Segment, Object> bid, BId3Bean bean) {
         // When
         bean.setReference(99);
         // Then
         assertTrue(bid.supports(null));
-        assertTrue(bid.supports(AccessMode.RO));
-        assertFalse(bid.supports(AccessMode.WO));
+        assertTrue(bid.supports(BeanAccess.RO));
+        assertFalse(bid.supports(BeanAccess.WO));
         assertEquals(99, bid.get(bean));
         assertEquals("99", bid.format(bean));
         assertThrows(AccessException.class, () -> bid.set(bean, 0));
     }
 
-    static void assertValid(BAccessor<Segment, Object> bid, BId4Bean bean) {
+    static void assertValid(BId<Segment, Object> bid, BId4Bean bean) {
         assertTrue(bid.supports(null));
-        assertTrue(bid.supports(AccessMode.RO));
-        assertFalse(bid.supports(AccessMode.WO));
+        assertTrue(bid.supports(BeanAccess.RO));
+        assertFalse(bid.supports(BeanAccess.WO));
         assertEquals(99, bid.get(bean));
         assertEquals("99", bid.format(bean));
         assertThrows(AccessException.class, () -> bid.set(bean, 0));
     }
 
-    static void assertUndefined(BAccessor<Segment, Object> bid, Segment bean) {
+    static void assertUndefined(BId<Segment, Object> bid, Segment bean) {
         assertFalse(bid.supports(null));
-        assertFalse(bid.supports(AccessMode.RO));
-        assertFalse(bid.supports(AccessMode.WO));
+        assertFalse(bid.supports(BeanAccess.RO));
+        assertFalse(bid.supports(BeanAccess.WO));
         assertThrows(AccessException.class, () -> bid.get(bean));
         assertThrows(AccessException.class, () -> bid.format(bean));
         assertThrows(AccessException.class, () -> bid.set(bean, 0));

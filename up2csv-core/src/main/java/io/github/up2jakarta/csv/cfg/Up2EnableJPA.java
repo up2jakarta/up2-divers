@@ -5,7 +5,7 @@ import io.github.up2jakarta.csv.core.ext.*;
 import java.lang.annotation.*;
 
 /**
- * Up2 {@link io.github.up2jakarta.lov.TypeAdapter} extension that supports XML types.
+ * Up2J {@link io.github.up2jakarta.lov.TypeAdapter} extension that supports XML types.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

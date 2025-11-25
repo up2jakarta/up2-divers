@@ -9,7 +9,7 @@ import io.github.up2jakarta.lov.core.BeanContext;
 import java.lang.annotation.*;
 
 /**
- * Up2 {@link io.github.up2jakarta.lov.TypeAdapter} resolver
+ * Up2J {@link io.github.up2jakarta.lov.TypeAdapter} resolver
  * that supports {@link io.github.up2jakarta.lov.CodeList} types.
  *
  * @see CodeListConverter

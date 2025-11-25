@@ -5,7 +5,7 @@ import io.github.up2jakarta.csv.prc.TrimProcessor;
 import java.lang.annotation.*;
 
 /**
- * Up2 Shortcut Annotation for {@link Processor} that trims {@link String} to <code>null</code>.
+ * Up2J Shortcut Annotation for {@link Processor} that trims {@link String} to <code>null</code>.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

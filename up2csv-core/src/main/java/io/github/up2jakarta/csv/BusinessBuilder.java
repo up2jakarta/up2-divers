@@ -41,8 +41,8 @@ public class BusinessBuilder<B extends DataType<B>> {
      * @param <T>  the business class
      * @return new builder
      */
-    public <T extends Segment> UnitBuilder<T> unit(Class<T> type) {
-        return new UnitBuilder<>(type);
+    public <T extends Segment> Unit<T> unit(Class<T> type) {
+        return new Unit<>(type);
     }
 
     /**
@@ -52,8 +52,8 @@ public class BusinessBuilder<B extends DataType<B>> {
      * @param <T>  the business class
      * @return new builder
      */
-    public <T extends Segment> FastBuilder<T> fast(Class<T> type) {
-        return new FastBuilder<>(type);
+    public <T extends Segment> Fast<T> fast(Class<T> type) {
+        return new Fast<>(type);
     }
 
     /**
@@ -63,14 +63,14 @@ public class BusinessBuilder<B extends DataType<B>> {
      * @param <T>  the business class
      * @return new builder
      */
-    public <T extends Segment> FullBuilder<T> full(Class<T> type) {
-        return new FullBuilder<>(type);
+    public <T extends Segment> Full<T> full(Class<T> type) {
+        return new Full<>(type);
     }
 
-    public final class UnitBuilder<T extends Segment> {
+    public final class Unit<T extends Segment> {
         private final Class<T> type;
 
-        private UnitBuilder(Class<T> type) {
+        private Unit(Class<T> type) {
             this.type = type;
         }
 
@@ -82,8 +82,8 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @param <I>   the input segment type
          * @return new preconfigured final builder
          */
-        public <I extends IType<B, I>> FinalBuilder<I> build(I root, List<I> nodes) {
-            return new FinalBuilder<>(root, nodes);
+        public <I extends IType<B, I>> Builder<I> build(I root, List<I> nodes) {
+            return new Builder<>(root, nodes);
         }
 
         /**
@@ -93,15 +93,15 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @param <I>  the input segment type
          * @return new preconfigured final builder
          */
-        public <I extends IType<B, I>> FinalBuilder<I> build(I root) {
+        public <I extends IType<B, I>> Builder<I> build(I root) {
             return this.build(root, DefaultProvider.values(root));
         }
 
-        public final class FinalBuilder<I extends IType<B, I>> {
+        public final class Builder<I extends IType<B, I>> {
             private final I root;
             private final List<I> nodes;
 
-            private FinalBuilder(I root, List<I> nodes) {
+            private Builder(I root, List<I> nodes) {
                 this.root = root;
                 this.nodes = nodes;
             }
@@ -112,7 +112,7 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new unit-exporter
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public SimpleUnitExporter<T, B, I> format() throws BeanException {
+            public SimpleUnitExporter<T, B, I> export() throws BeanException {
                 return new SimpleUnitExporter<>(factory, type, root, nodes);
             }
 
@@ -210,10 +210,10 @@ public class BusinessBuilder<B extends DataType<B>> {
         }
     }
 
-    public final class FastBuilder<T extends Segment> {
+    public final class Fast<T extends Segment> {
         private final Class<T> type;
 
-        private FastBuilder(Class<T> type) {
+        private Fast(Class<T> type) {
             this.type = type;
         }
 
@@ -225,8 +225,8 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @param <I>   the input segment type
          * @return new preconfigured final builder
          */
-        public <I extends IType<B, I>> FinalBuilder<I> build(I root, List<I> nodes) {
-            return new FinalBuilder<>(root, nodes);
+        public <I extends IType<B, I>> Builder<I> build(I root, List<I> nodes) {
+            return new Builder<>(root, nodes);
         }
 
         /**
@@ -236,15 +236,15 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @param <I>  the input segment type
          * @return new preconfigured final builder
          */
-        public <I extends IType<B, I>> FinalBuilder<I> build(I root) {
+        public <I extends IType<B, I>> Builder<I> build(I root) {
             return this.build(root, DefaultProvider.values(root));
         }
 
-        public final class FinalBuilder<I extends IType<B, I>> {
+        public final class Builder<I extends IType<B, I>> {
             private final I root;
             private final List<I> nodes;
 
-            private FinalBuilder(I root, List<I> nodes) {
+            private Builder(I root, List<I> nodes) {
                 this.root = root;
                 this.nodes = nodes;
             }
@@ -255,7 +255,7 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new fast-exporter
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public SimpleFastExporter<T, B, I> format() throws BeanException {
+            public SimpleFastExporter<T, B, I> export() throws BeanException {
                 return new SimpleFastExporter<>(factory, type, root, nodes);
             }
 
@@ -353,10 +353,10 @@ public class BusinessBuilder<B extends DataType<B>> {
         }
     }
 
-    public final class FullBuilder<T extends Segment> {
+    public final class Full<T extends Segment> {
         private final Class<T> type;
 
-        private FullBuilder(Class<T> type) {
+        private Full(Class<T> type) {
             this.type = type;
         }
 
@@ -368,8 +368,8 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @param <I>   the input segment type
          * @return new preconfigured final builder
          */
-        public <I extends IType<B, I>> FinalBuilder<I> build(I root, List<I> nodes) {
-            return new FinalBuilder<>(root, nodes);
+        public <I extends IType<B, I>> Builder<I> build(I root, List<I> nodes) {
+            return new Builder<>(root, nodes);
         }
 
         /**
@@ -379,15 +379,15 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @param <I>  the input segment type
          * @return new preconfigured final builder
          */
-        public <I extends IType<B, I>> FinalBuilder<I> build(I root) {
+        public <I extends IType<B, I>> Builder<I> build(I root) {
             return this.build(root, DefaultProvider.values(root));
         }
 
-        public final class FinalBuilder<I extends IType<B, I>> {
+        public final class Builder<I extends IType<B, I>> {
             private final I root;
             private final List<I> nodes;
 
-            private FinalBuilder(I root, List<I> nodes) {
+            private Builder(I root, List<I> nodes) {
                 this.root = root;
                 this.nodes = nodes;
             }
@@ -398,7 +398,7 @@ public class BusinessBuilder<B extends DataType<B>> {
              * @return new full-exporter
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public SimpleFullExporter<T, B, I> format() throws BeanException {
+            public SimpleFullExporter<T, B, I> export() throws BeanException {
                 return new SimpleFullExporter<>(factory, type, root, nodes);
             }
 

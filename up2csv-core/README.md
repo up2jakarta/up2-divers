@@ -21,8 +21,8 @@ approach.
 - Support of IoC container like CDI (Contexts and Dependency Injection) provider or Spring or whatever
 - Configuration based on @Annotation
 - Support of Java OOP (Object-Oriented Programming)
-- Support of Java `Record`
-- Support of Java `Optional`
+- Support of `Immutable` java-beans including java `Record`
+- Support of Java `Optional` and Up2J `Wrapper`
 - Mapping from flat-data to java-bean
 - Unmapping from java-bean to flat-data
 - Extensions
@@ -42,7 +42,7 @@ approach.
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.1</version>
     </dependency>
     <!-- Required JSR-303 Validation Provider -->
     <dependency>
@@ -57,7 +57,8 @@ approach.
 
 - Without error collecting (fail-fast)
 
-``` java
+```java
+
 @Inject
 private Up2Factory<?> factory;
 
@@ -73,7 +74,8 @@ public void test() {
 
 - Within error collecting
 
-``` java
+```java
+
 @Inject
 private Up2Factory<DynamicType> factory;
 
@@ -81,7 +83,7 @@ public void test() {
     // GIVEN Singletons
     final Up2Mapper<Up2Segment, DynamicType> mapper = factory.build(Up2Segment.class);
     // GIVEN Prototypes
-    final SimpleCollector<DynamicType> handler = new SimpleCollector<>() ;
+    final SimpleCollector<DynamicType> handler = new SimpleCollector<>();
     // WHEN
     final Up2Segment bean = mapper.map(handler, "Data 1", "Data 2", "...", "Data n");
     final List<SimpleEvent<DynamicType>> errors = handler.toList();
@@ -103,16 +105,17 @@ During the unmapping of java-bean:
 - The annotation `@Truncated` is supported
 - When the flag `@Fragment.nullable` is enabled then export of default values is disabled when fragment is `null`
 
-``` java
+```java
+
 @Inject
 private Up2Factory<?> factory;
 
 public void test() {
     // GIVEN Singleton
-    final Up2Format<Up2Segment, ?> mapper = factory.format(Up2Segment.class);
-    final Up2Segment bean ; // ... full-fill the bean
+    final Up2Flatter<Up2Segment, ?> mapper = factory.format(Up2Segment.class);
+    final Up2Segment bean; // ... full-fill the bean
     // WHEN
-    final List<? extends IViolationEvent<?>> violations =  mapper.validate(bean); // manual validation
+    final List<? extends IViolationEvent<?>> violations = mapper.validate(bean); // manual validation
     final String[] data = mapper.unmap(bean);
     // THEN
     // Here the data is full-filled automatically 
@@ -123,15 +126,15 @@ public void test() {
 
 ## @Position
 
-``` java
-public Up2Fragment implements Segment {
+```java
+public class Up2Fragment implements Segment {
 
     @Position(0)
     private String firstName;
 
     @Position(1)
     private String lastName;
-    
+
     // ...
 }
 ```
@@ -144,8 +147,8 @@ Overrides `@Position` of an embeddable property or a super-property defined in s
 
 Reuse of java beans in order to avoid code duplication
 
-``` java
-public Up2Segment extends Up2Fragment {
+```java
+public class Up2Segment extends Up2Fragment {
 
     // Override the positions defined in Up2Fragment 
     @Fragment(2)
@@ -154,19 +157,19 @@ public Up2Segment extends Up2Fragment {
     // Override the positions defined in Up2Fragment 
     @Position(2 + 2)
     private Up2Fragment father;
-    
+
     @Position(2 + 2 + 2)
     private String other;
-    
+
     // ...
-    
+
     public static final class Up2Fragment implements Segment {
         @Position(0)
         private String firstName;
-    
+
         @Position(1)
         private String lastName;
-        
+
         // ...
     }
 }
@@ -178,60 +181,60 @@ Overrides `@Fragment` of an embeddable fragment or a super-fragment defined in s
 
 ## @Processor API
 
-Up2 Processor API is useful for creating configurable processor activated by annotation on fields.
+Up2J Processor API is useful for creating configurable processor activated by annotation on fields.
 
-Up2 Core comes with 3 built-in shortcut annotations:
+Up2J Core comes with 3 built-in shortcut annotations:
 
 ### @Position.defaultValue
 
 Setting the default value
 
-``` java
-public Up2Segment implements Segment {
+```java
+public class Up2Segment implements Segment {
 
     @Position(value = 0, defaultValue = "*")
     private String code;
-    
+
     // ...
 }
 ```
 
 ### @Up2Token
 
-``` java
-public Up2Segment implements Segment {
+```java
+public class Up2Segment implements Segment {
 
     @Position(0)
     @Up2Token
     private String code;
-    
+
     // ...
 }
 ```
 
 ### @Up2Trim
 
-``` java
-public Up2Segment implements Segment {
+```java
+public class Up2Segment implements Segment {
 
     @Position(0)
-    @Up2Trim({"", "-", "null", "undefined"}) 
+    @Up2Trim({"", "-", "null", "undefined"})
     private String code;
-    
+
     // ...
 }
 ```
 
 ### Put all together
 
-``` java
-public Up2Segment implements Segment {
+```java
+public class Up2Segment implements Segment {
 
     @Position(value = 0, defaultValue = "*") // 1st order
     @Up2Trim({"", "-", "null", "undefined"}) // 2nd order
     @Up2Token // 3rd order
     private String code;
-    
+
     // ...
 }
 ```
@@ -240,35 +243,35 @@ public Up2Segment implements Segment {
 
 Any type different from `String` needs to be converted, so the utility of converters
 
-``` java
-public Up2Segment implements Segment {
+```java
+public class Up2Segment implements Segment {
 
     @Position(value = 0, converter = CurrencyConverter.class)
     private CurrencyCodeType currency;
-    
+
     // ...
 }
 ```
 
 ## @Resolver API
 
-Up2 @Resolver allows the resolution of the conversion function for one or more type.
+Up2J @Resolver allows the resolution of the conversion function for one or more type.
 
-Up2 @Resolver is activated by shortcut annotation like @Processor.
+Up2J @Resolver is activated by shortcut annotation like @Processor.
 
-Up2 Core comes with 6 built-in shortcut annotations:
+Up2J Core comes with 6 built-in shortcut annotations:
 
 ### @Up2Boolean
 
 This annotation allows the automatic conversion of `boolean` and its wrapper.
 
-``` java
-public Up2Segment implements Segment {
+```java
+public class Up2Segment implements Segment {
 
     @Position(0)
     @Up2Boolean(trueValue = "Yes", falseValue = "No")
     private Boolean flag;
-    
+
     // ...
 }
 ```
@@ -283,17 +286,17 @@ This annotation allows the automatic conversion of non-decimal `Number` and thei
 - byte
 - BigInteger
 
-``` java
-public Up2Segment implements Segment {
+```java
+public class Up2Segment implements Segment {
 
     @Position(value = 0, defaultValue = "-1")
     @Up2Number
     private int number;
-    
+
     @Position(1)
     @Up2Number
     private Integer other;
-    
+
     // ...
 }
 ```
@@ -306,17 +309,17 @@ This annotation allows the automatic conversion of decimal `Number` and their wr
 - double
 - float
 
-``` java
-public Up2Segment implements Segment {
+```java
+public class Up2Segment implements Segment {
 
     @Position(0)
     @Up2Decimal(value = 4, roundingMode = RoundingMode.HALF_EVEN)
     private BigDecimal amount;
-    
+
     @Position(1)
     @Up2Decimal(value = 4)
     private double quantity;
-    
+
     // ...
 }
 ```
@@ -335,13 +338,13 @@ This annotation allows the automatic conversion of `java.time.Temporal`:
 - YearMonth
 - Instant
 
-``` java
-public Up2Segment implements Segment {
+```java
+public class Up2Segment implements Segment {
 
     @Position(0)
     @Up2Temporal
     private LocalDate date;
-    
+
     // ...
 }
 ```
@@ -353,25 +356,25 @@ This annotation allows the automatic conversion of `java.time.TemporalAmount`:
 - Period
 - Duration
 
-``` java
-public Up2Segment implements Segment {
+```java
+public class Up2Segment implements Segment {
 
     @Position(1)
     @Up2TemporalAmount
-    private Period perid;
-    
+    private Period period;
+
     // ...
 }
 ```
 
 ### @Up2CodeList
 
-This annotation allows the automatic conversion of Up2 `CodeList` API
+This annotation allows the automatic conversion of Up2J `CodeList` API
 
 - `CodeList` based on `enum` or `class` constants
 
-``` java
-public Up2Segment implements Segment {
+```java
+public class Up2Segment implements Segment {
 
     @Position(0)
     @Up2CodeList
@@ -380,35 +383,42 @@ public Up2Segment implements Segment {
     @Position(1)
     @Up2CodeList
     private CountryCodeType country;
-    
+
     // ...
 }
 ```
 
 ## @Extension and @Checker API
 
-Up2 @Extension allows the resolution of the conversion function for one or more type for third-party annotation.
+Up2J @Extension allows the resolution of the conversion function for one or more type for third-party annotation.
 
-Up2 @Extension is activated by shortcut annotation like @Processor and @Resolver.
+Up2J @Extension is activated by shortcut annotation like @Processor and @Resolver.
 
-Up2 Core comes with 2 built-in shortcut annotations:
+Up2J Core comes with 2 built-in shortcut annotations:
 
 ### @Up2EnableXML
 
 Automatic detection for `XmlEnum` and `XmlJavaTypeAdapter` XML annotations on segments annotated by `XmlType`.
 
-``` java
+```java
+
 @XmlType
 @XmlEnum
 public enum TestXmlEnumValue {
     @XmlEnumValue("1") ONE
 }
+```
+
+```java
 
 @XmlType
 @XmlEnum
 public enum TestXmlEnum {
     TWO
 }
+```
+
+```java
 
 @XmlJavaTypeAdapter(CurrencyConverter.class)
 public enum CurrencyCodeType implements CodeList<CurrencyCodeType> {
@@ -434,26 +444,28 @@ public enum CurrencyCodeType implements CodeList<CurrencyCodeType> {
     public String getCode() {
         return code;
     }
-
 }
+```
+
+```java
 
 @XmlType
 @Up2EnableXML
-public Up2Segment implements Segment {
+public class Up2Segment implements Segment {
 
     @Position(0)
     private TestXmlEnumValue enum1; // enum within @XmlEnumValue
-    
+
     @Position(1)
     private TestXmlEnum enum2; // enum without @XmlEnumValue
 
     @Position(2)
     private CurrencyCodeType currency; // type annotated with XmlJavaTypeAdapter
-    
+
     @Position(3)
     @XmlJavaTypeAdapter(CountryXmlAdapter.class) // property annotated with XmlJavaTypeAdapter
     private CountryCodeType country;
-    
+
     // ... setters
 }
 ```
@@ -462,14 +474,17 @@ public Up2Segment implements Segment {
 
 Automatic detection for `Enumerated` and `Convert` JPA annotations on segments annotated by `Entity`.
 
-``` java
+```java
 public enum JpaEnum {
-   ONE, TWO
+    ONE, TWO
 }
+```
+
+```java
 
 @Entity
 @Up2EnableJPA
-public Up2Segment implements Segment {
+public class Up2Segment implements Segment {
 
     @Position(0)
     @Enumerated(EnumType.STRING) // conversion based on enum constant name
@@ -480,10 +495,11 @@ public Up2Segment implements Segment {
     private JpaEnum ordinal;
 
     @Position(2)
-    @Convert(converter = CurrencyConverter.class) // CurrencyConverter implements AttributeConverter<CurrencyCodeType, String> {...}
+    @Convert(converter = CurrencyConverter.class)
+    // CurrencyConverter implements AttributeConverter<CurrencyCodeType, String> {...}
     private CurrencyCodeType currency;
-    
-     // ... setters
+
+    // ... setters
 }
 ```
 
@@ -495,15 +511,15 @@ Helps the engine to full-fill the right error code and severity.
 
 This annotation is fully integrated with @Processor, @Resolver and JSR-303 Payload.
 
-``` java
-public TestSegment implements Segment {
+```java
+public class TestSegment implements Segment {
 
     public static final String TU_P_021 = "TU-P021";
 
     @Position(0)
     @Error(value = TU_P_021, severity = FATAL) // for any error caused by this property
     private String code;
-    
+
     // ...
 
 }
@@ -513,14 +529,15 @@ public TestSegment implements Segment {
 
 You can also use the JSR-303 validation `Payload` to override the error severity and error code.
 
-Up2 comes with two predefined payloads to override the error severity, by default is `SeverityType.ERROR`.
+Up2J comes with two predefined payloads to override the error severity, by default is `SeverityType.ERROR`.
 
 - [Warning.class](src/main/java/io/github/up2jakarta/csv/api/Warning.java)
 - [Fatal.class](src/main/java/io/github/up2jakarta/csv/api/Fatal.java)
 
 You can define your own payload of course:
 
-``` java
+```java
+
 @Error(value = "UP2-100100", severity = SeverityType.WARNING) // Here is the magic
 public interface Up2Payload extends Error.Payload {
 }
@@ -528,9 +545,10 @@ public interface Up2Payload extends Error.Payload {
 
 ## Support of JSR-303 @Constraint
 
-Also, Up2 supports @Error on JSR-303 constraint annotations:
+Also, Up2J supports @Error on JSR-303 constraint annotations:
 
-``` java
+```java
+
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -550,14 +568,15 @@ public @interface Up2NotEmpty {
 
 Enables JSR-303 validation
 
-``` java
+```java
+
 @jakarta.validation.Valid
-public TestSegment implements Segment {
+public class TestSegment implements Segment {
 
     @Position(0)
     @Size(min = 1, max = 3, payload = SeverityFatal.class)
     private String code;
-    
+
     // ...
 
 }
@@ -573,15 +592,16 @@ public TestSegment implements Segment {
 - On segment classes, the validation can be enabled by super-segment classes, the first super-class annotated by
   `@ValidOverride` or `@Valid` will be considered.
 
-``` java
+```java
+
 @ValidOverride(groups = Up2Group.class)
-public TestSegment implements Segment {
+public class TestSegment implements Segment {
 
     @Position(0)
     @Size(min = 1, max = 3, payload = SeverityFatal.class, groups = Up2Group.class)
     @Size(min = 1, max = 2, payload = SeverityError.class) // Default
     private String code;
-    
+
     // ...
 
 }
@@ -608,11 +628,12 @@ processing flat-data within fault-tolerance principle.
 
 ## @Truncated
 
-Tells the engine that the given input data is already truncated, it allows overriding of error offset.
+Tells the engine that the given input data is already truncated, it allows overriding of event offset.
 
-``` java
+```java
+
 @Truncated(4) // The first 4 columns are truncated
-public MySegment implements Segment {
+public class MySegment implements Segment {
     // ...
 }
 ```
@@ -621,7 +642,7 @@ public MySegment implements Segment {
 
 ## Field based access
 
-``` java
+```java
 public class MyBean implements Segment {
 
     @Position(0)
@@ -635,14 +656,15 @@ public class MyBean implements Segment {
 
 ## Property based access (Default Mode)
 
-``` java
+```java
+
 @Access(AccessType.PROPERTY)
-public class MyBean extends implements Segment {
+public class MyBean implements Segment {
 
     @Position(1)
     @Up2Boolean
     protected String code;
-    
+
     // ...
 
     protected String getCode() {
@@ -657,16 +679,150 @@ public class MyBean extends implements Segment {
 
 ## Support of Java Record access
 
-```
-@Access(AccessType.PROPERTY)
-public record MyRecord(long id, @Position(0) String code, @Position(1) String label, Object src) implements Segment {
+```java
+public enum Source {
+    CSV, WEB, KPI
 }
 ```
 
-- In this special case, the writing of properties is done with constructor whatever the access mode (Property/Field).
-- Primitive properties are set with default values when are not mapped or the input data is null, so be careful with
-  validation and export
-- When primitive property is managed by the framework, its value is exported by `Up2Format`
+```java
+public record MyRecord(long id, @Position(0) String code, @Position(1) String label, Source source) implements Segment {
+}
+```
+
+> :warning: In the case of `MyRecord` beans are created by the framework;
+> - The value of `id` will be always `0` because primitive
+> - The value of `source` will be always `null`
+
+> :information_source: In the case of immutable beans, the following assertions are true:
+> - The writing of properties is done with constructor whatever the access type Property or Field
+> - Primitive properties are set with default values when are not mapped or the input data is null
+> - When primitive property is managed by the framework, its value is exported by `Up2Flatter` because not `null`
+
+### Constructor selection to set values of non-managed properties
+
+```java
+public record MyRecord(@Position(0) String code, @Position(1) String label, Source source) implements Segment {
+
+    @Creator // Correct the value of source
+    private MyRecord(String code, String label) {
+        this(code, label, Source.CSV);
+    }
+}
+```
+
+> :warning: the constraints for java-records are:
+> - The constructor must contain all managed properties as arguments with the same names and types
+> - The order is not important
+
+### More, you can secure the source attribute
+
+```java
+public final class MySegment implements Segment {
+
+    private final @Position(0) String code;
+    private final @Position(1) String label;
+    private final Source source;
+
+    @Creator // For mapping only
+    private Final1Segment(String code, String label) {
+        this.code = code;
+        this.label = label;
+        this.source = Source.CSV;
+    }
+
+    // Public constructor
+    public Final1Segment(String code, String label, Source source) {
+        if (source == Source.CSV) {
+            throw new IllegalArgumentException("trying to hack the source");
+        }
+        this.code = code;
+        this.label = label;
+        this.source = source;
+    }
+
+    // ... Getters
+}
+```
+
+> :warning: the constraints for immutables beans are:
+> - The constructor must contain all managed properties as arguments with the same names and types
+> - :new: Each property must be final
+> - The order is not important
+
+### Mix final and non-final properties workarounds
+
+### 1. @Fragment
+
+If some properties are open for modification, you can use segments composition technique
+i.e put all non-final properties in separate fragment
+
+```java
+public final class MySegment implements Segment {
+
+    private final @Position(0) String code;
+    private final @Position(1) String label;
+    private final @Fragment(1 /* nullable = false */) MyFragment container;
+
+    @Creator
+    private Final1Segment(String code, String label, MyFragment container) {
+        this.code = code;
+        this.label = label;
+        this.container = container;
+    }
+
+    // ... Getters
+
+    public static class MyFragment implements Segment {
+
+        private @Position(0) String description; // non-final
+        private @Position(1) String another; // non-final
+        // ... Other properties
+
+        // ... Getters & Setters
+
+    }
+}
+```
+
+### 2. Wrapper
+
+Another solution, the use of `Wrapper` to wrap each non-final property,
+> :new: The wrapper supports the JSR-303 validation, free to use annotation on Wrapper type-argument.
+
+```java
+import io.github.up2jakarta.lov.core.Wrapper;
+
+@Access(FIELD) // avoid conflict of getNote return-type
+public final class MySegment implements Segment {
+
+    private final @Position(0) String code;
+    private final @Position(1) String label;
+    @Position(2)
+    private final @NotBlank Wrapper<String> note; // non-final
+    @Position(3)
+    private final Wrapper<@NotBlank String> another; // non-final
+    // ... Other properties
+
+    @Creator
+    private Final1Segment(String code, String label, Wrapper<String> note, Wrapper<String> another) {
+        this.code = code;
+        this.note = note;
+        this.label = label;
+        this.another = another;
+    }
+
+    public String getNote() {
+        return this.note.get();
+    }
+
+    public void setNote(String note) {
+        return this.note.accept(note);
+    }
+
+    // ... Accessors
+}
+```
 
 ## Input API
 

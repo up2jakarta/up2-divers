@@ -6,7 +6,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
 
 /**
- * Up2 Bean Exception that wraps missing or wrong configuration on java-beans.
+ * Up2J Bean Exception that wraps missing or wrong configuration on java-beans.
  */
 public class BeanException extends Exception implements MessageFormatter {
 
