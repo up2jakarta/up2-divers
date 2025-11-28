@@ -121,7 +121,7 @@ public class AllowanceChargeReasonCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(45, error.getLineNumber());
             assertEquals(61, error.getLineOffset());
-            assertEquals("ECE-4465: Unknown value [???] for CodeList[AllowanceChargeReasonCodeType].", error.getMessage());
+            assertEquals("ECE-4465: Unknown input [???] for CodeList[AllowanceChargeReasonCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }
@@ -130,7 +130,7 @@ public class AllowanceChargeReasonCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(267, error.getLineNumber());
             assertEquals(53, error.getLineOffset());
-            assertEquals("ECE-5189: Unknown value [???] for CodeList[AllowanceChargeIdentificationCodeType].", error.getMessage());
+            assertEquals("ECE-5189: Unknown input [???] for CodeList[AllowanceChargeIdentificationCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }
@@ -139,7 +139,7 @@ public class AllowanceChargeReasonCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(282, error.getLineNumber());
             assertEquals(53, error.getLineOffset());
-            assertEquals("ECE-7161: Unknown value [???] for CodeList[SpecialServiceDescriptionCodeType].", error.getMessage());
+            assertEquals("ECE-7161: Unknown input [???] for CodeList[SpecialServiceDescriptionCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

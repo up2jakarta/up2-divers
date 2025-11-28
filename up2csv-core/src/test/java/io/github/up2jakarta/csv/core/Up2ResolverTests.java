@@ -4,12 +4,10 @@ import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.core.hdl.FailureException;
 import io.github.up2jakarta.csv.core.misc.cvr.Test1Definition;
 import io.github.up2jakarta.csv.core.misc.cvr.Test3Resolver;
-import io.github.up2jakarta.csv.data.DataTypeResolver;
+import io.github.up2jakarta.csv.data.DataResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.lov.SeverityType;
-import io.github.up2jakarta.lov.core.BeanContext;
 import io.github.up2jakarta.lov.core.BeanException;
-import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +25,8 @@ class Up2ResolverTests {
     private final Up2Factory<DynamicType> factory;
 
     @Autowired
-    Up2ResolverTests(BeanContext context, Validator validator) {
-        this.factory = new Up2Factory<>(context, validator, DataTypeResolver.dynamic());
+    Up2ResolverTests(BeanContext context) {
+        this.factory = new Up2Factory<>(context, DataResolver.dynamic());
     }
 
     @Test
@@ -44,7 +42,7 @@ class Up2ResolverTests {
         assertEquals(SeverityType.ERROR, error.getLevel());
         assertEquals(EC_CODE_LIST, error.getCode());
         assertNotNull(error.getCause());
-        assertEquals("Unknown value [TON] for CodeList[MeasurementUnitCode]", error.getCause().getMessage());
+        assertEquals("Unknown input [TON] for CodeList[MeasurementUnitCode]", error.getCause().getMessage());
     }
 
     @Test
@@ -64,7 +62,7 @@ class Up2ResolverTests {
     }
 
     @Test
-    void testPrivateConstant() throws BeanException {
+    void testDeprecatedConstant() throws BeanException {
         // Given
         final Up2Mapper<Test3Resolver, DynamicType> mapper = factory.build(Test3Resolver.class);
         final FailureException error = assertThrows(FailureException.class, () -> mapper.map("N"));
@@ -72,11 +70,11 @@ class Up2ResolverTests {
         assertEquals(SeverityType.ERROR, error.getLevel());
         assertEquals(EC_CODE_LIST, error.getCode());
         assertNotNull(error.getCause());
-        assertEquals("Unknown value [N] for CodeList[EnumLike]", error.getCause().getMessage());
+        assertEquals("Unknown input [N] for CodeList[UnitType]", error.getCause().getMessage());
     }
 
     @Test
-    void testPublicConstant() throws BeanException {
+    void testValidConstant() throws BeanException {
         // Given
         final Up2Mapper<Test3Resolver, DynamicType> mapper = factory.build(Test3Resolver.class);
         final Test3Resolver bean = mapper.map("1");

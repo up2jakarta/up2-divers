@@ -4,11 +4,8 @@ import io.github.up2jakarta.csv.cfg.Creator;
 import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.data.Segment;
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 import jakarta.validation.constraints.NotBlank;
 
-@Access(AccessType.FIELD)
 public class Final2Segment implements Segment {
 
     @Position(0)

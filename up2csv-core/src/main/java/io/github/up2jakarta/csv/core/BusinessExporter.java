@@ -2,8 +2,8 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.core.BSOperator.OPS.Format;
-import io.github.up2jakarta.csv.core.BSOperator.OPS.Mapper;
+import io.github.up2jakarta.csv.core.BSManager.Format;
+import io.github.up2jakarta.csv.core.BSManager.Mapper;
 import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
 import io.github.up2jakarta.csv.core.hdl.SimpleCollector;
 import io.github.up2jakarta.csv.data.DataType;
@@ -17,13 +17,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static io.github.up2jakarta.csv.core.BeanAccess.RO;
+import static io.github.up2jakarta.csv.core.BSAccessor.Mode.RO;
 import static io.github.up2jakarta.csv.data.DataType.isValid;
 import static io.github.up2jakarta.csv.data.DataType.message;
 import static java.util.Set.of;
 
 /**
- * Base Processor that's able to segregate and export java-bean to flat-data.
+ * Up2J Base Processor that's able to segregate and export java-bean to flat-data.
  *
  * @param <T> the business object type
  * @param <B> the business data type
@@ -134,9 +134,9 @@ public abstract sealed class BusinessExporter<B extends DataType<B>, I extends I
     @Override
     final Format<Segment, B> build(Up2Factory<B> factory, I type, Mapper<Segment, B> source) throws BeanException {
         if (source != null) {
-            return new Format<>(source.node.reverse());
+            return source.reverse();
         }
-        return factory.format(factory.resolver.or(type.getDataType()), type.getClassType());
+        return factory.ft(type.getClassType());
     }
 
     abstract void fill(String[] target, Supplier<String> recordId, IType<?, ?> type, String reference);

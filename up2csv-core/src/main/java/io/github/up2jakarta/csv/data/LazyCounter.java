@@ -1,24 +1,31 @@
 package io.github.up2jakarta.csv.data;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.IntSupplier;
 
 public final class LazyCounter implements IntSupplier {
 
-    static final int NAN = Integer.MIN_VALUE;
+    private final Lock mutex = new ReentrantLock();
+    private final IntSupplier repository;
+    private volatile AtomicInteger value;
 
-    private final IntSupplier supplier;
-    private volatile int value = NAN;
-
-    public LazyCounter(IntSupplier supplier) {
-        this.supplier = supplier;
+    public LazyCounter(IntSupplier repository) {
+        this.repository = repository;
     }
 
     @Override
-    public synchronized int getAsInt() {
-        if (value == NAN) {
-            value = supplier.getAsInt();
+    public int getAsInt() {
+        this.mutex.lock();
+        try {
+            if (value == null) {
+                value = new AtomicInteger(repository.getAsInt());
+            }
+            return value.getAndIncrement();
+        } finally {
+            this.mutex.unlock();
         }
-        return value;
     }
 
 }

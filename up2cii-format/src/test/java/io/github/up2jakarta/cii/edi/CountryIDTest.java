@@ -91,7 +91,7 @@ public class CountryIDTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(118, error.getLineNumber());
             assertEquals(55, error.getLineOffset());
-            assertEquals("ISO-3166: Unknown value [???] for CodeList[CountryIDType].", error.getMessage());
+            assertEquals("ISO-3166: Unknown input [???] for CodeList[CountryIDType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

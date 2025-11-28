@@ -71,7 +71,7 @@ public class AllowanceChargeIdentificationCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(246, error.getLineNumber());
             assertEquals(49, error.getLineOffset());
-            assertEquals("ECE-5189: Unknown value [???] for CodeList[AllowanceChargeIdentificationCodeType].", error.getMessage());
+            assertEquals("ECE-5189: Unknown input [???] for CodeList[AllowanceChargeIdentificationCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

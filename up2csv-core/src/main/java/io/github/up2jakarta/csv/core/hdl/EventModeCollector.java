@@ -7,7 +7,7 @@ import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.lov.IException;
 import io.github.up2jakarta.lov.SeverityType;
 
-import static java.util.Objects.requireNonNull;
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 
 /**
  * Base {@link EventCollector} implementation that delegates partial event creation to {@link #mode}.
@@ -17,12 +17,12 @@ import static java.util.Objects.requireNonNull;
 public abstract class EventModeCollector<D extends DataType<D>, R extends IRecord<?>, E extends IEvent<D>, B extends IException> extends EventCollector<D, E> {
 
     final R source;
-    final EventModeType<B> mode;
+    final EventModeType<? extends B> mode;
 
-    protected EventModeCollector(R source, ICreator<R, E> creator, EventModeType<B> mode) {
+    protected EventModeCollector(R source, ICreator<R, E> creator, EventModeType<? extends B> mode) {
         super(creator.apply(source));
-        this.source = requireNonNull(source);
-        this.mode = requireNonNull(mode);
+        this.source = notNull(source, EventModeCollector.class, "source");
+        this.mode = notNull(mode, EventModeCollector.class, "mode");
     }
 
     public final R getSource() {

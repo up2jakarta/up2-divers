@@ -1,13 +1,12 @@
 package io.github.up2jakarta.csv.cfg;
 
+import io.github.up2jakarta.csv.core.BeanContext;
 import io.github.up2jakarta.lov.TypeAdapter;
-import io.github.up2jakarta.lov.TypeConverter;
-import io.github.up2jakarta.lov.core.BeanContext;
 
 import java.lang.annotation.*;
 
 /**
- * Up2J Annotation that supports {@link TypeConverter}.
+ * Up2J Annotation that supports any {@link TypeAdapter}.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

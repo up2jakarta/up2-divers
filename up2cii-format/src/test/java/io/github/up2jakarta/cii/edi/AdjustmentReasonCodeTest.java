@@ -79,7 +79,7 @@ public class AdjustmentReasonCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(52, error.getLineNumber());
             assertEquals(57, error.getLineOffset());
-            assertEquals("ECE-4465: Unknown value [???] for CodeList[AdjustmentReasonCodeType].", error.getMessage());
+            assertEquals("ECE-4465: Unknown input [???] for CodeList[AdjustmentReasonCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

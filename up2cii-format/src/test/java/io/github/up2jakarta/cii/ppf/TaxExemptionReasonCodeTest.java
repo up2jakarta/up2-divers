@@ -72,7 +72,7 @@ public class TaxExemptionReasonCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(260, error.getLineNumber());
             assertEquals(71, error.getLineOffset());
-            assertEquals("EDI-E307: Unknown value [???] for CodeList[TaxExemptionReasonCodeType].", error.getMessage());
+            assertEquals("EDI-E307: Unknown input [???] for CodeList[TaxExemptionReasonCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

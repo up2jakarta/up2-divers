@@ -3,11 +3,10 @@ package io.github.up2jakarta.csv.core.hdl;
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.hdl.IBusinessEvent;
 import io.github.up2jakarta.csv.api.hdl.IPropertyEvent;
-import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Listable;
-import io.github.up2jakarta.lov.PropertyException;
 import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.TypeException;
+import io.github.up2jakarta.lov.core.Listable;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -15,18 +14,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static io.github.up2jakarta.csv.core.Up2Factory.trace;
+
 /**
  * Exception implementation for fail-fast events handling within collecting.
  *
  * @see PropertyCollector
  */
-public class PropertyFailureException extends FailureException implements Listable<IEvent<?>> {
+public final class PropertyFailureException extends FailureException implements Listable<IEvent<?>> {
 
-    private static final String ERROR = "%s) the data #[%s] has %s: %s - %s";
+    private static final String ERROR = "%s) #[%s] has %s #[%s] %s";
 
     private final List<IEvent<?>> events;
 
-    PropertyFailureException(DataType<?> type, Integer offset, PropertyException cause, List<? extends IEvent<?>> events) {
+    PropertyFailureException(DataType<?> type, Integer offset, TypeException cause, List<? extends IEvent<?>> events) {
         super(type, offset, cause.getLevel(), cause.getCode(), cause);
         this.events = List.copyOf(events);
     }
@@ -40,29 +41,29 @@ public class PropertyFailureException extends FailureException implements Listab
             if (event instanceof IBusinessEvent<?, ?, ?> t && t.getTrace() != null) {
                 println.accept(t.getTrace());
             } else if (event instanceof IPropertyEvent<?, ?> c) {
-                Up2Factory.trace(c.getCause()).ifPresent(println);
+                trace(c.getCause()).ifPresent(println);
             }
         }
     }
 
     @Override
-    public final List<IEvent<?>> toList() {
+    public List<IEvent<?>> toList() {
         return events;
     }
 
     @Override
-    public PropertyException getCause() {
-        return (PropertyException) super.getCause();
+    public TypeException getCause() {
+        return (TypeException) super.getCause();
     }
 
     @Override
-    public String getFormattedMessage() {
+    public String getLocalizedMessage() {
         final String offset = Optional.of(this.offset).map(String::valueOf).orElse("?");
-        return String.format(FORMAT, offset, this.getCause().getFormattedMessage());
+        return String.format(FORMAT, offset, this.getCause().getLocalizedMessage());
     }
 
     @Override
-    public final void printStackTrace(PrintStream stream) {
+    public void printStackTrace(PrintStream stream) {
         super.printStackTrace(stream);
         if (!events.isEmpty()) {
             print(stream::println);
@@ -71,7 +72,7 @@ public class PropertyFailureException extends FailureException implements Listab
     }
 
     @Override
-    public final void printStackTrace(PrintWriter writer) {
+    public void printStackTrace(PrintWriter writer) {
         super.printStackTrace(writer);
         if (!events.isEmpty()) {
             print(writer::println);

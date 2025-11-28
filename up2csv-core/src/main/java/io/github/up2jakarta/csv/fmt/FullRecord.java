@@ -2,8 +2,8 @@ package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.api.IFullRecord;
 import io.github.up2jakarta.csv.data.Definition;
-import io.github.up2jakarta.csv.data.Identifiable;
 import io.github.up2jakarta.lov.CodeList;
+import io.github.up2jakarta.lov.core.Identifiable;
 
 import static io.github.up2jakarta.lov.core.Codes.token;
 

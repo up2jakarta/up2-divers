@@ -71,7 +71,7 @@ public class PaymentMeansCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(244, error.getLineNumber());
             assertEquals(49, error.getLineOffset());
-            assertEquals("ECE-4461: Unknown value [???] for CodeList[PaymentMeansCodeType].", error.getMessage());
+            assertEquals("ECE-4461: Unknown input [???] for CodeList[PaymentMeansCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

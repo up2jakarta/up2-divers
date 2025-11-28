@@ -10,7 +10,7 @@
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2lov-core</artifactId>
-        <version>1.6.1</version>
+        <version>1.6.2</version>
     </dependency>
 ```
 
@@ -18,12 +18,36 @@
 
 ## CodeList
 
-`API` that presents `LOV` model (List of values)
-
-## CodeListProvider
-
-The list of values provider.
+`API` that represents the base model for List of values (`LOV`)
 
 ## CodeListConverter
 
-The list of values converter, it's compatible with JPA and XML models.
+Converter based on binary search that maps CodeList from/to flat-data, it's compatible with XML and JPA.
+
+## CodeListResolver
+
+Contract interface to solve the right converter/adapter for code-list types.
+
+### EntityResolver
+
+Generic Lazy resolver that retrieves code-list stored in database based on JPA queries.
+
+### EntityResolver
+
+Generic Lazy resolver that retrieves code-list stored in database based on native SQL queries.
+
+### CodeListProvider
+
+Generic Eager resolver that fetches the list of values at bootstrap time.
+
+#### 1. ConstantProvider
+
+Simple provider that's able to scan java classes to solve the list of values of a specific code-list type, it supports:
+
+- Compile time constants for enum based types.
+- Runtime constants for class based types.
+
+#### 2.DynamicProvider
+
+Simple provider that's able to retrieve the list of values from `.properties` or `.yml` files. 
+

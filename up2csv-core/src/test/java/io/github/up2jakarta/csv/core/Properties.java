@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.core.BSOperator.BId;
-import io.github.up2jakarta.csv.core.BSProperty.Accessor;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition.PS;
 import io.github.up2jakarta.csv.core.misc.acs.*;
@@ -16,10 +15,10 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
-import static io.github.up2jakarta.csv.core.BSProperty.isFinal;
+import static io.github.up2jakarta.csv.core.BSAccessor.Mode.RO;
+import static io.github.up2jakarta.csv.core.BSAccessor.Mode.WO;
 import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
 import static io.github.up2jakarta.lov.SeverityType.WARNING;
-import static io.github.up2jakarta.lov.core.Beans.getTypeName;
 import static jakarta.persistence.AccessType.PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -47,17 +46,19 @@ public class Properties {
         assertEquals(1, ps.size());
         final PS<String, D> code = assertInstanceOf(PS.class, ps.getFirst());
         assertEquals("code", code.getName());
-        assertTrue(isFinal(code));
+        assertTrue(code.isFinal());
         // WHEN
         final Test6Segment bean = mapper.map("TU");
         final AccessException thrown = assertThrows(AccessException.class, () -> code.value(bean, "*"));
-        assertEquals(getTypeName(bean.getClass()) + "[code] - unsupported write operation", thrown.getMessage());
+        assertEquals(bean.getClass(), thrown.getSource());
+        assertEquals("code", thrown.getLocator());
+        assertEquals("unsupported write operation", thrown.getMessage());
         // THEN
         assertEquals("TU", bean.getCode());
     }
 
-    static <V> Accessor<V> wo(Class<V> type, Field field) throws BeanException {
-        return BeanAccess.WO.of(PROPERTY, (Class<? extends Segment>) field.getDeclaringClass(), field, type);
+    static <V> BSAccessor<V> wo(Class<V> type, Field field) throws BeanException {
+        return WO.of(PROPERTY, (Class<? extends Segment>) field.getDeclaringClass(), field, type);
     }
 
     static Object parse(final PPosition<?, ?, ?> property, String value) {
@@ -68,8 +69,8 @@ public class Properties {
         // Support
         assertInstanceOf(BId.DP.class, bid);
         assertTrue(bid.supports(null));
-        assertTrue(bid.supports(BeanAccess.RO));
-        assertTrue(bid.supports(BeanAccess.WO));
+        assertTrue(bid.supports(RO));
+        assertTrue(bid.supports(WO));
         // Null Fragment
         assertNull(bid.get(bean));
         assertNull(bid.format(bean));
@@ -100,8 +101,8 @@ public class Properties {
         // Then
         assertInstanceOf(BId.DP.class, bid);
         assertTrue(bid.supports(null));
-        assertTrue(bid.supports(BeanAccess.RO));
-        assertTrue(bid.supports(BeanAccess.WO));
+        assertTrue(bid.supports(RO));
+        assertTrue(bid.supports(WO));
         assertEquals(99, bid.get(bean));
         // Write
         bid.set(bean, 100);
@@ -114,8 +115,8 @@ public class Properties {
         bean.setReference(99);
         // Then
         assertTrue(bid.supports(null));
-        assertTrue(bid.supports(BeanAccess.RO));
-        assertTrue(bid.supports(BeanAccess.WO));
+        assertTrue(bid.supports(RO));
+        assertTrue(bid.supports(WO));
         assertEquals(99, bid.get(bean));
         // Write
         bid.set(bean, 100);
@@ -128,8 +129,8 @@ public class Properties {
         bean.setReference(99);
         // Then
         assertTrue(bid.supports(null));
-        assertTrue(bid.supports(BeanAccess.RO));
-        assertFalse(bid.supports(BeanAccess.WO));
+        assertTrue(bid.supports(RO));
+        assertFalse(bid.supports(WO));
         assertEquals(99, bid.get(bean));
         assertEquals("99", bid.format(bean));
         assertThrows(AccessException.class, () -> bid.set(bean, 0));
@@ -137,8 +138,8 @@ public class Properties {
 
     static void assertValid(BId<Segment, Object> bid, BId4Bean bean) {
         assertTrue(bid.supports(null));
-        assertTrue(bid.supports(BeanAccess.RO));
-        assertFalse(bid.supports(BeanAccess.WO));
+        assertTrue(bid.supports(RO));
+        assertFalse(bid.supports(WO));
         assertEquals(99, bid.get(bean));
         assertEquals("99", bid.format(bean));
         assertThrows(AccessException.class, () -> bid.set(bean, 0));
@@ -146,8 +147,8 @@ public class Properties {
 
     static void assertUndefined(BId<Segment, Object> bid, Segment bean) {
         assertFalse(bid.supports(null));
-        assertFalse(bid.supports(BeanAccess.RO));
-        assertFalse(bid.supports(BeanAccess.WO));
+        assertFalse(bid.supports(RO));
+        assertFalse(bid.supports(WO));
         assertThrows(AccessException.class, () -> bid.get(bean));
         assertThrows(AccessException.class, () -> bid.format(bean));
         assertThrows(AccessException.class, () -> bid.set(bean, 0));

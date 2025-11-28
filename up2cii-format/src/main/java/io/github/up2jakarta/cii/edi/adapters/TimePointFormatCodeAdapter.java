@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.TimePointFormatCodeType;
-import io.github.up2jakarta.lov.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListAdapter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -12,7 +12,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  */
 @Named
 @Singleton
-public class TimePointFormatCodeAdapter extends CodeListConverter<TimePointFormatCodeType> {
+public class TimePointFormatCodeAdapter extends CodeListAdapter<TimePointFormatCodeType> {
 
     TimePointFormatCodeAdapter() {
         super(TimePointFormatCodeType.class, "ECE-2379");

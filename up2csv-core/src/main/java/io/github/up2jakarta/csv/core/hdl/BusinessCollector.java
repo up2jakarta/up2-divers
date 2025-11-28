@@ -6,10 +6,11 @@ import io.github.up2jakarta.csv.api.hdl.IBusinessEvent;
 import io.github.up2jakarta.csv.api.hdl.IBusinessRepository;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Identifiable;
 import io.github.up2jakarta.csv.data.LazyCounter;
+import io.github.up2jakarta.lov.IException;
+import io.github.up2jakarta.lov.core.Identifiable;
 
-import static java.util.Objects.requireNonNull;
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 
 /**
  * Input events collector of {@link BusinessHandler} that collects all events in {@link #events}.
@@ -18,8 +19,8 @@ import static java.util.Objects.requireNonNull;
  * @param <D> the business data type
  * @param <E> the event type
  */
-public class BusinessCollector<D extends DataType<D>, R extends IRecord<?> & Identifiable<?>, E extends IBusinessEvent<D, R, ?>> extends EventModeCollector<D, R, E, BusinessException> {
-    public static final EventModeType<BusinessException> MODE = BusinessModeType.INSTANCE;
+public class BusinessCollector<D extends DataType<D>, R extends IRecord<?> & Identifiable<?>, E extends IBusinessEvent<D, R, ?>> extends EventModeCollector<D, R, E, IException> {
+    public static final EventModeType<? extends IException> MODE = BusinessModeType.INSTANCE;
 
     private final IBusinessCreator<D, R, E> creator;
     private final LazyCounter counter;
@@ -33,14 +34,14 @@ public class BusinessCollector<D extends DataType<D>, R extends IRecord<?> & Ide
      */
     public BusinessCollector(R source, IBusinessCreator<D, R, E> creator, IBusinessRepository<R> repository) {
         super(source, creator, MODE);
-        requireNonNull(repository);
-        this.creator = requireNonNull(creator);
+        notNull(repository, BusinessCollector.class, "repository");
+        this.creator = notNull(creator, BusinessCollector.class, "creator");
         this.counter = new LazyCounter(() -> repository.max(source));
     }
 
     @Override
-    protected final E newEvent(D type, Integer offset, BusinessException cause) {
-        final int order = counter.getAsInt() + events.size();
+    protected final E newEvent(D type, Integer offset, IException cause) {
+        final int order = counter.getAsInt();
         final String trace = Up2Factory.trace(cause).orElse(null);
         return creator.apply(source, order, type, offset, cause, trace);
     }

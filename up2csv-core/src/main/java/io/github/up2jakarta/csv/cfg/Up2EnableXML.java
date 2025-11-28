@@ -6,7 +6,7 @@ import io.github.up2jakarta.csv.core.ext.XmlEnumExtension;
 import java.lang.annotation.*;
 
 /**
- * Up2J {@link io.github.up2jakarta.lov.TypeAdapter} extension that supports JPA types.
+ * Up2J {@link io.github.up2jakarta.lov.TypeAdapter} extension that supports XML type adapters.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

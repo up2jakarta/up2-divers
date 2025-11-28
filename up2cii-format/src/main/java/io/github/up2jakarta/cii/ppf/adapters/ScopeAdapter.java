@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.ppf.adapters;
 
 import io.github.up2jakarta.cii.ppf.ScopeType;
-import io.github.up2jakarta.lov.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListAdapter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -11,7 +11,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  */
 @Named
 @Singleton
-public class ScopeAdapter extends CodeListConverter<ScopeType> {
+public class ScopeAdapter extends CodeListAdapter<ScopeType> {
 
     ScopeAdapter() {
         super(ScopeType.class, "PPF-G102");

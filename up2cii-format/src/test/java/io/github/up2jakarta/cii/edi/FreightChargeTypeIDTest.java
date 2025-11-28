@@ -71,7 +71,7 @@ public class FreightChargeTypeIDTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(295, error.getLineNumber());
             assertEquals(37, error.getLineOffset());
-            assertEquals("ECE-R23: Unknown value [???] for CodeList[FreightChargeTypeIDType].", error.getMessage());
+            assertEquals("ECE-R23: Unknown input [???] for CodeList[FreightChargeTypeIDType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

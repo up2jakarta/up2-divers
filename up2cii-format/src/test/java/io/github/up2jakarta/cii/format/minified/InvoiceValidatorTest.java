@@ -90,7 +90,7 @@ public class InvoiceValidatorTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(61, error.getLineNumber());
             assertEquals(54, error.getLineOffset());
-            assertEquals("ECE-R20: Unknown value [S1] for CodeList[MeasurementUnitCode].", error.getMessage());
+            assertEquals("ECE-R20: Unknown input [S1] for CodeList[MeasurementUnitCode].", error.getMessage());
             assertNotNull(error.getLinkedException());
         }
         {
@@ -98,7 +98,7 @@ public class InvoiceValidatorTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(65, error.getLineNumber());
             assertEquals(51, error.getLineOffset());
-            assertEquals("ECE-R20: Unknown value [S1] for CodeList[MeasurementUnitCode].", error.getMessage());
+            assertEquals("ECE-R20: Unknown input [S1] for CodeList[MeasurementUnitCode].", error.getMessage());
             assertNotNull(error.getLinkedException());
         }
         {
@@ -106,7 +106,7 @@ public class InvoiceValidatorTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(85, error.getLineNumber());
             assertEquals(70, error.getLineOffset());
-            assertEquals("ECE-1153: Unknown value [01] for CodeList[ReferenceCodeType].", error.getMessage());
+            assertEquals("ECE-1153: Unknown input [01] for CodeList[ReferenceCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
         }
         {
@@ -114,7 +114,7 @@ public class InvoiceValidatorTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(107, error.getLineNumber());
             assertEquals(54, error.getLineOffset());
-            assertEquals("ECE-R20: Unknown value [B2] for CodeList[MeasurementUnitCode].", error.getMessage());
+            assertEquals("ECE-R20: Unknown input [B2] for CodeList[MeasurementUnitCode].", error.getMessage());
             assertNotNull(error.getLinkedException());
         }
         {
@@ -122,7 +122,7 @@ public class InvoiceValidatorTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(111, error.getLineNumber());
             assertEquals(51, error.getLineOffset());
-            assertEquals("ECE-R20: Unknown value [B2] for CodeList[MeasurementUnitCode].", error.getMessage());
+            assertEquals("ECE-R20: Unknown input [B2] for CodeList[MeasurementUnitCode].", error.getMessage());
             assertNotNull(error.getLinkedException());
         }
         {
@@ -130,7 +130,7 @@ public class InvoiceValidatorTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(131, error.getLineNumber());
             assertEquals(70, error.getLineOffset());
-            assertEquals("ECE-1153: Unknown value [01] for CodeList[ReferenceCodeType].", error.getMessage());
+            assertEquals("ECE-1153: Unknown input [01] for CodeList[ReferenceCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
         }
         {
@@ -138,7 +138,7 @@ public class InvoiceValidatorTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(177, error.getLineNumber());
             assertEquals(70, error.getLineOffset());
-            assertEquals("ECE-1153: Unknown value [01] for CodeList[ReferenceCodeType].", error.getMessage());
+            assertEquals("ECE-1153: Unknown input [01] for CodeList[ReferenceCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
         }
         {
@@ -146,7 +146,7 @@ public class InvoiceValidatorTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(223, error.getLineNumber());
             assertEquals(70, error.getLineOffset());
-            assertEquals("ECE-1153: Unknown value [01] for CodeList[ReferenceCodeType].", error.getMessage());
+            assertEquals("ECE-1153: Unknown input [01] for CodeList[ReferenceCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
         }
     }

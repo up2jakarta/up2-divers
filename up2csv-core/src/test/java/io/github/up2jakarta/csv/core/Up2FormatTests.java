@@ -5,10 +5,12 @@ import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.cfg.FragmentOverride;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.PositionOverride;
+import io.github.up2jakarta.csv.core.misc.acs.Access4Bean;
 import io.github.up2jakarta.csv.core.misc.acs.BIdOptionalBean;
+import io.github.up2jakarta.csv.core.misc.acs.Final2Segment;
 import io.github.up2jakarta.csv.core.misc.cvr.SupportEntity;
+import io.github.up2jakarta.csv.core.misc.cvr.ValidEntity;
 import io.github.up2jakarta.csv.core.misc.map.*;
-import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.impl.GroupType;
@@ -16,12 +18,8 @@ import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.lov.IError;
 import io.github.up2jakarta.lov.IException;
-import io.github.up2jakarta.lov.PropertyException;
-import io.github.up2jakarta.lov.core.BeanContext;
+import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.BeanException;
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
-import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +28,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
+import static io.github.up2jakarta.csv.data.DataResolver.dynamic;
 import static io.github.up2jakarta.csv.impl.GroupType.D001;
 import static io.github.up2jakarta.csv.impl.GroupType.NONE;
 import static io.github.up2jakarta.csv.impl.SegmentType.S11;
@@ -42,18 +41,74 @@ import static org.junit.jupiter.api.Assertions.*;
 class Up2FormatTests {
 
     private final Up2Factory<GroupType> factory;
-    private final Up2Factory<DynamicType> fh;
 
     @Autowired
-    Up2FormatTests(Up2Factory<GroupType> factory, BeanContext context, Validator validator) {
+    Up2FormatTests(Up2Factory<GroupType> factory, BeanContext context) {
         this.factory = factory;
-        this.fh = new Up2Factory<>(context, validator, DataTypeResolver.dynamic());
+    }
+
+    @Test
+    void testCache1() throws BeanException {
+        // GIVEN
+        final Up2Flatter<ValidEntity, ?> flatter1 = factory.format(ValidEntity.class);
+        final Up2Flatter<ValidEntity, ?> flatter2 = factory.format(ValidEntity.class);
+        // THEN
+        assertNotSame(flatter1, flatter2);
+        assertSame(flatter1.node, flatter2.node);
+    }
+
+    @Test
+    void testCache2() throws BeanException {
+        // GIVEN
+        final Up2Flatter<ValidEntity, ?> flatter1 = factory.format(ValidEntity.class);
+        final Up2Flatter<ValidEntity, ?> flatter2 = factory.format(ValidEntity.class, dynamic());
+        // THEN
+        assertNotSame(flatter1, flatter2);
+        assertNotSame(flatter1.node, flatter2.node);
+    }
+
+    @Test
+    void testCache3() throws BeanException {
+        // GIVEN
+        final Up2Flatter<ValidEntity, ?> flatter1 = factory.format(ValidEntity.class);
+        final Up2Flatter<ValidEntity, ?> flatter2 = flatter1.toMapper().toFlatter();
+        // THEN
+        assertNotSame(flatter1, flatter2);
+        assertSame(flatter1.node, flatter2.node);
+    }
+
+    @Test
+    void testReverse1() throws BeanException {
+        // GIVEN
+        final Up2Flatter<ValidEntity, ?> flatter1 = factory.format(ValidEntity.class);
+        final Up2Mapper<ValidEntity, ?> mapper = factory.build(ValidEntity.class);
+        // THEN
+        assertSame(flatter1.node.properties, mapper.node.properties);
+    }
+
+    @Test
+    void testReverse2() throws BeanException {
+        // GIVEN
+        final Up2Flatter<Access4Bean, ?> flatter1 = factory.format(Access4Bean.class);
+        final Up2Mapper<ValidEntity, ?> mapper = factory.build(ValidEntity.class);
+        final Up2Flatter<ValidEntity, ?> flatter2 = mapper.toFlatter();
+        // THEN
+        assertNotSame(flatter1.node.properties, mapper.node.properties);
+        assertSame(flatter2.node.properties, mapper.node.properties);
+    }
+
+    @Test
+    void testReverse3() throws BeanException {
+        // GIVEN
+        final Up2Flatter<Final2Segment, ?> flatter1 = factory.format(Final2Segment.class);
+        final Up2Mapper<Final2Segment, ?> mapper = factory.build(Final2Segment.class);
+        // THEN
+        assertNotSame(flatter1.node.properties, mapper.node.properties);
     }
 
     @Test
     void testLocalClass() throws BeanException {
         //Given
-        @Access(AccessType.FIELD)
         class LocalSegment implements Segment {
             private final @Position(0) String test;
 
@@ -89,7 +144,7 @@ class Up2FormatTests {
         final InputRecord row = new InputRecord("R0099", S11, "I2025", "");
         final String msg = "Text cannot be parsed to a LocalDate";
         final String trace = "java.time.format.DateTimeParseException: " + msg + " ...";
-        final InputError error = new InputError(row, 99, D001, 3, new PropertyException(ERROR, "CSV-DT", msg), trace);
+        final InputError error = new InputError(row, 99, D001, 3, new TypeException(ERROR, "CSV-DT", msg), trace);
         // When
         final Up2Flatter<InputError, GroupType> format = factory.format(InputError.class);
         final String[] export = format.unmap(error);
@@ -124,7 +179,7 @@ class Up2FormatTests {
     @Test
     void testErrorHeader2() throws BeanException {
         // Given
-        final Up2Flatter<InputError, DynamicType> format = fh.format(InputError.class);
+        final Up2Flatter<InputError, DynamicType> format = factory.format(InputError.class, dynamic());
         // When
         final String[] export = format.header();
         // Then
@@ -239,7 +294,7 @@ class Up2FormatTests {
         // Given
         final Up2Flatter<InputError, GroupType> mapper = factory.format(InputError.class);
         // When
-        final IException cause = new PropertyException(ERROR, "CSV", "Test");
+        final IException cause = new TypeException(ERROR, "CSV", "Test");
         final String[] out = mapper.unmap(new InputError(null, 0, NONE, 9, cause, "Error"));
         // Then
         assertNotNull(out);
@@ -257,7 +312,7 @@ class Up2FormatTests {
                 super(row, order, type, offset, cause, trace);
             }
         }
-        final IException cause = new PropertyException(ERROR, "CSV", "Test");
+        final IException cause = new TypeException(ERROR, "CSV", "Test");
         final Up2Flatter<DefaultError, GroupType> mapper = factory.format(DefaultError.class);
         // When
         final String[] out = mapper.unmap(new DefaultError(null, 0, NONE, 9, cause, "Error"));

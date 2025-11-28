@@ -11,7 +11,7 @@ import io.github.up2jakarta.lov.IError;
 public interface IEvent<D extends DataType<D>> extends IError {
 
     /**
-     * Default event code for JS-303 {@link jakarta.validation.ConstraintViolation}
+     * Default event code for JSR-303 {@link jakarta.validation.ConstraintViolation}
      */
     String EC_COMPLIANCE = "UP2-V001";
     /**

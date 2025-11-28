@@ -2,12 +2,12 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2-divers?style=for-the-badge&color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2-divers)
 
-Diverse Frameworks & APIs for Jakarta EE
+Up2J - divers frameworks build upon Jakarta EE (JEE)
 
 ## Requirements
 
 1. JDK v21
-2. Maven V3
+2. Maven V3.9
 
 ## Maven Build
 

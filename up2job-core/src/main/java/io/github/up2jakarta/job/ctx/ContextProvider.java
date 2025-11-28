@@ -26,7 +26,7 @@ public class ContextProvider<P extends Enum<P> & ContextParameter<P>, A extends 
 
     public ContextProvider(Class<P> pType, Class<A> aType, Function<A, P> mapper, P iName, P sOrder, P fOrder) {
         if (!aType.isAnnotationPresent(ContextProxy.class)) {
-            throw new IllegalArgumentException(aType.getName() + " must be annotated by @ContextProxy");
+            throw new IllegalArgumentException(aType.getName() + " must be annotated with @ContextProxy");
         }
         requireNonNull(iName, "inputName");
         requireNonNull(iName, "stepOrder");

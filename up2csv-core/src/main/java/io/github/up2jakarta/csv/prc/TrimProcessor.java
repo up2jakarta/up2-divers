@@ -11,7 +11,7 @@ import jakarta.inject.Singleton;
  */
 @Named
 @Singleton
-public final class TrimProcessor extends InputProcessor<Up2Trim> {
+public final class TrimProcessor implements InputProcessor<Up2Trim> {
 
     /**
      * Trim all the given values with {@link TrimProcessor#trim(String, String...)}.
@@ -52,7 +52,7 @@ public final class TrimProcessor extends InputProcessor<Up2Trim> {
 
     @Override
     public String process(String value, Up2Trim config) {
-        return TrimProcessor.trim(value, config.value());
+        return trim(value, config.value());
     }
 
 }

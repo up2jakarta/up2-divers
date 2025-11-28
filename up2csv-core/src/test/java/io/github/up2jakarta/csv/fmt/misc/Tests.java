@@ -10,7 +10,6 @@ import io.github.up2jakarta.csv.core.*;
 import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
 import io.github.up2jakarta.csv.core.hdl.PropertyFailureCollector;
 import io.github.up2jakarta.csv.data.IMutual;
-import io.github.up2jakarta.csv.data.Up2ListParser;
 import io.github.up2jakarta.csv.fmt.Fixed06Generator;
 import io.github.up2jakarta.csv.fmt.FullRecord;
 import io.github.up2jakarta.csv.fmt.UnitRecord;
@@ -19,8 +18,8 @@ import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
 import io.github.up2jakarta.csv.impl.dto.Item;
-import io.github.up2jakarta.lov.PropertyException;
-import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.CodeListAdapter;
+import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.BeanException;
 
 import java.io.IOException;
@@ -36,7 +35,7 @@ import static io.github.up2jakarta.csv.fmt.misc.ABusinessTest.assertValid;
 import static io.github.up2jakarta.csv.impl.GroupType.D001;
 import static io.github.up2jakarta.csv.impl.SegmentType.S01;
 import static io.github.up2jakarta.csv.impl.SegmentType.S09;
-import static io.github.up2jakarta.lov.DefaultProvider.values;
+import static io.github.up2jakarta.lov.SeverityType.FATAL;
 import static io.github.up2jakarta.lov.core.Codes.encodeInt;
 import static io.github.up2jakarta.lov.core.Codes.fixed;
 import static java.util.Arrays.copyOfRange;
@@ -45,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public final class Tests {
 
     public static final String ERROR_CODE = "TU-V001";
-    public static final Up2ListParser<SegmentType> PARSER = new Up2ListParser<>(SegmentType.class, values(S01));
+    public static final CodeListAdapter<SegmentType> PARSER = new CodeListAdapter<>(SegmentType.class, "TU");
 
     public static final String[][] FAST_INVOICE = {
             new String[]{"01", "TU2025R0099", "2025-03-12", "120", "100", "20"},
@@ -236,7 +235,7 @@ public final class Tests {
 
     public static class TUCollector extends PropertyFailureCollector<GroupType, TURecord, TUError> {
         public TUCollector(TURecord row) {
-            super(row, TUError::new, SeverityType.FATAL);
+            super(row, TUError::new, FATAL);
         }
     }
 
@@ -262,7 +261,7 @@ public final class Tests {
 
     public static class TUError extends PropertyEvent<GroupType, TURecord> implements IMutual<TURecord, TUError> {
 
-        public TUError(TURecord row, Integer offset, GroupType type, PropertyException cause) {
+        public TUError(TURecord row, Integer offset, GroupType type, TypeException cause) {
             super(row, offset, type, cause);
         }
     }

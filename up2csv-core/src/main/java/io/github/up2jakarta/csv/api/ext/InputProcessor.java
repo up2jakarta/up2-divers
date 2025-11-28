@@ -1,16 +1,15 @@
 package io.github.up2jakarta.csv.api.ext;
 
 import io.github.up2jakarta.csv.cfg.Processor;
-import io.github.up2jakarta.lov.core.BeanAware;
 
 import java.lang.annotation.Annotation;
 
 /**
  * Up2J configurable {@link Processor} that processes the input data before setting the destination property.
  *
- * @param <A> the annotation type
+ * @param <C> the annotation type
  */
-public abstract class InputProcessor<A extends Annotation> extends BeanAware {
+public interface InputProcessor<C extends Annotation> {
 
     /**
      * Processes {@link String} to the proper value of the destination field.
@@ -20,6 +19,6 @@ public abstract class InputProcessor<A extends Annotation> extends BeanAware {
      * @return the processed {@link String} for the destination field
      * @throws RuntimeException If any exception occurred during the processing
      */
-    public abstract String process(String value, A config) throws RuntimeException;
+    String process(String value, C config) throws RuntimeException;
 
 }

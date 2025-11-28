@@ -60,7 +60,7 @@ public class MessageFunctionCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(17, error.getLineNumber());
             assertEquals(47, error.getLineOffset());
-            assertEquals("ECE-1225: Unknown value [???] for CodeList[MessageFunctionCodeType].", error.getMessage());
+            assertEquals("ECE-1225: Unknown input [???] for CodeList[MessageFunctionCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

@@ -78,7 +78,7 @@ public class LinearMeasurementUnitCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(195, error.getLineNumber());
             assertEquals(62, error.getLineOffset());
-            assertEquals("ECE-R20: Unknown value [???] for CodeList[LinearMeasurementUnitCodeType].", error.getMessage());
+            assertEquals("ECE-R20: Unknown input [???] for CodeList[LinearMeasurementUnitCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

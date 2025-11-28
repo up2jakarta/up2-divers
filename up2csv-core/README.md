@@ -42,15 +42,10 @@ approach.
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.6.1</version>
+        <version>1.6.2</version>
     </dependency>
-    <!-- Required JSR-303 Validation Provider -->
-    <dependency>
-        <groupId>org.hibernate.validator</groupId>
-        <artifactId>hibernate-validator</artifactId>
-    </dependency>
-    <!-- Optional JPA Provider -->
-    <!-- Optional CDI Provider -->
+    <!-- Optional JSR-303 Provider -->
+    <!-- Optional CDI/IoC Provider -->
 ```
 
 # Mapping of flat-data
@@ -640,21 +635,28 @@ public class MySegment implements Segment {
 
 # Support of JPA AccessMode
 
+> :information_source: In the case of multiple `@Access` are presents, the precedence is as follows:
+> - The annotation on top segment-level (inherited class) always takes precedence over segment-level (super class).
+> - The annotation on property-level always takes precedence over segment-level.
+> - The default access is based on fields not getters and setters.
+
 ## Field based access
 
 ```java
+
+@Access(AccessType.FIELD) // Default access
 public class MyBean implements Segment {
 
     @Position(0)
-    @Access(AccessType.FIELD)
     private String code;
+    // ... other fields
 
     // No getters neither setters
 
 }
 ```
 
-## Property based access (Default Mode)
+## Property based access
 
 ```java
 
@@ -662,10 +664,8 @@ public class MyBean implements Segment {
 public class MyBean implements Segment {
 
     @Position(1)
-    @Up2Boolean
     protected String code;
-
-    // ...
+    // ... other properties
 
     protected String getCode() {
         return code;
@@ -755,7 +755,7 @@ public final class MySegment implements Segment {
 ### 1. @Fragment
 
 If some properties are open for modification, you can use segments composition technique
-i.e put all non-final properties in separate fragment
+ie put all non-final properties in separate fragment
 
 ```java
 public final class MySegment implements Segment {
@@ -840,13 +840,13 @@ See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/impl)
 ## Contract
 
 - [DataType.java](./src/main/java/io/github/up2jakarta/csv/data/DataType.java) base interface
-- [DataTypeResolver.java](./src/main/java/io/github/up2jakarta/csv/data/DataTypeResolver.java) base resolver
+- [DataResolver.java](./src/main/java/io/github/up2jakarta/csv/data/DataResolver.java) base resolver
 
 ## Simple implementation
 
 - [@Definition](./src/main/java/io/github/up2jakarta/csv/data/Definition.java) annotation based definition
-- [DataTypeResolver.dynamic()](./src/main/java/io/github/up2jakarta/csv/data/DataTypeResolver.java) for `@Definition`
-- [DataTypeResolver.empty()](./src/main/java/io/github/up2jakarta/csv/data/DataTypeResolver.java) NoOP implementation
+- [DataResolver.dynamic()](./src/main/java/io/github/up2jakarta/csv/data/DataResolver.java) for `@Definition`
+- [DataResolver.empty()](./src/main/java/io/github/up2jakarta/csv/data/DataResolver.java) NoOP implementation
 
 # Format API
 

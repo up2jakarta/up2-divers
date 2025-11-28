@@ -75,7 +75,7 @@ public class TransportEquipmentCategoryCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(196, error.getLineNumber());
             assertEquals(61, error.getLineOffset());
-            assertEquals("ECE-8053: Unknown value [???] for CodeList[TransportEquipmentCategoryCodeType].", error.getMessage());
+            assertEquals("ECE-8053: Unknown input [???] for CodeList[TransportEquipmentCategoryCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

@@ -74,7 +74,7 @@ public class VolumeMeasurementUnitCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(165, error.getLineNumber());
             assertEquals(56, error.getLineOffset());
-            assertEquals("ECE-R20: Unknown value [???] for CodeList[VolumeMeasurementUnitCodeType].", error.getMessage());
+            assertEquals("ECE-R20: Unknown input [???] for CodeList[VolumeMeasurementUnitCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

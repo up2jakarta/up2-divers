@@ -11,6 +11,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static io.github.up2jakarta.lov.core.Beans.getTypeName;
 import static java.util.Arrays.copyOfRange;
 import static java.util.Arrays.stream;
 
@@ -52,7 +53,7 @@ public final class Overrides {
         if (overrides.size() == 1) {
             return overrides.getFirst();
         }
-        throw BeanException.of(e, "multiple @" + Beans.getTypeName(t) + "(path = {})");
+        throw BeanException.of(e, "multiple @" + getTypeName(t) + "(path = {})");
     }
 
     public static <A extends Annotation> A get(Class<A> t, Map<Path, A> ps, Field f, Function<A, String[]> m) throws BeanException {
@@ -89,7 +90,7 @@ public final class Overrides {
             final Path source = new Path(m.apply(override));
             for (int j = i + 1; j < overrides.length; j++) {
                 if (equals(m.apply(overrides[j]), source.path, 0)) {
-                    throw BeanException.of(e, "multiple @" + Beans.getTypeName(t) + "(path = " + source + ")");
+                    throw BeanException.of(e, "multiple @" + getTypeName(t) + "(path = " + source + ")");
                 }
             }
             c.accept(source, override);

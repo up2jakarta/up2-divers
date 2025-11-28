@@ -13,11 +13,11 @@ import io.github.up2jakarta.lov.core.AccessException;
 import java.util.Collection;
 
 import static io.github.up2jakarta.csv.core.BSBuilder.MEP;
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 import static io.github.up2jakarta.lov.core.Beans.cast;
-import static java.util.Objects.requireNonNull;
 
 /**
- * Link accessor that's able to link beans of a relationship parent-child (association)
+ * Up2 business accessor that's able to link beans of a relationship parent-child (association)
  *
  * @param <T> the child type
  * @param <P> the parent type
@@ -38,10 +38,10 @@ public non-sealed abstract class BeanLinker<T extends Segment, P extends Segment
      * @param setter     the link function
      */
     public BeanLinker(Class<P> parentType, Class<T> type, IJoin<P, T> getter, ILink<P, T> setter) {
-        this.getter = requireNonNull(getter, "getter");
-        this.setter = requireNonNull(setter, "setter");
-        this.classType = requireNonNull(type, "class-type");
-        this.parentType = requireNonNull(parentType, "parent-type");
+        this.getter = notNull(getter, BeanLinker.class, "getter");
+        this.setter = notNull(setter, BeanLinker.class, "setter");
+        this.classType = notNull(type, BeanLinker.class, "class-type");
+        this.parentType = notNull(parentType, BeanLinker.class, "parent-type");
     }
 
     @Override
@@ -66,7 +66,7 @@ public non-sealed abstract class BeanLinker<T extends Segment, P extends Segment
             super(cast(pt), cast(ct), (IJoin<Segment, Segment>) jn, (ILink<Segment, Segment>) ln);
             final Error config = getError(ct);
             if (config == null) {
-                throw new AccessException(ct, "class", "must be annotated with @Error");
+                throw new AccessException(ct, "must be annotated with @Error");
             }
             this.level = config.level();
             this.code = config.value();

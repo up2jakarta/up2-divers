@@ -6,6 +6,8 @@ import io.github.up2jakarta.csv.cfg.Up2Decimal;
 import io.github.up2jakarta.csv.cfg.Up2Number;
 import io.github.up2jakarta.csv.core.misc.Parsable;
 import io.github.up2jakarta.csv.data.BusinessId;
+import io.github.up2jakarta.csv.impl.GroupType;
+import io.github.up2jakarta.csv.impl.InputType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +18,7 @@ import java.util.Map;
 
 @Valid
 @Error("CSV-C03")
+@InputType(GroupType.D004)
 @SuppressWarnings("unused")
 public class Item extends Parsable {
 

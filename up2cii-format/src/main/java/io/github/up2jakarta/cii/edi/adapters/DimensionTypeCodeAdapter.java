@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.DimensionTypeCodeType;
-import io.github.up2jakarta.lov.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListAdapter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -11,7 +11,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  */
 @Named
 @Singleton
-public class DimensionTypeCodeAdapter extends CodeListConverter<DimensionTypeCodeType> {
+public class DimensionTypeCodeAdapter extends CodeListAdapter<DimensionTypeCodeType> {
 
     DimensionTypeCodeAdapter() {
         super(DimensionTypeCodeType.class, "ECE-6145");

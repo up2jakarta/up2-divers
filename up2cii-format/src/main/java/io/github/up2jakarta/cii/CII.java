@@ -10,6 +10,7 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
@@ -47,48 +48,33 @@ public final class CII {
             .appendOffset(OFFSET_PATTERN, DEFAULT_OFFSET)
             .toFormatter();
     // CII SINGLETONS
-    private static volatile Schema CII_SCHEMA = null;
-    private static volatile SchemaFactory CII_FACTORY = null;
-    private static volatile DocumentBuilderFactory CII_BUILDER = null;
+    private static final Schema CII_SCHEMA;
+    private static final SchemaFactory CII_FACTORY;
+    private static final DocumentBuilderFactory CII_BUILDER;
+
+    static {
+        final URL xsd = getResource("CII_D16B/uncefact/data/standard/CrossIndustryInvoice_100pD16B.xsd");
+        CII_FACTORY = XContext.newSchemaFactory();
+        CII_SCHEMA = XContext.newSchema(CII_FACTORY, xsd);
+        CII_BUILDER = XContext.newDocumentFactory(getSchema(), false, true);
+    }
 
     private CII() {
     }
 
-    public static ClassLoader getLoader() {
-        return Thread.currentThread().getContextClassLoader();
+    public static URL getResource(String path) {
+        return Thread.currentThread().getContextClassLoader().getResource(path);
     }
 
     public static SchemaFactory getFactory() {
-        if (CII_FACTORY == null) {
-            synchronized (CII.class) {
-                if (CII_FACTORY == null) {
-                    CII_FACTORY = XContext.newSchemaFactory();
-                }
-            }
-        }
         return CII_FACTORY;
     }
 
     public static Schema getSchema() {
-        if (CII_SCHEMA == null) {
-            synchronized (CII.class) {
-                if (CII_SCHEMA == null) {
-                    final String path = "CII_D16B/uncefact/data/standard/CrossIndustryInvoice_100pD16B.xsd";
-                    CII_SCHEMA = XContext.newSchema(getFactory(), getLoader().getResource(path));
-                }
-            }
-        }
         return CII_SCHEMA;
     }
 
     public static DocumentBuilderFactory getBuilder() {
-        if (CII_BUILDER == null) {
-            synchronized (CII.class) {
-                if (CII_BUILDER == null) {
-                    CII_BUILDER = XContext.newDocumentFactory(getSchema(), false, true);
-                }
-            }
-        }
         return CII_BUILDER;
     }
 

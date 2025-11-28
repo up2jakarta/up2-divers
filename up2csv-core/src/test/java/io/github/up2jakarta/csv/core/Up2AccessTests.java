@@ -6,7 +6,6 @@ import io.github.up2jakarta.csv.core.BSOperator.BId;
 import io.github.up2jakarta.csv.core.hdl.SimpleCollector;
 import io.github.up2jakarta.csv.core.misc.acs.*;
 import io.github.up2jakarta.csv.core.misc.map.Default1Bean;
-import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.impl.GroupType;
@@ -20,24 +19,25 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
+import static io.github.up2jakarta.csv.core.BSAccessor.Mode.RO;
+import static io.github.up2jakarta.csv.core.BSAccessor.Mode.WO;
 import static io.github.up2jakarta.csv.core.Properties.assertUndefined;
 import static io.github.up2jakarta.csv.core.Properties.assertValid;
 import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
 import static io.github.up2jakarta.csv.core.misc.acs.Final1Segment.Source.CSV;
-import static io.github.up2jakarta.csv.data.DataTypeResolver.dynamic;
+import static io.github.up2jakarta.csv.data.DataResolver.dynamic;
 import static io.github.up2jakarta.lov.SeverityType.WARNING;
+import static io.github.up2jakarta.lov.core.Localizable.CLASS;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
 class Up2AccessTests {
 
-    private final DataTypeResolver<?> resolver;
     private final Up2Factory<?> factory;
 
     @Autowired
     Up2AccessTests(Up2Factory<GroupType> factory) {
-        this.resolver = factory.resolver;
         this.factory = factory;
     }
 
@@ -90,7 +90,7 @@ class Up2AccessTests {
         // Then
         assertEquals(Access32Bean.class, thrown.getSource());
         assertEquals("code", thrown.getLocator());
-        assertEquals("Access32Bean[code] - getter not found", thrown.getMessage());
+        assertEquals("getter not found", thrown.getMessage());
     }
 
     @Test
@@ -99,8 +99,8 @@ class Up2AccessTests {
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Final8Segment.class));
         // Then
         assertEquals(Final8Segment.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("Final8Segment[class] - one and only one constructor must be annotated by @Creator", thrown.getMessage());
+        assertEquals(CLASS, thrown.getLocator());
+        assertEquals("one and only one constructor must be annotated with @Creator", thrown.getMessage());
     }
 
     @Test
@@ -109,8 +109,8 @@ class Up2AccessTests {
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Final9Segment.class));
         // Then
         assertEquals(Final9Segment.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("Final9Segment[class] - mix final and writable properties is not allowed", thrown.getMessage());
+        assertEquals(CLASS, thrown.getLocator());
+        assertEquals("mix final and writable properties is not allowed", thrown.getMessage());
     }
 
     @Test
@@ -506,7 +506,7 @@ class Up2AccessTests {
     @Test
     void validOptionalBusinessId() throws BeanException {
         // When
-        final BId<Segment, Object> bid = factory.build(resolver, BIdOptionalBean.class).businessId;
+        final BId<Segment, Object> bid = factory.of(BIdOptionalBean.class).businessId;
         // Then
         assertValid(bid, new BIdOptionalBean());
     }
@@ -516,11 +516,11 @@ class Up2AccessTests {
         // Given
         final BId5Bean bean = new BId5Bean(99);
         // When
-        final BId<Segment, Object> bid = factory.format(resolver, BId5Bean.class).businessId;
+        final BId<Segment, Object> bid = factory.ft(BId5Bean.class).businessId;
         // Then
         assertTrue(bid.supports(null));
-        assertTrue(bid.supports(BeanAccess.RO));
-        assertFalse(bid.supports(BeanAccess.WO));
+        assertTrue(bid.supports(RO));
+        assertFalse(bid.supports(WO));
         assertEquals(99, bid.get(bean));
         assertEquals("99", bid.format(bean));
         assertThrows(AccessException.class, () -> bid.set(bean, 0));
@@ -531,8 +531,8 @@ class Up2AccessTests {
         // Given
         final BId1Bean bean = new BId1Bean();
         // When
-        final BId<Segment, Object> bid1 = factory.build(resolver, BId1Bean.class).businessId;
-        final BId<Segment, Object> bid2 = factory.format(resolver, BId1Bean.class).businessId;
+        final BId<Segment, Object> bid1 = factory.of(BId1Bean.class).businessId;
+        final BId<Segment, Object> bid2 = factory.ft(BId1Bean.class).businessId;
         // Then
         assertValid(bid1, bean);
         assertValid(bid2, bean);
@@ -543,8 +543,8 @@ class Up2AccessTests {
         // Given
         final BId2Bean bean = new BId2Bean();
         // When
-        final BId<Segment, Object> bid1 = factory.build(resolver, BId2Bean.class).businessId;
-        final BId<Segment, Object> bid2 = factory.format(resolver, BId2Bean.class).businessId;
+        final BId<Segment, Object> bid1 = factory.of(BId2Bean.class).businessId;
+        final BId<Segment, Object> bid2 = factory.ft(BId2Bean.class).businessId;
         // Then
         assertValid(bid1, bean);
         assertValid(bid2, bean);
@@ -555,8 +555,8 @@ class Up2AccessTests {
         // Given
         final BId3Bean bean = new BId3Bean();
         // When
-        final BId<Segment, Object> bid1 = factory.build(resolver, BId3Bean.class).businessId;
-        final BId<Segment, Object> bid2 = factory.format(resolver, BId3Bean.class).businessId;
+        final BId<Segment, Object> bid1 = factory.of(BId3Bean.class).businessId;
+        final BId<Segment, Object> bid2 = factory.ft(BId3Bean.class).businessId;
         // Then
         assertValid(bid1, bean);
         assertValid(bid2, bean);
@@ -567,8 +567,8 @@ class Up2AccessTests {
         // Given
         final BId4Bean bean = new BId4Bean(99);
         // When
-        final BId<Segment, Object> bid1 = factory.build(resolver, BId4Bean.class).businessId;
-        final BId<Segment, Object> bid2 = factory.format(resolver, BId4Bean.class).businessId;
+        final BId<Segment, Object> bid1 = factory.of(BId4Bean.class).businessId;
+        final BId<Segment, Object> bid2 = factory.ft(BId4Bean.class).businessId;
         // Then
         assertValid(bid1, bean);
         assertValid(bid2, bean);
@@ -579,8 +579,8 @@ class Up2AccessTests {
         // Given
         final Default1Bean bean = new Default1Bean();
         // When
-        final BId<Segment, Object> bid1 = factory.build(resolver, Default1Bean.class).businessId;
-        final BId<Segment, Object> bid2 = factory.format(resolver, Default1Bean.class).businessId;
+        final BId<Segment, Object> bid1 = factory.of(Default1Bean.class).businessId;
+        final BId<Segment, Object> bid2 = factory.ft(Default1Bean.class).businessId;
         // Then
         assertUndefined(bid1, bean);
         assertUndefined(bid2, bean);
@@ -591,8 +591,8 @@ class Up2AccessTests {
         // Given
         final Record1Bean bean = new Record1Bean(null);
         // When
-        final BId<Segment, Object> bid1 = factory.build(resolver, Record1Bean.class).businessId;
-        final BId<Segment, Object> bid2 = factory.format(resolver, Record1Bean.class).businessId;
+        final BId<Segment, Object> bid1 = factory.of(Record1Bean.class).businessId;
+        final BId<Segment, Object> bid2 = factory.ft(Record1Bean.class).businessId;
         // Then
         assertUndefined(bid1, bean);
         assertUndefined(bid2, bean);

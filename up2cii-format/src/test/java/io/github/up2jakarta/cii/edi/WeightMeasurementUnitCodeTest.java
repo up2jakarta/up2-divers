@@ -78,7 +78,7 @@ public class WeightMeasurementUnitCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(187, error.getLineNumber());
             assertEquals(60, error.getLineOffset());
-            assertEquals("ECE-R20: Unknown value [???] for CodeList[WeightMeasurementUnitCodeType].", error.getMessage());
+            assertEquals("ECE-R20: Unknown input [???] for CodeList[WeightMeasurementUnitCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

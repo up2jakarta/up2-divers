@@ -6,7 +6,7 @@ import io.github.up2jakarta.csv.core.misc.lov.CurrencyCodeType;
 import io.github.up2jakarta.csv.core.misc.lov.CurrencyConverter;
 import io.github.up2jakarta.csv.data.Recordable;
 import io.github.up2jakarta.csv.impl.InputRecord;
-import io.github.up2jakarta.lov.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListAdapter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class BeansTest {
     @Test
     void testDummyGeneric() {
         // GIVEN
-        final Class<? extends CodeListConverter<?>> beanType = CurrencyConverter.class;
+        final Class<? extends CodeListAdapter<?>> beanType = CurrencyConverter.class;
         // WHEN
         final Type[] arguments = getTypeArguments(beanType, beanType);
         // THEN
@@ -31,9 +31,9 @@ class BeansTest {
     @Test
     void testGetSimpleCodeListArguments() {
         // Given
-        final Class<? extends CodeListConverter<?>> beanType = CurrencyConverter.class;
+        final Class<? extends CodeListAdapter<?>> beanType = CurrencyConverter.class;
         // When
-        final Type[] arguments = getTypeArguments(beanType, CodeListConverter.class);
+        final Type[] arguments = getTypeArguments(beanType, CodeListAdapter.class);
         // Then
         assertEquals(1, arguments.length);
         assertEquals(CurrencyCodeType.class, arguments[0]);
@@ -42,7 +42,7 @@ class BeansTest {
     @Test
     void testGetComplexAdapterArguments() {
         // Given
-        final Class<? extends CodeListConverter<?>> beanType = CurrencyConverter.class;
+        final Class<? extends CodeListAdapter<?>> beanType = CurrencyConverter.class;
         // When
         final Type[] arguments = getTypeArguments(beanType, XmlAdapter.class);
         // Then
@@ -65,7 +65,7 @@ class BeansTest {
     @Test
     void testGetComplexConverterArguments() {
         // Given
-        final Class<? extends CodeListConverter<?>> beanType = CurrencyConverter.class;
+        final Class<? extends CodeListAdapter<?>> beanType = CurrencyConverter.class;
         // When
         final Type[] arguments = getTypeArguments(beanType, AttributeConverter.class);
         // Then

@@ -19,7 +19,8 @@ import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputRecord;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.lov.CodeListException;
-import io.github.up2jakarta.lov.PropertyException;
+import io.github.up2jakarta.lov.TypeException;
+import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,6 @@ import static io.github.up2jakarta.csv.api.IEvent.*;
 import static io.github.up2jakarta.csv.core.Up2ErrorTests.EX_CAUSE;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.ERROR_CODE;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
-import static io.github.up2jakarta.csv.impl.GroupType.NONE;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.lov.SeverityType.WARNING;
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,11 +56,11 @@ public class FastHandlerTest {
         final InputRecord row = record(SegmentType.S00, "");
         // When
         final EventHandler<GroupType> handler = null;
-        final NullPointerException npe1 = assertThrows(NullPointerException.class, () -> mapper.map(row, null));
-        final NullPointerException npe2 = assertThrows(NullPointerException.class, () -> mapper.map(handler, ""));
+        final AccessException npe1 = assertThrows(AccessException.class, () -> mapper.map(row, null));
+        final AccessException npe2 = assertThrows(AccessException.class, () -> mapper.map(handler, ""));
         // Then
-        assertEquals("handler is required", npe1.getMessage());
-        assertEquals("handler is required", npe2.getMessage());
+        assertEquals("Up2Mapper[handler] must not be null", npe1.getLocalizedMessage());
+        assertEquals("Up2Mapper[handler] must not be null", npe2.getLocalizedMessage());
     }
 
     /**
@@ -69,7 +69,7 @@ public class FastHandlerTest {
     @Test
     void testValidator() throws BeanException {
         // Given
-        final Up2Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class, factory.resolver.or(NONE));
+        final Up2Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class);
         final EventHandler<GroupType> handler = FastHandler.of(WARNING);
         {
             // When
@@ -80,7 +80,7 @@ public class FastHandlerTest {
             assertEquals(ERROR, error.getLevel());
             assertNull(error.getCause());
             assertEquals("size must be between 0 and 1", error.getMessage());
-            assertEquals(NONE, error.getType());
+            assertNull(error.getType());
         }
         {
             // When
@@ -161,7 +161,7 @@ public class FastHandlerTest {
             assertEquals(EC_CODE_LIST, error.getCode());
             assertEquals(ERROR, error.getLevel());
             assertInstanceOf(CodeListException.class, error.getCause());
-            assertEquals("Unknown value [ISL] for CodeList[CurrencyCodeType]", error.getCause().getMessage());
+            assertEquals("Unknown input [ISL] for CodeList[CurrencyCodeType]", error.getCause().getMessage());
             assertNull(error.getCause().getCause());
         }
         {
@@ -171,7 +171,7 @@ public class FastHandlerTest {
             assertEquals(MeasurementUnitConverter.EDI_R_20, error.getCode());
             assertEquals(ERROR, error.getLevel());
             assertInstanceOf(CodeListException.class, error.getCause());
-            assertEquals("Unknown value [XGM] for CodeList[MeasurementUnitCode]", error.getCause().getMessage());
+            assertEquals("Unknown input [XGM] for CodeList[MeasurementUnitCode]", error.getCause().getMessage());
             assertNull(error.getCause().getCause());
         }
         {
@@ -200,8 +200,8 @@ public class FastHandlerTest {
             // Then
             assertEquals(CurrencyConverter.ISO_4217, error.getCode());
             assertEquals(ERROR, error.getLevel());
-            assertInstanceOf(PropertyException.class, error.getCause());
-            assertEquals("Unknown value [ILS] for CodeList[CurrencyCodeType]", error.getCause().getMessage());
+            assertInstanceOf(TypeException.class, error.getCause());
+            assertEquals("Unknown input [ILS] for CodeList[CurrencyCodeType]", error.getCause().getMessage());
             assertNull(error.getCause().getCause());
         }
         {
@@ -210,7 +210,7 @@ public class FastHandlerTest {
             // Then
             assertEquals(DummyConverter.TU_P_005, error.getCode());
             assertEquals(ERROR, error.getLevel());
-            assertInstanceOf(PropertyException.class, error.getCause());
+            assertInstanceOf(TypeException.class, error.getCause());
             assertEquals("For input string: \"int\"", error.getCause().getMessage());
             assertNotNull(error.getCause().getCause());
         }
@@ -230,7 +230,7 @@ public class FastHandlerTest {
             // Then
             assertEquals(Dummy1Processor.TU_P_001, error.getCode());
             assertEquals(WARNING, error.getLevel());
-            assertInstanceOf(PropertyException.class, error.getCause());
+            assertInstanceOf(TypeException.class, error.getCause());
             assertEquals("property message", error.getCause().getMessage());
             assertNull(error.getCause().getCause());
         }

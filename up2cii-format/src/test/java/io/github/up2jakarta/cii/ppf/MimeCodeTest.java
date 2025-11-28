@@ -90,7 +90,7 @@ public class MimeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(175, error.getLineNumber());
             assertEquals(85, error.getLineOffset());
-            assertEquals("PPF-G417: Unknown value [???] for CodeList[MimeCodeType].", error.getMessage());
+            assertEquals("PPF-G417: Unknown input [???] for CodeList[MimeCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

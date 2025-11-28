@@ -14,9 +14,9 @@ import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputCollector;
 import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;
-import io.github.up2jakarta.lov.PropertyException;
-import io.github.up2jakarta.lov.TypeConverter;
+import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.SafeAdapter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class Up2ErrorTests {
 
     static final String EX_CAUSE = DummyException.class.getName();
-    static final String EX_EVENT = PropertyException.class.getName();
+    static final String EX_EVENT = TypeException.class.getName();
     static final String EX_FAILURE = FailureException.class.getName();
     static final String EX_EVENT_FAILURE = PropertyFailureException.class.getName();
 
@@ -71,7 +71,7 @@ public class Up2ErrorTests {
         // Given
         final Up2Mapper<Test6Processor, ?> mapper = factory.build(Test6Processor.class);
         final List<String> expected = Arrays.asList(
-                EX_FAILURE + ": " + EX_CAUSE + ": dummy message",
+                EX_FAILURE + ": #[1] throws #[UP2-P001] " + EX_CAUSE + ": dummy message",
                 "Caused by: " + EX_CAUSE + ": dummy message"
         );
         // Then
@@ -124,11 +124,12 @@ public class Up2ErrorTests {
         // Given
         final Up2Mapper<Test1Exception, GroupType> mapper = factory.build(Test1Exception.class);
         final List<String> expected = Arrays.asList(
-                EX_EVENT_FAILURE + ": " + EX_EVENT + ": dummy message",
+                EX_EVENT_FAILURE + ": #[3] throws #[F003] dummy message",
+                "Caused by: " + EX_EVENT + ": #[F003] dummy message",
                 "Caused by: " + EX_CAUSE + ": dummy message",
                 "Multiple events have been occurred:",
-                "1) the data #[1] has warning: W001 - Unknown value [EURO] for CodeList[CountryCodeType]",
-                "2) the data #[2] has error: E002 - Unknown value [USA] for CodeList[CurrencyCodeType]"
+                "1) #[1] has warning #[W001] Unknown input [EURO] for CodeList[CountryCodeType]",
+                "2) #[2] has error #[E002] Unknown input [USA] for CodeList[CurrencyCodeType]"
         );
         final TURecord row = new TURecord(S00, null, "EURO", "USA", "dummy");
         final TUCollector handler = new TUCollector(row);
@@ -182,13 +183,13 @@ public class Up2ErrorTests {
         // Given
         final Up2Mapper<Test2Exception, GroupType> mapper = factory.build(Test2Exception.class);
         final List<String> expected = Arrays.asList(
-                EX_EVENT_FAILURE + ": " + EX_EVENT + ": dummy message",
-                "Caused by: " + EX_EVENT + ": dummy message",
+                EX_EVENT_FAILURE + ": #[2] throws #[F003] dummy message",
+                "Caused by: " + EX_EVENT + ": #[F003] dummy message",
                 "Caused by: " + EX_CAUSE + ": dummy message",
                 "Multiple events have been occurred:",
-                "1) the data #[0] has warning: W001 - EURO message",
+                "1) #[0] has warning #[W001] EURO message",
                 "java.lang.RuntimeException: EURO message",
-                "2) the data #[1] has error: E002 - USA message",
+                "2) #[1] has error #[E002] USA message",
                 "java.lang.RuntimeException: USA message"
         );
         final TURecord row = new TURecord(S00, null, "EURO", "USA", "dummy");
@@ -268,7 +269,7 @@ public class Up2ErrorTests {
         // THEN
         assertEquals(1, handler.toList().size());
         final InputError error = handler.toList().getFirst();
-        assertEquals("Unknown value [USD] for CodeList[CurrencyCodeType]", error.getMessage());
+        assertEquals("Unknown input [USD] for CodeList[CurrencyCodeType]", error.getMessage());
         assertNull(error.getTrace());
     }
 
@@ -287,12 +288,12 @@ public class Up2ErrorTests {
                 EX_CAUSE + ": dummy wrapped message",
                 "\t" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:23)",
                 "\t" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:8)",
-                "\tio.github.up2jakarta.lov.TypeConverter.parse(TypeConverter.java:92)",
+                "\t" + SafeAdapter.class.getName() + ".parse(SafeAdapter.java:73)",
                 "Caused by java.lang.RuntimeException: NPE message",
                 "\t" + Dummy1Processor.class.getName() + ".process(Dummy1Processor.java:29)",
                 "\t" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:21)",
                 "\t" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:8)",
-                "\t" + TypeConverter.class.getName() + ".parse(TypeConverter.java:92)"
+                "\t" + SafeAdapter.class.getName() + ".parse(SafeAdapter.java:73)"
         );
     }
 

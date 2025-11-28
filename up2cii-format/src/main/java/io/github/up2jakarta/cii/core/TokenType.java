@@ -1,19 +1,18 @@
 package io.github.up2jakarta.cii.core;
 
 import io.github.up2jakarta.cii.ppf.ChargeReasonCodeType;
+import io.github.up2jakarta.lov.core.WKCache;
 import jakarta.xml.bind.annotation.*;
 import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import javax.xml.XMLConstants;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "token", propOrder = {"value"}, namespace = XMLConstants.W3C_XML_SCHEMA_NS_URI)
 public final class TokenType implements ChargeReasonCodeType<TokenType> {
 
-    private static final Map<String, TokenType> CACHE = new WeakHashMap<>();
+    private static final WKCache<String, TokenType> CACHE = new WKCache<>();
 
     @XmlValue
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
@@ -25,7 +24,7 @@ public final class TokenType implements ChargeReasonCodeType<TokenType> {
     }
 
     public static TokenType from(String value) {
-        return CACHE.computeIfAbsent(value, TokenType::new);
+        return CACHE.get(value, TokenType::new);
     }
 
     @Override

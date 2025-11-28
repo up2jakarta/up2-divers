@@ -10,8 +10,6 @@ import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.lov.CodeList;
 import io.github.up2jakarta.lov.core.BeanException;
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +95,6 @@ public class Up2PrimitiveTests {
     @Test
     void testBeanWithNumber() {
         // GIVEN
-        @Access(AccessType.FIELD)
         final class Bean implements Segment {
             @Position(0)
             public @SuppressWarnings("unused") int value;
@@ -107,13 +104,12 @@ public class Up2PrimitiveTests {
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
-        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2Number", thrown.getMessage());
+        assertEquals("should be annotated with @Up2Number", thrown.getMessage());
     }
 
     @Test
     void testBeanWithDecimal() {
         // GIVEN
-        @Access(AccessType.FIELD)
         final class Bean implements Segment {
             @Position(0)
             public @SuppressWarnings("unused") double value;
@@ -123,13 +119,12 @@ public class Up2PrimitiveTests {
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
-        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2Decimal", thrown.getMessage());
+        assertEquals("should be annotated with @Up2Decimal", thrown.getMessage());
     }
 
     @Test
     void testBeanWithBoolean() {
         // GIVEN
-        @Access(AccessType.FIELD)
         final class Bean implements Segment {
             @Position(0)
             public @SuppressWarnings("unused") boolean value;
@@ -139,13 +134,12 @@ public class Up2PrimitiveTests {
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
-        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2Boolean", thrown.getMessage());
+        assertEquals("should be annotated with @Up2Boolean", thrown.getMessage());
     }
 
     @Test
     void testBeanWithCodeList() {
         // GIVEN
-        @Access(AccessType.FIELD)
         final class Bean implements Segment {
             @Position(0)
             public @SuppressWarnings("unused") CodeList<?> value;
@@ -155,13 +149,12 @@ public class Up2PrimitiveTests {
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
-        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2CodeList", thrown.getMessage());
+        assertEquals("should be annotated with @Up2CodeList", thrown.getMessage());
     }
 
     @Test
     void testBeanWithTemporal() {
         // GIVEN
-        @Access(AccessType.FIELD)
         final class Bean implements Segment {
             @Position(0)
             public @SuppressWarnings("unused") LocalDate value;
@@ -171,13 +164,12 @@ public class Up2PrimitiveTests {
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
-        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2Temporal", thrown.getMessage());
+        assertEquals("should be annotated with @Up2Temporal", thrown.getMessage());
     }
 
     @Test
     void testBeanWithTemporalUnit() {
         // GIVEN
-        @Access(AccessType.FIELD)
         final class Bean implements Segment {
             @Position(0)
             public @SuppressWarnings("unused") Period value;
@@ -187,13 +179,12 @@ public class Up2PrimitiveTests {
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
-        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2TemporalAmount", thrown.getMessage());
+        assertEquals("should be annotated with @Up2TemporalAmount", thrown.getMessage());
     }
 
     @Test
     void testBeanWithByteArray() {
         // GIVEN
-        @Access(AccessType.FIELD)
         final class Bean implements Segment {
             @Position(0)
             public @SuppressWarnings("unused") byte[] value;
@@ -203,7 +194,7 @@ public class Up2PrimitiveTests {
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
-        assertEquals("Up2PrimitiveTests.Bean[value] - should be annotated with @Up2Base64", thrown.getMessage());
+        assertEquals("should be annotated with @Up2Base64", thrown.getMessage());
     }
 
 }

@@ -4,13 +4,18 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.api.hdl.IEventBuilder;
-import io.github.up2jakarta.csv.core.BSOperator.OPS.Format;
-import io.github.up2jakarta.csv.core.BSOperator.OPS.Mapper;
+import io.github.up2jakarta.csv.core.BSManager.Format;
+import io.github.up2jakarta.csv.core.BSManager.Mapper;
 import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
-import io.github.up2jakarta.csv.data.*;
+import io.github.up2jakarta.csv.data.BusinessCreator;
+import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.data.Up2Result;
+import io.github.up2jakarta.lov.CodeListAdapter;
 import io.github.up2jakarta.lov.CodeListException;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.Listable;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -18,8 +23,9 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static io.github.up2jakarta.csv.api.IEvent.EC_CODE_LIST;
 import static io.github.up2jakarta.csv.api.IEvent.EC_COMPLIANCE;
-import static io.github.up2jakarta.csv.core.BeanAccess.WO;
+import static io.github.up2jakarta.csv.core.BSAccessor.Mode.WO;
 import static io.github.up2jakarta.csv.data.DataType.*;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.lov.core.AccessException.notNull;
@@ -27,7 +33,7 @@ import static java.util.Arrays.copyOfRange;
 import static java.util.Set.of;
 
 /**
- * Base Processor that's able to aggregate and import java-bean from flat-data.
+ * Up2J Base Processor that's able to aggregate and import java-bean from flat-data.
  *
  * @param <T> the business object type
  * @param <B> the business data type
@@ -106,12 +112,12 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
 
     @SuppressWarnings("unchecked")
     private Listable<E> map(Collection<R> records, Consumer<Entry<T>> root, Consumer<Entry<?>> node) {
-        final IEventBuilder<B, R, E> builder = notNull(this.newBuilder(records.size()), this.getClass(), "newBuilder");
+        final IEventBuilder<B, R, E> builder = notNull(this.newBuilder(records.size()), this.getClass(), "builder");
         for (final R record : records) {
             if (record == null) {
                 continue;
             }
-            final BusinessHandler<B> handler = notNull(builder.of(record), builder.getClass(), "of");
+            final BusinessHandler<B> handler = notNull(builder.of(record), builder.getClass(), "handler");
             final I type = record.getType();
             if (type == null) {
                 handler.handle(ERROR, EC_COMPLIANCE, null, mode.typeIdIndex, "must not be null");
@@ -134,9 +140,9 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
     @Override
     final Mapper<Segment, B> build(Up2Factory<B> factory, I type, Format<Segment, B> source) throws BeanException {
         if (source != null) {
-            return new Mapper<>(source.node.reverse());
+            return source.reverse();
         }
-        return factory.build(factory.resolver.or(type.getDataType()), type.getClassType());
+        return factory.of(type.getClassType());
     }
 
     /**
@@ -304,11 +310,12 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
     }
 
     public class Typing {
-        private final Up2ListParser<I> parser;
+        private final CodeListAdapter<I> parser;
 
         @SuppressWarnings("unchecked")
         private Typing(List<I> nodes) {
-            this.parser = new Up2ListParser<>((Class<I>) root.getClass(), nodes);
+            final Class<I> type = (Class<I>) root.getClass();
+            this.parser = new CodeListAdapter<>(type, ERROR, EC_CODE_LIST, nodes);
         }
 
         /**

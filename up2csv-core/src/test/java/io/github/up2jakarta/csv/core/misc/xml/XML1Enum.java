@@ -8,6 +8,7 @@ import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType
 @XmlEnum
+@SuppressWarnings("unused")
 @Error(value = Test1Bean.XML_XXX, level = SeverityType.WARNING)
 public enum XML1Enum {
 

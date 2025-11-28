@@ -79,7 +79,7 @@ public class PackageTypeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(52, error.getLineNumber());
             assertEquals(53, error.getLineOffset());
-            assertEquals("ECE-7065: Unknown value [???] for CodeList[PackageTypeCodeType].", error.getMessage());
+            assertEquals("ECE-7065: Unknown input [???] for CodeList[PackageTypeCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

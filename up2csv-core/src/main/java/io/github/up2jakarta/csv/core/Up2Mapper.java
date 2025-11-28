@@ -4,31 +4,30 @@ import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.BSNode.Bean;
-import io.github.up2jakarta.csv.core.BSOperator.Computer;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
 import io.github.up2jakarta.csv.core.hdl.FailureException;
 import io.github.up2jakarta.csv.core.hdl.FastHandler;
 import io.github.up2jakarta.csv.core.hdl.PropertyFailureException;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
 
+import static io.github.up2jakarta.csv.core.BSManager.*;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
-import static java.util.Objects.requireNonNull;
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 
 /**
- * Map and validate input data to a configurable bean that supports only {@link String} type.
+ * Up2J Processor that maps and validates flat-data to java-beans, based on java annotations configuration.
  *
  * @param <S> the segment type
  * @param <D> The business data type
  */
-public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends Computer<S, D, Bean<S, D, ?>> {
+public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends Pod<S, D, Bean<S, D, ?>> {
 
-    Up2Mapper(Bean<S, D, ?> node) throws BeanException {
-        super(node);
+    Up2Mapper(Key<D, S> key, Bean<S, D, ?> node) throws BeanException {
+        super(key, node);
         check(node);
     }
 
@@ -73,7 +72,7 @@ public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends C
         if (record == null) {
             return null;
         }
-        requireNonNull(handler, "handler is required");
+        notNull(handler, Up2Mapper.class, "handler");
         final S bean = node.parse(handler, offset, record);
         node.validate(bean, offset, handler);
         return bean;
@@ -129,13 +128,14 @@ public final class Up2Mapper<S extends Segment, D extends DataType<D>> extends C
 
     /**
      * Converts the current mapper to flatter that is able to map bean-segment to flat-data.
-     * This method is faster then {@link Up2Factory#format(Class, DataTypeResolver)} when the bean is already scanned.
+     * This method is faster then {@link Up2Factory#format(Class, io.github.up2jakarta.csv.data.DataResolver)}
+     * because the bean is already scanned.
      *
      * @return preconfigured CSV Format for the same segment
      * @throws BeanException if any property is not accessible for read
      */
     public Up2Flatter<S, D> toFlatter() throws BeanException {
-        return new Up2Flatter<>(node.reverse());
+        return ft(this).build(Up2Flatter::new);
     }
 
 }

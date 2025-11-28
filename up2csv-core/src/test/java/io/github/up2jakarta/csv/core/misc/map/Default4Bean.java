@@ -5,11 +5,8 @@ import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.PositionOverride;
 import io.github.up2jakarta.csv.cfg.Up2Number;
 import io.github.up2jakarta.csv.data.Segment;
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 
 @SuppressWarnings("unused")
-@Access(AccessType.FIELD)
 public class Default4Bean implements Segment {
 
     @Position(0)

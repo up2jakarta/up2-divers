@@ -1,48 +1,35 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.BSBuilder.MEP;
 import io.github.up2jakarta.csv.core.BSBuilder.MST;
-import io.github.up2jakarta.csv.core.BSNode.Bean;
-import io.github.up2jakarta.csv.core.BSNode.Bean.BC;
-import io.github.up2jakarta.csv.core.BSNode.Flat;
-import io.github.up2jakarta.csv.core.BSOperator.OPS;
-import io.github.up2jakarta.csv.core.BSProperty.Accessor;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
-import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
 import io.github.up2jakarta.csv.data.*;
-import io.github.up2jakarta.csv.slv.CodeListResolver;
 import io.github.up2jakarta.lov.IException;
-import io.github.up2jakarta.lov.core.*;
+import io.github.up2jakarta.lov.core.AccessException;
+import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.Beans;
+import io.github.up2jakarta.lov.core.WVCache;
 import jakarta.validation.Validator;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
+import static io.github.up2jakarta.csv.core.BSAccessor.Mode;
+import static io.github.up2jakarta.csv.core.BSManager.*;
 import static io.github.up2jakarta.csv.core.BSOperator.BId.*;
-import static io.github.up2jakarta.csv.core.BSOperator.OPS.Format;
-import static io.github.up2jakarta.csv.core.BSOperator.OPS.Mapper;
-import static io.github.up2jakarta.csv.core.BeanAccess.RO;
-import static io.github.up2jakarta.csv.core.BeanAccess.WO;
 import static io.github.up2jakarta.csv.core.ext.Beans.*;
-import static java.lang.String.join;
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 import static java.util.Collections.*;
-import static java.util.Objects.requireNonNull;
-import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 
 /**
- * Internal business-mapping implementation for aggregation and segregation processing.
+ * Internal business operator.
  */
-abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P extends OPS<Segment, B, ?>, S extends OPS<Segment, B, ?>> permits BusinessExporter, BusinessImporter {
+abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P extends Node<Segment, B, ?>, S extends Node<Segment, B, ?>> permits BusinessExporter, BusinessImporter {
     protected final I root;
     protected final int offset;
     protected final ModeType mode;
@@ -54,16 +41,13 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
     final Map<IType<B, I>, Set<I>> joins;
 
     BSOperator(Up2Factory<B> factory, Class<?> type, ModeType mode, I root, List<I> nodes) throws BeanException {
-        requireNonNull(factory, "factory is required");
-        requireNonNull(root, "root is required");
-        this.nodes = unmodifiableList(nodes);
-        CodeListResolver.checkUnique(type, this.nodes);
-        if (!type.equals(root.getClassType())) {
-            throw new BeanException(type, "Invalid business typing");
+        this.factory = notNull(factory, BSOperator.class, "factory");
+        this.nodes = unmodifiableList(notNull(nodes, BSOperator.class, "nodes"));
+        if (root == null || !notNull(type, BSOperator.class, "type").equals(root.getClassType())) {
+            throw new BeanException(type, "invalid business typing");
         }
         this.root = root;
         this.mode = mode;
-        this.factory = factory;
         final Map<I, Set<I>> joins = new HashMap<>();
         this.mappers = this.joins(new Stack<>(), root, joins::put);
         this.joins = unmodifiableMap(joins);
@@ -83,7 +67,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
         this.mappers = this.joins(root, source.mappers);
     }
 
-    private static int offset(Computer<?, ?, ?> mapper, ModeType mode) throws BeanException {
+    private static int offset(Pod<?, ?, ?> mapper, ModeType mode) throws BeanException {
         final int min = mode.getBeanIdIndex();
         if (mapper.offset != 0) {
             if (mapper.offset < min) {
@@ -129,90 +113,19 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
     abstract P build(Up2Factory<B> factory, I type, S source) throws BeanException;
 
     /**
-     * Internal Segment Processor.
-     */
-    abstract sealed static class Computer<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> implements MEP permits Up2Mapper, Up2Flatter, OPS {
-        final int length;
-        final int offset;
-        final T node;
-
-        Computer(T node) throws BeanException {
-            this.node = node;
-            this.length = max(node) + 1;
-            final Truncated truncated = Overrides.get(node.type, Segment.class, Truncated.class);
-            this.offset = (truncated != null) ? truncated.value() : 0;
-            if (offset < 0) {
-                throw new BeanException(node.type, "@Truncated[value] must be positive");
-            }
-        }
-
-        private static void check(Stack<Bean<?, ?, ?>> stack, Bean<?, ?, ?> node) throws BeanException {
-            final Class<?> t = node.type;
-            if (isInnerType(node.type)) {
-                final Class<?> et = node.type.getEnclosingClass();
-                final Optional<Bean<?, ?, ?>> parent = stack.stream().filter(n -> n.type.equals(et)).findAny();
-                if (parent.isEmpty()) {
-                    var cn = stack.stream().filter(not(BC.class::isInstance)).map(n -> getTypeName(n.type)).toList();
-                    throw new BeanException(t, "inner class is not allowed outside enclosing segments: " + join(", ", cn));
-                }
-                if (parent.get() instanceof Bean.BC<?, ?> n) {
-                    throw new BeanException(t, "inner class is not allowed inside enclosing segment: " + getTypeName(n.type));
-                }
-            }
-            stack.push(node);
-            for (final BSProperty<?, ?, ?> p : node.properties) {
-                if (p instanceof PFragment<?, ?, ?> fp) {
-                    check(stack, (Bean<?, ?, ?>) fp.node);
-                }
-            }
-        }
-
-        static int max(BSNode<?, ?> node) {
-            int max = -1;
-            for (final BSProperty<?, ?, ?> p : node.properties) {
-                final int offset;
-                if (p instanceof PFragment<?, ?, ?> fp) {
-                    offset = max(fp.node);
-                } else {
-                    offset = p.offset;
-                }
-                max = Math.max(max, offset);
-            }
-            return max;
-        }
-
-        static int min(BSNode<?, ?> node) {
-            int min = Integer.MAX_VALUE;
-            for (final BSProperty<?, ?, ?> p : node.properties) {
-                final int offset;
-                if (p instanceof PFragment<?, ?, ?> fp) {
-                    offset = max(fp.node);
-                } else {
-                    offset = p.offset;
-                }
-                min = Math.min(min, offset);
-            }
-            return min;
-        }
-
-        protected void check(Bean<S, D, ?> node) throws BeanException {
-            check(new Stack<>(), node);
-        }
-    }
-
-    /**
      * Internal Business Factory.
      */
-    static sealed abstract class Factory permits Up2Factory {
+    static sealed abstract class Factory<D extends DataType<D>> permits Up2Factory {
         private static final List<String> CN_ENTRIES = getPermittedTypes(MEP.class).toList();
         private static final List<String> EXCLUSIONS = getPermittedTypes(MEP.class, MST.class, Beans.class).toList();
-
+        final DataResolver<D> resolver;
         final BeanContext context;
         final Validator validator;
 
-        Factory(BeanContext context, Validator validator) {
-            this.validator = requireNonNull(validator);
-            this.context = requireNonNull(context);
+        Factory(BeanContext context, DataResolver<D> resolver) {
+            this.context = notNull(context, Up2Factory.class, "context");
+            this.resolver = notNull(resolver, Up2Factory.class, "resolver");
+            this.validator = defaultValidator(context);
         }
 
         /**
@@ -243,6 +156,18 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             return writer.toString();
         }
 
+        private static Validator defaultValidator(BeanContext context) {
+            try {
+                return context.getBean(Validator.class);
+            } catch (Exception ignore) {
+            }
+            try {
+                return Up2Factory.validator(null);
+            } catch (Exception ignore) {
+                return null;
+            }
+        }
+
         private static void stackTrace(List<String> cns, Throwable cause, String prefix, PrintWriter printer) {
             printer.println(prefix + cause);
             final StackTraceElement[] traces = cause.getStackTrace();
@@ -261,74 +186,12 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             }
         }
 
-        <S extends Segment, B extends DataType<B>> Mapper<S, B> build(DataTypeResolver<B> dr, Class<S> type) throws BeanException {
-            return new Mapper<>(BSContext.build(type, this, dr));
+        <S extends Segment> Mapper<S, D> of(Class<S> type) throws BeanException {
+            return BSManager.of(this, type, resolver).build(Mapper::new);
         }
 
-        <S extends Segment, B extends DataType<B>> Format<S, B> format(DataTypeResolver<B> dr, Class<S> type) throws BeanException {
-            return new Format<>(BSContext.format(type, this, dr));
-        }
-    }
-
-    /**
-     * Internal Business Processor.
-     */
-    static abstract sealed class OPS<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> extends Computer<S, D, T> permits Mapper, Format {
-        final BId<Segment, Object> businessId;
-        final boolean hasBusinessId;
-
-        OPS(BeanAccess mode, T node) throws BeanException {
-            super(node);
-            this.businessId = this.id(BusinessId.class, mode).or(() -> unknown(node.type));
-            this.hasBusinessId = this.businessId.supports(RO);
-        }
-
-        <A extends Annotation> Wrapper<BId<Segment, Object>> id(Class<A> type, BeanAccess mode) throws BeanException {
-            final Wrapper<BId<Segment, Object>> result = new Wrapper<>();
-            BSBuilder.id(mode, node, type, (fs, pp) -> {
-                if (result.isPresent()) {
-                    throw new BeanException(node.type, "multiple @" + getTypeName(type) + " are found");
-                }
-                result.accept(BSProperty.id(fs, pp));
-            });
-            return result;
-        }
-
-        /**
-         * Internal Business Format.
-         */
-        static final class Format<S extends Segment, D extends DataType<D>> extends OPS<S, D, Flat<S, D>> {
-            Format(Flat<S, D> node) throws BeanException {
-                super(RO, node);
-            }
-        }
-
-        /**
-         * Internal Business Mapper.
-         */
-        static final class Mapper<S extends Segment, D extends DataType<D>> extends OPS<S, D, Bean<S, D, ?>> {
-            final BId<Segment, Object> parentId;
-            final boolean hasParentId;
-
-            Mapper(Bean<S, D, ?> node) throws BeanException {
-                super(WO, node);
-                this.check(node);
-                this.parentId = this.id(ParentId.class, WO).or(BId::undefined);
-                this.hasParentId = parentId.supports(RO);
-            }
-
-            <R extends IRecord<?>> S map(R r, int o, boolean v, BusinessHandler<D> h) {
-                var data = r.getData();
-                if (data == null) {
-                    data = new String[0];
-                }
-                final S bean = node.parse(h, o, data);
-                node.update(bean, r);
-                if (v) {
-                    node.validate(bean, o, h);
-                }
-                return bean;
-            }
+        <S extends Segment> Format<S, D> ft(Class<S> type) throws BeanException {
+            return BSManager.ft(this, resolver, type).build(Format::new);
         }
     }
 
@@ -351,12 +214,11 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
         @SuppressWarnings({"rawtypes", "unchecked"})
         static BId<Segment, Object> unknown(Class<? extends Segment> type) {
             if (Referencable.class.isAssignableFrom(type)) {
-                final Type ft = getTypeArguments(type, Referencable.class)[0];
-                final Class<? extends Comparable<?>> rt = (ft instanceof Class<?> c) ? cast(c) : cast(Comparator.class);
+                final Class<Comparable> rt = getTypeArgument(type, Referencable.class, 0, Comparable.class);
                 if (BusinessObject.class.isAssignableFrom(type)) {
-                    return BO.CACHE.computeIfAbsent(rt, (k) -> new BO(rt));
+                    return BO.CACHE.get(rt, () -> new BO(rt));
                 }
-                return BR.CACHE.computeIfAbsent(rt, (k) -> new BR(rt));
+                return BR.CACHE.get(rt, () -> new BR(rt));
             }
             return undefined();
         }
@@ -367,7 +229,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             }
         }
 
-        abstract boolean supports(BeanAccess mode);
+        abstract boolean supports(Mode mode);
 
         abstract String format(S bean) throws AccessException;
 
@@ -379,7 +241,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
          * Internal {@link BusinessObject} accessor.
          */
         static final class BO<R extends Comparable<R>> extends BId<BusinessObject<R>, R> {
-            private static final Map<Class<?>, BId<Segment, Object>> CACHE = new ConcurrentHashMap<>();
+            private static final WVCache<Class<?>, BId<Segment, Object>> CACHE = new WVCache<>(Class::getName);
 
             @SuppressWarnings("unchecked")
             private BO(Class<? extends Comparable<?>> type) {
@@ -387,7 +249,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             }
 
             @Override
-            boolean supports(BeanAccess mode) {
+            boolean supports(Mode mode) {
                 return true;
             }
 
@@ -412,7 +274,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
          * Internal {@link Referencable} accessor.
          */
         static final class BR<R extends Comparable<R>> extends BId<Referencable<R>, R> {
-            private static final Map<Class<?>, BId<Segment, Object>> CACHE = new ConcurrentHashMap<>();
+            private static final WVCache<Class<?>, BId<Segment, Object>> CACHE = new WVCache<>(Class::getName);
 
             @SuppressWarnings("unchecked")
             private BR(Class<? extends Comparable<?>> type) {
@@ -420,8 +282,8 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             }
 
             @Override
-            boolean supports(BeanAccess mode) {
-                return mode != WO;
+            boolean supports(Mode mode) {
+                return mode != Mode.WO;
             }
 
             @Override
@@ -451,7 +313,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             }
 
             @Override
-            boolean supports(BeanAccess mode) {
+            boolean supports(Mode mode) {
                 return false;
             }
 
@@ -477,17 +339,17 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
         abstract sealed static class DP extends BId<Segment, Object> permits SP, MP {
 
             protected final PPosition<Object, Object, ?> property;
-            protected final Accessor<Object> setter;
+            protected final BSAccessor<Object> setter;
             private final boolean settable;
 
-            private DP(PPosition<Object, Object, ?> property, Accessor<Object> setter) {
+            private DP(PPosition<Object, Object, ?> property, BSAccessor<Object> setter) {
                 super(property.getType(), property.getName());
                 this.settable = !setter.isFinal();
                 this.property = property;
                 this.setter = setter;
             }
 
-            static DP of(List<? extends PFragment<Segment, ?, ?>> fs, PPosition<Object, Object, ?> pp, Accessor<Object> ps) {
+            static DP of(List<? extends PFragment<Segment, ?, ?>> fs, PPosition<Object, Object, ?> pp, BSAccessor<Object> ps) {
                 if (fs.isEmpty()) {
                     return new SP(pp, ps);
                 }
@@ -495,8 +357,8 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             }
 
             @Override
-            final boolean supports(BeanAccess mode) {
-                return settable || mode != WO;
+            final boolean supports(Mode mode) {
+                return settable || mode != Mode.WO;
             }
 
             @Override
@@ -515,7 +377,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
          * Internal Accessor based on simple property.
          */
         static final class SP extends DP {
-            private SP(PPosition<Object, Object, ?> property, Accessor<Object> setter) {
+            private SP(PPosition<Object, Object, ?> property, BSAccessor<Object> setter) {
                 super(property, setter);
             }
 
@@ -541,7 +403,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
         static final class MP extends DP {
             private final List<? extends PFragment<Segment, ?, ?>> path;
 
-            private MP(List<? extends PFragment<Segment, ?, ?>> fs, PPosition<Object, Object, ?> pp, Accessor<Object> ps) {
+            private MP(List<? extends PFragment<Segment, ?, ?>> fs, PPosition<Object, Object, ?> pp, BSAccessor<Object> ps) {
                 super(pp, ps);
                 this.path = fs;
             }

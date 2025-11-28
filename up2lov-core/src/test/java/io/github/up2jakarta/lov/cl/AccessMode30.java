@@ -4,10 +4,10 @@ import io.github.up2jakarta.lov.CodeList;
 
 public sealed class AccessMode30 implements CodeList<AccessMode30> permits AccessMode31, AccessMode32 {
 
-    private final String name;
     private final String code;
+    private final String name;
 
-    AccessMode30(String name, String code) {
+    AccessMode30(String code, String name) {
         this.name = name;
         this.code = code;
     }

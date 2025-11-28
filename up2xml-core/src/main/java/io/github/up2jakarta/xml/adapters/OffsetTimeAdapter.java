@@ -1,7 +1,7 @@
 package io.github.up2jakarta.xml.adapters;
 
 import io.github.up2jakarta.lov.SeverityType;
-import io.github.up2jakarta.lov.TypeConverter;
+import io.github.up2jakarta.lov.core.SafeAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import java.time.LocalTime;
@@ -17,7 +17,7 @@ import static io.github.up2jakarta.xml.adapters.Formatters.defaultOffset;
  * @see jakarta.xml.bind.annotation.adapters.XmlAdapter
  * @see java.time.OffsetTime
  */
-public class OffsetTimeAdapter extends TypeConverter<OffsetTime> {
+public class OffsetTimeAdapter extends SafeAdapter<OffsetTime> {
 
     private final DateTimeFormatter formatter;
 

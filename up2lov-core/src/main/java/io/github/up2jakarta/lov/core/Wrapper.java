@@ -33,6 +33,15 @@ public final class Wrapper<T> implements Supplier<T>, Consumer<T> {
     }
 
     /**
+     * @see java.util.Optional#orElseGet(Supplier) (Supplier)
+     */
+    public <X extends Throwable> void accept(Computer<? extends T, X> defaultSupplier) throws X {
+        if (value == null) {
+            this.value = defaultSupplier.get();
+        }
+    }
+
+    /**
      * @see java.util.Optional#isEmpty()
      */
     public boolean isEmpty() {
@@ -44,6 +53,17 @@ public final class Wrapper<T> implements Supplier<T>, Consumer<T> {
      */
     public boolean isPresent() {
         return value != null;
+    }
+
+    /**
+     * @see java.util.Optional#orElseThrow(Supplier)
+     */
+    public <X extends Throwable> T orThrow(Supplier<? extends X> causeSupplier) throws X {
+        if (value != null) {
+            return value;
+        } else {
+            throw causeSupplier.get();
+        }
     }
 
     /**

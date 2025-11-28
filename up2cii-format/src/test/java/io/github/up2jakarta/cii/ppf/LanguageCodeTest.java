@@ -82,7 +82,7 @@ public class LanguageCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(18, error.getLineNumber());
             assertEquals(65, error.getLineOffset());
-            assertEquals("ISO-639: Unknown value [???] for CodeList[LanguageCodeType].", error.getMessage());
+            assertEquals("ISO-639: Unknown input [???] for CodeList[LanguageCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

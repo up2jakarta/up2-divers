@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.function.Supplier;
 
 /**
- * Base business writer for multi-segments format, that's able to write business-objects to output stream.
+ * Up2J Base business writer for multi-segments format, that's able to write business-objects to output stream.
  *
  * @param <T> the business object type
  */

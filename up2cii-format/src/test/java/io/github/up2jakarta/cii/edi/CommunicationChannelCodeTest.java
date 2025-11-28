@@ -76,7 +76,7 @@ public class CommunicationChannelCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(122, error.getLineNumber());
             assertEquals(59, error.getLineOffset());
-            assertEquals("ECE-3155: Unknown value [???] for CodeList[CommunicationChannelCodeType].", error.getMessage());
+            assertEquals("ECE-3155: Unknown input [???] for CodeList[CommunicationChannelCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

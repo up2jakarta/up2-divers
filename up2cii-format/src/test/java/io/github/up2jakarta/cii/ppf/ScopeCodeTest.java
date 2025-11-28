@@ -68,7 +68,7 @@ public class ScopeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(5, error.getLineNumber());
             assertEquals(33, error.getLineOffset());
-            assertEquals("PPF-G102: Unknown value [???] for CodeList[ScopeType].", error.getMessage());
+            assertEquals("PPF-G102: Unknown input [???] for CodeList[ScopeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

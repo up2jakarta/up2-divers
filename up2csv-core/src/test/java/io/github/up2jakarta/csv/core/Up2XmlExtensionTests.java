@@ -77,7 +77,7 @@ public class Up2XmlExtensionTests {
             assertEquals(0, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getLevel());
             assertEquals(Test1Bean.XML_XXX, error.getCode());
-            assertEquals("Unknown value [11] for @XmlEnum[XML1Enum]", error.getMessage());
+            assertEquals("Unknown input [11] for @XmlEnum[XML1Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -87,7 +87,7 @@ public class Up2XmlExtensionTests {
             assertEquals(2, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(EC_XML_ENUM, error.getCode());
-            assertEquals("Unknown value [33] for @XmlEnum[XML3Enum]", error.getMessage());
+            assertEquals("Unknown input [33] for @XmlEnum[XML3Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -97,7 +97,7 @@ public class Up2XmlExtensionTests {
             assertEquals(3, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(CurrencyConverter.ISO_4217, error.getCode());
-            assertEquals("Unknown value [ILS] for CodeList[CurrencyCodeType]", error.getMessage());
+            assertEquals("Unknown input [ILS] for CodeList[CurrencyCodeType]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -107,7 +107,7 @@ public class Up2XmlExtensionTests {
             assertEquals(4, error.getOffset());
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(TestCodeListConverter.TU_001, error.getCode());
-            assertEquals("Unknown value [ANY] for CodeList[TestCodeList]", error.getMessage());
+            assertEquals("Unknown input [ANY] for CodeList[TestCodeList]", error.getMessage());
             assertNull(error.getTrace());
         }
     }
@@ -132,7 +132,7 @@ public class Up2XmlExtensionTests {
             assertEquals(0, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getLevel());
             assertEquals(Test2Bean.XML_001, error.getCode());
-            assertEquals("Unknown value [11] for @XmlEnum[XML1Enum]", error.getMessage());
+            assertEquals("Unknown input [11] for @XmlEnum[XML1Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -142,7 +142,7 @@ public class Up2XmlExtensionTests {
             assertEquals(1, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getLevel());
             assertEquals(Test2Bean.XML_002, error.getCode());
-            assertEquals("Unknown value [22] for @XmlEnum[XML2Enum]", error.getMessage());
+            assertEquals("Unknown input [22] for @XmlEnum[XML2Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -152,7 +152,7 @@ public class Up2XmlExtensionTests {
             assertEquals(2, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getLevel());
             assertEquals(Test2Bean.XML_003, error.getCode());
-            assertEquals("Unknown value [ILS] for CodeList[CurrencyCodeType]", error.getMessage());
+            assertEquals("Unknown input [ILS] for CodeList[CurrencyCodeType]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -162,20 +162,21 @@ public class Up2XmlExtensionTests {
             assertEquals(3, error.getOffset());
             assertEquals(SeverityType.WARNING, error.getLevel());
             assertEquals(Test2Bean.XML_004, error.getCode());
-            assertEquals("Unknown value [ANY] for CodeList[TestCodeList]", error.getMessage());
+            assertEquals("Unknown input [ANY] for CodeList[TestCodeList]", error.getMessage());
             assertNull(error.getTrace());
         }
     }
 
     @Test
-    void testActivation() {
-        // Given
+    void testUniqueXmlValue() {
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test3Bean.class));
+        final BeanException ex = assertThrows(BeanException.class, () -> factory.build(Test3Bean.class));
+        assertNotNull(ex);
         // THEN
-        assertEquals(Test3Bean.class, thrown.getSource());
-        assertEquals("enum1", thrown.getLocator());
-        assertEquals("Test3Bean[enum1] - must be annotated with @Up2Converter or one of those shortcuts", thrown.getMessage());
+        assertEquals(XML4Enum.class, ex.getSource());
+        assertEquals("*", ex.getLocator());
+        assertEquals("must be unique", ex.getMessage());
+        assertEquals("XML4Enum[*] must be unique", ex.getLocalizedMessage());
     }
 
 }

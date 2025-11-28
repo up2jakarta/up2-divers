@@ -30,7 +30,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.IOException;
 
-import static io.github.up2jakarta.csv.data.DataTypeResolver.dynamic;
+import static io.github.up2jakarta.csv.data.DataResolver.dynamic;
 
 @SpringBatchTest
 @SpringJUnitConfig(TUConfiguration.class)
@@ -52,7 +52,7 @@ class FullCopyJobITests extends AbstractJobITest {
     private Job fullJob(ApplicationContext context, PlatformTransactionManager txm) throws BeanException {
         final CSVFormat format = context.getBean(CSVFormat.class);
         final JobRepository repository = context.getBean(JobRepository.class);
-        final Up2Factory<GroupType> factory = new Up2Factory<>(context::getBean, GroupType.class);
+        final Up2Factory<GroupType> factory = new Up2Factory<>(context::getBean);
         final InvoiceImporter importer = new InvoiceImporter(factory);
         final CompositeWriter<Up2Result<Invoice, InputError>> writer = new CompositeWriter<>(
                 new SynchronizedWriter<>(this.errorWriter(factory, format)),

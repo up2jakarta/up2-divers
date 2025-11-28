@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.api.hdl;
 
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.data.Identifiable;
+import io.github.up2jakarta.lov.core.Identifiable;
 
 /**
  * Contract interface for input repository that is able to count the events related to the given input record

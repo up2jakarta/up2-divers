@@ -4,11 +4,18 @@ import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.core.misc.Parsable;
 import io.github.up2jakarta.csv.data.BusinessId;
 import io.github.up2jakarta.csv.data.ParentId;
+import io.github.up2jakarta.csv.impl.GroupType;
+import io.github.up2jakarta.csv.impl.InputType;
 import io.github.up2jakarta.lov.core.BeanException;
+import jakarta.persistence.Access;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
+import static jakarta.persistence.AccessType.PROPERTY;
+
 @Valid
+@Access(PROPERTY)
+@InputType(GroupType.D005)
 @SuppressWarnings("unused")
 public class DummyAttribute extends Parsable {
 

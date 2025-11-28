@@ -68,7 +68,7 @@ public class ProfileCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(8, error.getLineNumber());
             assertEquals(33, error.getLineOffset());
-            assertEquals("PPF-S106: Unknown value [???] for CodeList[ProfileType].", error.getMessage());
+            assertEquals("PPF-S106: Unknown input [???] for CodeList[ProfileType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

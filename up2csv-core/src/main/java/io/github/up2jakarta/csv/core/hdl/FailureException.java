@@ -2,9 +2,8 @@ package io.github.up2jakarta.csv.core.hdl;
 
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.lov.MessageFormatter;
-import io.github.up2jakarta.lov.PropertyException;
 import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.TypeException;
 
 import java.util.Optional;
 
@@ -14,7 +13,7 @@ import java.util.Optional;
  * @see FastHandler
  */
 @SuppressWarnings("rawtypes")
-public class FailureException extends PropertyException implements IEvent {
+public class FailureException extends TypeException implements IEvent {
 
     protected static final String FORMAT = "#[%s] throws %s";
 
@@ -44,12 +43,9 @@ public class FailureException extends PropertyException implements IEvent {
     }
 
     @Override
-    public String getFormattedMessage() {
+    public String getLocalizedMessage() {
         final String offset = Optional.of(this.offset).map(String::valueOf).orElse("?");
-        if (this.getCause() instanceof MessageFormatter mf) {
-            return String.format(FORMAT, offset, mf.getFormattedMessage());
-        }
-        return String.format(FORMAT, offset, super.getFormattedMessage());
+        return String.format(FORMAT, offset, super.getLocalizedMessage());
     }
 
 }

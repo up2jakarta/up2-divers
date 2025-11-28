@@ -1,26 +1,12 @@
 package io.github.up2jakarta.lov;
 
 /**
- * Up2J base {@link Enum} implementation of LOV (List of Values) that can be identified by {@link CodeList#getCode()}.
+ * Up2J contract interface of LOV (List of Values) that can be identified by {@link CodeList#getCode()}.
  *
- * @param <T> the type of enum implementation
+ * @param <T> the self-type implementation
  */
 @SuppressWarnings("unused")
 public interface CodeList<T extends CodeList<T>> {
-
-    /**
-     * Generate and return an enum constant from the given {@code id}.
-     *
-     * @param code the code-list code
-     * @return Java valid constant name
-     */
-    static String constant(String code) {
-        code = code.toUpperCase();
-        if (Character.isDigit(code.charAt(0))) {
-            code = "V_" + code;
-        }
-        return code.replace("-", "_");
-    }
 
     /**
      * @return the code value.

@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.core.misc.cvr;
 
 import io.github.up2jakarta.csv.api.Warning;
-import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.*;
+import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.core.misc.ParsedEntity;
 import io.github.up2jakarta.csv.core.misc.lov.*;
 import jakarta.persistence.Column;

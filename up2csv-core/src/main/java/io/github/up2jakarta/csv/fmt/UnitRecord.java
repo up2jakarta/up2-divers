@@ -7,7 +7,7 @@ import io.github.up2jakarta.lov.CodeList;
 
 import java.util.Arrays;
 
-import static java.util.Objects.requireNonNull;
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 
 /**
  * Simple implementation of input record,
@@ -23,7 +23,7 @@ public class UnitRecord<T extends CodeList<T>> implements IRecord<T> {
     protected final String[] data;
 
     public UnitRecord(T type, String... data) {
-        this.type = requireNonNull(type);
+        this.type = notNull(type, IRecord.class, "type");
         this.data = data;
     }
 

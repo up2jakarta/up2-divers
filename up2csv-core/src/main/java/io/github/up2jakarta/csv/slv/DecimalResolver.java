@@ -2,11 +2,11 @@ package io.github.up2jakarta.csv.slv;
 
 import io.github.up2jakarta.csv.api.ext.TypeResolver;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
-import io.github.up2jakarta.lov.PropertyConverter;
-import io.github.up2jakarta.lov.PropertyFormatter;
 import io.github.up2jakarta.lov.TypeAdapter;
+import io.github.up2jakarta.lov.TypeConverter;
+import io.github.up2jakarta.lov.TypeFormatter;
 import io.github.up2jakarta.lov.core.BeanException;
-import io.github.up2jakarta.lov.core.TypeWrapper;
+import io.github.up2jakarta.lov.core.TypeSupport;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
@@ -17,7 +17,7 @@ import static java.math.BigDecimal.valueOf;
 
 @Named
 @Singleton
-public final class DecimalResolver extends TypeResolver<Up2Decimal> {
+public final class DecimalResolver implements TypeResolver<Number, Up2Decimal> {
 
     private static BigDecimal round(BigDecimal value, Up2Decimal decimal) {
         if (value.scale() > decimal.value()) {
@@ -27,23 +27,23 @@ public final class DecimalResolver extends TypeResolver<Up2Decimal> {
     }
 
     @Override
-    public TypeAdapter<? extends Number> resolve(Field property, Class<?> type, Up2Decimal config) throws BeanException {
-        if (type == BigDecimal.class) {
-            final PropertyConverter<BigDecimal> parser = (v) -> round(new BigDecimal(v), config);
-            final PropertyFormatter<BigDecimal> format = (v) -> round(v, config).toString();
-            return new TypeWrapper<>(BigDecimal.class, parser, format);
+    public TypeAdapter<? extends Number> resolve(Field pf, Class<Number> pt, Up2Decimal pc) throws BeanException {
+        if (BigDecimal.class.equals(pt)) {
+            final TypeConverter<BigDecimal> parser = (v) -> round(new BigDecimal(v), pc);
+            final TypeFormatter<BigDecimal> format = (v) -> round(v, pc).toString();
+            return new TypeSupport<>(BigDecimal.class, parser, format);
         }
-        if (type == Double.class || type == double.class) {
-            final PropertyConverter<Double> parser = (v) -> round(new BigDecimal(v), config).doubleValue();
-            final PropertyFormatter<Double> format = (v) -> round(valueOf(v), config).toString();
-            return new TypeWrapper<>(Double.class, parser, format);
+        if (Double.class.equals(pt) || double.class.equals(pt)) {
+            final TypeConverter<Double> parser = (v) -> round(new BigDecimal(v), pc).doubleValue();
+            final TypeFormatter<Double> format = (v) -> round(valueOf(v), pc).toString();
+            return new TypeSupport<>(Double.class, parser, format);
         }
-        if (type == Float.class || type == float.class) {
-            final PropertyConverter<Float> parser = (v) -> round(new BigDecimal(v), config).floatValue();
-            final PropertyFormatter<Float> format = (v) -> round(valueOf(v), config).toString();
-            return new TypeWrapper<>(Float.class, parser, format);
+        if (Float.class.equals(pt) || float.class.equals(pt)) {
+            final TypeConverter<Float> parser = (v) -> round(new BigDecimal(v), pc).floatValue();
+            final TypeFormatter<Float> format = (v) -> round(valueOf(v), pc).toString();
+            return new TypeSupport<>(Float.class, parser, format);
         }
-        throw new BeanException(property, "must not be annotated by @Up2Decimal");
+        throw new BeanException(pf, "must not be annotated with @Up2Decimal");
     }
 
 }

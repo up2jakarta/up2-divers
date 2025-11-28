@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.cfg;
 
 import io.github.up2jakarta.csv.api.ext.TypeResolver;
-import io.github.up2jakarta.lov.core.BeanContext;
+import io.github.up2jakarta.csv.core.BeanContext;
 
 import java.lang.annotation.*;
 
@@ -18,7 +18,7 @@ public @interface Resolver {
      *
      * @return the class of type-resolver
      */
-    Class<? extends TypeResolver<?>> value();
+    Class<? extends TypeResolver<?, ?>> value();
 
     /**
      * Returns the qualified name of the type-resolver , by default is <code>null</code>.

@@ -4,12 +4,13 @@ import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2CodeList;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.CodeList;
+import io.github.up2jakarta.lov.Deprecated;
 
-@SuppressWarnings("unused")
+@SuppressWarnings("ALL")
 public class Test3Resolver implements Segment {
 
     @Position(0)
-    @Up2CodeList
+    @Up2CodeList("UnitType")
     private EnumLike unit = EnumLike.NAN;
 
     public EnumLike getUnit() {
@@ -25,7 +26,8 @@ public class Test3Resolver implements Segment {
         public static final EnumLike ONE = new EnumLike("1", "ONE");
         public static final EnumLike TWO = new EnumLike("2", "TWO");
 
-        private static final EnumLike NAN = new EnumLike("N", "NAN");
+        @Deprecated
+        static final EnumLike NAN = new EnumLike("N", "NAN");
 
         private final String name;
         private final String code;

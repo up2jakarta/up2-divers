@@ -88,7 +88,7 @@ public class PackagingMarkingCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(54, error.getLineNumber());
             assertEquals(57, error.getLineOffset());
-            assertEquals("ECE-7233: Unknown value [???] for CodeList[PackagingMarkingCodeType].", error.getMessage());
+            assertEquals("ECE-7233: Unknown input [???] for CodeList[PackagingMarkingCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

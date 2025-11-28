@@ -4,7 +4,6 @@ import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
 import io.github.up2jakarta.csv.core.BSContext.VContext;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
-import io.github.up2jakarta.csv.core.misc.lov.CurrencyConverter;
 import io.github.up2jakarta.csv.core.misc.vld.*;
 import io.github.up2jakarta.csv.impl.*;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -18,6 +17,7 @@ import java.util.List;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_COMPLIANCE;
 import static io.github.up2jakarta.csv.api.IEvent.EC_CONVERTER;
+import static io.github.up2jakarta.csv.core.misc.lov.CurrencyConverter.ISO_4217;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
 import static io.github.up2jakarta.lov.SeverityType.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -95,7 +95,7 @@ class Up2ValidatorTests {
         assertSame(row, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
         assertEquals(ERROR, error.getLevel());
-        assertEquals(CurrencyConverter.ISO_4217, error.getCode());
+        assertEquals(ISO_4217, error.getCode());
         assertEquals("size must be between 0 and 3", error.getMessage());
     }
 
@@ -302,6 +302,36 @@ class Up2ValidatorTests {
         final VContext context = ((PFragment<?, ?, ?>) mapper.node.properties.getFirst()).node.context;
         assertEquals(2, mapper.node.context.groups.length);
         assertFalse(context.enabled);
+    }
+
+    @Test
+    void testValid15Fragment() throws BeanException {
+        // Given
+        final Up2Flatter<Validator15Bean, GroupType> mapper = factory.format(Validator15Bean.class);
+        // When
+        final List<? extends IComplianceEvent<GroupType>> events = mapper.validate(new Validator15Bean());
+        // Then
+        assertEquals(1, events.size());
+        final IComplianceEvent<GroupType> event = events.getFirst();
+        assertNotNull(event);
+        assertEquals(0, event.getOffset());
+        assertEquals(WARNING, event.getLevel());
+        assertEquals(EC_COMPLIANCE, event.getCode());
+    }
+
+    @Test
+    void testValid16Fragment() throws BeanException {
+        // Given
+        final Up2Flatter<Validator16Bean, GroupType> mapper = factory.format(Validator16Bean.class);
+        // When
+        final List<? extends IComplianceEvent<GroupType>> events = mapper.validate(new Validator16Bean());
+        // Then
+        assertEquals(1, events.size());
+        final IComplianceEvent<GroupType> event = events.getFirst();
+        assertNotNull(event);
+        assertEquals(1, event.getOffset());
+        assertEquals(WARNING, event.getLevel());
+        assertEquals(EC_COMPLIANCE, event.getCode());
     }
 
 }

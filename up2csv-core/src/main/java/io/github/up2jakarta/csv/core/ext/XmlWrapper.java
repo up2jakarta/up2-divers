@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.core.ext;
 
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.TypeAdapter;
-import io.github.up2jakarta.lov.TypeConverter;
+import io.github.up2jakarta.lov.core.SafeAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
@@ -10,7 +10,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  *
  * @param <T> the property type
  */
-public final class XmlWrapper<T> extends TypeConverter<T> {
+public final class XmlWrapper<T> extends SafeAdapter<T> {
 
     private final XmlAdapter<String, T> delegate;
 

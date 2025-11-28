@@ -17,8 +17,8 @@ import io.github.up2jakarta.csv.fmt.UnitRecord;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.SegmentType;
 import io.github.up2jakarta.csv.impl.dto.Invoice;
-import io.github.up2jakarta.lov.PropertyException;
 import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.github.up2jakarta.csv.core.Up2ErrorTests.assertTrace;
 import static io.github.up2jakarta.csv.impl.SegmentType.*;
+import static io.github.up2jakarta.lov.core.Localizable.CLASS;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,14 +54,14 @@ public class BusinessTests {
         // WHEN
         final BeanException ex = assertThrows(
                 BeanException.class,
-                () -> factory.builder()
-                        .full(Invoice.class)
-                        .build(S11)
-                        .build((r) -> 0)
+                () -> factory.builder().full(Invoice.class).build(S11).build((r) -> 0)
         );
         assertNotNull(ex);
         // THEN
-        assertEquals("Invoice[class] - Invalid business typing", ex.getMessage());
+        assertEquals(Invoice.class, ex.getSource());
+        assertEquals(CLASS, ex.getLocator());
+        assertEquals("invalid business typing", ex.getMessage());
+        assertEquals("Invoice[class] invalid business typing", ex.getLocalizedMessage());
     }
 
     @Test
@@ -75,7 +76,9 @@ public class BusinessTests {
         );
         assertNotNull(ex);
         // THEN
-        assertEquals("SegmentType[63] - cyclic segment is not allowed: CyclicInvoice > CyclicItem > CyclicInvoice", ex.getMessage());
+        assertEquals(SegmentType.class, ex.getSource());
+        assertEquals("63", ex.getLocator());
+        assertEquals("cyclic segment is not allowed: CyclicInvoice > CyclicItem > CyclicInvoice", ex.getMessage());
     }
 
     @Test
@@ -148,7 +151,7 @@ public class BusinessTests {
         final AccessException error = assertThrows(AccessException.class, () -> importer.parse(singletonList(record)));
         //THEN
         assertNotNull(error);
-        assertEquals("BusinessTests.1[newBuilder] - must not be null", error.getMessage());
+        assertEquals("BusinessTests.1[builder] must not be null", error.getLocalizedMessage());
         assertNull(error.getCause());
     }
 
@@ -176,7 +179,7 @@ public class BusinessTests {
         final AccessException error = assertThrows(AccessException.class, () -> importer.parse(singletonList(record)));
         //THEN
         assertNotNull(error);
-        assertEquals("BusinessTests.2.1[of] - must not be null", error.getMessage());
+        assertEquals("BusinessTests.2.1[handler] must not be null", error.getLocalizedMessage());
         assertNull(error.getCause());
     }
 
@@ -261,9 +264,9 @@ public class BusinessTests {
         assertEquals(S71.getDataType(), error.getType());
         assertEquals("cannot update the business identifier", error.getMessage());
         assertTrace(error.getTrace(),
-                EX_ACCESS + ": DummyReference[businessId] - invalid identifier",
-                "\tio.github.up2jakarta.csv.core.bs.DummyReference.setReference(DummyReference.java:31)",
-                "\tio.github.up2jakarta.csv.core.bs.DummyReference.setReference(DummyReference.java:15)"
+                EX_ACCESS + ": DummyReference[businessId] invalid identifier",
+                "\tio.github.up2jakarta.csv.core.bs.DummyReference.setReference(DummyReference.java:35)",
+                "\tio.github.up2jakarta.csv.core.bs.DummyReference.setReference(DummyReference.java:18)"
         );
     }
 
@@ -311,7 +314,7 @@ public class BusinessTests {
         assertEquals(S72.getDataType(), error.getType());
         assertEquals("cannot retrieve the parent identifier", error.getMessage());
         assertTrace(error.getTrace(),
-                EX_ACCESS + ": DummyAttribute[getParentId] - DummyAttribute[parentId] - invalid identifier"
+                EX_ACCESS + ": DummyAttribute[getParentId] invalid identifier"
         );
     }
 
@@ -340,7 +343,7 @@ public class BusinessTests {
         assertEquals(S72.getDataType(), error.getType());
         assertEquals("cannot retrieve the business identifier", error.getMessage());
         assertTrace(error.getTrace(),
-                EX_ACCESS + ": DummyAttribute[getBusinessId] - DummyAttribute[businessId] - invalid identifier"
+                EX_ACCESS + ": DummyAttribute[getBusinessId] invalid identifier"
         );
     }
 
@@ -369,7 +372,7 @@ public class BusinessTests {
         assertEquals(S72.getDataType(), error.getType());
         assertEquals("cannot link with Segment#[71]", error.getMessage());
         assertTrace(error.getTrace(),
-                EX_ACCESS + ": DummyAttribute[value] - invalid value",
+                EX_ACCESS + ": DummyAttribute[value] invalid value",
                 "\tio.github.up2jakarta.csv.impl.DummyTypes.lambda$dummyAttributes$0(DummyTypes.java:98)"
         );
     }
@@ -431,7 +434,7 @@ public class BusinessTests {
         assertEquals(3, error.getOffset());
         assertEquals(SeverityType.ERROR, error.getLevel());
         assertEquals(IEvent.EC_COMPLIANCE, error.getCode());
-        assertEquals(S72.getDataType(), error.getType());
+        assertEquals(GroupType.D005, error.getType());
         assertEquals("must not be blank", error.getMessage());
     }
 
@@ -457,7 +460,7 @@ public class BusinessTests {
     }
 
     static final class MyError extends PropertyEvent<GroupType, MyRecord> {
-        public MyError(MyRecord row, Integer offset, GroupType type, PropertyException cause) {
+        public MyError(MyRecord row, Integer offset, GroupType type, TypeException cause) {
             super(row, offset, type, cause);
         }
     }

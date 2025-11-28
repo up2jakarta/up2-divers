@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.hdl.IBusinessEvent.IKey;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Identifiable;
+import io.github.up2jakarta.lov.core.Identifiable;
 
 /**
  * Contact interface for an input event with trace property instead of exception, useful for events persistence.

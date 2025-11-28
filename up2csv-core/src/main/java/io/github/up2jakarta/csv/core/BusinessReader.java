@@ -7,7 +7,7 @@ import io.github.up2jakarta.csv.data.*;
 import io.github.up2jakarta.lov.core.AccessException;
 
 /**
- * Base business reader for multi-segments format, that's able to read business-objects from input stream.
+ * Up2J Base business reader for multi-segments format, that's able to read business-objects from input stream.
  *
  * @param <T> the business object type
  * @param <B> the business data type

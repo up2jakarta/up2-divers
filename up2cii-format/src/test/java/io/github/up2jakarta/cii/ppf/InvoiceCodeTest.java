@@ -60,7 +60,7 @@ public class InvoiceCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(13, error.getLineNumber());
             assertEquals(40, error.getLineOffset());
-            assertEquals("PPF-G101: Unknown value [50] for CodeList[InvoiceCodeType].", error.getMessage());
+            assertEquals("PPF-G101: Unknown input [50] for CodeList[InvoiceCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

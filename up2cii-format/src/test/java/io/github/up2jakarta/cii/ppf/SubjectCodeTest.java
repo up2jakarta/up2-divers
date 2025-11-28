@@ -68,7 +68,7 @@ public class SubjectCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(19, error.getLineNumber());
             assertEquals(51, error.getLineOffset());
-            assertEquals("ECE-4451: Unknown value [???] for CodeList[SubjectCodeType].", error.getMessage());
+            assertEquals("ECE-4451: Unknown input [???] for CodeList[SubjectCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

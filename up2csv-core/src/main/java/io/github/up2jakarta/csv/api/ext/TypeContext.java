@@ -1,6 +1,5 @@
 package io.github.up2jakarta.csv.api.ext;
 
-import io.github.up2jakarta.csv.core.BeanAccess;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.core.BeanException;
 
@@ -37,11 +36,11 @@ public interface TypeContext {
      * Before super-class segment handler or listener.
      *
      * @param fragment the field annotated by {@link io.github.up2jakarta.csv.cfg.Fragment}
-     * @param mode     the access mode read/write only
      * @param type     the fragment type
+     * @param offset   the fragment index
      * @throws BeanException for any missing or wrong bean configuration
      */
-    default void beforeFragmentProperty(BeanAccess mode, Field fragment, Class<? extends Segment> type) throws BeanException {
+    default void beforeFragmentProperty(Field fragment, Class<? extends Segment> type, int offset) throws BeanException {
     }
 
     /**

@@ -59,7 +59,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType, S
         // Then
         assertEquals(EC_CODE_LIST, error.getCode());
         assertEquals(ERROR, error.getLevel());
-        assertEquals("Unknown value [RT] for CodeList[SegmentType]", error.getMessage());
+        assertEquals("Unknown input [RT] for CodeList[SegmentType]", error.getMessage());
     }
 
     @Test

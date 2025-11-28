@@ -1,12 +1,9 @@
 package io.github.up2jakarta.cii.api;
 
-import io.github.up2jakarta.cii.Documented;
+import io.github.up2jakarta.cii.CII;
 import io.github.up2jakarta.cii.InvoiceValidator;
-import io.github.up2jakarta.cii.core.Agency;
-import io.github.up2jakarta.lov.CodeList;
 import io.github.up2jakarta.lov.CodeListException;
-import io.github.up2jakarta.lov.Schema;
-import io.github.up2jakarta.lov.SubList;
+import io.github.up2jakarta.lov.ConstantProvider;
 import io.github.up2jakarta.xml.api.*;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -25,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 
-import static io.github.up2jakarta.cii.CII.getLoader;
 import static io.github.up2jakarta.lov.core.Codes.token;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,43 +39,7 @@ public class TestUtil {
         assertNotNull(code);
         assertFalse(code.isBlank());
         assertEquals(code, token(code));
-        assertEquals(CodeList.constant(code), constant.name());
-    }
-
-    private static <I extends Enum<I>> Documented assertCodeList(Class<I> implClass) {
-        var codeList = implClass.getAnnotation(Documented.class);
-        assertNotNull(codeList);
-        assertNotNull(codeList.value());
-        assertNotNull(codeList.version());
-        assertNotNull(codeList.agency());
-        return codeList;
-    }
-
-    private static <I extends Enum<I>> void assertSubList(Class<I> implClass) {
-        var subList = implClass.getAnnotation(SubList.class);
-        if (subList != null && !CodeList.class.equals(subList.type())) {
-            var parentClass = subList.type();
-            var parentSL = parentClass.getAnnotation(SubList.class);
-            assertNull(parentSL);
-        }
-    }
-
-    private static <I extends Enum<I>> void assertSchema(Class<I> implClass, Agency agency) {
-        // Find CodeListAccessor
-        var schema = implClass.getAnnotation(Schema.class);
-        if (agency == Agency.EN_16931) {
-            assertNull(schema);
-            return;
-        }
-        assertNotNull(schema);
-        // Find SubList
-        var subList = implClass.getAnnotation(SubList.class);
-        if (subList != null && !CodeList.class.equals(subList.type())) {
-            var parentClass = subList.type();
-            var parentSchema = parentClass.getAnnotation(Schema.class);
-            assertNotNull(parentSchema);
-            assertEquals(schema.agency(), parentSchema.agency(), implClass.getName());
-        }
+        assertEquals(ConstantProvider.constant(code), constant.name());
     }
 
     public static <I extends Enum<I>> void assertUniqueness(Class<I> implClass, Function<I, String> codeFunction, boolean includeNaming) {
@@ -94,10 +54,6 @@ public class TestUtil {
         }
         var size = implClass.getEnumConstants().length;
         assertEquals(size, codes.size());
-        // Checking Annotations
-        var cl = assertCodeList(implClass);
-        assertSubList(implClass);
-        assertSchema(implClass, cl.agency());
     }
 
     public static <I extends Enum<I>> void assertUniqueness(Class<I> implClass, Function<I, String> codeFunction) {
@@ -105,7 +61,7 @@ public class TestUtil {
     }
 
     public static File loadResource(final String resourcePath) throws FileNotFoundException {
-        var url = getLoader().getResource(resourcePath);
+        var url = CII.getResource(resourcePath);
         try {
             assert url != null;
             return new File(url.toURI());

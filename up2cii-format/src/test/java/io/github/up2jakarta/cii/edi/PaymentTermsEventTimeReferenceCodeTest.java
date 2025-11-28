@@ -79,7 +79,7 @@ public class PaymentTermsEventTimeReferenceCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(75, error.getLineNumber());
             assertEquals(63, error.getLineOffset());
-            assertEquals("ECE-2475: Unknown value [???] for CodeList[PaymentTermsEventTimeReferenceCodeType].", error.getMessage());
+            assertEquals("ECE-2475: Unknown input [???] for CodeList[PaymentTermsEventTimeReferenceCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

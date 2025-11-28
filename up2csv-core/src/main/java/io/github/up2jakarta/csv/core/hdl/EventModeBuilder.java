@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.hdl.IEventBuilder;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Listable;
+import io.github.up2jakarta.lov.core.Listable;
 
 import java.util.ArrayList;
 import java.util.List;

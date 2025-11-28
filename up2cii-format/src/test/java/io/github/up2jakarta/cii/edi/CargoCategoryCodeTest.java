@@ -76,7 +76,7 @@ public class CargoCategoryCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(189, error.getLineNumber());
             assertEquals(57, error.getLineOffset());
-            assertEquals("ECE-R21: Unknown value [???] for CodeList[CargoCategoryCodeType].", error.getMessage());
+            assertEquals("ECE-R21: Unknown input [???] for CodeList[CargoCategoryCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

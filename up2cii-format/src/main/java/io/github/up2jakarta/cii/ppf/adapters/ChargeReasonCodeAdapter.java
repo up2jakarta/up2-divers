@@ -5,11 +5,13 @@ import io.github.up2jakarta.cii.edi.adapters.AllowanceChargeIdentificationCodeAd
 import io.github.up2jakarta.cii.edi.adapters.AllowanceChargeReasonCodeAdapter;
 import io.github.up2jakarta.cii.ppf.ChargeReasonCodeType;
 import io.github.up2jakarta.lov.CodeListException;
-import io.github.up2jakarta.lov.TypeConverter;
+import io.github.up2jakarta.lov.core.SafeAdapter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.core.Beans.cast;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -21,10 +23,10 @@ import static java.util.Optional.ofNullable;
  */
 @Named
 @Singleton
-public final class ChargeReasonCodeAdapter extends TypeConverter<ChargeReasonCodeType<?>> {
+public final class ChargeReasonCodeAdapter extends SafeAdapter<ChargeReasonCodeType<?>> {
 
     ChargeReasonCodeAdapter() {
-        super(null, null, null);
+        super(cast(ChargeReasonCodeType.class), ERROR, null);
     }
 
     public static ChargeReasonCodeType<?> from(ChargeReasonCodeType<?> value, io.github.up2jakarta.cii.format.minified.udt.IndicatorType indicator) {
@@ -38,12 +40,13 @@ public final class ChargeReasonCodeAdapter extends TypeConverter<ChargeReasonCod
     }
 
     public static ChargeReasonCodeType<?> from(ChargeReasonCodeType<?> value, Boolean indicator) {
+        final String code = value.getCode();
         if (indicator == null) {
-            return AllowanceChargeReasonCodeAdapter.from(value);
+            return AllowanceChargeReasonCodeAdapter.ECE_4465.parse(code);
         } else if (indicator) {
-            return SpecialServiceDescriptionCodeAdapter.from(value); // BG-21, BG-28
+            return SpecialServiceDescriptionCodeAdapter.ECE_7161.parse(code); // BG-21, BG-28
         }
-        return AllowanceChargeIdentificationCodeAdapter.from(value); // BG-20, BG-27
+        return AllowanceChargeIdentificationCodeAdapter.ECE_5189.parse(code); // BG-20, BG-27
     }
 
     @Override

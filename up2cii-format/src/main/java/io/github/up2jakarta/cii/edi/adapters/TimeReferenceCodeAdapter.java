@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.TimeReferenceCodeType;
-import io.github.up2jakarta.lov.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListAdapter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -11,7 +11,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  */
 @Named
 @Singleton
-public class TimeReferenceCodeAdapter extends CodeListConverter<TimeReferenceCodeType> {
+public class TimeReferenceCodeAdapter extends CodeListAdapter<TimeReferenceCodeType> {
 
     TimeReferenceCodeAdapter() {
         super(TimeReferenceCodeType.class, "ECE-2475");

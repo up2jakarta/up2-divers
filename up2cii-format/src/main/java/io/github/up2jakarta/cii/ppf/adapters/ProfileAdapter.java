@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.ppf.adapters;
 
 import io.github.up2jakarta.cii.ppf.ProfileType;
-import io.github.up2jakarta.lov.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListAdapter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -11,7 +11,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  */
 @Named
 @Singleton
-public class ProfileAdapter extends CodeListConverter<ProfileType> {
+public class ProfileAdapter extends CodeListAdapter<ProfileType> {
 
     ProfileAdapter() {
         super(ProfileType.class, "PPF-S106");

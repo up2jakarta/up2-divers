@@ -5,10 +5,12 @@ import io.github.up2jakarta.csv.core.misc.cvr.*;
 import io.github.up2jakarta.csv.core.misc.lov.CountryCodeType;
 import io.github.up2jakarta.csv.core.misc.lov.CurrencyCodeType;
 import io.github.up2jakarta.csv.core.misc.lov.MeasurementUnitCode;
+import io.github.up2jakarta.csv.core.misc.lov.Test4CodeList;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.impl.InputCollector;
 import io.github.up2jakarta.csv.impl.InputError;
 import io.github.up2jakarta.csv.impl.InputRecord;
+import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,15 +38,6 @@ class Up2ConverterTests {
     @Autowired
     Up2ConverterTests(Up2Factory<GroupType> factory) {
         this.factory = factory;
-    }
-
-    @Test
-    void testCache() throws BeanException {
-        // GIVEN
-        final Up2Mapper<ValidEntity, GroupType> instance1 = factory.build(ValidEntity.class);
-        final Up2Mapper<ValidEntity, GroupType> instance2 = factory.build(ValidEntity.class);
-        // THEN
-        assertNotSame(instance1, instance2);
     }
 
     @Test
@@ -136,7 +129,7 @@ class Up2ConverterTests {
             assertEquals(ERROR, error.getLevel());
             assertEquals(SupportEntity.ISO_4217, error.getCode());
             assertEquals(1 + 4, error.getOffset());
-            assertEquals("Unknown value [ILS] for CodeList[CurrencyCodeType]", error.getMessage());
+            assertEquals("Unknown input [ILS] for CodeList[CurrencyCodeType]", error.getMessage());
             assertNull(error.getTrace());
         }
         // Error Country
@@ -147,10 +140,21 @@ class Up2ConverterTests {
             assertEquals(ERROR, error.getLevel());
             assertEquals(SupportEntity.ISO_3166, error.getCode());
             assertEquals(1 + 9, error.getOffset());
-            assertEquals("Unknown value [IL] for CodeList[CountryCodeType]", error.getMessage());
+            assertEquals("Unknown input [IL] for CodeList[CountryCodeType]", error.getMessage());
             assertNull(error.getTrace());
         }
 
+    }
+
+    @Test
+    void testMultipleExtensions() throws BeanException {
+        // GIVEN
+        final Up2Mapper<Test7Resolver, GroupType> mapper = factory.build(Test7Resolver.class);
+        // WHEN
+        final Test7Resolver bean = mapper.map("1");
+        // THEN
+        assertNotNull(bean);
+        assertEquals(BigDecimal.ONE, bean.test);
     }
 
     // Checking
@@ -162,7 +166,7 @@ class Up2ConverterTests {
         // THEN
         assertEquals(CodeList1Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
-        assertEquals("CodeList1Entity[key] - type must implements CodeList<Test1CodeList>", error.getMessage());
+        assertEquals("type must implements CodeList<Test1CodeList>", error.getMessage());
     }
 
     @Test
@@ -172,7 +176,7 @@ class Up2ConverterTests {
         // THEN
         assertEquals(CodeList2Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
-        assertEquals("CodeList2Entity[key] - type must implements CodeList<Test2CodeList>", error.getMessage());
+        assertEquals("type must implements CodeList<Test2CodeList>", error.getMessage());
     }
 
     @Test
@@ -182,7 +186,18 @@ class Up2ConverterTests {
         // THEN
         assertEquals(CodeList3Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
-        assertEquals("CodeList3Entity[key] - type must implements CodeList<Test3CodeList>", error.getMessage());
+        assertEquals("type must implements CodeList<Test3CodeList>", error.getMessage());
+    }
+
+    @Test
+    void testInvalidCodeList4Entity() {
+        // GIVEN
+        final AccessException error = assertThrows(AccessException.class, () -> factory.build(CodeList4Entity.class));
+        // THEN
+        assertEquals(Test4CodeList.class, error.getSource());
+        assertEquals("*", error.getLocator());
+        assertEquals("must be unique", error.getMessage());
+        assertEquals("Test4CodeList[*] must be unique", error.getLocalizedMessage());
     }
 
     @Test
@@ -192,7 +207,7 @@ class Up2ConverterTests {
         // THEN
         assertEquals(DefaultBean.class, error.getSource());
         assertEquals("key", error.getLocator());
-        assertEquals("DefaultBean[key] - @Position[defaultValue] cannot be parsed", error.getMessage());
+        assertEquals("@Position[defaultValue] cannot be parsed", error.getMessage());
     }
 
     @Test
@@ -203,7 +218,57 @@ class Up2ConverterTests {
         // THEN
         assertEquals(Test3Converter.class, error.getSource());
         assertEquals("test", error.getLocator());
-        assertEquals("Test3Converter[test] - @Position[converter] does not support class " + cn, error.getMessage());
+        assertEquals("@Position[converter] does not support class " + cn, error.getMessage());
+    }
+
+    @Test
+    void testResolver1Support() {
+        // GIVEN
+        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test4Resolver.class));
+        // THEN
+        assertEquals(Test4Resolver.class, error.getSource());
+        assertEquals("test", error.getLocator());
+        assertEquals("must not be annotated with @Up2CodeList", error.getMessage());
+    }
+
+    @Test
+    void testResolver2Support() {
+        // GIVEN
+        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test5Resolver.class));
+        // THEN
+        assertEquals(Test5Resolver.class, error.getSource());
+        assertEquals("test", error.getLocator());
+        assertEquals("must not be annotated with @Up2Decimal", error.getMessage());
+    }
+
+    @Test
+    void testResolver3Support() {
+        // GIVEN
+        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test6Resolver.class));
+        // THEN
+        assertEquals(Test6Resolver.class, error.getSource());
+        assertEquals("test", error.getLocator());
+        assertEquals("must be annotated with one and only one of shortcuts: Up2Number, Up2Dummy", error.getMessage());
+    }
+
+    @Test
+    void testResolver4Support() {
+        // GIVEN
+        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test8Resolver.class));
+        // THEN
+        assertEquals(Test8Resolver.class, error.getSource());
+        assertEquals("test", error.getLocator());
+        assertEquals("must not be annotated with @Enumerated", error.getMessage());
+    }
+
+    @Test
+    void testResolver5Support() {
+        // GIVEN
+        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test9Resolver.class));
+        // THEN
+        assertEquals(Test9Resolver.class, error.getSource());
+        assertEquals("test", error.getLocator());
+        assertEquals("type must not be annotated with @XmlEnum", error.getMessage());
     }
 
 }

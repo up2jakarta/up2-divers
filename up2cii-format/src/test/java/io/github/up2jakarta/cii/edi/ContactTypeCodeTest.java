@@ -76,7 +76,7 @@ public class ContactTypeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(104, error.getLineNumber());
             assertEquals(53, error.getLineOffset());
-            assertEquals("ECE-3139: Unknown value [???] for CodeList[ContactTypeCodeType].", error.getMessage());
+            assertEquals("ECE-3139: Unknown input [???] for CodeList[ContactTypeCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

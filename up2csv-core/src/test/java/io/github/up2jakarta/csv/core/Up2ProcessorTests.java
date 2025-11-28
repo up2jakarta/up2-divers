@@ -4,7 +4,6 @@ import io.github.up2jakarta.csv.TUConfiguration;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Trim;
 import io.github.up2jakarta.csv.core.BSBuilder.Input;
-import io.github.up2jakarta.csv.core.BSProperty.Accessor;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition.PS;
 import io.github.up2jakarta.csv.core.hdl.FailureException;
@@ -17,10 +16,9 @@ import io.github.up2jakarta.csv.core.misc.prc.Test7Processor;
 import io.github.up2jakarta.csv.impl.GroupType;
 import io.github.up2jakarta.csv.prc.TrimProcessor;
 import io.github.up2jakarta.lov.TypeAdapter;
-import io.github.up2jakarta.lov.core.BeanContext;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.lov.core.StringAdapter;
-import io.github.up2jakarta.lov.core.TypeWrapper;
+import io.github.up2jakarta.lov.core.TypeSupport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +31,7 @@ import static io.github.up2jakarta.csv.api.IEvent.EC_PROCESSOR;
 import static io.github.up2jakarta.csv.core.Properties.parse;
 import static io.github.up2jakarta.csv.core.Up2ErrorTests.EX_CAUSE;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.core.Localizable.CLASS;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -53,11 +52,11 @@ public class Up2ProcessorTests {
         final Position position = field.getAnnotation(Position.class);
         final Input<?> processor = BSBuilder.build(context, field, position);
         if (field.getType() == String.class) {
-            final Accessor<String> va = Properties.wo(String.class, field);
+            final BSAccessor<String> va = Properties.wo(String.class, field);
             return new PS<>(va, null, 0, position, processor, StringAdapter.INSTANCE);
         } else if (field.getType() == Integer.class) {
-            final Accessor<Integer> va = Properties.wo(Integer.class, field);
-            final TypeAdapter<Integer> cvr = new TypeWrapper<>(Integer.class, Integer::parseInt);
+            final BSAccessor<Integer> va = Properties.wo(Integer.class, field);
+            final TypeAdapter<Integer> cvr = new TypeSupport<>(Integer.class, Integer::parseInt);
             return new PS<>(va, null, 0, position, processor, cvr);
         }
         throw new UnsupportedOperationException();
@@ -194,7 +193,7 @@ public class Up2ProcessorTests {
             assertEquals(EC_PROCESSOR, thrown.getCode());
             assertEquals(ERROR, thrown.getLevel());
             assertInstanceOf(NullPointerException.class, thrown.getCause());
-            assertEquals("#[1] throws ERROR[UP2-P001] : java.lang.NullPointerException: null message", thrown.getFormattedMessage());
+            assertEquals("#[1] throws #[UP2-P001] java.lang.NullPointerException: null message", thrown.getLocalizedMessage());
         }
         {
             // When
@@ -203,7 +202,7 @@ public class Up2ProcessorTests {
             assertEquals(EC_PROCESSOR, thrown.getCode());
             assertEquals(ERROR, thrown.getLevel());
             assertInstanceOf(RuntimeException.class, thrown.getCause());
-            assertEquals("#[1] throws ERROR[UP2-P001] : java.lang.RuntimeException: other message", thrown.getFormattedMessage());
+            assertEquals("#[1] throws #[UP2-P001] java.lang.RuntimeException: other message", thrown.getLocalizedMessage());
         }
     }
 
@@ -237,8 +236,8 @@ public class Up2ProcessorTests {
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test5Processor.class));
         // THEN
         assertEquals(Dummy4.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("Dummy4[class] - @Processor[value] must implements InputProcessor<Dummy4>", thrown.getMessage());
+        assertEquals(CLASS, thrown.getLocator());
+        assertEquals("@Processor[value] must implements InputProcessor<Dummy4>", thrown.getMessage());
     }
 
 }

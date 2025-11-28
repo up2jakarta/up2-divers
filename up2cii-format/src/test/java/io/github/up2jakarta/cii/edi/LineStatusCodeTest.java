@@ -71,7 +71,7 @@ public class LineStatusCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(26, error.getLineNumber());
             assertEquals(61, error.getLineOffset());
-            assertEquals("ECE-1229: Unknown value [???] for CodeList[LineStatusCodeType].", error.getMessage());
+            assertEquals("ECE-1229: Unknown input [???] for CodeList[LineStatusCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

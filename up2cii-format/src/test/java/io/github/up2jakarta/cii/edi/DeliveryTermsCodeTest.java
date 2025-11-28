@@ -67,7 +67,7 @@ public class DeliveryTermsCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(160, error.getLineNumber());
             assertEquals(65, error.getLineOffset());
-            assertEquals("ECE-4053: Unknown value [???] for CodeList[DeliveryTermsCodeType].", error.getMessage());
+            assertEquals("ECE-4053: Unknown input [???] for CodeList[DeliveryTermsCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

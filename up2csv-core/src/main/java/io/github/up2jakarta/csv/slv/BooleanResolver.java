@@ -5,7 +5,7 @@ import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Up2Boolean;
 import io.github.up2jakarta.lov.*;
 import io.github.up2jakarta.lov.core.BeanException;
-import io.github.up2jakarta.lov.core.TypeWrapper;
+import io.github.up2jakarta.lov.core.TypeSupport;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
@@ -18,29 +18,26 @@ import static io.github.up2jakarta.lov.SeverityType.ERROR;
 
 @Named
 @Singleton
-public final class BooleanResolver extends TypeResolver<Up2Boolean> {
+public final class BooleanResolver implements TypeResolver<Boolean, Up2Boolean> {
 
     @Override
-    public TypeAdapter<Boolean> resolve(Field property, Class<?> type, Up2Boolean config) throws BeanException {
-        if (type == Boolean.class || type == boolean.class) {
-            final Optional<Error> error = error(property, type);
-            final SeverityType level = error.map(Error::level).orElse(ERROR);
-            final String code = error.map(Error::value).orElse(EC_BOOLEAN);
-            final String trueValue = config.trueValue();
-            final String falseValue = config.falseValue();
-            final PropertyConverter<Boolean> parser = (v) -> {
-                if (trueValue.equals(v)) {
-                    return true;
-                }
-                if (falseValue.equals(v)) {
-                    return false;
-                }
-                throw new PropertyException(level, code, "Unknown value [" + v + "] for Boolean");
-            };
-            final PropertyFormatter<Boolean> format = (v) -> (v) ? trueValue : falseValue;
-            return new TypeWrapper<>(Boolean.class, parser, format);
-        }
-        throw new BeanException(property, "must not be annotated by @Up2Boolean");
+    public TypeAdapter<Boolean> resolve(Field pf, Class<Boolean> pt, Up2Boolean pc) throws BeanException {
+        final Optional<Error> error = error(pf, pt);
+        final SeverityType level = error.map(Error::level).orElse(ERROR);
+        final String code = error.map(Error::value).orElse(EC_BOOLEAN);
+        final String trueValue = pc.trueValue();
+        final String falseValue = pc.falseValue();
+        final TypeConverter<Boolean> parser = (v) -> {
+            if (trueValue.equals(v)) {
+                return true;
+            }
+            if (falseValue.equals(v)) {
+                return false;
+            }
+            throw new TypeException(level, code, "Unknown input [" + v + "] for Boolean");
+        };
+        final TypeFormatter<Boolean> format = (v) -> (v) ? trueValue : falseValue;
+        return new TypeSupport<>(Boolean.class, parser, format);
     }
 
 }

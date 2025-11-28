@@ -21,9 +21,9 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 import static io.github.up2jakarta.csv.core.BSBuilder.MST;
+import static io.github.up2jakarta.csv.core.BSManager.Pod;
 import static io.github.up2jakarta.csv.core.BSNode.Bean.*;
 import static io.github.up2jakarta.csv.core.BSNode.Flat;
-import static io.github.up2jakarta.csv.core.BSOperator.Computer;
 import static io.github.up2jakarta.csv.core.ext.Beans.getDefaultConstructor;
 import static io.github.up2jakarta.csv.core.ext.Beans.newInstance;
 import static io.github.up2jakarta.lov.core.Defaults.EMPTY;
@@ -62,38 +62,42 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         this.validator = source.validator;
         this.offset = source.offset;
         final List<BSProperty<?, ?, D>> ps = new ArrayList<>(source.properties.size());
+        var same = true;
         for (final BSProperty<?, ?, D> p : source.properties) {
-            ps.add(p.reverse());
-        }
-        this.properties = unmodifiableList(ps);
-    }
-
-    @SuppressWarnings("ALL")
-    private BSProperty<?, ?, D> find(final ConstraintViolation<?> violation) {
-        final String path = violation.getPropertyPath().toString();
-        final String[] fieldNames = path.split("\\.");
-        BSProperty<?, ?, D> property = null;
-        List<BSProperty<?, ?, D>> properties = this.properties;
-        for (final String fieldName : fieldNames) {
-            property = properties.stream().filter(p -> fieldName.equals(p.getName())).findFirst().orElse(null);
-            if (property instanceof PFragment<?, ?, ?> fp) {
-                properties = ((PFragment<?, ?, D>) fp).node.properties;
-            } else {
-                return property;
+            final BSProperty<?, ?, D> r = p.reverse();
+            ps.add(r);
+            if (p != r) {
+                same = false;
             }
         }
-        return property;
+        this.properties = (same) ? source.properties : unmodifiableList(ps);
     }
 
-    void validate(S b, int o, ComplianceHandler<D> h) {
+    @SuppressWarnings("RedundantCast")
+    private BSProperty<?, ?, D> find(final ConstraintViolation<?> violation) {
+        final String path = violation.getPropertyPath().toString();
+        final String[] names = path.split("\\.");
+        var ps = this.properties;
+        for (final String fn : names) {
+            var cp = ps.stream().filter(p -> fn.equals(p.getName())).findAny().orElse(null);
+            if (cp instanceof PFragment<?, ?, ?> fp) {
+                ps = ((PFragment<?, ?, D>) fp).node.properties;
+            } else {
+                return cp;
+            }
+        }
+        return null;
+    }
+
+    void validate(S bean, int offset, ComplianceHandler<D> handler) {
         if (context.enabled) {
-            final Set<ConstraintViolation<Object>> violations = validator.validate(b, context.groups);
+            final Set<ConstraintViolation<Object>> violations = validator.validate(bean, context.groups);
             for (final ConstraintViolation<?> cv : violations) {
                 final BSProperty<?, ?, D> p = this.find(cv);
                 if (p != null) {
-                    h.handle(p.dataType, p.offset + o, cv, p.error);
+                    handler.handle(p.dataType, p.offset + offset, cv, p.error);
                 } else {
-                    h.handle(null, null, cv, null);
+                    handler.handle(null, null, cv, null);
                 }
             }
         }
@@ -111,7 +115,7 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         Flat(int i, Class<S> t, Validator v, VContext c, Fragment f, List<BSProperty<?, ?, D>> ps) {
             super(i, t, v, c, f.nullable(), f.prototype(), ps);
             if (this.prototype) {
-                this.index = Computer.min(this);
+                this.index = Pod.min(this);
                 this.cache = this.defaultValues(index);
             } else {
                 this.index = -1;
@@ -128,7 +132,7 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         private Flat(Bean<S, D, ?> source) throws BeanException {
             super(source);
             if (this.prototype) {
-                this.index = Computer.min(this);
+                this.index = Pod.min(this);
                 this.cache = this.defaultValues(index);
             } else {
                 this.index = -1;
@@ -137,7 +141,7 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         }
 
         private String[] defaultValues(int min) {
-            final int length = Computer.max(this) + 1;
+            final int length = Pod.max(this) + 1;
             if (length != 0 && min >= 0) {
                 final String[] result = new String[length];
                 for (final BSProperty<?, ?, D> p : properties) {
@@ -230,7 +234,7 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
             this.constructor = cs;
         }
 
-        protected boolean parse(List<Segment> stack, C args, EventHandler<D> hdl, int offset, String... record) {
+        protected boolean parse(List<Segment> stack, C args, EventHandler<D> handler, int offset, String... record) {
             if (nullable && !(offset < record.length)) {
                 return true;
             }
@@ -238,17 +242,17 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
             for (final BSProperty<?, ?, D> property : properties) {
                 if (property instanceof PFragment<?, ?, ?>) {
                     final PFragment<Segment, Object, D> fp = (PFragment<Segment, Object, D>) property;
-                    final Segment value = ((Bean<?, D, C>) fp.node).parse(stack, hdl, offset, record);
+                    final Segment value = ((Bean<?, D, C>) fp.node).parse(stack, handler, offset, record);
                     this.set(args, fp, fp.wrap(value));
                     if (value != null) {
-                        fp.node.validate(value, offset, hdl);
+                        fp.node.validate(value, offset, handler);
                         empty = false;
                     }
                 } else {
                     final PPosition<Object, Object, D> pp = (PPosition<Object, Object, D>) property;
                     final int index = property.offset;
                     final String data = (index < record.length) ? record[index] : null;
-                    final Object value = pp.parse(data, offset, hdl);
+                    final Object value = pp.parse(data, offset, handler);
                     this.set(args, pp, pp.wrap(value));
                     if (value != null) {
                         empty = false;

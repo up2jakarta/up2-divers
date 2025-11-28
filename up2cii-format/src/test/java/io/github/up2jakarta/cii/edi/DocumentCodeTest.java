@@ -72,7 +72,7 @@ public class DocumentCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(174, error.getLineNumber());
             assertEquals(49, error.getLineOffset());
-            assertEquals("ECE-1001: Unknown value [???] for CodeList[DocumentCodeType].", error.getMessage());
+            assertEquals("ECE-1001: Unknown input [???] for CodeList[DocumentCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

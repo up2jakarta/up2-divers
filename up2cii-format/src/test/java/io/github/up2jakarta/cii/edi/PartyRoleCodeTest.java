@@ -72,7 +72,7 @@ public class PartyRoleCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(96, error.getLineNumber());
             assertEquals(49, error.getLineOffset());
-            assertEquals("ECE-3035: Unknown value [???] for CodeList[PartyRoleCodeType].", error.getMessage());
+            assertEquals("ECE-3035: Unknown input [???] for CodeList[PartyRoleCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

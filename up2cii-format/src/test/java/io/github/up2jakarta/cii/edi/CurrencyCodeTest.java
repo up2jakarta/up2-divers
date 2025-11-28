@@ -63,7 +63,7 @@ public class CurrencyCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(234, error.getLineNumber());
             assertEquals(67, error.getLineOffset());
-            assertEquals("ISO-4217: Unknown value [???] for CodeList[CurrencyCodeType].", error.getMessage());
+            assertEquals("ISO-4217: Unknown input [???] for CodeList[CurrencyCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

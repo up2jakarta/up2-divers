@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.core.hdl;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.hdl.IPropertyEvent;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.lov.PropertyException;
+import io.github.up2jakarta.lov.TypeException;
 
 /**
  * Simple implementation of input event based on cause exceptions, it's compatible with all modes.
@@ -13,17 +13,17 @@ import io.github.up2jakarta.lov.PropertyException;
  */
 public class PropertyEvent<B extends DataType<B>, R extends IRecord<?>> extends Event<B> implements IPropertyEvent<B, R> {
 
-    private final PropertyException cause;
+    private final TypeException cause;
     private final R record;
 
-    public PropertyEvent(R source, Integer offset, B type, PropertyException cause) {
+    public PropertyEvent(R source, Integer offset, B type, TypeException cause) {
         super(type, offset);
         this.record = source;
         this.cause = cause;
     }
 
     @Override
-    public PropertyException getCause() {
+    public TypeException getCause() {
         return cause;
     }
 
@@ -34,7 +34,7 @@ public class PropertyEvent<B extends DataType<B>, R extends IRecord<?>> extends 
 
     @Override
     public final String toString() {
-        return this.getFormattedMessage();
+        return this.getLocalizedMessage();
     }
 
 }

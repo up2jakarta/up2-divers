@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.core.misc.lov;
 
-import io.github.up2jakarta.lov.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.springframework.stereotype.Component;
 
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
  * {@link XmlAdapter} mapping of {@link MeasurementUnitCode} to CII (D16B) XML-String.
  */
 @Component
-public class MeasurementUnitConverter extends CodeListConverter<MeasurementUnitCode> {
+public class MeasurementUnitConverter extends CodeListAdapter<MeasurementUnitCode> {
 
     public static final String EDI_R_20 = "EDI-R20";
 

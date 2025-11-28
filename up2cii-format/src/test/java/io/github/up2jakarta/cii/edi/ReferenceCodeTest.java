@@ -79,7 +79,7 @@ public class ReferenceCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(84, error.getLineNumber());
             assertEquals(71, error.getLineOffset());
-            assertEquals("ECE-1153: Unknown value [???] for CodeList[ReferenceCodeType].", error.getMessage());
+            assertEquals("ECE-1153: Unknown input [???] for CodeList[ReferenceCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.slv;
 
-import io.github.up2jakarta.csv.api.ext.TypeResolver;
+import io.github.up2jakarta.csv.api.ext.SimpleResolver;
 import io.github.up2jakarta.csv.cfg.Up2Number;
 import io.github.up2jakarta.lov.TypeAdapter;
 import io.github.up2jakarta.lov.core.BeanException;
-import io.github.up2jakarta.lov.core.TypeWrapper;
+import io.github.up2jakarta.lov.core.TypeSupport;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
@@ -13,26 +13,26 @@ import java.math.BigInteger;
 
 @Named
 @Singleton
-public final class NumberResolver extends TypeResolver<Up2Number> {
+public final class NumberResolver extends SimpleResolver<Number, Up2Number> {
 
     @Override
-    public TypeAdapter<? extends Number> resolve(Field property, Class<?> type, Up2Number config) throws BeanException {
-        if (type == BigInteger.class) {
-            return new TypeWrapper<>(BigInteger.class, BigInteger::new);
+    protected TypeAdapter<? extends Number> resolve(Field pf, Class<Number> pt) throws BeanException {
+        if (BigInteger.class.equals(pt)) {
+            return new TypeSupport<>(BigInteger.class, BigInteger::new);
         }
-        if (type == Integer.class || type == int.class) {
-            return new TypeWrapper<>(Integer.class, Integer::parseInt);
+        if (Integer.class.equals(pt) || int.class.equals(pt)) {
+            return new TypeSupport<>(Integer.class, Integer::parseInt);
         }
-        if (type == Long.class || type == long.class) {
-            return new TypeWrapper<>(Long.class, Long::parseLong);
+        if (Long.class.equals(pt) || long.class.equals(pt)) {
+            return new TypeSupport<>(Long.class, Long::parseLong);
         }
-        if (type == Short.class || type == short.class) {
-            return new TypeWrapper<>(Short.class, Short::parseShort);
+        if (Short.class.equals(pt) || short.class.equals(pt)) {
+            return new TypeSupport<>(Short.class, Short::parseShort);
         }
-        if (type == Byte.class || type == byte.class) {
-            return new TypeWrapper<>(Byte.class, Byte::parseByte);
+        if (Byte.class.equals(pt) || byte.class.equals(pt)) {
+            return new TypeSupport<>(Byte.class, Byte::parseByte);
         }
-        throw new BeanException(property, "must not be annotated by @Up2Number");
+        throw new BeanException(pf, "must not be annotated with @Up2Number");
     }
 
 }

@@ -5,12 +5,9 @@ import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Number;
 import io.github.up2jakarta.csv.data.Segment;
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 
 import java.util.Optional;
 
-@Access(AccessType.FIELD)
 public class Final3Segment implements Segment {
 
     @Position(0)

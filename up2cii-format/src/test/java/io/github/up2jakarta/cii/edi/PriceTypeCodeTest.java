@@ -76,7 +76,7 @@ public class PriceTypeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(44, error.getLineNumber());
             assertEquals(53, error.getLineOffset());
-            assertEquals("ECE-5375: Unknown value [???] for CodeList[PriceTypeCodeType].", error.getMessage());
+            assertEquals("ECE-5375: Unknown input [???] for CodeList[PriceTypeCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

@@ -128,7 +128,7 @@ public class ErrorSupportTest {
             assertEquals(0, error.getOffset());
             assertEquals(ERROR, error.getLevel());
             assertEquals(CurrencyConverter.ISO_4217, error.getCode());
-            assertEquals("Unknown value [ILS] for CodeList[CurrencyCodeType]", error.getMessage());
+            assertEquals("Unknown input [ILS] for CodeList[CurrencyCodeType]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -163,7 +163,7 @@ public class ErrorSupportTest {
             assertEquals(0, error.getOffset());
             assertEquals(WARNING, error.getLevel());
             assertEquals(Test2Converter.TU_P_004, error.getCode());
-            assertEquals("Unknown value [ILS] for CodeList[CurrencyCodeType]", error.getMessage());
+            assertEquals("Unknown input [ILS] for CodeList[CurrencyCodeType]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -198,7 +198,7 @@ public class ErrorSupportTest {
             assertEquals(0, error.getOffset());
             assertEquals(ERROR, error.getLevel());
             assertEquals(EC_CODE_LIST, error.getCode());
-            assertEquals("Unknown value [ISL] for CodeList[CurrencyCodeType]", error.getMessage());
+            assertEquals("Unknown input [ISL] for CodeList[CurrencyCodeType]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -208,7 +208,7 @@ public class ErrorSupportTest {
             assertEquals(1, error.getOffset());
             assertEquals(ERROR, error.getLevel());
             assertEquals(MeasurementUnitConverter.EDI_R_20, error.getCode());
-            assertEquals("Unknown value [XGM] for CodeList[MeasurementUnitCode]", error.getMessage());
+            assertEquals("Unknown input [XGM] for CodeList[MeasurementUnitCode]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -243,7 +243,7 @@ public class ErrorSupportTest {
             assertEquals(0, error.getOffset());
             assertEquals(ERROR, error.getLevel());
             assertEquals(Test2Resolver.TU_P_007, error.getCode());
-            assertEquals("Unknown value [date] for CodeList[MeasurementUnitCode]", error.getMessage());
+            assertEquals("Unknown input [date] for CodeList[MeasurementUnitCode]", error.getMessage());
             assertNull(error.getTrace());
         }
         {

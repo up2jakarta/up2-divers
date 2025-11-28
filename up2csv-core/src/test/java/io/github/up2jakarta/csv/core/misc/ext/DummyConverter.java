@@ -2,11 +2,11 @@ package io.github.up2jakarta.csv.core.misc.ext;
 
 import io.github.up2jakarta.csv.core.misc.DummyException;
 import io.github.up2jakarta.lov.SeverityType;
-import io.github.up2jakarta.lov.TypeConverter;
+import io.github.up2jakarta.lov.core.SafeAdapter;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class DummyConverter extends TypeConverter<Integer> {
+public final class DummyConverter extends SafeAdapter<Integer> {
 
     public static final String TU_P_005 = "TU-P005";
 

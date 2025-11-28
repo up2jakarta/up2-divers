@@ -67,7 +67,7 @@ public class TimePointFormatCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(15, error.getLineNumber());
             assertEquals(46, error.getLineOffset());
-            assertEquals("ECE-2379: Unknown value [???] for CodeList[TimePointFormatCodeType].", error.getMessage());
+            assertEquals("ECE-2379: Unknown input [???] for CodeList[TimePointFormatCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

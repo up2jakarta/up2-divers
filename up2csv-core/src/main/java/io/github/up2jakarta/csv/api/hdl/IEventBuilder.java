@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Listable;
+import io.github.up2jakarta.lov.core.Listable;
 
 /**
  * Contract interface for {@link BusinessHandler} builder.

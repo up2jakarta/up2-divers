@@ -88,7 +88,7 @@ public class AutomaticDataCaptureMethodCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(55, error.getLineNumber());
             assertEquals(109, error.getLineOffset());
-            assertEquals("ECE-7233: Unknown value [???] for CodeList[AutomaticDataCaptureMethodCodeType].", error.getMessage());
+            assertEquals("ECE-7233: Unknown input [???] for CodeList[AutomaticDataCaptureMethodCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

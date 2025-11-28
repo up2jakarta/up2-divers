@@ -75,7 +75,7 @@ public class TransportModeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(202, error.getLineNumber());
             assertEquals(53, error.getLineOffset());
-            assertEquals("ECE-R19: Unknown value [???] for CodeList[TransportModeCodeType].", error.getMessage());
+            assertEquals("ECE-R19: Unknown input [???] for CodeList[TransportModeCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

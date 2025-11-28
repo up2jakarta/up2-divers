@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.core.ext;
 
-import io.github.up2jakarta.lov.PropertyException;
 import io.github.up2jakarta.lov.TypeAdapter;
+import io.github.up2jakarta.lov.TypeException;
 import jakarta.persistence.AttributeConverter;
 
 /**
@@ -20,7 +20,7 @@ public final class JpaWrapper<T> implements TypeAdapter<T> {
     }
 
     @Override
-    public Class<T> getSupportedType() {
+    public Class<T> getType() {
         return type;
     }
 
@@ -30,7 +30,7 @@ public final class JpaWrapper<T> implements TypeAdapter<T> {
     }
 
     @Override
-    public String format(T value) throws PropertyException {
+    public String format(T value) throws TypeException {
         return delegate.convertToDatabaseColumn(value);
     }
 

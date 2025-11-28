@@ -1,16 +1,13 @@
 package io.github.up2jakarta.csv;
 
+import io.github.up2jakarta.csv.core.BeanContext;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.misc.ext.DummyConverter;
 import io.github.up2jakarta.csv.core.misc.lov.CurrencyConverter;
-import io.github.up2jakarta.csv.data.DataTypeResolver;
-import io.github.up2jakarta.csv.impl.GroupType;
-import io.github.up2jakarta.csv.impl.MyFastAggregator;
-import io.github.up2jakarta.csv.impl.MyFullAggregator;
-import io.github.up2jakarta.csv.impl.MyUnitAggregator;
+import io.github.up2jakarta.csv.data.DataResolver;
+import io.github.up2jakarta.csv.impl.*;
 import io.github.up2jakarta.csv.prc.TokenProcessor;
 import io.github.up2jakarta.csv.slv.DecimalResolver;
-import io.github.up2jakarta.lov.core.BeanContext;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.Validator;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
@@ -57,8 +54,8 @@ public class TUConfiguration {
     }
 
     @Bean
-    DataTypeResolver<GroupType> resolver() {
-        return DataTypeResolver.empty(GroupType.class);
+    DataResolver<GroupType> resolver() {
+        return new InputResolver();
     }
 
     @Bean

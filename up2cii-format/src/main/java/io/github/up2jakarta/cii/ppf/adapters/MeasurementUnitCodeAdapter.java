@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.ppf.adapters;
 
 import io.github.up2jakarta.cii.ppf.MeasurementUnitCode;
-import io.github.up2jakarta.lov.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListAdapter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -11,7 +11,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  */
 @Named
 @Singleton
-public class MeasurementUnitCodeAdapter extends CodeListConverter<MeasurementUnitCode> {
+public class MeasurementUnitCodeAdapter extends CodeListAdapter<MeasurementUnitCode> {
 
     MeasurementUnitCodeAdapter() {
         super(MeasurementUnitCode.class, "ECE-R20");

@@ -12,7 +12,7 @@ import io.github.up2jakarta.csv.io.BaseFileReader;
 import io.github.up2jakarta.csv.io.dto.Invoice;
 import io.github.up2jakarta.csv.io.impl.GroupType;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
-import io.github.up2jakarta.lov.PropertyException;
+import io.github.up2jakarta.lov.TypeException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -62,7 +62,7 @@ public abstract class Tests {
     }
 
     public static class TUError extends PropertyEvent<GroupType, TURecord> {
-        public TUError(TURecord row, Integer offset, GroupType type, PropertyException cause) {
+        public TUError(TURecord row, Integer offset, GroupType type, TypeException cause) {
             super(row, offset, type, cause);
         }
     }

@@ -7,8 +7,8 @@ public final class AccessMode31 extends AccessMode30 {
 
     public static final AccessMode30 RO = new AccessMode30("RO", "Read only");
 
-    private AccessMode31(String name, String code) {
-        super(name, code);
+    private AccessMode31(String code, String name) {
+        super(code, name);
     }
 
 }

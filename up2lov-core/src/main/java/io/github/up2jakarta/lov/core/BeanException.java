@@ -1,16 +1,14 @@
 package io.github.up2jakarta.lov.core;
 
-import io.github.up2jakarta.lov.MessageFormatter;
-
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
+
+import static io.github.up2jakarta.lov.core.Beans.getTypeName;
 
 /**
  * Up2J Bean Exception that wraps missing or wrong configuration on java-beans.
  */
-public class BeanException extends Exception implements MessageFormatter {
-
-    private static final String FORMAT = "%s[%s] - %s";
+public final class BeanException extends Exception implements Localizable {
 
     private final AnnotatedElement source;
     private final CharSequence name;
@@ -18,13 +16,13 @@ public class BeanException extends Exception implements MessageFormatter {
 
     private BeanException(AnnotatedElement source, CharSequence name, String locator, String message) {
         super(message);
-        this.source = source;
         this.name = name;
+        this.source = source;
         this.locator = locator;
     }
 
     public BeanException(Class<?> source, String locator, final String message) {
-        this(source, Beans.getTypeName(source), locator, message);
+        this(source, getTypeName(source), locator, message);
     }
 
     public BeanException(Member source, String message) {
@@ -32,11 +30,15 @@ public class BeanException extends Exception implements MessageFormatter {
     }
 
     public BeanException(Class<?> source, String message) {
-        this(source, "class", message);
+        this(source, CLASS, message);
     }
 
     public BeanException(Package source, String message) {
-        this(source, "info", source.getName(), message);
+        this(source, source.getName(), PACKAGE, message);
+    }
+
+    public BeanException(TypeContext context, String message) {
+        this(context.source, message);
     }
 
     public static BeanException of(AnnotatedElement source, String message) {
@@ -52,27 +54,23 @@ public class BeanException extends Exception implements MessageFormatter {
         throw new IllegalArgumentException(source.getClass().getName());
     }
 
-    /**
-     * @return the bean class
-     */
-    public final AnnotatedElement getSource() {
+    @Override
+    public AnnotatedElement getSource() {
         return source;
     }
 
-    /**
-     * @return the attribute of the bean, it should be the property name or whatever.
-     */
-    public final String getLocator() {
+    @Override
+    public CharSequence getName() {
+        return name;
+    }
+
+    @Override
+    public String getLocator() {
         return locator;
     }
 
     @Override
-    public String getMessage() {
-        return getFormattedMessage();
-    }
-
-    @Override
-    public String getFormattedMessage() {
+    public String getLocalizedMessage() {
         return String.format(FORMAT, name, locator, super.getMessage());
     }
 

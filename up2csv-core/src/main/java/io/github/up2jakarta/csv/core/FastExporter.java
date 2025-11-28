@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * {@link ModeType#FAST} Processor that's able to segregate and export java-bean to flat-data.
+ * Up2J {@link ModeType#FAST} Processor that's able to segregate and export java-bean to flat-data.
  *
  * @param <T> the business object type
  * @param <B> the business data type

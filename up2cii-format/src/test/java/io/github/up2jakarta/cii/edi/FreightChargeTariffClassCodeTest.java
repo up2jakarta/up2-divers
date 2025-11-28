@@ -71,7 +71,7 @@ public class FreightChargeTariffClassCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(296, error.getLineNumber());
             assertEquals(63, error.getLineOffset());
-            assertEquals("ECE-5243: Unknown value [???] for CodeList[FreightChargeTariffClassCodeType].", error.getMessage());
+            assertEquals("ECE-5243: Unknown input [???] for CodeList[FreightChargeTariffClassCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

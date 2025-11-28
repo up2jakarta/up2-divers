@@ -77,7 +77,7 @@ public class EASchemeIDTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(121, error.getLineNumber());
             assertEquals(47, error.getLineOffset());
-            assertEquals("PPF-BR63: Unknown value [???] for CodeList[EASchemeIDType].", error.getMessage());
+            assertEquals("PPF-BR63: Unknown input [???] for CodeList[EASchemeIDType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

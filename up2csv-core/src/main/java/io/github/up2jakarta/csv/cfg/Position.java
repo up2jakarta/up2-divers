@@ -70,7 +70,7 @@ public @interface Position {
      *         }
      * </pre></blockquote>
      *
-     * @return the nullable flag
+     * @return the required flag
      */
     boolean required() default false;
 

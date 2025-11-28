@@ -75,7 +75,7 @@ public class TransportEquipmentFullnessCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(198, error.getLineNumber());
             assertEquals(69, error.getLineOffset());
-            assertEquals("ECE-8169: Unknown value [???] for CodeList[TransportEquipmentFullnessCodeType].", error.getMessage());
+            assertEquals("ECE-8169: Unknown input [???] for CodeList[TransportEquipmentFullnessCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

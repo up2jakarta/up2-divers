@@ -71,7 +71,7 @@ public class ChargePayingPartyRoleCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(297, error.getLineNumber());
             assertEquals(71, error.getLineOffset());
-            assertEquals("ECE-3035: Unknown value [???] for CodeList[ChargePayingPartyRoleCodeType].", error.getMessage());
+            assertEquals("ECE-3035: Unknown input [???] for CodeList[ChargePayingPartyRoleCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

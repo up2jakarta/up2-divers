@@ -2,6 +2,7 @@ package io.github.up2jakarta.csv.core.ext;
 
 import io.github.up2jakarta.csv.api.ext.TypeExtension;
 import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.core.BeanContext;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.TypeAdapter;
@@ -28,12 +29,13 @@ import static io.github.up2jakarta.lov.SeverityType.ERROR;
  */
 @Named
 @Singleton
-@SuppressWarnings("unchecked")
-public final class XmlAdapterExtension extends TypeExtension<XmlType, XmlJavaTypeAdapter> {
+public final class XmlAdapterExtension implements TypeExtension<Object, XmlJavaTypeAdapter> {
+
+    private final BeanContext context;
 
     @Inject
-    XmlAdapterExtension() {
-        super(XmlType.class);
+    XmlAdapterExtension(BeanContext context) {
+        this.context = context;
     }
 
     private static XmlJavaTypeAdapter getAdapter(Field field, Class<?> type) {
@@ -45,16 +47,12 @@ public final class XmlAdapterExtension extends TypeExtension<XmlType, XmlJavaTyp
     }
 
     @Override
-    public Optional<XmlJavaTypeAdapter> get(Class<? extends Segment> st, Field p, Class<?> type, Field... ps) throws BeanException {
-        final XmlJavaTypeAdapter xml = getAdapter(p, type);
+    public Optional<XmlJavaTypeAdapter> resolve(Class<? extends Segment> st, Field p, Class<?> pt, Field... ps) throws BeanException {
+        final XmlJavaTypeAdapter xml = getAdapter(p, pt);
         if (xml != null) {
-            if (!st.isAnnotationPresent(XmlType.class)) {
-                throw new BeanException(st, "must be annotated with @XmlType");
-            }
-            final Class<? extends XmlAdapter<String, ?>> adapterType = (Class<? extends XmlAdapter<String, ?>>) xml.value();
-            final Type[] arguments = getTypeArguments(adapterType, XmlAdapter.class);
-            if (!String.class.equals(arguments[0]) || !type.equals(arguments[1])) {
-                final CharSequence cn = getTypeName(type);
+            final Type[] types = getTypeArguments(xml.value(), XmlAdapter.class);
+            if (!String.class.equals(types[0]) || !(types[1] instanceof Class<?> c) || !c.isAssignableFrom(pt)) {
+                final CharSequence cn = getTypeName(pt);
                 throw new BeanException(p, "@XmlJavaTypeAdapter[value] should extends XmlAdapter<String, " + cn + ">");
             }
             return Optional.of(xml);
@@ -63,16 +61,15 @@ public final class XmlAdapterExtension extends TypeExtension<XmlType, XmlJavaTyp
     }
 
     @Override
-    public <V> TypeAdapter<V> resolve(Field property, Class<V> type, XmlJavaTypeAdapter config) throws BeanException {
-        final Class<XmlAdapter<String, V>> adapterType = (Class<XmlAdapter<String, V>>) config.value();
-        final XmlAdapter<String, V> adapter = this.getBean(adapterType, "");
+    public TypeAdapter<?> resolve(Field pf, Class<Object> pt, XmlJavaTypeAdapter pc) throws BeanException {
+        final XmlAdapter<String, Object> adapter = getBean(context, pc.value(), "");
         if (adapter instanceof TypeAdapter<?> pa) {
-            return (TypeAdapter<V>) pa;
+            return pa;
         }
-        final Optional<Error> error = error(property, type);
+        final Optional<Error> error = error(pf, pt);
         final SeverityType level = error.map(Error::level).orElse(ERROR);
         final String code = error.map(Error::value).orElse(EC_JPA_ENUM);
-        return new XmlWrapper<>(type, level, code, adapter);
+        return new XmlWrapper<>(pt, level, code, adapter);
     }
 
 }

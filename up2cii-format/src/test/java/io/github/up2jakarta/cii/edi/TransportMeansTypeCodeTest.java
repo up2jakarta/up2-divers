@@ -75,7 +75,7 @@ public class TransportMeansTypeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(204, error.getLineNumber());
             assertEquals(57, error.getLineOffset());
-            assertEquals("ECE-R28: Unknown value [???] for CodeList[TransportMeansTypeCodeType].", error.getMessage());
+            assertEquals("ECE-R28: Unknown input [???] for CodeList[TransportMeansTypeCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

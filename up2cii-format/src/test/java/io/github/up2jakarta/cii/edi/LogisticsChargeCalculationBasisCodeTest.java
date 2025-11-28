@@ -71,7 +71,7 @@ public class LogisticsChargeCalculationBasisCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(298, error.getLineNumber());
             assertEquals(73, error.getLineOffset());
-            assertEquals("ECE-6131: Unknown value [???] for CodeList[LogisticsChargeCalculationBasisCodeType].", error.getMessage());
+            assertEquals("ECE-6131: Unknown input [???] for CodeList[LogisticsChargeCalculationBasisCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

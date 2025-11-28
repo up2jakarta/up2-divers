@@ -5,15 +5,15 @@ import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.api.ext.TypeListener;
 import io.github.up2jakarta.csv.api.hdl.EventLevel;
 import io.github.up2jakarta.csv.cfg.*;
+import io.github.up2jakarta.csv.core.BSAccessor.Mode;
+import io.github.up2jakarta.csv.core.BSManager.Pod;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
-import io.github.up2jakarta.csv.core.ext.Beans;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.TypeAdapter;
 import io.github.up2jakarta.lov.core.AccessException;
-import io.github.up2jakarta.lov.core.BeanContext;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
@@ -22,20 +22,24 @@ import jakarta.validation.Valid;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.lang.reflect.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_PROCESSOR;
 import static io.github.up2jakarta.csv.core.BSBuilder.Input.*;
 import static io.github.up2jakarta.csv.core.BSOperator.BId;
-import static io.github.up2jakarta.csv.core.BSOperator.Computer;
-import static io.github.up2jakarta.csv.core.BSProperty.Accessor;
-import static io.github.up2jakarta.csv.core.BeanAccess.WO;
 import static io.github.up2jakarta.csv.core.ext.Beans.*;
 import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.lov.SeverityType.WARNING;
+import static io.github.up2jakarta.lov.core.Localizable.CLASS;
 import static java.util.Collections.unmodifiableList;
 
+/**
+ * Internal business builder.
+ */
 @SuppressWarnings("unchecked")
 final class BSBuilder {
 
@@ -64,7 +68,7 @@ final class BSBuilder {
     private static Method getRepeatableValue(Class<? extends Annotation> annotationType) throws BeanException {
         final Repeatable repeatable = annotationType.getDeclaredAnnotation(Repeatable.class);
         if (repeatable != null) {
-            return Beans.getMethod(repeatable.value(), "value", "class", "value()");
+            return getMethod(repeatable.value(), "value", CLASS, "value()");
         }
         return null;
     }
@@ -84,8 +88,8 @@ final class BSBuilder {
         final Class<? extends Annotation> type = ppa.annotationType();
         final Processor processor = type.getAnnotation(Processor.class);
         final Class<? extends InputProcessor<?>> pType = processor.value();
-        final Type[] types = Beans.getTypeArguments(pType, InputProcessor.class);
-        if (types.length == 0 || type != types[0]) {
+        final Class<?> support = getTypeArgument(pType, InputProcessor.class, 0, void.class);
+        if (type != support) {
             final CharSequence cn = getTypeName(type);
             throw new BeanException(type, "@Processor[value] must implements InputProcessor<" + cn + ">");
         }
@@ -128,13 +132,13 @@ final class BSBuilder {
         return other;
     }
 
-    static <A extends Annotation> List<A> getAnnotationsByType(Class<A> annotationType, AnnotatedElement element) throws BeanException {
-        final Method repeatValue = getRepeatableValue(annotationType);
+    static <A extends Annotation> List<A> getAnnotationsByType(Class<A> type, AnnotatedElement element) throws BeanException {
+        final Method repeatValue = getRepeatableValue(type);
         final List<A> result = new LinkedList<>();
         for (final Annotation annotation : element.getAnnotations()) {
             final Class<? extends Annotation> aType = annotation.annotationType();
             // direct
-            if (annotationType.equals(aType)) {
+            if (type.equals(aType)) {
                 result.add((A) annotation);
             }
             // indirect
@@ -147,31 +151,22 @@ final class BSBuilder {
                 }
             }
             // shortcuts
-            final A[] shortcutArray = aType.getAnnotationsByType(annotationType);
+            final A[] shortcutArray = aType.getAnnotationsByType(type);
             result.addAll(Arrays.asList(shortcutArray));
         }
         return result;
     }
 
-    static <A extends Annotation> void id(BeanAccess mode, BSNode<?, ?> pn, Class<A> ct, BIdPath bc, PFragment<Segment, ?, ?>... pp) throws BeanException {
+    static <A extends Annotation> void id(BSNode<?, ?> pn, Class<A> ct, BIdPath bc, PFragment<Segment, ?, ?>... pp) throws BeanException {
         for (final BSProperty<?, ?, ?> p : pn.properties) {
             final A annotation = p.getAnnotation(ct);
             if (p instanceof PFragment<?, ?, ?> fp) {
                 if (annotation != null) {
                     throw new BeanException(p.getSource(), "must not be annotated with @" + getTypeName(ct));
                 }
-                id(mode, fp.node, ct, bc, concat(pp, (PFragment<Segment, ?, ?>) fp));
+                id(fp.node, ct, bc, concat(pp, (PFragment<Segment, ?, ?>) fp));
             } else if (annotation != null) {
-                if (mode == WO) {
-                    final List<PFragment<Segment, ?, ?>> path = new ArrayList<>(pp.length);
-                    for (final PFragment<Segment, ?, ?> fp : pp) {
-                        path.add(fp.reverse());
-                    }
-                    final BSProperty<Object, Object, ?> pr = ((BSProperty<Object, Object, ?>) p).reverse();
-                    bc.accept(unmodifiableList(path), (PPosition<Object, Object, ?>) pr);
-                } else {
-                    bc.accept(Arrays.asList(pp), (PPosition<Object, Object, ?>) p);
-                }
+                bc.accept(pp, (PPosition<Object, Object, ?>) p);
             }
         }
     }
@@ -217,19 +212,19 @@ final class BSBuilder {
     }
 
     interface BIdPath {
-        void accept(List<PFragment<Segment, ?, ?>> path, PPosition<Object, Object, ?> property) throws BeanException;
+        void accept(PFragment<Segment, ?, ?>[] path, PPosition<Object, Object, ?> property) throws BeanException;
     }
 
     /**
      * Class Marker for Stack Trace.
      */
-    sealed interface MST permits BSProperty, Input, Accessor, BSNode {
+    sealed interface MST permits BSProperty, Input, BSAccessor, BSNode {
     }
 
     /**
      * Class Marker for Entry Point.
      */
-    sealed interface MEP permits Computer, BId, BeanLinker {
+    sealed interface MEP permits Pod, BId, BeanLinker {
     }
 
     /**
@@ -296,16 +291,16 @@ final class BSBuilder {
             }
 
             @Override
-            public String process(String value, int offset, PPosition<?, ?, D> pp, EventHandler<D> handler) {
+            public String process(String value, int offset, PPosition<?, ?, D> property, EventHandler<D> handler) {
                 try {
                     return delegate.process(value, config);
                 } catch (RuntimeException cause) {
-                    offset += pp.offset;
-                    if (pp.error != null) {
-                        handler.handle(pp.dataType, offset, cause, pp.error);
+                    offset += property.offset;
+                    if (property.error != null) {
+                        handler.handle(property.dataType, offset, cause, property.error);
                     } else {
                         final EventLevel level = () -> skip.isInstance(cause) ? WARNING : ERROR;
-                        handler.handle(level, () -> EC_PROCESSOR, pp.dataType, offset, cause);
+                        handler.handle(level, () -> EC_PROCESSOR, property.dataType, offset, cause);
                     }
                     return value;
                 }
@@ -322,7 +317,7 @@ final class BSBuilder {
             }
 
             @Override
-            public String process(String value, int offset, PPosition<?, ?, D> pp, EventHandler<D> handler) {
+            public String process(String value, int offset, PPosition<?, ?, D> property, EventHandler<D> handler) {
                 return value;
             }
         }
@@ -341,13 +336,13 @@ final class BSBuilder {
             this.contexts = contexts;
         }
 
-        static Listener of(Class<? extends Segment> type, BeanContext context) throws BeanException {
+        static Listener of(Class<? extends Segment> type, BeanContext context, Mode mode) throws BeanException {
             if (type.getTypeParameters().length != 0) {
                 throw new BeanException(type, "generic class is not allowed");
             }
             final Checker[] checkers = getAnnotationsByType(Checker.class, type).toArray(Checker[]::new);
             final List<TypeListener> result = new LinkedList<>();
-            result.add(BeanChecker.INSTANCE);
+            result.add(BeanChecker.of(mode));
             for (final Checker checker : checkers) {
                 final TypeListener bean = getBean(context, checker.value(), checker.name());
                 if (bean.isActivated(type)) {
@@ -360,9 +355,9 @@ final class BSBuilder {
         }
 
         @Override
-        public Listener beforeSegment(BeanAccess mode, Class<? extends Segment> type) throws BeanException {
+        public Listener beforeSegment(Class<? extends Segment> type) throws BeanException {
             for (var i = 0; i < listeners.length; i++) {
-                contexts[i] = listeners[i].beforeSegment(mode, type);
+                contexts[i] = listeners[i].beforeSegment(type);
             }
             return this;
         }
@@ -390,9 +385,9 @@ final class BSBuilder {
         }
 
         @Override
-        public void beforeFragmentProperty(BeanAccess mode, Field fragment, Class<? extends Segment> type) throws BeanException {
+        public void beforeFragmentProperty(Field fragment, Class<? extends Segment> type, int offset) throws BeanException {
             for (final TypeContext context : contexts) {
-                context.beforeFragmentProperty(mode, fragment, type);
+                context.beforeFragmentProperty(fragment, type, offset);
             }
         }
 

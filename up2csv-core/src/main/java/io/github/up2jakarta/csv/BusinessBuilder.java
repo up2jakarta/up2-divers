@@ -11,12 +11,12 @@ import io.github.up2jakarta.csv.core.hdl.PropertyCollector;
 import io.github.up2jakarta.csv.core.hdl.PropertyFailureCollector;
 import io.github.up2jakarta.csv.data.DataType;
 import io.github.up2jakarta.csv.data.IMutual;
-import io.github.up2jakarta.csv.data.Identifiable;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.fmt.*;
-import io.github.up2jakarta.lov.DefaultProvider;
+import io.github.up2jakarta.lov.ConstantProvider;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.Identifiable;
 
 import java.util.List;
 
@@ -94,7 +94,7 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @return new preconfigured final builder
          */
         public <I extends IType<B, I>> Builder<I> build(I root) {
-            return this.build(root, DefaultProvider.values(root));
+            return this.build(root, ConstantProvider.values(root));
         }
 
         public final class Builder<I extends IType<B, I>> {
@@ -237,7 +237,7 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @return new preconfigured final builder
          */
         public <I extends IType<B, I>> Builder<I> build(I root) {
-            return this.build(root, DefaultProvider.values(root));
+            return this.build(root, ConstantProvider.values(root));
         }
 
         public final class Builder<I extends IType<B, I>> {
@@ -380,7 +380,7 @@ public class BusinessBuilder<B extends DataType<B>> {
          * @return new preconfigured final builder
          */
         public <I extends IType<B, I>> Builder<I> build(I root) {
-            return this.build(root, DefaultProvider.values(root));
+            return this.build(root, ConstantProvider.values(root));
         }
 
         public final class Builder<I extends IType<B, I>> {

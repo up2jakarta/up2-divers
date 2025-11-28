@@ -75,7 +75,7 @@ public class DimensionTypeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(173, error.getLineNumber());
             assertEquals(57, error.getLineOffset());
-            assertEquals("ECE-6145: Unknown value [???] for CodeList[DimensionTypeCodeType].", error.getMessage());
+            assertEquals("ECE-6145: Unknown input [???] for CodeList[DimensionTypeCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

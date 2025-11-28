@@ -75,7 +75,7 @@ public class TransportMovementStageCodeTypeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(201, error.getLineNumber());
             assertEquals(55, error.getLineOffset());
-            assertEquals("ECE-8051: Unknown value [???] for CodeList[TransportMovementStageCodeType].", error.getMessage());
+            assertEquals("ECE-8051: Unknown input [???] for CodeList[TransportMovementStageCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

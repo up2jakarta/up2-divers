@@ -1,16 +1,15 @@
 package io.github.up2jakarta.csv.io;
 
+import io.github.up2jakarta.csv.core.BeanContext;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Flatter;
-import io.github.up2jakarta.csv.data.DataTypeResolver;
+import io.github.up2jakarta.csv.data.DataResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.fmt.FullError;
 import io.github.up2jakarta.csv.fmt.FullRecord;
 import io.github.up2jakarta.csv.io.impl.SegmentType;
-import io.github.up2jakarta.lov.PropertyException;
-import io.github.up2jakarta.lov.core.BeanContext;
+import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.BeanException;
-import jakarta.validation.Validator;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -45,8 +44,8 @@ public class SingleErrorTests {
     private final CSVFormat format;
 
     @Autowired
-    SingleErrorTests(BeanContext context, Validator validator, CSVFormat fmt) throws BeanException {
-        final Up2Factory<DynamicType> factory = new Up2Factory<>(context, validator, DataTypeResolver.dynamic());
+    SingleErrorTests(BeanContext context, CSVFormat fmt) throws BeanException {
+        final Up2Factory<DynamicType> factory = new Up2Factory<>(context, DataResolver.dynamic());
         final Up2Flatter<TSError, DynamicType> format = factory.format(TSError.class);
         this.writer = new SingleWriter<>(format, fmt);
         this.format = fmt;
@@ -116,7 +115,7 @@ public class SingleErrorTests {
 
     public static class TSError extends FullError<DynamicType, String, TSRecord> {
         public TSError(TSRecord row, int order, String code) {
-            super(row, order, null, 3, new PropertyException(ERROR, code, MSG), TRACE);
+            super(row, order, null, 3, new TypeException(ERROR, code, MSG), TRACE);
         }
     }
 

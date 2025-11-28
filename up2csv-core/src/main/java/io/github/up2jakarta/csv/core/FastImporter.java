@@ -10,10 +10,10 @@ import io.github.up2jakarta.lov.core.BeanException;
 import java.util.List;
 import java.util.Objects;
 
-import static io.github.up2jakarta.lov.DefaultProvider.values;
+import static io.github.up2jakarta.lov.ConstantProvider.values;
 
 /**
- * {@link ModeType#FAST} Processor that's able to aggregate and import java-bean from flat-data.
+ * Up2J {@link ModeType#FAST} Processor that's able to aggregate and import java-bean from flat-data.
  *
  * @param <T> the business object type
  * @param <B> the business data type

@@ -2,11 +2,10 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.BusinessBuilder;
 import io.github.up2jakarta.csv.core.BSOperator.Factory;
+import io.github.up2jakarta.csv.data.DataResolver;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.DataTypeResolver;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.data.WrapperValueExtractor;
-import io.github.up2jakarta.lov.core.BeanContext;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -20,31 +19,26 @@ import jakarta.validation.*;
  */
 @Named
 @Singleton
-public final class Up2Factory<D extends DataType<D>> extends Factory {
-
-    final DataTypeResolver<D> resolver;
+public final class Up2Factory<D extends DataType<D>> extends Factory<D> {
 
     /**
      * Constructor with empty resolver.
      *
      * @param context the bean context
-     * @param type    the business data type
      */
-    public Up2Factory(BeanContext context, Class<D> type) {
-        this(context, context.getBean(Validator.class), DataTypeResolver.empty(type));
+    public Up2Factory(BeanContext context) {
+        super(context, DataResolver.empty());
     }
 
     /**
      * Constructor for dependencies injection.
      *
-     * @param context   the bean context
-     * @param validator the JS-303 validator
-     * @param resolver  the default business data-type resolver
+     * @param context  the bean context
+     * @param resolver the default business data-type resolver
      */
     @Inject
-    public Up2Factory(BeanContext context, Validator validator, DataTypeResolver<D> resolver) {
-        super(context, validator);
-        this.resolver = resolver;
+    public Up2Factory(BeanContext context, DataResolver<D> resolver) {
+        super(context, resolver);
     }
 
     /**
@@ -70,10 +64,10 @@ public final class Up2Factory<D extends DataType<D>> extends Factory {
      * @param <S>  The class of segment
      * @return the CSV mapper
      * @throws BeanException for any missing or wrong bean configuration
-     * @see Up2Factory#build(Class, DataTypeResolver)
+     * @see Up2Factory#build(Class, DataResolver)
      */
     public <S extends Segment> Up2Mapper<S, D> build(final Class<S> type) throws BeanException {
-        return new Up2Mapper<>(BSContext.build(type, this, resolver));
+        return BSManager.of(this, type, resolver).build(Up2Mapper::new);
     }
 
     /**
@@ -81,14 +75,14 @@ public final class Up2Factory<D extends DataType<D>> extends Factory {
      * <p>
      * If the bean is already scanned for mapping, {@link Up2Flatter#toMapper()} is much faster
      *
-     * @param type the type of segment that is being mapped
-     * @param dtr  the {@link DataType} resolver
-     * @param <S>  The class of segment
+     * @param st  the type of segment that is being mapped
+     * @param dr  the {@link B} resolver
+     * @param <S> The class of segment
      * @return the CSV mapper
      * @throws BeanException for any missing or wrong bean configuration
      */
-    <S extends Segment, B extends DataType<B>> Up2Mapper<S, B> build(Class<S> type, DataTypeResolver<B> dtr) throws BeanException {
-        return new Up2Mapper<>(BSContext.build(type, this, dtr));
+    <S extends Segment, B extends DataType<B>> Up2Mapper<S, B> build(Class<S> st, DataResolver<B> dr) throws BeanException {
+        return BSManager.of(this, st, dr).build(Up2Mapper::new);
     }
 
     /**
@@ -98,10 +92,10 @@ public final class Up2Factory<D extends DataType<D>> extends Factory {
      * @param <S>  The class of segment
      * @return the CSV Format
      * @throws BeanException for any missing or wrong bean configuration
-     * @see Up2Factory#format(Class, DataTypeResolver)
+     * @see Up2Factory#format(Class, DataResolver)
      */
     public <S extends Segment> Up2Flatter<S, D> format(final Class<S> type) throws BeanException {
-        return new Up2Flatter<>(BSContext.format(type, this, resolver));
+        return BSManager.ft(this, resolver, type).build(Up2Flatter::new);
     }
 
     /**
@@ -109,14 +103,14 @@ public final class Up2Factory<D extends DataType<D>> extends Factory {
      * <p>
      * If the bean is already scanned for mapping, {@link Up2Mapper#toFlatter()} is much faster
      *
-     * @param type the type of segment that is being mapped
-     * @param dtr  the {@link DataType} resolver
-     * @param <S>  The class of segment
+     * @param st  the type of segment that is being mapped
+     * @param dr  the {@link B} resolver
+     * @param <S> The class of segment
      * @return the CSV Format
      * @throws BeanException for any missing or wrong bean configuration
      */
-    public <S extends Segment, B extends DataType<B>> Up2Flatter<S, B> format(Class<S> type, DataTypeResolver<B> dtr) throws BeanException {
-        return new Up2Flatter<>(BSContext.format(type, this, dtr));
+    public <S extends Segment, B extends DataType<B>> Up2Flatter<S, B> format(Class<S> st, DataResolver<B> dr) throws BeanException {
+        return BSManager.ft(this, dr, st).build(Up2Flatter::new);
     }
 
     /**

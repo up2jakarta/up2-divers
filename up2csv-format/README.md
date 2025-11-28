@@ -8,13 +8,10 @@
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-format</artifactId>
-        <version>1.6.1</version>
+        <version>1.6.2</version>
     </dependency>
-    <!-- Required JSR-303 Validation Provider -->
-    <dependency>
-        <groupId>org.hibernate.validator</groupId>
-        <artifactId>hibernate-validator</artifactId>
-    </dependency>
+    <!-- Optional JSR-303 Provider -->
+    <!-- Optional CDI/IoC Provider -->
 ```
 
 # Features

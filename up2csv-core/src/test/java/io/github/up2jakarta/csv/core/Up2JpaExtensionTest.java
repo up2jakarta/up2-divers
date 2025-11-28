@@ -1,7 +1,11 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.TUConfiguration;
-import io.github.up2jakarta.csv.core.misc.jpa.*;
+import io.github.up2jakarta.csv.core.misc.jpa.Test1Bean;
+import io.github.up2jakarta.csv.core.misc.jpa.Test2Bean;
+import io.github.up2jakarta.csv.core.misc.jpa.XML1Enum;
+import io.github.up2jakarta.csv.core.misc.jpa.XML2Enum;
+import io.github.up2jakarta.csv.core.misc.jpa.checker.*;
 import io.github.up2jakarta.csv.core.misc.lov.TestCodeList;
 import io.github.up2jakarta.csv.core.misc.lov.TestCodeListConverter;
 import io.github.up2jakarta.csv.impl.*;
@@ -76,7 +80,7 @@ public class Up2JpaExtensionTest {
             assertEquals(0, error.getOffset());
             assertEquals(WARNING, error.getLevel());
             assertEquals(Test1Bean.JPA_XXX, error.getCode());
-            assertEquals("Unknown value [11] for @Enumerated[XML1Enum]", error.getMessage());
+            assertEquals("Unknown input [11] for @Enumerated[XML1Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -86,7 +90,7 @@ public class Up2JpaExtensionTest {
             assertEquals(1, error.getOffset());
             assertEquals(ERROR, error.getLevel());
             assertEquals(EC_JPA_ENUM, error.getCode());
-            assertEquals("Unknown value [22] for @Enumerated[XML2Enum]", error.getMessage());
+            assertEquals("Unknown input [22] for @Enumerated[XML2Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
 
@@ -97,7 +101,7 @@ public class Up2JpaExtensionTest {
             assertEquals(2, error.getOffset());
             assertEquals(WARNING, error.getLevel());
             assertEquals(Test1Bean.JPA_XXX, error.getCode());
-            assertEquals("Unknown value [33] for @Enumerated[XML1Enum]", error.getMessage());
+            assertEquals("Unknown input [33] for @Enumerated[XML1Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -107,7 +111,7 @@ public class Up2JpaExtensionTest {
             assertEquals(3, error.getOffset());
             assertEquals(ERROR, error.getLevel());
             assertEquals(EC_JPA_ENUM, error.getCode());
-            assertEquals("Unknown value [44] for @Enumerated[XML2Enum]", error.getMessage());
+            assertEquals("Unknown input [44] for @Enumerated[XML2Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -117,7 +121,7 @@ public class Up2JpaExtensionTest {
             assertEquals(4, error.getOffset());
             assertEquals(ERROR, error.getLevel());
             assertEquals(TestCodeListConverter.TU_001, error.getCode());
-            assertEquals("Unknown value [ANY] for CodeList[TestCodeList]", error.getMessage());
+            assertEquals("Unknown input [ANY] for CodeList[TestCodeList]", error.getMessage());
             assertNull(error.getTrace());
         }
     }
@@ -142,7 +146,7 @@ public class Up2JpaExtensionTest {
             assertEquals(0, error.getOffset());
             assertEquals(WARNING, error.getLevel());
             assertEquals(Test2Bean.XML_001, error.getCode());
-            assertEquals("Unknown value [11] for @Enumerated[XML1Enum]", error.getMessage());
+            assertEquals("Unknown input [11] for @Enumerated[XML1Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -152,7 +156,7 @@ public class Up2JpaExtensionTest {
             assertEquals(1, error.getOffset());
             assertEquals(WARNING, error.getLevel());
             assertEquals(Test2Bean.XML_002, error.getCode());
-            assertEquals("Unknown value [22] for @Enumerated[XML2Enum]", error.getMessage());
+            assertEquals("Unknown input [22] for @Enumerated[XML2Enum]", error.getMessage());
             assertNull(error.getTrace());
         }
         {
@@ -162,20 +166,59 @@ public class Up2JpaExtensionTest {
             assertEquals(2, error.getOffset());
             assertEquals(WARNING, error.getLevel());
             assertEquals(Test2Bean.XML_003, error.getCode());
-            assertEquals("Unknown value [ANY] for CodeList[TestCodeList]", error.getMessage());
+            assertEquals("Unknown input [ANY] for CodeList[TestCodeList]", error.getMessage());
             assertNull(error.getTrace());
         }
     }
 
     @Test
-    void testActivation() {
-        // Given
-        // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test3Bean.class));
+    void test1UniqueOffset() {
+        // GIVEN
+        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test1Offset.class));
         // THEN
-        assertEquals(Test3Bean.class, thrown.getSource());
-        assertEquals("enum1", thrown.getLocator());
-        assertEquals("Test3Bean[enum1] - must be annotated with @Up2Converter or one of those shortcuts", thrown.getMessage());
+        assertEquals(Test1Offset.class, error.getSource());
+        assertEquals("value", error.getLocator());
+        assertEquals("@Position[value] must be unique", error.getMessage());
+    }
+
+    @Test
+    void test2UniqueOffset() {
+        // GIVEN
+        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test2Offset.class));
+        // THEN
+        assertEquals(Test2Offset.class, error.getSource());
+        assertEquals("class", error.getLocator());
+        assertEquals("must not have gap on @Position[value]: 1", error.getMessage());
+    }
+
+    @Test
+    void test3UniqueOffset() {
+        // GIVEN
+        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test3Offset.class));
+        // THEN
+        assertEquals(Test3Offset.class, error.getSource());
+        assertEquals("fragment", error.getLocator());
+        assertEquals("must not have gap on @Position[value]: 1, 3", error.getMessage());
+    }
+
+    @Test
+    void test4UniqueOffset() {
+        // GIVEN
+        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test4Offset.class));
+        // THEN
+        assertEquals(Test4Offset.class, error.getSource());
+        assertEquals("fragment", error.getLocator());
+        assertEquals("must not have gap on @Position[value]: 1, 3", error.getMessage());
+    }
+
+    @Test
+    void test5UniqueOffset() {
+        // GIVEN
+        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test5Offset.class));
+        // THEN
+        assertEquals(Test5Offset.class, error.getSource());
+        assertEquals("fragment", error.getLocator());
+        assertEquals("must not have gap on @Position[value]: 1", error.getMessage());
     }
 
 }

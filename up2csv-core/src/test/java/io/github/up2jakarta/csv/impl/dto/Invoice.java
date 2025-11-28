@@ -1,9 +1,11 @@
 package io.github.up2jakarta.csv.impl.dto;
 
-import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.*;
+import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.core.misc.Parsable;
 import io.github.up2jakarta.csv.data.BusinessId;
+import io.github.up2jakarta.csv.impl.GroupType;
+import io.github.up2jakarta.csv.impl.InputType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -19,6 +21,7 @@ import static io.github.up2jakarta.lov.SeverityType.FATAL;
  */
 @Valid
 @Error(value = "CSV-C01", level = FATAL)
+@InputType(GroupType.D001)
 @SuppressWarnings("unused")
 public class Invoice extends Parsable {
 

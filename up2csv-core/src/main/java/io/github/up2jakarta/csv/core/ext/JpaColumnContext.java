@@ -4,7 +4,6 @@ import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
 import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.core.BeanAccess;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.persistence.*;
@@ -14,7 +13,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
-import static io.github.up2jakarta.csv.core.ext.JpaTableChecker.checkName;
+import static io.github.up2jakarta.csv.core.ext.JpaColumnChecker.checkName;
 import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
 
 final class JpaColumnContext implements TypeContext {
@@ -94,7 +93,7 @@ final class JpaColumnContext implements TypeContext {
         if (!column.nullable() && (position == null || undefined(position))) {
             if (field.isAnnotationPresent(NotEmpty.class)) {
                 if (field.isAnnotationPresent(NotBlank.class)) {
-                    throw new BeanException(field, "must not be annotated by @NotBlank in favor of @NotEmpty");
+                    throw new BeanException(field, "must not be annotated with @NotBlank in favor of @NotEmpty");
                 }
             } else if (!field.isAnnotationPresent(NotBlank.class)) {
                 throw new BeanException(field, "must be annotated @NotEmpty or @NotBlank when @Column[nullable] is false");
@@ -130,14 +129,14 @@ final class JpaColumnContext implements TypeContext {
         if (type.getAnnotation(Entity.class) != null) {
             final Inheritance inheritance = type.getAnnotation(Inheritance.class);
             if (inheritance == null) {
-                throw new BeanException(type, "must be annotated by @Inheritance");
+                throw new BeanException(type, "must be annotated with @Inheritance");
             }
             final DiscriminatorColumn column = type.getAnnotation(DiscriminatorColumn.class);
             if (column != null) {
                 checkName(type, column.name(), prefix, "@DiscriminatorColumn[name]");
             }
         } else if (type.getAnnotation(MappedSuperclass.class) == null) {
-            throw new BeanException(type, "must be annotated by @MappedSuperclass");
+            throw new BeanException(type, "must be annotated with @MappedSuperclass");
         }
     }
 
@@ -150,32 +149,32 @@ final class JpaColumnContext implements TypeContext {
     }
 
     @Override
-    public void beforeFragmentProperty(BeanAccess mode, Field fragment, Class<? extends Segment> type) throws BeanException {
+    public void beforeFragmentProperty(Field fragment, Class<? extends Segment> type, int offset) throws BeanException {
         final PrimaryKeyJoinColumn column = type.getAnnotation(PrimaryKeyJoinColumn.class);
         if (column != null) {
             checkName(type, column.name(), prefix, "@PrimaryKeyJoinColumn[name]");
         }
         if (fragment.getAnnotation(Embedded.class) != null || fragment.getAnnotation(EmbeddedId.class) != null) {
             if (type.getAnnotation(Embeddable.class) == null) {
-                throw new BeanException(type, "must be annotated by @Embeddable");
+                throw new BeanException(type, "must be annotated with @Embeddable");
             }
         } else if (fragment.getAnnotation(OneToOne.class) != null) {
             if (type.getAnnotation(Entity.class) == null) {
-                throw new BeanException(type, "must be annotated by @Entity");
+                throw new BeanException(type, "must be annotated with @Entity");
             }
         } else if (fragment.getAnnotation(ManyToOne.class) != null) {
             if (type.getAnnotation(Entity.class) == null) {
-                throw new BeanException(type, "must be annotated by @Entity");
+                throw new BeanException(type, "must be annotated with @Entity");
             }
             final JoinColumn join = type.getAnnotation(JoinColumn.class);
             final JoinColumns joins = type.getAnnotation(JoinColumns.class);
             if (join != null) {
                 if (joins != null) {
-                    throw new BeanException(fragment, "must be annotated by only one @JoinColumn(s)");
+                    throw new BeanException(fragment, "must be annotated with only one @JoinColumn(s)");
                 }
                 checkName(fragment, join.name(), prefix, "@JoinColumn[name]");
             } else if (joins == null) {
-                throw new BeanException(type, "must be annotated by @JoinColumn(s)");
+                throw new BeanException(type, "must be annotated with @JoinColumn(s)");
             } else {
                 for (final JoinColumn jc : joins.value()) {
                     checkName(fragment, jc.name(), prefix, "@JoinColumn[name]");
@@ -185,7 +184,7 @@ final class JpaColumnContext implements TypeContext {
                 }
             }
         } else if (fragment.getAnnotation(Transient.class) != null) {
-            throw new BeanException(fragment, "must be annotated by @Transient");
+            throw new BeanException(fragment, "must be annotated with @Transient");
         }
     }
 

@@ -6,7 +6,7 @@ import jakarta.inject.Singleton;
 
 @Named
 @Singleton
-public class Dummy3Processor extends InputProcessor<Dummy3> {
+public class Dummy3Processor implements InputProcessor<Dummy3> {
 
     public String process(String value, Dummy3 ignore) {
         return Dummy1Processor.process(value);

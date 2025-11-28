@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.PackageTypeCodeType;
-import io.github.up2jakarta.lov.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListAdapter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -11,7 +11,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  */
 @Named
 @Singleton
-public class PackageTypeCodeAdapter extends CodeListConverter<PackageTypeCodeType> {
+public class PackageTypeCodeAdapter extends CodeListAdapter<PackageTypeCodeType> {
 
     PackageTypeCodeAdapter() {
         super(PackageTypeCodeType.class, "ECE-7065");

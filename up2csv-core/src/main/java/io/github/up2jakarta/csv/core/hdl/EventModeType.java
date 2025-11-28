@@ -10,9 +10,9 @@ import io.github.up2jakarta.lov.SeverityType;
  */
 public abstract class EventModeType<E extends IException> {
 
-    public final Class<E> type;
+    public final Class<? extends E> type;
 
-    public EventModeType(Class<E> type) {
+    public EventModeType(Class<? extends E> type) {
         this.type = type;
     }
 

@@ -75,7 +75,7 @@ public class AccountingAmountTypeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(267, error.getLineNumber());
             assertEquals(65, error.getLineOffset());
-            assertEquals("EDI-E601: Unknown value [???] for CodeList[AccountingAmountTypeCodeType].", error.getMessage());
+            assertEquals("EDI-E601: Unknown input [???] for CodeList[AccountingAmountTypeCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

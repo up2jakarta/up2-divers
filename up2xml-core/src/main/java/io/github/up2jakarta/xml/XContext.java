@@ -1,5 +1,6 @@
 package io.github.up2jakarta.xml;
 
+import io.github.up2jakarta.lov.core.WVCache;
 import io.github.up2jakarta.xml.api.XConfigurationException;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -10,8 +11,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.net.URL;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static javax.xml.XMLConstants.*;
 
@@ -22,12 +21,12 @@ public class XContext {
 
     static final String ALLOWED_PROTOCOL = "file,nested";
 
-    private static final Map<Class<?>, JAXBContext> CACHE_CONTEXT = new ConcurrentHashMap<>();
+    private static final WVCache<Class<?>, JAXBContext> CACHE_CONTEXT = new WVCache<>(Class::getName);
 
     public static JAXBContext getContext(final Class<?> type) {
-        return CACHE_CONTEXT.computeIfAbsent(type, (key) -> {
+        return CACHE_CONTEXT.get(type, () -> {
             try {
-                return JAXBContext.newInstance(key);
+                return JAXBContext.newInstance(type);
             } catch (JAXBException e) {
                 throw new XConfigurationException("Cannot create XML context", e);
             }

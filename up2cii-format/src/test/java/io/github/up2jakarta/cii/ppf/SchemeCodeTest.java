@@ -73,7 +73,7 @@ public class SchemeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(94, error.getLineNumber());
             assertEquals(46, error.getLineOffset());
-            assertEquals("ISO-6523: Unknown value [???] for CodeList[SchemeCodeType].", error.getMessage());
+            assertEquals("ISO-6523: Unknown input [???] for CodeList[SchemeCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

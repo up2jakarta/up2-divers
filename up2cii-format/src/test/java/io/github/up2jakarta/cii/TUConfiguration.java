@@ -4,8 +4,11 @@ import io.github.up2jakarta.cii.api.TestUtil;
 import io.github.up2jakarta.cii.core.ErrorEnhancer;
 import io.github.up2jakarta.cii.core.LocalDateAdapter;
 import io.github.up2jakarta.cii.edi.DocumentCodeType;
+import io.github.up2jakarta.cii.edi.adapters.AllowanceChargeIdentificationCodeAdapter;
+import io.github.up2jakarta.cii.edi.adapters.AllowanceChargeReasonCodeAdapter;
 import io.github.up2jakarta.cii.format.standard.CrossIndustryInvoiceType;
 import io.github.up2jakarta.cii.ppf.adapters.ProfileAdapter;
+import io.github.up2jakarta.cii.ppf.adapters.SpecialServiceDescriptionCodeAdapter;
 import io.github.up2jakarta.xml.SchemaValidator;
 import io.github.up2jakarta.xml.api.XConfigurationException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -44,6 +47,21 @@ public class TUConfiguration {
         } catch (IOException e) {
             throw new XConfigurationException("Cannot create XML output directory", e);
         }
+    }
+
+    @Bean
+    public AllowanceChargeIdentificationCodeAdapter allowanceChargeIdentificationCodeAdapter() {
+        return AllowanceChargeIdentificationCodeAdapter.ECE_5189;
+    }
+
+    @Bean
+    public AllowanceChargeReasonCodeAdapter allowanceChargeReasonCodeAdapter() {
+        return AllowanceChargeReasonCodeAdapter.ECE_4465;
+    }
+
+    @Bean
+    public SpecialServiceDescriptionCodeAdapter specialServiceDescriptionCodeAdapter() {
+        return SpecialServiceDescriptionCodeAdapter.ECE_7161;
     }
 
     @Bean

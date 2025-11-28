@@ -2,12 +2,12 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.api.ext.TypeListener;
+import io.github.up2jakarta.csv.core.BSAccessor.Mode;
 import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.core.BeanException;
 
 import java.lang.reflect.Field;
 
-import static io.github.up2jakarta.csv.core.BeanAccess.WO;
 import static io.github.up2jakarta.csv.core.ext.Beans.isInnerType;
 import static java.lang.reflect.Modifier.isAbstract;
 import static java.lang.reflect.Modifier.isStatic;
@@ -17,9 +17,20 @@ import static java.lang.reflect.Modifier.isStatic;
  */
 final class BeanChecker implements TypeListener, TypeContext {
 
-    static final BeanChecker INSTANCE = new BeanChecker();
+    private static final BeanChecker RA = new BeanChecker(Mode.RO);
+    private static final BeanChecker WA = new BeanChecker(Mode.WO);
 
-    private BeanChecker() {
+    private final Mode mode;
+
+    private BeanChecker(Mode mode) {
+        this.mode = mode;
+    }
+
+    static BeanChecker of(Mode mode) {
+        if (mode == Mode.RO) {
+            return RA;
+        }
+        return WA;
     }
 
     private static void check(Field field) throws BeanException {
@@ -28,8 +39,8 @@ final class BeanChecker implements TypeListener, TypeContext {
         }
     }
 
-    private static void check(BeanAccess mode, Class<? extends Segment> type) throws BeanException {
-        if (mode == WO && type.isLocalClass()) {
+    private static void check(Mode mode, Class<? extends Segment> type) throws BeanException {
+        if (mode == Mode.WO && type.isLocalClass()) {
             throw new BeanException(type, "local class is not allowed");
         }
         if (type.isInterface()) {
@@ -41,9 +52,9 @@ final class BeanChecker implements TypeListener, TypeContext {
     }
 
     @Override
-    public TypeContext beforeSegment(BeanAccess mode, Class<? extends Segment> type) throws BeanException {
+    public TypeContext beforeSegment(Class<? extends Segment> type) throws BeanException {
         check(mode, type);
-        if (mode == WO && isInnerType(type)) {
+        if (mode == Mode.WO && isInnerType(type)) {
             throw new BeanException(type, "inner class is not allowed");
         }
         return this;
@@ -55,8 +66,8 @@ final class BeanChecker implements TypeListener, TypeContext {
     }
 
     @Override
-    public void beforeFragmentProperty(BeanAccess mode, Field fragment, Class<? extends Segment> fragmentType) throws BeanException {
-        check(mode, fragmentType);
+    public void beforeFragmentProperty(Field fragment, Class<? extends Segment> type, int offset) throws BeanException {
+        check(mode, type);
         check(fragment);
     }
 

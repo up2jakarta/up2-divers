@@ -4,15 +4,19 @@ import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.core.misc.Parsable;
 import io.github.up2jakarta.csv.data.BusinessObject;
 import io.github.up2jakarta.lov.core.AccessException;
+import jakarta.persistence.Access;
 import jakarta.validation.Valid;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import static jakarta.persistence.AccessType.PROPERTY;
+
 /**
  * {@link io.github.up2jakarta.csv.impl.SegmentType#S61}
  */
 @Valid
+@Access(PROPERTY)
 public final class DummyReference extends Parsable implements BusinessObject<String> {
 
     @Position(0)

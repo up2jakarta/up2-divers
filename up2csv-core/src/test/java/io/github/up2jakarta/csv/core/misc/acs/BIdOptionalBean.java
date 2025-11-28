@@ -5,14 +5,11 @@ import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Number;
 import io.github.up2jakarta.csv.data.BusinessId;
 import io.github.up2jakarta.csv.data.Segment;
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 import jakarta.validation.Valid;
 
 import java.util.Optional;
 
 @Valid
-@Access(AccessType.FIELD)
 public final class BIdOptionalBean implements Segment {
 
     @Fragment(0)

@@ -45,7 +45,7 @@ class UnitCopyJobITests extends AbstractJobITest {
     private Job fastJob(ApplicationContext context, PlatformTransactionManager txm) throws BeanException {
         final CSVFormat format = context.getBean(CSVFormat.class);
         final JobRepository repository = context.getBean(JobRepository.class);
-        final Up2Factory<GroupType> factory = new Up2Factory<>(context::getBean, GroupType.class);
+        final Up2Factory<GroupType> factory = new Up2Factory<>(context::getBean);
         final InvoiceImporter importer = new InvoiceImporter(factory);
         final InvoiceReader reader = new InvoiceReader(importer, format);
         final InvoiceWriter writer = new InvoiceWriter(importer, format);

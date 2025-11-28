@@ -11,7 +11,7 @@ import jakarta.inject.Singleton;
  */
 @Named
 @Singleton
-public final class AnonymiseProcessor extends InputProcessor<Up2Anonymise> {
+public final class AnonymiseProcessor implements InputProcessor<Up2Anonymise> {
 
     @Override
     public String process(String value, Up2Anonymise config) {

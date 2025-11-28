@@ -6,6 +6,7 @@ import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.hdl.FailureException;
 import io.github.up2jakarta.csv.core.misc.acs.BIdOptionalBean;
 import io.github.up2jakarta.csv.core.misc.acs.Optional8Bean;
+import io.github.up2jakarta.csv.core.misc.cvr.ValidEntity;
 import io.github.up2jakarta.csv.core.misc.jpa.NoteEntity;
 import io.github.up2jakarta.csv.core.misc.lov.CountryCodeType;
 import io.github.up2jakarta.csv.core.misc.lov.CurrencyCodeType;
@@ -36,8 +37,10 @@ import java.util.List;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_CONVERTER;
 import static io.github.up2jakarta.csv.core.Properties.assertFinal;
+import static io.github.up2jakarta.csv.data.DataResolver.dynamic;
 import static io.github.up2jakarta.csv.fmt.misc.Tests.record;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.core.Localizable.CLASS;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -59,6 +62,27 @@ class Up2MapperTests {
         final Up2Mapper<ValidBean, GroupType> mapper2 = factory.build(ValidBean.class);
         // Then
         assertNotSame(mapper1, mapper2);
+        assertSame(mapper1.node, mapper2.node);
+    }
+
+    @Test
+    void testCache2() throws BeanException {
+        // GIVEN
+        final Up2Mapper<ValidEntity, ?> mapper1 = factory.build(ValidEntity.class);
+        final Up2Mapper<ValidEntity, ?> mapper2 = factory.build(ValidEntity.class, dynamic());
+        // THEN
+        assertNotSame(mapper1, mapper2);
+        assertNotSame(mapper1.node, mapper2.node);
+    }
+
+    @Test
+    void testCache3() throws BeanException {
+        // GIVEN
+        final Up2Mapper<ValidEntity, ?> mapper1 = factory.build(ValidEntity.class);
+        final Up2Mapper<ValidEntity, ?> mapper2 = mapper1.toFlatter().toMapper();
+        // THEN
+        assertNotSame(mapper1, mapper2);
+        assertSame(mapper1.node, mapper2.node);
     }
 
     @Test
@@ -346,8 +370,8 @@ class Up2MapperTests {
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(LocalSegment.class));
         // THEN
         assertEquals(LocalSegment.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("Up2MapperTests.LocalSegment[class] - local class is not allowed", thrown.getFormattedMessage());
+        assertEquals(CLASS, thrown.getLocator());
+        assertEquals("local class is not allowed", thrown.getMessage());
     }
 
     @Test
@@ -356,8 +380,8 @@ class Up2MapperTests {
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(AbstractAddress.class));
         // THEN
         assertEquals(AbstractAddress.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("AbstractAddress[class] - abstract class is not allowed", thrown.getMessage());
+        assertEquals(CLASS, thrown.getLocator());
+        assertEquals("abstract class is not allowed", thrown.getMessage());
     }
 
     @Test
@@ -366,8 +390,8 @@ class Up2MapperTests {
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Segment.class));
         // THEN
         assertEquals(Segment.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("Segment[class] - interface is not allowed", thrown.getMessage());
+        assertEquals(CLASS, thrown.getLocator());
+        assertEquals("interface is not allowed", thrown.getMessage());
     }
 
     @Test
@@ -376,8 +400,8 @@ class Up2MapperTests {
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test4Segment.class));
         // THEN
         assertEquals(Test4Segment.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("Test4Segment[class] - generic class is not allowed", thrown.getMessage());
+        assertEquals(CLASS, thrown.getLocator());
+        assertEquals("generic class is not allowed", thrown.getMessage());
     }
 
     @Test
@@ -398,8 +422,8 @@ class Up2MapperTests {
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Inner2Segment.class));
         // THEN
         assertEquals(Inner1Segment.InnerFragment.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("Inner1Segment.InnerFragment[class] - inner class is not allowed outside enclosing segments: Inner2Segment, Inner2Segment.InnerFragment", thrown.getMessage());
+        assertEquals(CLASS, thrown.getLocator());
+        assertEquals("inner class is not allowed outside enclosing segments: Inner2Segment, Inner2Segment.InnerFragment", thrown.getMessage());
     }
 
     @Test
@@ -439,7 +463,7 @@ class Up2MapperTests {
         // THEN
         assertEquals(Inner5Segment.class, thrown.getSource());
         assertEquals("fragment", thrown.getLocator());
-        assertEquals("Inner5Segment[fragment] - inner class is not allowed inside enclosing record: Inner5Segment", thrown.getMessage());
+        assertEquals("inner class is not allowed inside enclosing record: Inner5Segment", thrown.getMessage());
     }
 
     @Test
@@ -448,8 +472,8 @@ class Up2MapperTests {
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Inner6Segment.class));
         // THEN
         assertEquals(Inner6Segment.SFragment.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("Inner6Segment.SFragment[class] - inner class is not allowed inside enclosing segment: Inner6Segment", thrown.getMessage());
+        assertEquals(CLASS, thrown.getLocator());
+        assertEquals("inner class is not allowed inside enclosing segment: Inner6Segment", thrown.getMessage());
     }
 
     @Test
@@ -458,8 +482,8 @@ class Up2MapperTests {
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(InnerFragment.class));
         // THEN
         assertEquals(InnerFragment.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("Inner1Segment.InnerFragment[class] - inner class is not allowed", thrown.getMessage());
+        assertEquals(CLASS, thrown.getLocator());
+        assertEquals("inner class is not allowed", thrown.getMessage());
     }
 
     @Test
@@ -468,8 +492,8 @@ class Up2MapperTests {
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(TestRecursive1Segment.class));
         // THEN
         assertEquals(TestRecursive1Segment.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("TestRecursive1Segment[class] - cyclic fragment is not allowed", thrown.getMessage());
+        assertEquals(CLASS, thrown.getLocator());
+        assertEquals("cyclic fragment is not allowed", thrown.getMessage());
     }
 
     @Test
@@ -478,8 +502,8 @@ class Up2MapperTests {
         final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(TestRecursive3Segment.class));
         // THEN
         assertEquals(TestRecursive1Segment.class, thrown.getSource());
-        assertEquals("class", thrown.getLocator());
-        assertEquals("TestRecursive1Segment[class] - cyclic fragment is not allowed", thrown.getMessage());
+        assertEquals(CLASS, thrown.getLocator());
+        assertEquals("cyclic fragment is not allowed", thrown.getMessage());
     }
 
     @Test
@@ -505,7 +529,7 @@ class Up2MapperTests {
         // THEN
         assertEquals(Test1Segment.class, thrown.getSource());
         assertEquals("p", thrown.getLocator());
-        assertEquals("Test1Segment[p] - type must implements Segment", thrown.getMessage());
+        assertEquals("type must implements Segment", thrown.getMessage());
     }
 
     @Test
@@ -515,7 +539,7 @@ class Up2MapperTests {
         // THEN
         assertEquals(Test2Segment.class, thrown.getSource());
         assertEquals("p", thrown.getLocator());
-        assertEquals("Test2Segment[p] - @Fragment[value] must be positive", thrown.getMessage());
+        assertEquals("@Fragment[value] must be positive", thrown.getMessage());
     }
 
     @Test
@@ -525,7 +549,7 @@ class Up2MapperTests {
         // THEN
         assertEquals(Test3Segment.class, thrown.getSource());
         assertEquals("p", thrown.getLocator());
-        assertEquals("Test3Segment[p] - @Position[value] must be positive", thrown.getMessage());
+        assertEquals("@Position[value] must be positive", thrown.getMessage());
     }
 
     @Test
@@ -557,7 +581,7 @@ class Up2MapperTests {
         // THEN
         assertEquals(Test7Segment.class, thrown.getSource());
         assertEquals("staticField", thrown.getLocator());
-        assertEquals("Test7Segment[staticField] - must not be static", thrown.getMessage());
+        assertEquals("must not be static", thrown.getMessage());
     }
 
     @Test

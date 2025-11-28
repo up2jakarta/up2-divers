@@ -5,15 +5,15 @@ import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.api.hdl.EventCode;
 import io.github.up2jakarta.csv.api.hdl.EventLevel;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Listable;
 import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.core.Listable;
 import jakarta.validation.ConstraintViolation;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import static java.util.Objects.requireNonNull;
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 
 /**
  * Simple events collector of {@link BusinessHandler} that collects all events in {@link #events}.
@@ -26,7 +26,7 @@ public abstract class EventCollector<D extends DataType<D>, E extends IEvent<D>>
     private final Set<Integer> offsets;
 
     protected EventCollector(List<E> events) {
-        this.events = requireNonNull(events);
+        this.events = notNull(events, EventCollector.class, "events");
         this.offsets = new LinkedHashSet<>();
     }
 

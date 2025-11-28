@@ -23,7 +23,7 @@ public final class StringAdapter implements TypeAdapter<String> {
     }
 
     @Override
-    public Class<String> getSupportedType() {
+    public Class<String> getType() {
         return String.class;
     }
 

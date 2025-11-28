@@ -2,12 +2,13 @@ package io.github.up2jakarta.csv.core.misc.acs;
 
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.data.Identifiable;
 import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.lov.core.Identifiable;
 
 import java.util.Optional;
 
 abstract class Optional3Super<I extends Number> implements Identifiable<Optional<I>>, Segment {
+
     @Position(0)
     @Up2Number
     private Optional<I> key;

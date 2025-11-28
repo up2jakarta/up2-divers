@@ -76,7 +76,7 @@ public class GoodsTypeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(185, error.getLineNumber());
             assertEquals(53, error.getLineOffset());
-            assertEquals("ECE-7357: Unknown value [???] for CodeList[GoodsTypeCodeType].", error.getMessage());
+            assertEquals("ECE-7357: Unknown input [???] for CodeList[GoodsTypeCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

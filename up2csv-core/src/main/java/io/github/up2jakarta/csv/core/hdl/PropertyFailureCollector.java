@@ -4,8 +4,8 @@ import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.hdl.IPropertyCreator;
 import io.github.up2jakarta.csv.api.hdl.IPropertyEvent;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.lov.PropertyException;
 import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.lov.TypeException;
 
 /**
  * Extension of {@link PropertyCollector} that fails at the first event having
@@ -18,7 +18,7 @@ import io.github.up2jakarta.lov.SeverityType;
  * @param <D> the business data type
  * @param <E> the event type
  */
-public class PropertyFailureCollector<D extends DataType<D>, R extends IRecord<?>, E extends IPropertyEvent<D, R>> extends EventModeCollector<D, R, E, PropertyException> {
+public class PropertyFailureCollector<D extends DataType<D>, R extends IRecord<?>, E extends IPropertyEvent<D, R>> extends EventModeCollector<D, R, E, TypeException> {
 
     private final IPropertyCreator<D, R, E> creator;
     private final int level;
@@ -37,7 +37,7 @@ public class PropertyFailureCollector<D extends DataType<D>, R extends IRecord<?
     }
 
     @Override
-    protected final E newEvent(D type, Integer offset, PropertyException cause) {
+    protected final E newEvent(D type, Integer offset, TypeException cause) {
         if (cause.getLevel().getAsInt() < level) {
             return creator.apply(source, offset, type, cause);
         } else {

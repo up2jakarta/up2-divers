@@ -67,7 +67,7 @@ public class DocumentStatusCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(164, error.getLineNumber());
             assertEquals(53, error.getLineOffset());
-            assertEquals("ECE-1373: Unknown value [???] for CodeList[DocumentStatusCodeType].", error.getMessage());
+            assertEquals("ECE-1373: Unknown input [???] for CodeList[DocumentStatusCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

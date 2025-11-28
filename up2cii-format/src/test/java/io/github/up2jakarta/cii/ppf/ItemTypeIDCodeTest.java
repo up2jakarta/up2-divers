@@ -82,7 +82,7 @@ public class ItemTypeIDCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(36, error.getLineNumber());
             assertEquals(49, error.getLineOffset());
-            assertEquals("ECE-7143: Unknown value [???] for CodeList[ItemTypeIDCodeType].", error.getMessage());
+            assertEquals("ECE-7143: Unknown input [???] for CodeList[ItemTypeIDCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

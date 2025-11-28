@@ -2,11 +2,8 @@ package io.github.up2jakarta.csv.core.misc.map;
 
 import io.github.up2jakarta.csv.cfg.*;
 import io.github.up2jakarta.csv.data.Segment;
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 
 @SuppressWarnings("unused")
-@Access(AccessType.FIELD)
 public class Default5Bean implements Segment {
 
     @Position(0)

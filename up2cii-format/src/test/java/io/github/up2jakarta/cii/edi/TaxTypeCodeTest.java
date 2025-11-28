@@ -71,7 +71,7 @@ public class TaxTypeCodeTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(257, error.getLineNumber());
             assertEquals(49, error.getLineOffset());
-            assertEquals("ECE-5153: Unknown value [???] for CodeList[TaxTypeCodeType].", error.getMessage());
+            assertEquals("ECE-5153: Unknown input [???] for CodeList[TaxTypeCodeType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

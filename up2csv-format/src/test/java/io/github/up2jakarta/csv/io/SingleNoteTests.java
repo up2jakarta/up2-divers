@@ -1,14 +1,13 @@
 package io.github.up2jakarta.csv.io;
 
+import io.github.up2jakarta.csv.core.BeanContext;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Mapper;
-import io.github.up2jakarta.csv.data.DataTypeResolver;
+import io.github.up2jakarta.csv.data.DataResolver;
 import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.io.dto.Note;
-import io.github.up2jakarta.lov.core.BeanContext;
 import io.github.up2jakarta.lov.core.BeanException;
-import jakarta.validation.Validator;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,8 +33,8 @@ public class SingleNoteTests {
     private final File file;
 
     @Autowired
-    SingleNoteTests(BeanContext context, Validator validator, CSVFormat fmt) throws BeanException, IOException {
-        final Up2Factory<DynamicType> factory = new Up2Factory<>(context, validator, DataTypeResolver.dynamic());
+    SingleNoteTests(BeanContext context, CSVFormat fmt) throws BeanException, IOException {
+        final Up2Factory<DynamicType> factory = new Up2Factory<>(context, DataResolver.dynamic());
         final Up2Flatter<Note, DynamicType> format = factory.format(Note.class);
         final SingleWriter<Note, DynamicType> writer = new SingleWriter<>(format, fmt);
         final Up2Mapper<Note, DynamicType> mapper = factory.build(Note.class);

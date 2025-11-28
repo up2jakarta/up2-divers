@@ -5,6 +5,8 @@ import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Number;
 import io.github.up2jakarta.csv.core.misc.Parsable;
 import io.github.up2jakarta.csv.data.ParentId;
+import io.github.up2jakarta.csv.impl.GroupType;
+import io.github.up2jakarta.csv.impl.InputType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +15,7 @@ import static io.github.up2jakarta.lov.SeverityType.WARNING;
 
 @Valid
 @Error(value = "CSV-C05", level = WARNING)
+@InputType(GroupType.D005)
 @SuppressWarnings("unused")
 public class Attribute extends Parsable {
 

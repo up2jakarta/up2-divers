@@ -4,9 +4,9 @@ import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.hdl.IPropertyCreator;
 import io.github.up2jakarta.csv.api.hdl.IPropertyEvent;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.lov.PropertyException;
+import io.github.up2jakarta.lov.TypeException;
 
-import static java.util.Objects.requireNonNull;
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 
 /**
  * Input events collector of {@link BusinessHandler} that collects all events in {@link #events}.
@@ -15,8 +15,8 @@ import static java.util.Objects.requireNonNull;
  * @param <D> the business data type
  * @param <E> the event type
  */
-public class PropertyCollector<D extends DataType<D>, R extends IRecord<?>, E extends IPropertyEvent<D, R>> extends EventModeCollector<D, R, E, PropertyException> {
-    public static final EventModeType<PropertyException> MODE = PropertyModeType.INSTANCE;
+public class PropertyCollector<D extends DataType<D>, R extends IRecord<?>, E extends IPropertyEvent<D, R>> extends EventModeCollector<D, R, E, TypeException> {
+    public static final EventModeType<TypeException> MODE = PropertyModeType.INSTANCE;
 
     private final IPropertyCreator<D, R, E> creator;
 
@@ -28,11 +28,11 @@ public class PropertyCollector<D extends DataType<D>, R extends IRecord<?>, E ex
      */
     public PropertyCollector(R source, IPropertyCreator<D, R, E> creator) {
         super(source, creator, MODE);
-        this.creator = requireNonNull(creator);
+        this.creator = notNull(creator, PropertyCollector.class, "creator");
     }
 
     @Override
-    protected final E newEvent(D type, Integer offset, PropertyException cause) {
+    protected final E newEvent(D type, Integer offset, TypeException cause) {
         return creator.apply(source, offset, type, cause);
     }
 

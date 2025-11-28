@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.PaymentTermsTypeCodeType;
-import io.github.up2jakarta.lov.CodeListConverter;
+import io.github.up2jakarta.lov.CodeListAdapter;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -11,7 +11,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  */
 @Named
 @Singleton
-public class PaymentTermsTypeCodeAdapter extends CodeListConverter<PaymentTermsTypeCodeType> {
+public class PaymentTermsTypeCodeAdapter extends CodeListAdapter<PaymentTermsTypeCodeType> {
 
     PaymentTermsTypeCodeAdapter() {
         super(PaymentTermsTypeCodeType.class, "ECE-4279");

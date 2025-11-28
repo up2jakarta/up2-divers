@@ -11,19 +11,12 @@ import java.util.zip.ZipEntry;
 @SuppressWarnings("unused")
 public class EntryFastDecoder implements EntryDecoder {
 
-    private static volatile EntryFastDecoder INSTANCE;
+    private static final EntryFastDecoder INSTANCE = new EntryFastDecoder();
 
     private EntryFastDecoder() {
     }
 
     public static EntryFastDecoder getInstance() {
-        if (INSTANCE == null) {
-            synchronized (EntryFastDecoder.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new EntryFastDecoder();
-                }
-            }
-        }
         return INSTANCE;
     }
 

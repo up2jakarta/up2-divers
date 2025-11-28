@@ -79,7 +79,7 @@ public class PaymentTermsIDTest extends CodeAdapterTest {
             assertEquals(SeverityType.ERROR, error.getLevel());
             assertEquals(74, error.getLineNumber());
             assertEquals(41, error.getLineOffset());
-            assertEquals("ECE-4277: Unknown value [???] for CodeList[PaymentTermsIDType].", error.getMessage());
+            assertEquals("ECE-4277: Unknown input [???] for CodeList[PaymentTermsIDType].", error.getMessage());
             assertNotNull(error.getLinkedException());
             assertInstanceOf(CodeListException.class, error.getLinkedException());
         }

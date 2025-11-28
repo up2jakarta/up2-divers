@@ -11,7 +11,7 @@ import jakarta.inject.Singleton;
  */
 @Named
 @Singleton
-public final class DefaultProcessor extends InputProcessor<Position> {
+public final class DefaultProcessor implements InputProcessor<Position> {
 
     public static boolean undefined(Position config) {
         return config.defaultValue().isEmpty();

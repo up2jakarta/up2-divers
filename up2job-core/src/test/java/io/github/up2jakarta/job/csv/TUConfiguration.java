@@ -1,5 +1,6 @@
 package io.github.up2jakarta.job.csv;
 
+import io.github.up2jakarta.csv.core.BeanContext;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.prc.TokenProcessor;
 import io.github.up2jakarta.csv.slv.DecimalResolver;
@@ -14,6 +15,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.test.StepRunner;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -66,6 +68,11 @@ public class TUConfiguration {
                         false
                 )
         );
+    }
+
+    @Bean
+    public BeanContext beanContext(final ApplicationContext context) {
+        return context::getBean;
     }
 
     @Bean
