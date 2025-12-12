@@ -36,6 +36,7 @@ public non-sealed class FullExporter<B extends DataType<B>, I extends IType<B, I
      * @throws IOException     for some reason cannot be opened for writing by the callback.
      * @see FullExporter#format(Segment, Supplier, SegmentWriter)
      */
+    @Override
     public final void format(T bean, Supplier<String> recordId, SegmentWriter callback) throws AccessException, IOException {
         super.format(bean, recordId, callback);
     }

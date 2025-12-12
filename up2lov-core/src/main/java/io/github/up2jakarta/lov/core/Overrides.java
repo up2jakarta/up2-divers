@@ -15,6 +15,9 @@ import static io.github.up2jakarta.lov.core.Beans.getTypeName;
 import static java.util.Arrays.copyOfRange;
 import static java.util.Arrays.stream;
 
+/**
+ * Override utility class.
+ */
 public final class Overrides {
 
     private Overrides() {

@@ -22,7 +22,7 @@ public interface IArray<P extends Segment, T extends Segment> extends Function<P
      * @return valid join accessor.
      */
     default IJoin<P, T> values() {
-        return (p) -> {
+        return p -> {
             final T[] values = this.apply(p);
             if (values == null) {
                 return List.of();

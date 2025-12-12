@@ -8,7 +8,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.stream.Collector;
@@ -77,7 +76,7 @@ public final class Flows {
         return step.getStatus().isUnsuccessful() || !step.getFailureExceptions().isEmpty();
     }
 
-    public static void warning(Logger logger, String ctx, Serializable uid, Throwable error) {
+    public static void warning(Logger logger, String ctx, Object uid, Throwable error) {
         if (error instanceof BusinessException) {
             logger.warn("{} execution #[{}] failure cause: {}", ctx, uid, error.getMessage(), error.getCause());
         } else if (isFatal(error)) {

@@ -34,7 +34,7 @@ public final class XmlAdapterExtension implements TypeExtension<Object, XmlJavaT
     private final BeanContext context;
 
     @Inject
-    XmlAdapterExtension(BeanContext context) {
+    public XmlAdapterExtension(BeanContext context) {
         this.context = context;
     }
 

@@ -2,11 +2,10 @@ package io.github.up2jakarta.job.flux;
 
 import io.github.up2jakarta.job.core.LocalFile;
 
-import java.io.Serializable;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
-public class FluxEntry implements Serializable {
+public class FluxEntry {
 
     private final FluxPart firstPart;
     private final FluxPart otherPart;

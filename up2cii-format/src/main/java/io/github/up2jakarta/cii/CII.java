@@ -81,7 +81,7 @@ public final class CII {
     public static void config(Marshaller marshaller) {
         try {
             marshaller.setProperty("org.glassfish.jaxb.namespacePrefixMapper", PrefixMapper.getInstance());
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         } catch (PropertyException e) {
             throw new XConfigurationException("Cannot customize XML marshaller", e);
         }

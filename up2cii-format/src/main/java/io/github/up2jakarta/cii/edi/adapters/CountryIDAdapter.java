@@ -4,6 +4,7 @@ import io.github.up2jakarta.cii.edi.CountryIDType;
 import io.github.up2jakarta.lov.CodeListAdapter;
 import io.github.up2jakarta.lov.CodeListException;
 import io.github.up2jakarta.lov.core.SafeAdapter;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -20,7 +21,8 @@ public final class CountryIDAdapter extends SafeAdapter<CountryIDType> {
     private static final String CODE_GREECE = "EL";
     private final CodeListAdapter<CountryIDType> delegate;
 
-    CountryIDAdapter() {
+    @Inject
+    public CountryIDAdapter() {
         super(CountryIDType.class, ERROR, "ISO-3166");
         this.delegate = new CodeListAdapter<>(type, level, code);
     }

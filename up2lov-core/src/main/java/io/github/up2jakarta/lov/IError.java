@@ -1,11 +1,9 @@
 package io.github.up2jakarta.lov;
 
-import java.io.Serializable;
-
 /**
  * Contact interface for an input error.
  */
-public interface IError extends Serializable {
+public interface IError {
 
     /**
      * @return the error level

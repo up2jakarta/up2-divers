@@ -27,7 +27,7 @@ public final class BooleanResolver implements TypeResolver<Boolean, Up2Boolean> 
         final String code = error.map(Error::value).orElse(EC_BOOLEAN);
         final String trueValue = pc.trueValue();
         final String falseValue = pc.falseValue();
-        final TypeConverter<Boolean> parser = (v) -> {
+        final TypeConverter<Boolean> parser = v -> {
             if (trueValue.equals(v)) {
                 return true;
             }
@@ -36,7 +36,7 @@ public final class BooleanResolver implements TypeResolver<Boolean, Up2Boolean> 
             }
             throw new TypeException(level, code, "Unknown input [" + v + "] for Boolean");
         };
-        final TypeFormatter<Boolean> format = (v) -> (v) ? trueValue : falseValue;
+        final TypeFormatter<Boolean> format = v -> (v) ? trueValue : falseValue;
         return new TypeSupport<>(Boolean.class, parser, format);
     }
 

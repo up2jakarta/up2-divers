@@ -1,7 +1,7 @@
 package io.github.up2jakarta.cii.format.standard.qdt;
 
-import io.github.up2jakarta.cii.core.AbstractUnitMeasureType;
 import io.github.up2jakarta.cii.edi.LinearMeasurementUnitCodeType;
+import io.github.up2jakarta.cii.format.UnitMeasureType;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -9,7 +9,7 @@ import jakarta.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "LinearUnitMeasureType", propOrder = {"value"})
-public class LinearUnitMeasureType extends AbstractUnitMeasureType<LinearMeasurementUnitCodeType> {
+public class LinearUnitMeasureType extends UnitMeasureType<LinearMeasurementUnitCodeType> {
 
     @XmlAttribute(name = "unitCode")
     protected LinearMeasurementUnitCodeType unitCode;

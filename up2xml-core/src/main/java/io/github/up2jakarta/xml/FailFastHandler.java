@@ -1,6 +1,5 @@
 package io.github.up2jakarta.xml;
 
-
 import io.github.up2jakarta.lov.CodeListException;
 import io.github.up2jakarta.xml.api.AbstractCollector;
 import io.github.up2jakarta.xml.api.IValidationError;

@@ -22,7 +22,7 @@ public abstract class Event<D extends DataType<D>> implements IEvent<D>, Segment
     @Definition(code = "CID", value = "Offset")
     private final Integer offset;
 
-    public Event(D type, Integer offset) {
+    protected Event(D type, Integer offset) {
         this.type = type;
         this.offset = offset;
     }

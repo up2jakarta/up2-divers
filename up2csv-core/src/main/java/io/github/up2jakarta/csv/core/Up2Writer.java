@@ -19,7 +19,7 @@ public abstract class Up2Writer<S extends Segment, D extends DataType<D>> implem
 
     private final Up2Flatter<S, D> mapper;
 
-    public Up2Writer(Up2Flatter<S, D> mapper) {
+    protected Up2Writer(Up2Flatter<S, D> mapper) {
         this.mapper = mapper;
     }
 

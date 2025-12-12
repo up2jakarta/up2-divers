@@ -10,7 +10,6 @@ import java.lang.reflect.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -63,8 +62,8 @@ public abstract class Beans extends io.github.up2jakarta.lov.core.Beans {
         return Optional.of(config);
     }
 
-    public static Class<? extends Segment> segmentType(Stack<Class<? extends Segment>> stack) {
-        Class<? extends Segment> segmentType = stack.peek();
+    public static Class<? extends Segment> segmentType(List<Class<? extends Segment>> stack) {
+        Class<? extends Segment> segmentType = stack.getLast();
         for (Class<? extends Segment> superType : stack) {
             if (segmentType.isAssignableFrom(superType)) {
                 segmentType = superType;
@@ -74,12 +73,12 @@ public abstract class Beans extends io.github.up2jakarta.lov.core.Beans {
         return segmentType;
     }
 
-    public static Stack<Class<? extends Segment>> cleanStack(Stack<Class<? extends Segment>> stack) {
-        final Stack<Class<? extends Segment>> result = new Stack<>();
-        result.push(stack.getFirst());
+    public static List<Class<? extends Segment>> cleanStack(List<Class<? extends Segment>> stack) {
+        final List<Class<? extends Segment>> result = new LinkedList<>();
+        result.addLast(stack.getFirst());
         for (Class<? extends Segment> superType : stack) {
-            if (!superType.isAssignableFrom(result.peek())) {
-                result.push(superType);
+            if (!superType.isAssignableFrom(result.getLast())) {
+                result.addLast(superType);
             }
         }
         return result;

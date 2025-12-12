@@ -42,7 +42,7 @@ approach.
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.6.2</version>
+        <version>1.6.3</version>
     </dependency>
     <!-- Optional JSR-303 Provider -->
     <!-- Optional CDI/IoC Provider -->
@@ -833,7 +833,7 @@ public final class MySegment implements Segment {
 - `IRecord`: Input record representation (model)
 - `IType`: Segment definition for import/export processing.
 
-See [Sample implementations here](./src/test/java/io/github/up2jakarta/csv/impl)
+See [Sample implementations here](./src/test/java/io/github/up2jakarta/test/impl)
 
 ## Data Definition and Resolver API
 
@@ -893,9 +893,9 @@ It's impossible to present a `business-property` within `0..n` cardinality
 
 ## Use cases
 
-1. See [BusinessFullTests](src/test/java/io/github/up2jakarta/csv/fmt/BusinessFullTests.java) for `FULL` mode.
-2. See [BusinessFastTests](src/test/java/io/github/up2jakarta/csv/fmt/BusinessFastTests.java) for `FAST` mode.
-3. See [BusinessUnitTests](src/test/java/io/github/up2jakarta/csv/fmt/BusinessUnitTests.java) for `UNIT` mode.
+1. See [BusinessFullTests](src/test/java/io/github/up2jakarta/test/fmt/BusinessFullTests.java) for `FULL` mode.
+2. See [BusinessFastTests](src/test/java/io/github/up2jakarta/test/fmt/BusinessFastTests.java) for `FAST` mode.
+3. See [BusinessUnitTests](src/test/java/io/github/up2jakarta/test/fmt/BusinessUnitTests.java) for `UNIT` mode.
 
 # Stream API (Batch processing)
 

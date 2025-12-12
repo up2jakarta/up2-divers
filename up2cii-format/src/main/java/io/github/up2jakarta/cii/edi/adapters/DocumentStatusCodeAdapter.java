@@ -2,6 +2,7 @@ package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.DocumentStatusCodeType;
 import io.github.up2jakarta.lov.CodeListAdapter;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -13,7 +14,8 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 @Singleton
 public class DocumentStatusCodeAdapter extends CodeListAdapter<DocumentStatusCodeType> {
 
-    DocumentStatusCodeAdapter() {
+    @Inject
+    public DocumentStatusCodeAdapter() {
         super(DocumentStatusCodeType.class, "ECE-1373");
     }
 

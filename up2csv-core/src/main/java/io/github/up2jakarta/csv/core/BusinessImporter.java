@@ -7,15 +7,11 @@ import io.github.up2jakarta.csv.api.hdl.IEventBuilder;
 import io.github.up2jakarta.csv.core.BSManager.Format;
 import io.github.up2jakarta.csv.core.BSManager.Mapper;
 import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
-import io.github.up2jakarta.csv.data.BusinessCreator;
-import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.csv.data.Up2Result;
+import io.github.up2jakarta.csv.data.*;
 import io.github.up2jakarta.lov.CodeListAdapter;
 import io.github.up2jakarta.lov.CodeListException;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
-import io.github.up2jakarta.lov.core.Listable;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -231,7 +227,7 @@ public abstract sealed class BusinessImporter<B extends DataType<B>, I extends I
 
     @FunctionalInterface
     interface Operation {
-        void apply() throws RuntimeException;
+        void apply();
     }
 
     /**

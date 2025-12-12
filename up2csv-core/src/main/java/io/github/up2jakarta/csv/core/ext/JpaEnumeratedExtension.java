@@ -8,6 +8,7 @@ import io.github.up2jakarta.lov.TypeConverter;
 import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.lov.core.TypeSupport;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.persistence.Column;
@@ -38,7 +39,8 @@ public final class JpaEnumeratedExtension extends SimpleExtension<Enum<?>, Enume
 
     public static final String FORMAT = "Unknown input [%s] for @Enumerated[%s]";
 
-    JpaEnumeratedExtension() {
+    @Inject
+    public JpaEnumeratedExtension() {
         super(Enumerated.class);
     }
 
@@ -53,10 +55,8 @@ public final class JpaEnumeratedExtension extends SimpleExtension<Enum<?>, Enume
             }
         }
         final Column jpa = field.getAnnotation(Column.class);
-        if (jpa != null) {
-            if (max > jpa.length()) {
-                throw new BeanException(field, "@Column[length] must be greater or equals to " + max);
-            }
+        if (jpa != null && max > jpa.length()) {
+            throw new BeanException(field, "@Column[length] must be greater or equals to " + max);
         }
         return unmodifiableMap(mapping);
     }
@@ -72,7 +72,7 @@ public final class JpaEnumeratedExtension extends SimpleExtension<Enum<?>, Enume
     private static <T extends Enum<?>> TypeAdapter<T> ofOrdinal(Class<T> type, SeverityType level, String code) {
         final T[] constants = type.getEnumConstants();
         final List<T> values = asList(constants);
-        final TypeConverter<T> parser = (o) -> {
+        final TypeConverter<T> parser = o -> {
             try {
                 final int ordinal = Integer.parseInt(o);
                 return values.get(ordinal);
@@ -86,7 +86,7 @@ public final class JpaEnumeratedExtension extends SimpleExtension<Enum<?>, Enume
 
     private static <T extends Enum<?>> TypeAdapter<T> ofName(Class<T> pt, Field pf, SeverityType el, String ec) throws BeanException {
         final Map<String, T> mapping = getConstants(pt, pf);
-        final TypeConverter<T> parser = (k) -> {
+        final TypeConverter<T> parser = k -> {
             final T value = mapping.get(k);
             if (value == null) {
                 throw new TypeException(el, ec, format(FORMAT, k, getTypeName(pt)));

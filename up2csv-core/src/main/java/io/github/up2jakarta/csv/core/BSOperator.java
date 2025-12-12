@@ -49,7 +49,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
         this.root = root;
         this.mode = mode;
         final Map<I, Set<I>> joins = new HashMap<>();
-        this.mappers = this.joins(new Stack<>(), root, joins::put);
+        this.mappers = this.joins(new LinkedList<>(), root, joins::put);
         this.joins = unmodifiableMap(joins);
         final P rootMapper = mappers.get(root);
         this.offset = offset(rootMapper, mode);
@@ -88,10 +88,10 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
         return unmodifiableMap(result);
     }
 
-    private Map<IType<B, I>, P> joins(Stack<I> cp, I rn, BiConsumer<I, Set<I>> cb) throws BeanException {
+    private Map<IType<B, I>, P> joins(List<I> cp, I rn, BiConsumer<I, Set<I>> cb) throws BeanException {
         final Map<IType<B, I>, P> result = new LinkedHashMap<>();
         final P pm = this.build(factory, rn, null);
-        cp.push(rn);
+        cp.addLast(rn);
         result.put(rn, pm);
         final Set<I> children = new LinkedHashSet<>();
         for (final I node : nodes) {
@@ -105,7 +105,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
                 result.putAll(mappers);
             }
         }
-        cp.pop();
+        cp.removeLast();
         cb.accept(rn, unmodifiableSet(children));
         return unmodifiableMap(result);
     }
@@ -115,7 +115,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
     /**
      * Internal Business Factory.
      */
-    static sealed abstract class Factory<D extends DataType<D>> permits Up2Factory {
+    abstract static sealed class Factory<D extends DataType<D>> permits Up2Factory {
         private static final List<String> CN_ENTRIES = getPermittedTypes(MEP.class).toList();
         private static final List<String> EXCLUSIONS = getPermittedTypes(MEP.class, MST.class, Beans.class).toList();
         final DataResolver<D> resolver;
@@ -198,7 +198,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
     /**
      * Internal Business ID Accessor.
      */
-    abstract sealed static class BId<S extends Segment, K> implements MEP permits BO, BU, BR, DP {
+    abstract static sealed class BId<S extends Segment, K> implements MEP permits BO, BU, BR, DP {
         protected final Class<K> type;
         protected final String locator;
 
@@ -336,7 +336,7 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
         /**
          * Internal Accessor based on defined property.
          */
-        abstract sealed static class DP extends BId<Segment, Object> permits SP, MP {
+        abstract static sealed class DP extends BId<Segment, Object> permits SP, MP {
 
             protected final PPosition<Object, Object, ?> property;
             protected final BSAccessor<Object> setter;

@@ -13,7 +13,7 @@ import jakarta.validation.ConstraintViolation;
  */
 final class ComplianceEvent<D extends DataType<D>> extends SimpleEvent<D> implements IComplianceEvent<D> {
 
-    private final ConstraintViolation<?> cause;
+    private final transient ConstraintViolation<?> cause;
 
     ComplianceEvent(SeverityType level, String code, D type, Integer offset, ConstraintViolation<?> cause) {
         super(type, offset, level, code, cause.getMessage());

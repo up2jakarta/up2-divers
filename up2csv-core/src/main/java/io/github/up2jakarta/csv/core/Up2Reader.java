@@ -15,7 +15,7 @@ public abstract class Up2Reader<S extends Segment> {
 
     private final Up2Mapper<S, ?> mapper;
 
-    public Up2Reader(Up2Mapper<S, ?> mapper) {
+    protected Up2Reader(Up2Mapper<S, ?> mapper) {
         this.mapper = mapper;
     }
 

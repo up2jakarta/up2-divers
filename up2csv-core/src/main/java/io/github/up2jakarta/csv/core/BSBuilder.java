@@ -230,7 +230,7 @@ final class BSBuilder {
     /**
      * Internal Property processor.
      */
-    static abstract sealed class Input<D extends DataType<D>> implements MST permits WP, CP, NP {
+    abstract static sealed class Input<D extends DataType<D>> implements MST permits WP, CP, NP {
 
         final <T, V> T parse(PPosition<T, V, D> p, TypeAdapter<T> adapter) throws BeanException {
             try {

@@ -32,7 +32,7 @@ public final class JpaConvertExtension implements TypeExtension<Object, Convert>
     private final BeanContext context;
 
     @Inject
-    JpaConvertExtension(BeanContext context) {
+    public JpaConvertExtension(BeanContext context) {
         this.context = context;
     }
 

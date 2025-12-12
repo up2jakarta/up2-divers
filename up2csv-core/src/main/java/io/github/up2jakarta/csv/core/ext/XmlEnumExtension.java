@@ -9,6 +9,7 @@ import io.github.up2jakarta.lov.TypeConverter;
 import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.lov.core.TypeSupport;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.XmlEnum;
@@ -38,7 +39,8 @@ public final class XmlEnumExtension implements TypeExtension<Enum<?>, XmlEnum> {
 
     public static final String FORMAT = "Unknown input [%s] for @XmlEnum[%s]";
 
-    XmlEnumExtension() {
+    @Inject
+    public XmlEnumExtension() {
         super();
     }
 
@@ -83,7 +85,7 @@ public final class XmlEnumExtension implements TypeExtension<Enum<?>, XmlEnum> {
         final Optional<Error> error = error(pf, pt);
         final SeverityType level = error.map(Error::level).orElse(ERROR);
         final String code = error.map(Error::value).orElse(EC_XML_ENUM);
-        final TypeConverter<Enum<?>> parser = (k) -> {
+        final TypeConverter<Enum<?>> parser = k -> {
             final Enum<?> value = mapping.get(k);
             if (value == null) {
                 throw new TypeException(level, code, format(FORMAT, k, getTypeName(pt)));

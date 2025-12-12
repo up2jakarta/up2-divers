@@ -21,6 +21,6 @@ public abstract class SimpleProcessor<C extends Annotation> implements InputProc
      * @return the processed {@link String} for the destination field
      * @throws RuntimeException If any exception occurred during the processing
      */
-    protected abstract String process(String value) throws RuntimeException;
+    protected abstract String process(String value);
 
 }

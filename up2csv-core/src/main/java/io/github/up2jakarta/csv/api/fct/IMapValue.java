@@ -21,7 +21,7 @@ public interface IMapValue<P extends Segment, T extends Segment> extends Functio
      * @return valid join accessor.
      */
     default IJoin<P, T> values() {
-        return (p) -> {
+        return p -> {
             final Map<?, T> value = this.apply(p);
             if (value == null) {
                 return List.of();

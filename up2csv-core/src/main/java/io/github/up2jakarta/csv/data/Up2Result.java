@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.data;
 
 import io.github.up2jakarta.csv.api.IEvent;
-import io.github.up2jakarta.lov.core.Listable;
 
 import java.util.List;
 import java.util.function.Supplier;

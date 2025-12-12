@@ -22,7 +22,7 @@ public interface IJoin<P extends Segment, T extends Segment> extends Function<P,
      * @return valid join accessor.
      */
     static <T extends Segment> IJoin<T, T> empty() {
-        return (p) -> List.of();
+        return p -> List.of();
     }
 
 }

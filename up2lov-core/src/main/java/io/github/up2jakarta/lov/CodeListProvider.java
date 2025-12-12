@@ -19,7 +19,7 @@ public abstract class CodeListProvider<T extends CodeList<?>> implements CodeLis
         final List<T> values = this.values(type, context).stream().filter(Objects::nonNull).toList();
         final String name = context.getTypeName();
         if (values.isEmpty()) {
-            final TypeConverter<T> parser = (v) -> {
+            final TypeConverter<T> parser = v -> {
                 throw new CodeListException(name, v, context.getLevel(), context.getCode());
             };
             return new TypeSupport<>(type, parser, CodeList::getCode);

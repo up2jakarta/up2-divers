@@ -10,13 +10,13 @@
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2job-core</artifactId>
-        <version>1.6.2</version>
+        <version>1.6.3</version>
     </dependency>
 ```
 
 # Sample use cases of [up2csv-format](../up2csv-format/README.md)
 
-- [FastCopyJobITests](./src/test/java/io/github/up2jakarta/job/csv/FastCopyJobITests.java) for `ModeType.FAST`
-- [FullCopyJobITests](./src/test/java/io/github/up2jakarta/job/csv/FullCopyJobITests.java) for `ModeType.FULL`
-- [UnitCopyJobITests](./src/test/java/io/github/up2jakarta/job/csv/UnitCopyJobITests.java) for `ModeType.UNIT`
+- [FastCopyJobITests](./src/test/java/io/github/up2jakarta/test/FastCopyJobITests.java) for `ModeType.FAST`
+- [FullCopyJobITests](./src/test/java/io/github/up2jakarta/test/FullCopyJobITests.java) for `ModeType.FULL`
+- [UnitCopyJobITests](./src/test/java/io/github/up2jakarta/test/UnitCopyJobITests.java) for `ModeType.UNIT`
 

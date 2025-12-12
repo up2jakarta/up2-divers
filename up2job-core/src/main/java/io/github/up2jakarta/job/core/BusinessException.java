@@ -3,11 +3,11 @@ package io.github.up2jakarta.job.core;
 @SuppressWarnings("unused")
 public abstract class BusinessException extends RuntimeException {
 
-    public <T> BusinessException(BusinessError<?> error, Throwable cause) {
+    protected <T> BusinessException(BusinessError<?> error, Throwable cause) {
         super(error.toString(), cause);
     }
 
-    public BusinessException(BusinessError<?> error) {
+    protected BusinessException(BusinessError<?> error) {
         super(error.toString());
     }
 

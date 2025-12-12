@@ -48,7 +48,7 @@ public final class SimpleFullImporter<T extends Segment, B extends DataType<B>, 
     @Override
     protected Builder<B, FullRecord<I, String>, FullError<B, String, FullRecord<I, String>>> newBuilder(int size) {
         final IBusinessCreator<B, FullRecord<I, String>, FullError<B, String, FullRecord<I, String>>> creator = FullError::new;
-        return new Builder<>(size, creator, (r) -> 0);
+        return new Builder<>(size, creator, r -> 0);
     }
 
     @Override

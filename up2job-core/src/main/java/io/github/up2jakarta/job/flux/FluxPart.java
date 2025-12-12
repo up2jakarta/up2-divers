@@ -5,10 +5,9 @@ import io.github.up2jakarta.job.core.LocalFile;
 import io.github.up2jakarta.job.zip.ArchiveResource;
 
 import java.io.File;
-import java.io.Serializable;
 
 @SuppressWarnings("unused")
-public class FluxPart implements Serializable {
+public class FluxPart {
 
     public static final FluxPart NULL = new FluxPart(null, null, "null");
 

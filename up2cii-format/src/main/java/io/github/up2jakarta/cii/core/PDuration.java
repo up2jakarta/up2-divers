@@ -14,7 +14,7 @@ import java.util.Objects;
 
 import static java.time.temporal.ChronoUnit.*;
 
-public class PDuration<T extends Temporal> implements TemporalAmount, Serializable {
+public class PDuration<T extends Temporal & Serializable> implements TemporalAmount, Serializable {
 
     private static final List<TemporalUnit> UNITS = List.of(NANOS, MILLIS, SECONDS, MINUTES, HOURS, DAYS, MONTHS, YEARS);
 
@@ -43,7 +43,7 @@ public class PDuration<T extends Temporal> implements TemporalAmount, Serializab
         this.times = Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds).plusNanos(nanos);
     }
 
-    public static <E extends Temporal> PDuration<E> of(E startTime, E untilTime) {
+    public static <E extends Temporal & Serializable> PDuration<E> of(E startTime, E untilTime) {
         return new PDuration<>(startTime, untilTime);
     }
 

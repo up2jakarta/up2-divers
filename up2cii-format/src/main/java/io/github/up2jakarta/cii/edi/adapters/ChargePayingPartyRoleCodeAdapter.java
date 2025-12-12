@@ -2,6 +2,7 @@ package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.ChargePayingPartyRoleCodeType;
 import io.github.up2jakarta.lov.CodeListAdapter;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -13,7 +14,8 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 @Singleton
 public class ChargePayingPartyRoleCodeAdapter extends CodeListAdapter<ChargePayingPartyRoleCodeType> {
 
-    ChargePayingPartyRoleCodeAdapter() {
+    @Inject
+    public ChargePayingPartyRoleCodeAdapter() {
         super(ChargePayingPartyRoleCodeType.class, "ECE-3035");
     }
 

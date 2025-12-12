@@ -12,7 +12,7 @@ public abstract class EventModeType<E extends IException> {
 
     public final Class<? extends E> type;
 
-    public EventModeType(Class<? extends E> type) {
+    protected EventModeType(Class<? extends E> type) {
         this.type = type;
     }
 

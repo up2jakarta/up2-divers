@@ -7,6 +7,9 @@ import static io.github.up2jakarta.lov.core.Defaults.wrap;
 import static io.github.up2jakarta.lov.core.Localizable.CONSTRUCTOR;
 import static java.lang.reflect.Modifier.isStatic;
 
+/**
+ * Bean utility class.
+ */
 public abstract class Beans {
 
     public static final Type[] NO_TYPES = {};
@@ -130,16 +133,20 @@ public abstract class Beans {
         final Type propertyType;
         final Class<?> propertyClass;
         final Class<?> defaultClass;
-        if (property instanceof Field field) {
-            propertyClass = field.getDeclaringClass();
-            propertyType = field.getGenericType();
-            defaultClass = field.getType();
-        } else if (property instanceof Method getter) {
-            propertyClass = getter.getDeclaringClass();
-            propertyType = getter.getGenericReturnType();
-            defaultClass = getter.getReturnType();
-        } else {
-            return void.class;
+        switch (property) {
+            case Field field -> {
+                propertyClass = field.getDeclaringClass();
+                propertyType = field.getGenericType();
+                defaultClass = field.getType();
+            }
+            case Method getter -> {
+                propertyClass = getter.getDeclaringClass();
+                propertyType = getter.getGenericReturnType();
+                defaultClass = getter.getReturnType();
+            }
+            default -> {
+                return void.class;
+            }
         }
         if (propertyType instanceof TypeVariable<?>) {
             final Type[] parameters = propertyClass.getTypeParameters();

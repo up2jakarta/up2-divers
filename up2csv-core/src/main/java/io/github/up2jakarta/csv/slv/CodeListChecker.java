@@ -30,7 +30,7 @@ public final class CodeListChecker implements TypeResolver<CodeList<?>, Up2CodeL
     private final BeanContext context;
 
     @Inject
-    CodeListChecker(BeanContext context) {
+    public CodeListChecker(BeanContext context) {
         this.context = context;
     }
 
@@ -56,12 +56,10 @@ public final class CodeListChecker implements TypeResolver<CodeList<?>, Up2CodeL
             if (c == '"') {
                 quoted = !quoted;
             }
-            if (c == delimiter) {
-                if (!quoted) {
-                    tokens.add(unquote(token));
-                    token.setLength(0);
-                    continue;
-                }
+            if (c == delimiter && !quoted) {
+                tokens.add(unquote(token));
+                token.setLength(0);
+                continue;
             }
             token.append(c);
         }
@@ -88,7 +86,7 @@ public final class CodeListChecker implements TypeResolver<CodeList<?>, Up2CodeL
         final List<String> names = new ArrayList<>(config.value().length);
         for (final Parameter p : config.value()) {
             final String name = p.value();
-            final String value = result.computeIfAbsent(name, (k) -> p.defaultValue());
+            final String value = result.computeIfAbsent(name, k -> p.defaultValue());
             if (p.required() && value.isEmpty()) {
                 throw new BeanException(pf, "@Up2CodeList[value] requires #argument[" + name + "] ");
             }

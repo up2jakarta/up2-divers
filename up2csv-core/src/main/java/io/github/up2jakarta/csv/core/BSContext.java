@@ -46,7 +46,7 @@ final class BSContext<D extends DataType<D>> {
     private final Map<Path, PositionOverride> positions = new LinkedHashMap<>();
     private final Map<Path, FragmentOverride> fragments = new LinkedHashMap<>();
     private final Map<Path, ValidOverride> validations = new LinkedHashMap<>();
-    private final Stack<Class<? extends Segment>> stack = new Stack<>();
+    private final List<Class<? extends Segment>> stack = new LinkedList<>();
     private final List<TypeExtension<?, Annotation>> extensions;
     private final LinkedList<Field> path = new LinkedList<>();
     private final Class<? extends Segment> type;
@@ -81,7 +81,7 @@ final class BSContext<D extends DataType<D>> {
         add(ValidOverride.class, type, this.validations::put, ValidOverride::path);
         this.access = getAccessType(origin.access, type);
         origin.path.forEach(this.path::addLast);
-        origin.stack.forEach(this.stack::push);
+        origin.stack.forEach(this.stack::addLast);
         this.extensions = origin.extensions;
         this.resolver = origin.resolver;
         this.context = origin.context;
@@ -111,26 +111,27 @@ final class BSContext<D extends DataType<D>> {
 
     private static BeanException translate(Class<?> type, Field field) {
         final Class<?> wrapper = wrap(type);
+        final String msg = "should be annotated with @";
         if (Boolean.class.equals(wrapper)) {
-            return new BeanException(field, "should be annotated with @" + Up2Boolean.class.getSimpleName());
+            return new BeanException(field, msg + Up2Boolean.class.getSimpleName());
         }
         if (CodeList.class.isAssignableFrom(wrapper)) {
-            return new BeanException(field, "should be annotated with @" + Up2CodeList.class.getSimpleName());
+            return new BeanException(field, msg + Up2CodeList.class.getSimpleName());
         }
         if (Temporal.class.isAssignableFrom(wrapper)) {
-            return new BeanException(field, "should be annotated with @" + Up2Temporal.class.getSimpleName());
+            return new BeanException(field, msg + Up2Temporal.class.getSimpleName());
         }
         if (TemporalAmount.class.isAssignableFrom(wrapper)) {
-            return new BeanException(field, "should be annotated with @" + Up2TemporalAmount.class.getSimpleName());
+            return new BeanException(field, msg + Up2TemporalAmount.class.getSimpleName());
         }
         if (Number.class.isAssignableFrom(wrapper)) {
             if (List.of(BigDecimal.class, Double.class, Float.class).contains(wrapper)) {
-                return new BeanException(field, "should be annotated with @" + Up2Decimal.class.getSimpleName());
+                return new BeanException(field, msg + Up2Decimal.class.getSimpleName());
             }
-            return new BeanException(field, "should be annotated with @" + Up2Number.class.getSimpleName());
+            return new BeanException(field, msg + Up2Number.class.getSimpleName());
         }
         if (byte[].class.isAssignableFrom(wrapper)) {
-            return new BeanException(field, "should be annotated with @" + Up2Base64.class.getSimpleName());
+            return new BeanException(field, msg + Up2Base64.class.getSimpleName());
         }
         final String cn = Up2Converter.class.getSimpleName();
         return new BeanException(field, "must be annotated with @" + cn + " or one of those shortcuts");
@@ -167,7 +168,7 @@ final class BSContext<D extends DataType<D>> {
 
     private D dataType(Field field) throws BeanException {
         if (resolver != null) {
-            final Stack<Class<? extends Segment>> cs = cleanStack(stack);
+            final List<Class<? extends Segment>> cs = cleanStack(stack);
             final D value = resolver.get(cs, path.toArray(Field[]::new), field).orElse(null);
             if (value != null) {
                 resolver.check(value);
@@ -179,7 +180,7 @@ final class BSContext<D extends DataType<D>> {
 
     private void checkType(Field field, Class<?> type, Annotation config, TypeResolver<?, ?> tr) throws BeanException {
         final Class<?> support = cache.computeIfAbsent(tr,
-                (r) -> getTypeArgument(r.getClass(), TypeResolver.class, 0, void.class)
+                r -> getTypeArgument(r.getClass(), TypeResolver.class, 0, void.class)
         );
         if (!support.isAssignableFrom(type)) {
             throw new BeanException(field, "must not be annotated with @" + getTypeName(config.annotationType()));
@@ -271,12 +272,12 @@ final class BSContext<D extends DataType<D>> {
         if (stack.contains(beanType)) {
             return true;
         }
-        this.stack.push(beanType);
+        this.stack.addLast(beanType);
         return false;
     }
 
     void end() throws BeanException {
-        checker.afterSuperSegment(stack.peek());
+        checker.afterSuperSegment(stack.getLast());
     }
 
     BSContext<D> with(Field field, Fragment fragment, Class<? extends Segment> segmentType) throws BeanException {

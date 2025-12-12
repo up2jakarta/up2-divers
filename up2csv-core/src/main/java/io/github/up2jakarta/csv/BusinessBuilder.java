@@ -186,7 +186,7 @@ public class BusinessBuilder<B extends DataType<B>> {
                 return new UnitImporter<>(factory, type, root, nodes) {
                     @Override
                     protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
-                        return new BusinessCollector.Builder<>(size, creator, (r) -> 0);
+                        return new BusinessCollector.Builder<>(size, creator, r -> 0);
                     }
                 };
             }
@@ -329,7 +329,7 @@ public class BusinessBuilder<B extends DataType<B>> {
                 return new FastImporter<>(factory, type, root, nodes) {
                     @Override
                     protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
-                        return new BusinessCollector.Builder<>(size, creator, (r) -> 0);
+                        return new BusinessCollector.Builder<>(size, creator, r -> 0);
                     }
                 };
             }
@@ -462,7 +462,7 @@ public class BusinessBuilder<B extends DataType<B>> {
                 return new FullImporter<>(factory, type, root, nodes) {
                     @Override
                     protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
-                        return new BusinessCollector.Builder<>(size, creator, (r) -> 0);
+                        return new BusinessCollector.Builder<>(size, creator, r -> 0);
                     }
                 };
             }

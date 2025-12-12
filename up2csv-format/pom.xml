@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2-divers</artifactId>
-        <version>1.6.2</version>
+        <version>1.6.3</version>
     </parent>
 
     <artifactId>up2csv-format</artifactId>
@@ -45,12 +45,6 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <optional>true</optional>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
             <optional>true</optional>
             <scope>test</scope>
         </dependency>

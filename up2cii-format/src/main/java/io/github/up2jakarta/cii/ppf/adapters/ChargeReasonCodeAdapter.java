@@ -6,6 +6,7 @@ import io.github.up2jakarta.cii.edi.adapters.AllowanceChargeReasonCodeAdapter;
 import io.github.up2jakarta.cii.ppf.ChargeReasonCodeType;
 import io.github.up2jakarta.lov.CodeListException;
 import io.github.up2jakarta.lov.core.SafeAdapter;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -25,7 +26,8 @@ import static java.util.Optional.ofNullable;
 @Singleton
 public final class ChargeReasonCodeAdapter extends SafeAdapter<ChargeReasonCodeType<?>> {
 
-    ChargeReasonCodeAdapter() {
+    @Inject
+    public ChargeReasonCodeAdapter() {
         super(cast(ChargeReasonCodeType.class), ERROR, null);
     }
 

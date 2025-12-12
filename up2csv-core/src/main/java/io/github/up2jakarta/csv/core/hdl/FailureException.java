@@ -17,7 +17,7 @@ public class FailureException extends TypeException implements IEvent {
 
     protected static final String FORMAT = "#[%s] throws %s";
 
-    protected final DataType<?> dataType;
+    protected final transient DataType<?> dataType;
     protected final Integer offset;
 
     FailureException(DataType<?> type, Integer offset, SeverityType level, String code, String message) {

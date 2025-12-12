@@ -20,7 +20,7 @@ public interface ISegment<P extends Segment, T extends Segment> extends Function
      * @return valid join accessor.
      */
     default IJoin<P, T> many() {
-        return (p) -> {
+        return p -> {
             final T value = this.apply(p);
             if (value == null) {
                 return List.of();

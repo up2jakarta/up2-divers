@@ -4,9 +4,9 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.hdl.IBusinessEvent;
 import io.github.up2jakarta.csv.api.hdl.IPropertyEvent;
 import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.Listable;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.TypeException;
-import io.github.up2jakarta.lov.core.Listable;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;

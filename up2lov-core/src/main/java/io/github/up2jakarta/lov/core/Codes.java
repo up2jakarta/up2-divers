@@ -2,6 +2,9 @@ package io.github.up2jakarta.lov.core;
 
 import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
 
+/**
+ * Code utility class.
+ */
 public abstract class Codes {
 
     private static final CollapsedStringAdapter TOKEN_ADAPTER = new CollapsedStringAdapter();

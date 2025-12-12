@@ -216,7 +216,7 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
     /**
      * Internal Mapper Node.
      */
-    static abstract sealed class Bean<S extends Segment, D extends DataType<D>, C> extends BSNode<S, D> permits BM, BC {
+    abstract static sealed class Bean<S extends Segment, D extends DataType<D>, C> extends BSNode<S, D> permits BM, BC {
         protected final Constructor<S> constructor;
 
         Bean(int i, Class<S> t, Validator v, VContext c, Fragment f, List<BSProperty<?, ?, D>> ps, Constructor<S> cs) {
@@ -235,7 +235,7 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         }
 
         protected boolean parse(List<Segment> stack, C args, EventHandler<D> handler, int offset, String... record) {
-            if (nullable && !(offset < record.length)) {
+            if (nullable && offset >= record.length) {
                 return true;
             }
             var empty = true;
@@ -280,7 +280,7 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         }
 
         protected final S parse(EventHandler<D> handler, int offset, String... record) {
-            return this.parse(new Stack<>(), handler, offset, record);
+            return this.parse(new LinkedList<>(), handler, offset, record);
         }
 
         protected abstract S parse(List<Segment> stack, EventHandler<D> handler, int offset, String... record);
@@ -328,7 +328,7 @@ abstract sealed class BSNode<S extends Segment, D extends DataType<D>> implement
         /**
          * Internal Mapper Node for java-beans within constructor setters.
          */
-        static abstract sealed class BC<S extends Segment, D extends DataType<D>> extends Bean<S, D, Object[]> permits JR, JB {
+        abstract static sealed class BC<S extends Segment, D extends DataType<D>> extends Bean<S, D, Object[]> permits JR, JB {
             private final Map<BSProperty<?, ?, D>, Integer> indexes;
             private final Object[] prototype;
 

@@ -1,6 +1,10 @@
 package io.github.up2jakarta.lov;
 
-import io.github.up2jakarta.lov.core.*;
+import io.github.up2jakarta.lov.bst.Cache;
+import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.SVCache;
+import io.github.up2jakarta.lov.core.SafeAdapter;
+import io.github.up2jakarta.lov.core.TypeContext;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -31,7 +35,7 @@ public final class TableResolver implements CodeListResolver<DynamicCode> {
     public static final String SQL_NAME = "sqlName";
     public static final String SQL_CODE = "sqlCode";
 
-    private final Cache<String, DynamicCode> cache = new SVCache<>();
+    private final Cache<String, DynamicCode> cache = new SVCache<>(String::compareTo);
     private final DataSource dataSource;
 
     public TableResolver(DataSource dataSource) {

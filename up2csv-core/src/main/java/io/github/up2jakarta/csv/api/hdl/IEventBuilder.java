@@ -4,7 +4,7 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
 import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.lov.core.Listable;
+import io.github.up2jakarta.csv.data.Listable;
 
 /**
  * Contract interface for {@link BusinessHandler} builder.
@@ -25,7 +25,7 @@ public interface IEventBuilder<D extends DataType<D>, R extends IRecord<?>, E ex
      * <ul>
      *     It depends on the event type {@link E}
      *   <li>if the error doesn't depend on the specified record then one handler per business-object is enough</li>
-     *   <li>if the error depend on the the specified record then it's necessary to create one handler per record</li>
+     *   <li>if the error depends on the specified record then it's necessary to create one handler per record</li>
      * </ul>
      *
      * @param record the input record

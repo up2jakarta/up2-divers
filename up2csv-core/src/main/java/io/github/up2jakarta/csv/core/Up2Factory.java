@@ -81,7 +81,7 @@ public final class Up2Factory<D extends DataType<D>> extends Factory<D> {
      * @return the CSV mapper
      * @throws BeanException for any missing or wrong bean configuration
      */
-    <S extends Segment, B extends DataType<B>> Up2Mapper<S, B> build(Class<S> st, DataResolver<B> dr) throws BeanException {
+    public <S extends Segment, B extends DataType<B>> Up2Mapper<S, B> build(Class<S> st, DataResolver<B> dr) throws BeanException {
         return BSManager.of(this, st, dr).build(Up2Mapper::new);
     }
 

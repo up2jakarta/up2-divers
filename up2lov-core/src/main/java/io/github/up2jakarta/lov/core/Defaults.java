@@ -5,30 +5,33 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Parameter;
 import java.util.*;
 
+/**
+ * Default utility class.
+ */
 public final class Defaults {
 
     public static final String[] EMPTY = {};
     private static final Map<Class<?>, Object> CACHE;
     // Default values
-    public static boolean DEFAULT_BOOLEAN;
-    public static double DEFAULT_DOUBLE;
-    public static float DEFAULT_FLOAT;
-    public static short DEFAULT_SHORT;
-    public static char DEFAULT_CHAR;
-    public static byte DEFAULT_BYTE;
-    public static long DEFAULT_LONG;
-    public static int DEFAULT_INT;
+    static boolean defaultBoolean;
+    static double defaultDouble;
+    static float defaultFloat;
+    static short defaultShort;
+    static char defaultChar;
+    static byte defaultByte;
+    static long defaultLong;
+    static int defaultInt;
 
     static {
         CACHE = Map.of(
-                boolean.class, DEFAULT_BOOLEAN,
-                double.class, DEFAULT_DOUBLE,
-                float.class, DEFAULT_FLOAT,
-                short.class, DEFAULT_SHORT,
-                char.class, DEFAULT_CHAR,
-                byte.class, DEFAULT_BYTE,
-                long.class, DEFAULT_LONG,
-                int.class, DEFAULT_INT
+                boolean.class, defaultBoolean,
+                double.class, defaultDouble,
+                float.class, defaultFloat,
+                short.class, defaultShort,
+                char.class, defaultChar,
+                byte.class, defaultByte,
+                long.class, defaultLong,
+                int.class, defaultInt
         );
     }
 

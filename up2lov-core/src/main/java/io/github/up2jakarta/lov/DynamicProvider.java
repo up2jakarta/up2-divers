@@ -30,7 +30,7 @@ public final class DynamicProvider extends CodeListProvider<DynamicCode> {
     private DynamicProvider() {
     }
 
-    static List<DynamicCode> values(TypeContext context) {
+    public static List<DynamicCode> values(TypeContext context) {
         final Properties ps = new Properties();
         try (final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(context.get(FILE))) {
             ps.load(is);

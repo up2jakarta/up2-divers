@@ -9,14 +9,15 @@ import io.github.up2jakarta.csv.core.BSOperator.BId;
 import io.github.up2jakarta.csv.core.BSOperator.Factory;
 import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
 import io.github.up2jakarta.csv.data.*;
+import io.github.up2jakarta.lov.bst.Cache;
 import io.github.up2jakarta.lov.core.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Stack;
 
 import static io.github.up2jakarta.csv.core.BSAccessor.Mode.RO;
 import static io.github.up2jakarta.csv.core.BSAccessor.Mode.WO;
@@ -49,29 +50,31 @@ class BSManager<D extends DataType<D>, S extends Segment> {
         return new MBuilder<>() {
             @Override
             public <M extends Pod<S, D, Bean<S, D, ?>>> M build(BCreator<D, S, M> c) throws BeanException {
-                final Value<D, S> value = that.cache.get(key, (k, v) -> {
+                return that.cache.get(key, v -> {
                     if (v instanceof RO<D, S> ro) {
                         return ro.complete();
+                    } else if (v == null) {
+                        return new WO<>(that.build(key, f));
                     }
-                    return (v == null) ? new WO<>(that.build(key, f)) : v;
-                });
-                return c.apply(key, value.beanValue());
+                    return v;
+                }, (k, v) -> c.apply(k, v.beanValue()));
             }
         };
     }
 
-    static <D extends DataType<D>, S extends Segment> MBuilder<D, S> of(Pod<S, D, Flat<S, D>> s) throws BeanException {
+    static <D extends DataType<D>, S extends Segment> MBuilder<D, S> of(Pod<S, D, Flat<S, D>> s) {
         final BSManager<D, S> that = BSManager.get();
         return new MBuilder<>() {
             @Override
             public <M extends Pod<S, D, Bean<S, D, ?>>> M build(BCreator<D, S, M> c) throws BeanException {
-                final Value<D, S> value = that.cache.get(s.key, (k, v) -> {
+                return that.cache.get(s.key, v -> {
                     if (v instanceof RO<D, S> ro) {
                         return ro.complete();
+                    } else if (v == null) {
+                        return new RW<>(s.node);
                     }
-                    return (v == null) ? new RW<>(s.node) : v;
-                });
-                return c.apply(s.key, value.beanValue());
+                    return v;
+                }, (k, v) -> c.apply(k, v.beanValue()));
             }
         };
     }
@@ -82,29 +85,31 @@ class BSManager<D extends DataType<D>, S extends Segment> {
         return new FBuilder<>() {
             @Override
             public <M extends Pod<S, D, Flat<S, D>>> M build(FCreator<D, S, M> c) throws BeanException {
-                final Value<D, S> value = that.cache.get(key, (k, v) -> {
+                return that.cache.get(key, v -> {
                     if (v instanceof WO<D, S> wo) {
                         return wo.complete();
+                    } else if (v == null) {
+                        return new RO<>(that.build(f, key));
                     }
-                    return (v == null) ? new RO<>(that.build(f, key)) : v;
-                });
-                return c.apply(key, value.flatValue());
+                    return v;
+                }, (k, v) -> c.apply(k, v.flatValue()));
             }
         };
     }
 
-    static <D extends DataType<D>, S extends Segment> FBuilder<D, S> ft(Pod<S, D, Bean<S, D, ?>> s) throws BeanException {
+    static <D extends DataType<D>, S extends Segment> FBuilder<D, S> ft(Pod<S, D, Bean<S, D, ?>> s) {
         final BSManager<D, S> that = BSManager.get();
         return new FBuilder<>() {
             @Override
             public <M extends Pod<S, D, Flat<S, D>>> M build(FCreator<D, S, M> c) throws BeanException {
-                final Value<D, S> value = that.cache.get(s.key, (k, v) -> {
+                return that.cache.get(s.key, v -> {
                     if (v instanceof WO<D, S> wo) {
                         return wo.complete();
+                    } else if (v == null) {
+                        return new RW<>(s.node);
                     }
-                    return (v == null) ? new RW<>(s.node) : v;
-                });
-                return c.apply(s.key, value.flatValue());
+                    return v;
+                }, (k, v) -> c.apply(k, v.flatValue()));
             }
         };
     }
@@ -177,13 +182,12 @@ class BSManager<D extends DataType<D>, S extends Segment> {
         public int compareTo(Key<D, S> that) {
             final Class<S> type = that.type;
             if (this.type == that.type) {
-                final DataResolver<D> resolver = that.resolver;
-                if (this.resolver == resolver) {
-                    return 0;
-                }
-                return Integer.compare(this.resolver.hashCode(), resolver.hashCode());
+                return this.resolver.compareTo(that.resolver);
             }
-            return this.type.getName().compareTo(type.getName());
+            if (this.type.getName().compareTo(type.getName()) < 1) {
+                return -1;
+            }
+            return 1;
         }
 
         @Override
@@ -195,7 +199,7 @@ class BSManager<D extends DataType<D>, S extends Segment> {
     /**
      * Internal Cache Value
      */
-    static abstract sealed class Value<D extends DataType<D>, S extends Segment> permits RO, WO, RW {
+    abstract static sealed class Value<D extends DataType<D>, S extends Segment> permits RO, WO, RW {
         abstract Flat<S, D> flatValue();
 
         abstract Bean<S, D, ?> beanValue();
@@ -204,7 +208,7 @@ class BSManager<D extends DataType<D>, S extends Segment> {
 
         @Override
         public final String toString() {
-            return getTypeName(this.getType());
+            return '#' + this.getClass().getSimpleName() + '[' + getTypeName(this.getType()) + ']';
         }
     }
 
@@ -295,7 +299,7 @@ class BSManager<D extends DataType<D>, S extends Segment> {
     /**
      * Internal Segment Processor.
      */
-    abstract sealed static class Pod<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> implements MEP permits Up2Mapper, Up2Flatter, Node {
+    abstract static sealed class Pod<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> implements MEP permits Up2Mapper, Up2Flatter, Node {
         final int length;
         final int offset;
         final T node;
@@ -312,7 +316,7 @@ class BSManager<D extends DataType<D>, S extends Segment> {
             }
         }
 
-        private static void check(Stack<Bean<?, ?, ?>> stack, Bean<?, ?, ?> node) throws BeanException {
+        private static void check(List<Bean<?, ?, ?>> stack, Bean<?, ?, ?> node) throws BeanException {
             final Class<?> t = node.type;
             if (isInnerType(node.type)) {
                 final Class<?> et = node.type.getEnclosingClass();
@@ -325,7 +329,7 @@ class BSManager<D extends DataType<D>, S extends Segment> {
                     throw new BeanException(t, "inner class is not allowed inside enclosing segment: " + getTypeName(n.type));
                 }
             }
-            stack.push(node);
+            stack.addLast(node);
             for (final BSProperty<?, ?, ?> p : node.properties) {
                 if (p instanceof BSProperty.PFragment<?, ?, ?> fp) {
                     check(stack, (Bean<?, ?, ?>) fp.node);
@@ -362,14 +366,14 @@ class BSManager<D extends DataType<D>, S extends Segment> {
         }
 
         protected void check(Bean<S, D, ?> node) throws BeanException {
-            check(new Stack<>(), node);
+            check(new LinkedList<>(), node);
         }
     }
 
     /**
      * Internal Business Processor.
      */
-    static abstract sealed class Node<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> extends Pod<S, D, T> permits Mapper, Format {
+    abstract static sealed class Node<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> extends Pod<S, D, T> permits Mapper, Format {
         final BId<Segment, Object> businessId;
         final boolean hasBusinessId;
 

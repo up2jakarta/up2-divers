@@ -148,7 +148,7 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> implements MST per
     /**
      * Internal {@link Fragment} implementation.
      */
-    abstract sealed static class PFragment<S extends Segment, V, B extends DataType<B>> extends BSProperty<S, V, B> permits FS, FO, FW {
+    abstract static sealed class PFragment<S extends Segment, V, B extends DataType<B>> extends BSProperty<S, V, B> permits FS, FO, FW {
         protected final BSNode<S, B> node;
 
         private PFragment(BSNode<S, B> node, BSAccessor<V> va, B type, int offset, Fragment pf) {
@@ -257,7 +257,7 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> implements MST per
     /**
      * Internal {@link Position} implementation.
      */
-    abstract sealed static class PPosition<T, V, D extends DataType<D>> extends BSProperty<T, V, D> permits PS, PO, PW {
+    abstract static sealed class PPosition<T, V, D extends DataType<D>> extends BSProperty<T, V, D> permits PS, PO, PW {
         protected final Class<T> type;
         protected final T defaultValue;
         protected final boolean required;

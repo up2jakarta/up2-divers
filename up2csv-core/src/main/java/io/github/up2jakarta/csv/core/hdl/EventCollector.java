@@ -5,8 +5,8 @@ import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.api.hdl.EventCode;
 import io.github.up2jakarta.csv.api.hdl.EventLevel;
 import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.Listable;
 import io.github.up2jakarta.lov.SeverityType;
-import io.github.up2jakarta.lov.core.Listable;
 import jakarta.validation.ConstraintViolation;
 
 import java.util.LinkedHashSet;

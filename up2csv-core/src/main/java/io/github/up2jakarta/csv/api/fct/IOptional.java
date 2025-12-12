@@ -21,7 +21,7 @@ public interface IOptional<P extends Segment, T extends Segment> extends Functio
      * @return valid join accessor.
      */
     default IJoin<P, T> many() {
-        return (p) -> this.apply(p).map(List::of).orElseGet(List::of);
+        return p -> this.apply(p).map(List::of).orElseGet(List::of);
     }
 
 }

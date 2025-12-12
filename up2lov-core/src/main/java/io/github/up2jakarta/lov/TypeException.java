@@ -1,5 +1,8 @@
 package io.github.up2jakarta.lov;
 
+/**
+ * Base Exception for {@link TypeAdapter} that encapsulates error {@link #code} and {@link #level} attributes.
+ */
 public class TypeException extends RuntimeException implements IException {
 
     protected final String code;

@@ -19,6 +19,6 @@ public interface InputProcessor<C extends Annotation> {
      * @return the processed {@link String} for the destination field
      * @throws RuntimeException If any exception occurred during the processing
      */
-    String process(String value, C config) throws RuntimeException;
+    String process(String value, C config);
 
 }

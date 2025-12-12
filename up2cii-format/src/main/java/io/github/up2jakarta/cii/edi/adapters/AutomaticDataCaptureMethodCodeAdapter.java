@@ -2,6 +2,7 @@ package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.AutomaticDataCaptureMethodCodeType;
 import io.github.up2jakarta.lov.CodeListAdapter;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -13,7 +14,8 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 @Singleton
 public class AutomaticDataCaptureMethodCodeAdapter extends CodeListAdapter<AutomaticDataCaptureMethodCodeType> {
 
-    AutomaticDataCaptureMethodCodeAdapter() {
+    @Inject
+    public AutomaticDataCaptureMethodCodeAdapter() {
         super(AutomaticDataCaptureMethodCodeType.class, "ECE-7233");
     }
 

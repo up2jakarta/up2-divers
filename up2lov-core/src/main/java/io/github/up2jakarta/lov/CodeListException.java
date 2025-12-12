@@ -3,9 +3,7 @@ package io.github.up2jakarta.lov;
 import java.util.List;
 
 /**
- * Encapsulate parse errors when processing {@link CodeList}.
- *
- * @see CodeListAdapter
+ * Base Exception for {@link CodeListAdapter} that encapsulates error {@link #code} and {@link #level} attributes.
  */
 public class CodeListException extends TypeException {
 

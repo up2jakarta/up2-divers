@@ -1,0 +1,88 @@
+package io.github.up2jakarta.test.edi;
+
+import io.github.up2jakarta.cii.edi.AdjustmentReasonCodeType;
+import io.github.up2jakarta.cii.format.standard.ram.DeliveryAdjustmentType;
+import io.github.up2jakarta.cii.format.standard.ram.LineTradeDeliveryType;
+import io.github.up2jakarta.cii.format.standard.ram.SupplyChainTradeLineItemType;
+import io.github.up2jakarta.cii.format.standard.ram.SupplyChainTradeTransactionType;
+import io.github.up2jakarta.lov.CodeListException;
+import io.github.up2jakarta.lov.SeverityType;
+import io.github.up2jakarta.test.TUConfiguration;
+import io.github.up2jakarta.test.api.CodeAdapterTest;
+import io.github.up2jakarta.xml.api.IValidationError;
+import io.github.up2jakarta.xml.api.XValidationException;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = TUConfiguration.class)
+public class AdjustmentReasonCodeTest extends CodeAdapterTest {
+
+    private static final io.github.up2jakarta.cii.format.unmapped.qdt.AdjustmentReasonCodeType WRONG_CODE =
+            new io.github.up2jakarta.cii.format.unmapped.qdt.AdjustmentReasonCodeType() {{
+                setValue("???");
+            }};
+
+    public AdjustmentReasonCodeTest(@Autowired ApplicationContext context) throws IOException {
+        super(context, "valid4-formatCII.xml", "invalid_adjustment_reason.xml", i -> {
+            var trade = i.getSupplyChainTradeTransaction();
+            var items = trade.getIncludedSupplyChainTradeLineItem();
+            var item = items.getFirst();
+            var delivery = item.getSpecifiedLineTradeDelivery();
+            var adjustmentTypes = delivery.getSpecifiedDeliveryAdjustment();
+            var adjustmentType = adjustmentTypes.getFirst();
+            adjustmentType.setReasonCode(WRONG_CODE);
+        });
+    }
+
+    @Test
+    public void value() {
+        final SupplyChainTradeTransactionType trade = validInvoice.getSupplyChainTradeTransaction();
+        assertNotNull(trade);
+        final List<SupplyChainTradeLineItemType> items = trade.getIncludedSupplyChainTradeLineItem();
+        assertNotNull(items);
+        assertEquals(1, items.size());
+        final SupplyChainTradeLineItemType item = items.getFirst();
+        assertNotNull(item);
+        final LineTradeDeliveryType delivery = item.getSpecifiedLineTradeDelivery();
+        assertNotNull(delivery);
+        final List<DeliveryAdjustmentType> adjustmentTypes = delivery.getSpecifiedDeliveryAdjustment();
+        assertNotNull(adjustmentTypes);
+        assertEquals(1, adjustmentTypes.size());
+        final DeliveryAdjustmentType adjustmentType = adjustmentTypes.getFirst();
+        assertNotNull(adjustmentTypes);
+        final AdjustmentReasonCodeType code = adjustmentType.getReasonCode();
+        assertEquals(AdjustmentReasonCodeType.V_1, code);
+        assertNotNull(code.getName());
+    }
+
+    @Test
+    public void read() throws IOException {
+        assertThrows(XValidationException.class, () -> reader.read(invalidInvoiceFile, false));
+    }
+
+    @Test
+    public void validate() throws IOException {
+        final List<IValidationError> errors = validator.validate(invalidInvoiceFile);
+        assertNotNull(errors);
+        assertEquals(1, errors.size());
+        {
+            final IValidationError error = errors.getFirst();
+            assertEquals(SeverityType.ERROR, error.getLevel());
+            assertEquals(52, error.getLineNumber());
+            assertEquals(57, error.getLineOffset());
+            assertEquals("ECE-4465: Unknown input [???] for CodeList[AdjustmentReasonCodeType].", error.getMessage());
+            assertNotNull(error.getLinkedException());
+            assertInstanceOf(CodeListException.class, error.getLinkedException());
+        }
+    }
+}

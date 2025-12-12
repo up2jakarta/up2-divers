@@ -2,6 +2,7 @@ package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.TransportMovementStageCodeType;
 import io.github.up2jakarta.lov.CodeListAdapter;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -13,7 +14,8 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 @Singleton
 public class TransportMovementStageCodeAdapter extends CodeListAdapter<TransportMovementStageCodeType> {
 
-    TransportMovementStageCodeAdapter() {
+    @Inject
+    public TransportMovementStageCodeAdapter() {
         super(TransportMovementStageCodeType.class, "ECE-8051");
     }
 

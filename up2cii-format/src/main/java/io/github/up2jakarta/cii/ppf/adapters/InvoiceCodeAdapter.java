@@ -3,6 +3,7 @@ package io.github.up2jakarta.cii.ppf.adapters;
 import io.github.up2jakarta.cii.edi.DocumentCodeType;
 import io.github.up2jakarta.cii.ppf.InvoiceCodeType;
 import io.github.up2jakarta.lov.CodeListAdapter;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -14,7 +15,8 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 @Singleton
 public class InvoiceCodeAdapter extends CodeListAdapter<InvoiceCodeType> {
 
-    InvoiceCodeAdapter() {
+    @Inject
+    public InvoiceCodeAdapter() {
         super(InvoiceCodeType.class, "PPF-G101");
     }
 

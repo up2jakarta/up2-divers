@@ -22,7 +22,7 @@ public abstract class SafeAdapter<T> extends XmlAdapter<String, T> implements At
     protected final SeverityType level;
 
     protected SafeAdapter(Class<T> type, SeverityType level, String code) {
-        this.type = notNull(type, SafeAdapter.class, "type");
+        this.type = notNull(type, this.getClass(), "type");
         this.level = level;
         this.code = code;
     }
@@ -71,7 +71,7 @@ public abstract class SafeAdapter<T> extends XmlAdapter<String, T> implements At
         }
         try {
             return this.doParse(value);
-        } catch (Throwable cause) {
+        } catch (Exception cause) {
             throw TypeException.of(level, code, cause);
         }
     }
@@ -83,7 +83,7 @@ public abstract class SafeAdapter<T> extends XmlAdapter<String, T> implements At
         }
         try {
             return this.doFormat(value);
-        } catch (Throwable cause) {
+        } catch (Exception cause) {
             throw TypeException.of(level, code, cause);
         }
     }

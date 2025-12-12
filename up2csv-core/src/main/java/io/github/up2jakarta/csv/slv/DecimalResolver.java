@@ -29,18 +29,18 @@ public final class DecimalResolver implements TypeResolver<Number, Up2Decimal> {
     @Override
     public TypeAdapter<? extends Number> resolve(Field pf, Class<Number> pt, Up2Decimal pc) throws BeanException {
         if (BigDecimal.class.equals(pt)) {
-            final TypeConverter<BigDecimal> parser = (v) -> round(new BigDecimal(v), pc);
-            final TypeFormatter<BigDecimal> format = (v) -> round(v, pc).toString();
+            final TypeConverter<BigDecimal> parser = v -> round(new BigDecimal(v), pc);
+            final TypeFormatter<BigDecimal> format = v -> round(v, pc).toString();
             return new TypeSupport<>(BigDecimal.class, parser, format);
         }
         if (Double.class.equals(pt) || double.class.equals(pt)) {
-            final TypeConverter<Double> parser = (v) -> round(new BigDecimal(v), pc).doubleValue();
-            final TypeFormatter<Double> format = (v) -> round(valueOf(v), pc).toString();
+            final TypeConverter<Double> parser = v -> round(new BigDecimal(v), pc).doubleValue();
+            final TypeFormatter<Double> format = v -> round(valueOf(v), pc).toString();
             return new TypeSupport<>(Double.class, parser, format);
         }
         if (Float.class.equals(pt) || float.class.equals(pt)) {
-            final TypeConverter<Float> parser = (v) -> round(new BigDecimal(v), pc).floatValue();
-            final TypeFormatter<Float> format = (v) -> round(valueOf(v), pc).toString();
+            final TypeConverter<Float> parser = v -> round(new BigDecimal(v), pc).floatValue();
+            final TypeFormatter<Float> format = v -> round(valueOf(v), pc).toString();
             return new TypeSupport<>(Float.class, parser, format);
         }
         throw new BeanException(pf, "must not be annotated with @Up2Decimal");

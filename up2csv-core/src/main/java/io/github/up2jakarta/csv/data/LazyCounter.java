@@ -9,7 +9,7 @@ public final class LazyCounter implements IntSupplier {
 
     private final Lock mutex = new ReentrantLock();
     private final IntSupplier repository;
-    private volatile AtomicInteger value;
+    private AtomicInteger value;
 
     public LazyCounter(IntSupplier repository) {
         this.repository = repository;

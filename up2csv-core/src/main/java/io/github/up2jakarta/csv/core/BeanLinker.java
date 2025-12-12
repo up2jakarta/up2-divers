@@ -22,7 +22,7 @@ import static io.github.up2jakarta.lov.core.Beans.cast;
  * @param <T> the child type
  * @param <P> the parent type
  */
-public non-sealed abstract class BeanLinker<T extends Segment, P extends Segment> implements ILinker<T, P>, MEP {
+public abstract non-sealed class BeanLinker<T extends Segment, P extends Segment> implements ILinker<T, P>, MEP {
 
     public final Class<T> classType;
     public final Class<P> parentType;
@@ -37,7 +37,7 @@ public non-sealed abstract class BeanLinker<T extends Segment, P extends Segment
      * @param getter     the getter accessor
      * @param setter     the link function
      */
-    public BeanLinker(Class<P> parentType, Class<T> type, IJoin<P, T> getter, ILink<P, T> setter) {
+    protected BeanLinker(Class<P> parentType, Class<T> type, IJoin<P, T> getter, ILink<P, T> setter) {
         this.getter = notNull(getter, BeanLinker.class, "getter");
         this.setter = notNull(setter, BeanLinker.class, "setter");
         this.classType = notNull(type, BeanLinker.class, "class-type");
@@ -57,7 +57,7 @@ public non-sealed abstract class BeanLinker<T extends Segment, P extends Segment
     /**
      * Simple base implementation of {@link IType} for non-enum implementations.
      */
-    public static abstract class Type<B extends DataType<B>, I extends Type<B, I>> extends BeanLinker<Segment, Segment> implements IType<B, I> {
+    public abstract static class Type<B extends DataType<B>, I extends Type<B, I>> extends BeanLinker<Segment, Segment> implements IType<B, I> {
         public final String code;
         public final SeverityType level;
 

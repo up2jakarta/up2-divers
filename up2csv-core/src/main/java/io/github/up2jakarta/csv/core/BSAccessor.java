@@ -39,7 +39,7 @@ abstract sealed class BSAccessor<V> implements BSBuilder.MST permits BSAccessor.
     /**
      * Final Access
      */
-    abstract sealed static class FA<V> extends BSAccessor<V> permits FRW, FRO, PRC, PRW {
+    abstract static sealed class FA<V> extends BSAccessor<V> permits FRW, FRO, PRC, PRW {
         private FA(Field source) {
             super(setAccessible(source));
         }
@@ -53,7 +53,7 @@ abstract sealed class BSAccessor<V> implements BSBuilder.MST permits BSAccessor.
     /**
      * Property Access
      */
-    abstract sealed static class PA<V> extends BSAccessor<V> permits PWO, PRO, PWC {
+    abstract static sealed class PA<V> extends BSAccessor<V> permits PWO, PRO, PWC {
         protected final Class<? extends Segment> container;
         protected final Class<V> type;
 

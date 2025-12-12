@@ -35,7 +35,7 @@ public final class ConstantProvider extends CodeListProvider<CodeList<?>> {
     }
 
     @SuppressWarnings("unchecked")
-    private static <C extends CodeList<?>> void values(Stack<Class<C>> cs, Class<C> type, Class<C> nd, Consumer<C> cl) {
+    private static <C extends CodeList<?>> void values(List<Class<C>> cs, Class<C> type, Class<C> nd, Consumer<C> cl) {
         cs.add(nd);
         for (final Field field : nd.getDeclaredFields()) {
             if (isValid(field)) {
@@ -70,7 +70,7 @@ public final class ConstantProvider extends CodeListProvider<CodeList<?>> {
     public static <C extends CodeList<?>> List<C> values(Class<C> type) {
         notNull(type, ConstantProvider.class, "type");
         final Set<C> values = new LinkedHashSet<>();
-        final Stack<Class<C>> stack = new Stack<>();
+        final List<Class<C>> stack = new LinkedList<>();
         values(stack, type, type, values::add);
         type = getTypeArgument(type, CodeList.class, 0, type);
         if (!stack.contains(type)) {

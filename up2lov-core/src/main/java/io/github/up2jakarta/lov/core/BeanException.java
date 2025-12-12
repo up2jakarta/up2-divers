@@ -10,9 +10,9 @@ import static io.github.up2jakarta.lov.core.Beans.getTypeName;
  */
 public final class BeanException extends Exception implements Localizable {
 
-    private final AnnotatedElement source;
-    private final CharSequence name;
-    private final String locator;
+    private final transient AnnotatedElement source;
+    private final transient CharSequence name;
+    private final transient String locator;
 
     private BeanException(AnnotatedElement source, CharSequence name, String locator, String message) {
         super(message);

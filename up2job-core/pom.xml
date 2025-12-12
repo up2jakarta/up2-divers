@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2-divers</artifactId>
-        <version>1.6.2</version>
+        <version>1.6.3</version>
     </parent>
 
     <artifactId>up2job-core</artifactId>
@@ -26,7 +26,7 @@
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
+            <artifactId>spring-boot-test-autoconfigure</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -56,18 +56,11 @@
         </dependency>
         <!-- Optional dependencies -->
         <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <optional>true</optional>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <optional>true</optional>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -78,8 +71,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <argLine>
-                            -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
-                            -Xshare:off
+                            --add-reads=org.jboss.logging=org.hibernate.validator
                         </argLine>
                     </configuration>
                 </plugin>

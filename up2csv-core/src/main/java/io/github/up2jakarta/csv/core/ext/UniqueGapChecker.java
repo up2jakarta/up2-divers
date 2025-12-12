@@ -11,7 +11,6 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 import java.util.stream.IntStream;
 
 import static io.github.up2jakarta.lov.core.Localizable.CLASS;
@@ -58,12 +57,12 @@ public final class UniqueGapChecker implements TypeListener {
 
     private static final class Context implements TypeContext {
         private final List<Node> fragments = new LinkedList<>();
-        private final Stack<Node> stack = new Stack<>();
+        private final List<Node> stack = new LinkedList<>();
         private final Node root;
 
         private Context(Class<? extends Segment> type) {
             this.root = new Node(type, CLASS, 0);
-            stack.push(root);
+            stack.addLast(root);
         }
 
         private void checkUnique(Node entry, Field property, int offset) throws BeanException {
@@ -75,7 +74,7 @@ public final class UniqueGapChecker implements TypeListener {
 
         @Override
         public void positionProperty(Field property, Class<?> type, int offset) throws BeanException {
-            final Node node = stack.peek();
+            final Node node = stack.getLast();
             this.checkUnique(node, property, offset);
             if (node != root) {
                 this.checkUnique(root, property, offset);
@@ -84,13 +83,13 @@ public final class UniqueGapChecker implements TypeListener {
 
         @Override
         public void beforeFragmentProperty(Field fragment, Class<? extends Segment> type, int offset) {
-            final Class<?> source = stack.peek().source;
-            stack.push(new Node(source, fragment.getName(), offset));
+            final Class<?> source = stack.getLast().source;
+            stack.addLast(new Node(source, fragment.getName(), offset));
         }
 
         @Override
         public void afterFragmentProperty(Field fragment, Class<? extends Segment> type) {
-            fragments.add(stack.pop());
+            fragments.add(stack.removeLast());
         }
 
         @Override

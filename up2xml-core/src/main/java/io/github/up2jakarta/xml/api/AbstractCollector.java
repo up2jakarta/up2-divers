@@ -10,7 +10,7 @@ public abstract class AbstractCollector implements ValidationEventHandler {
 
     protected final boolean lenient;
 
-    public AbstractCollector(boolean strict) {
+    protected AbstractCollector(boolean strict) {
         this.lenient = strict;
     }
 

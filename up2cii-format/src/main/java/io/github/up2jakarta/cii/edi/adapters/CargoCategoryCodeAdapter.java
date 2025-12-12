@@ -2,6 +2,7 @@ package io.github.up2jakarta.cii.edi.adapters;
 
 import io.github.up2jakarta.cii.edi.CargoCategoryCodeType;
 import io.github.up2jakarta.lov.CodeListAdapter;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -13,7 +14,8 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 @Singleton
 public class CargoCategoryCodeAdapter extends CodeListAdapter<CargoCategoryCodeType> {
 
-    CargoCategoryCodeAdapter() {
+    @Inject
+    public CargoCategoryCodeAdapter() {
         super(CargoCategoryCodeType.class, "ECE-R21");
     }
 

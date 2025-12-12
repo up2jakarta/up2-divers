@@ -143,33 +143,33 @@ public final class JpaTableChecker implements TypeListener {
     }
 
     private static class Context implements TypeContext {
-        private final Stack<Class<?>> stack = new Stack<>();
+        private final List<Class<?>> stack = new LinkedList<>();
 
         private Context(Class<? extends Segment> type) {
-            stack.push(type);
+            stack.addLast(type);
         }
 
         @Override
         public void beforeFragmentProperty(Field fragment, Class<? extends Segment> type, int offset) throws BeanException {
-            stack.push(checkFragment(fragment, type));
+            stack.addLast(checkFragment(fragment, type));
             this.unknownProperty(fragment, type);
         }
 
         @Override
         public void afterFragmentProperty(Field fragment, Class<? extends Segment> type) {
-            stack.pop();
+            stack.removeLast();
         }
 
         @Override
         public void unknownProperty(Field property, Class<?> type) throws BeanException {
             final SecondaryTable[] st = property.getAnnotationsByType(SecondaryTable.class);
             for (final SecondaryTable t : st) {
-                final String prefix = getPrefix(stack.peek().getPackage());
+                final String prefix = getPrefix(stack.getLast().getPackage());
                 checkName(property.getDeclaringClass(), t.name(), prefix, "@SecondaryTable[name]");
             }
             final JoinTable jt = property.getAnnotation(JoinTable.class);
             if (jt != null) {
-                final String prefix = getPrefix(stack.peek().getPackage());
+                final String prefix = getPrefix(stack.getLast().getPackage());
                 checkName(property.getDeclaringClass(), jt.name(), prefix, "@JoinTable[name]");
             }
             checkToOne(property, type);

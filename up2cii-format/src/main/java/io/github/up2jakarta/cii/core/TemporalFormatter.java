@@ -1,5 +1,6 @@
 package io.github.up2jakarta.cii.core;
 
+import jakarta.inject.Inject;
 
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
@@ -7,6 +8,7 @@ import java.time.temporal.TemporalQuery;
 
 public final class TemporalFormatter<T extends Temporal> extends AbstractFormatter<T, T> {
 
+    @Inject
     public TemporalFormatter(DateTimeFormatter formatter, Class<T> javaType, TemporalQuery<T> query) {
         super(javaType, query, formatter);
     }
