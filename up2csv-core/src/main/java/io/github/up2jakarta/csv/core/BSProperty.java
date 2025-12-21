@@ -22,9 +22,7 @@ import java.util.Optional;
 
 import static io.github.up2jakarta.csv.core.BSAccessor.FA;
 import static io.github.up2jakarta.csv.core.BSAccessor.Mode;
-import static io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import static io.github.up2jakarta.csv.core.BSProperty.PFragment.*;
-import static io.github.up2jakarta.csv.core.BSProperty.PPosition;
 import static io.github.up2jakarta.csv.core.BSProperty.PPosition.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;

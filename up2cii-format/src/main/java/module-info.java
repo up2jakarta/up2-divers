@@ -25,19 +25,19 @@ module up2jakarta.cii.core {
     exports io.github.up2jakarta.cii.format.unmapped.udt;
     exports io.github.up2jakarta.cii.format.unmapped.ram;
 
-    opens io.github.up2jakarta.cii.format;
-    opens io.github.up2jakarta.cii.format.minified;
-    opens io.github.up2jakarta.cii.format.minified.qdt;
-    opens io.github.up2jakarta.cii.format.minified.udt;
-    opens io.github.up2jakarta.cii.format.minified.ram;
-    opens io.github.up2jakarta.cii.format.standard;
-    opens io.github.up2jakarta.cii.format.standard.qdt;
-    opens io.github.up2jakarta.cii.format.standard.udt;
-    opens io.github.up2jakarta.cii.format.standard.ram;
-    opens io.github.up2jakarta.cii.format.unmapped;
-    opens io.github.up2jakarta.cii.format.unmapped.qdt;
-    opens io.github.up2jakarta.cii.format.unmapped.udt;
-    opens io.github.up2jakarta.cii.format.unmapped.ram;
+    opens io.github.up2jakarta.cii.format.minified to jakarta.xml.bind, org.glassfish.jaxb.runtime;
+    opens io.github.up2jakarta.cii.format.standard to jakarta.xml.bind, org.glassfish.jaxb.runtime;
+    opens io.github.up2jakarta.cii.format.unmapped to jakarta.xml.bind, org.glassfish.jaxb.runtime;
+    opens io.github.up2jakarta.cii.format.minified.qdt to org.glassfish.jaxb.runtime;
+    opens io.github.up2jakarta.cii.format.minified.udt to org.glassfish.jaxb.runtime;
+    opens io.github.up2jakarta.cii.format.minified.ram to org.glassfish.jaxb.runtime;
+    opens io.github.up2jakarta.cii.format.standard.qdt to org.glassfish.jaxb.runtime;
+    opens io.github.up2jakarta.cii.format.standard.udt to org.glassfish.jaxb.runtime;
+    opens io.github.up2jakarta.cii.format.standard.ram to org.glassfish.jaxb.runtime;
+    opens io.github.up2jakarta.cii.format.unmapped.qdt to org.glassfish.jaxb.runtime;
+    opens io.github.up2jakarta.cii.format.unmapped.udt to org.glassfish.jaxb.runtime;
+    opens io.github.up2jakarta.cii.format.unmapped.ram to org.glassfish.jaxb.runtime;
+    opens io.github.up2jakarta.cii.format to org.glassfish.jaxb.runtime;
 
     opens CII_D16B.uncefact.identifierlist.standard;
     opens CII_D16B.uncefact.codelist.standard;

@@ -10,7 +10,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import static io.github.up2jakarta.csv.core.ext.Beans.*;
-import static io.github.up2jakarta.lov.core.Beans.getValue;
 import static jakarta.persistence.AccessType.FIELD;
 
 /**

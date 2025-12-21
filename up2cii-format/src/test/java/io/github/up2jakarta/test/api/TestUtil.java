@@ -31,7 +31,8 @@ public class TestUtil {
 
     private final ApplicationContext context;
 
-    public TestUtil(@Autowired final ApplicationContext springContext) {
+    @Autowired
+    public TestUtil(final ApplicationContext springContext) {
         this.context = springContext;
     }
 

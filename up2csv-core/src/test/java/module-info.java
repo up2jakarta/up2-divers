@@ -35,8 +35,8 @@ module up2jakarta.test {
     opens io.github.up2jakarta.test.core.misc.vld to up2jakarta.csv.core, org.hibernate.validator;
     opens io.github.up2jakarta.test.core.misc.cvr to up2jakarta.csv.core, org.hibernate.validator;
     /* TU */
+    opens io.github.up2jakarta.test to spring.core, spring.beans, spring.context, org.junit.platform.commons;
     opens io.github.up2jakarta.test.fmt.misc to up2jakarta.csv.core, org.junit.platform.commons;
     opens io.github.up2jakarta.test.core to up2jakarta.csv.core, org.junit.platform.commons;
     opens io.github.up2jakarta.test.fmt to org.junit.platform.commons;
-    opens io.github.up2jakarta.test;
 }

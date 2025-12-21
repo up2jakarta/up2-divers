@@ -293,12 +293,12 @@ public class Up2ErrorTests {
                 EX_CAUSE + ": dummy wrapped message",
                 "\t" + CSV_MODULE + "/" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:23)",
                 "\t" + CSV_MODULE + "/" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:8)",
-                "\t" + LOV_MODULE + "@1.6.3/" + SafeAdapter.class.getName() + ".parse(SafeAdapter.java:73)",
+                "\t" + LOV_MODULE + "@1.6.4/" + SafeAdapter.class.getName() + ".parse(SafeAdapter.java:73)",
                 "Caused by java.lang.RuntimeException: NPE message",
                 "\t" + CSV_MODULE + "/" + Dummy1Processor.class.getName() + ".process(Dummy1Processor.java:27)",
                 "\t" + CSV_MODULE + "/" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:21)",
                 "\t" + CSV_MODULE + "/" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:8)",
-                "\t" + LOV_MODULE + "@1.6.3/" + SafeAdapter.class.getName() + ".parse(SafeAdapter.java:73)"
+                "\t" + LOV_MODULE + "@1.6.4/" + SafeAdapter.class.getName() + ".parse(SafeAdapter.java:73)"
         );
     }
 

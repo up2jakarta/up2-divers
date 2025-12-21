@@ -23,12 +23,6 @@ class ContextHandler<B extends ContextAware, T extends SupportAware> extends Fau
         super(baseInstance, provider);
         this.flowId = flowId;
         this.contract = baseInterface;
-        if (!baseInterface.isInterface()) {
-            throw new IllegalArgumentException("baseInterface");
-        }
-        if (!baseInterface.isInstance(baseInstance)) {
-            throw new IllegalArgumentException("baseInstance");
-        }
     }
 
     @Override

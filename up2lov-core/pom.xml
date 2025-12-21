@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2-divers</artifactId>
-        <version>1.6.3</version>
+        <version>1.6.4</version>
     </parent>
 
     <artifactId>up2lov-core</artifactId>
@@ -56,16 +56,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>jakarta.interceptor</groupId>
-            <artifactId>jakarta.interceptor-api</artifactId>
-            <version>2.2.0</version>
-            <optional>true</optional>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>jakarta.enterprise</groupId>
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
-            <version>4.1.0</version>
+            <version>${jakarta.cdi.version}</version>
             <optional>true</optional>
             <scope>test</scope>
         </dependency>

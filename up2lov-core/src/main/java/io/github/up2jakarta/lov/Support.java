@@ -47,6 +47,24 @@ public @interface Support {
          * @return the required flag.
          */
         boolean required() default true;
+    }
 
+    /**
+     * Up2J Internal Argument Definition.
+     */
+    @Documented
+    @Retention(RUNTIME)
+    @Target({})
+    @interface Argument {
+
+        /**
+         * @return the {@link Parameter#value()}.
+         */
+        String key();
+
+        /**
+         * @return the argument value
+         */
+        String value();
     }
 }

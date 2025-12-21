@@ -23,7 +23,6 @@ import java.util.*;
 import static io.github.up2jakarta.csv.core.BSBuilder.MST;
 import static io.github.up2jakarta.csv.core.BSManager.Pod;
 import static io.github.up2jakarta.csv.core.BSNode.Bean.*;
-import static io.github.up2jakarta.csv.core.BSNode.Flat;
 import static io.github.up2jakarta.csv.core.ext.Beans.getDefaultConstructor;
 import static io.github.up2jakarta.csv.core.ext.Beans.newInstance;
 import static io.github.up2jakarta.lov.core.Defaults.EMPTY;

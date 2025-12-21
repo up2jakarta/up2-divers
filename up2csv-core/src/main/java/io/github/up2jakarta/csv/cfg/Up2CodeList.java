@@ -4,6 +4,7 @@ import io.github.up2jakarta.csv.core.BeanContext;
 import io.github.up2jakarta.csv.slv.CodeListChecker;
 import io.github.up2jakarta.lov.CodeListResolver;
 import io.github.up2jakarta.lov.ConstantProvider;
+import io.github.up2jakarta.lov.Support.Argument;
 import io.github.up2jakarta.lov.core.TypeContext;
 
 import java.lang.annotation.*;
@@ -46,32 +47,29 @@ public @interface Up2CodeList {
 
     /**
      * Returns the arguments for the code-list resolver values lookup {@link CodeListResolver#resolve(Class, TypeContext)}.
-     * <p>
-     * The format supports multiple key-value pairs separated by <code>&amp;</code>
-     * and each key-value pair is separated by <code>=</code>.
-     * <p>
-     * If any argument value contains any separator, it must be quoted with the character <code>"</code>.
      * <ul>
-     *     Each code-list documents its parameters by {@link io.github.up2jakarta.lov.Support}, for examples:
+     *     The list of parameters are documented with {@link io.github.up2jakarta.lov.Support} on the resolver itself:
      *     <li>
-     *         {@link io.github.up2jakarta.lov.ConstantProvider} does not supports parameters.
+     *         {@link io.github.up2jakarta.lov.ConstantProvider} does not supports any parameters.
      *     </li>
      *     <li>
-     *         {@link io.github.up2jakarta.lov.DynamicProvider} supports only one required parameter:
-     *         <code>file=class_path_file.properties</code> or <code>file=class_path_file.yaml</code>
+     *         {@link io.github.up2jakarta.lov.DynamicProvider} supports only one required parameter: <code>file</code>
      *     </li>
      *     <li>
-     *         {@link io.github.up2jakarta.lov.EntityResolver} supports only one optional parameters:
-     *         <code>jpaCode=jpa_code_property_name</code>
+     *         {@link io.github.up2jakarta.lov.EntityResolver} supports only one optional parameter: <code>jpaCode</code>
      *     </li>
      *     <li>
      *         {@link io.github.up2jakarta.lov.TableResolver} supports 3 required parameters:
-     *         <code>sqlTable=sql_table_name &amp; sqlCode=sql_code_column &amp; sqlName=sql_name_column</code>
+     *         <ul>
+     *             <li><code>sqlTable</code></li>
+     *             <li><code>sqlName</code></li>
+     *             <li><code>sqlCode</code></li>
+     *         </ul>
      *     </li>
      * </ul>
      *
      * @return the resolver arguments
      */
-    String args() default "";
+    Argument[] args() default {};
 
 }

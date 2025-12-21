@@ -16,12 +16,15 @@ class FlowFactory<B extends ContextAware, I extends SupportAware, T extends B, P
     private final int order;
 
     @SuppressWarnings("unchecked")
-    FlowFactory(Class<T> bi, Class<B> bc, ContextBuilder<B, I> cb, ContextProvider<P, ?> lp, String input, int order) {
+    FlowFactory(Class<T> fi, Class<B> si, ContextBuilder<B, I> cb, ContextProvider<P, ?> lp, String input, int order) {
         this.order = order;
         final I baseInstance = cb.build(this, input);
+        if (!si.isInstance(baseInstance)) {
+            throw new IllegalArgumentException("superInstance");
+        }
         this.name = new File(baseInstance.getInput()).getName();
-        final ContextHandler<B, I> handler = new ContextHandler<>(bc, baseInstance, lp, order);
-        final T proxy = (T) Proxy.newProxyInstance(bi.getClassLoader(), new Class[]{bi, FaultAware.class}, handler);
+        final ContextHandler<B, I> handler = new ContextHandler<>(si, baseInstance, lp, order);
+        final T proxy = (T) Proxy.newProxyInstance(fi.getClassLoader(), new Class[]{fi, FaultAware.class}, handler);
         this.handler = new FlowHandler<>() {
             @Override
             public Map<String, Object> initialize(StepExecution execution, Logger logger, int stepId) {

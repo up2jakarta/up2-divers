@@ -16,6 +16,8 @@ import io.github.up2jakarta.test.api.TestUtil;
 import io.github.up2jakarta.xml.SchemaValidator;
 import io.github.up2jakarta.xml.api.XConfigurationException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +43,13 @@ public class TUConfiguration {
         System.setErr(System.out);
     }
 
+    @Autowired
+    public TUConfiguration(final DefaultListableBeanFactory factory) {
+        factory.registerSingleton("cl4465Adapter", AllowanceChargeReasonCodeAdapter.ECE_4465);
+        factory.registerSingleton("cl7161Converter", SpecialServiceDescriptionCodeAdapter.ECE_7161);
+        factory.registerSingleton("cl5189Adapter", AllowanceChargeIdentificationCodeAdapter.ECE_5189);
+    }
+
     public static File xmlOutput() {
         try {
             final File out = Path.of(".", "target", "workspace").toFile();
@@ -51,21 +60,6 @@ public class TUConfiguration {
         } catch (IOException e) {
             throw new XConfigurationException("Cannot create XML output directory", e);
         }
-    }
-
-    @Bean
-    public AllowanceChargeIdentificationCodeAdapter allowanceChargeIdentificationCodeAdapter() {
-        return AllowanceChargeIdentificationCodeAdapter.ECE_5189;
-    }
-
-    @Bean
-    public AllowanceChargeReasonCodeAdapter allowanceChargeReasonCodeAdapter() {
-        return AllowanceChargeReasonCodeAdapter.ECE_4465;
-    }
-
-    @Bean
-    public SpecialServiceDescriptionCodeAdapter specialServiceDescriptionCodeAdapter() {
-        return SpecialServiceDescriptionCodeAdapter.ECE_7161;
     }
 
     @Bean

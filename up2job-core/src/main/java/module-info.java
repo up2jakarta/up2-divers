@@ -1,5 +1,4 @@
 module up2jakarta.job.core {
-    requires spring.batch.infrastructure;
     requires up2jakarta.lov.core;
     requires up2jakarta.xml.core;
     requires jakarta.persistence;
@@ -7,6 +6,8 @@ module up2jakarta.job.core {
     requires spring.tx;
     requires org.slf4j;
     requires java.xml;
+
+    requires static spring.batch.infrastructure;
 
     exports io.github.up2jakarta.job;
     exports io.github.up2jakarta.job.ctx;

@@ -1,6 +1,6 @@
 package io.github.up2jakarta.job.ctx;
 
-interface FaultAware {
+public interface FaultAware {
 
     void addFailures(long count);
 

@@ -18,10 +18,16 @@ public abstract class FlowListener<B extends ContextAware, I extends SupportAwar
 
     private final List<FlowHolder<T>> holders;
 
-    protected FlowListener(Class<T> type, Class<B> bi, ContextBuilder<B, I> cb, ContextProvider<?, ?> cp, String[] inputs) {
+    protected FlowListener(Class<T> fi, Class<B> si, ContextBuilder<B, I> cb, ContextProvider<?, ?> cp, String[] inputs) {
+        if (!fi.isInterface()) {
+            throw new IllegalArgumentException("finalInterface");
+        }
+        if (!si.isInterface()) {
+            throw new IllegalArgumentException("superInterface");
+        }
         final List<FlowHolder<T>> result = new ArrayList<>(inputs.length);
         for (var i = 0; i < inputs.length; i++) {
-            result.add(new FlowFactory<>(type, bi, cb, cp, inputs[i], i + 1));
+            result.add(new FlowFactory<>(fi, si, cb, cp, inputs[i], i + 1));
         }
         this.holders = List.copyOf(result);
     }
