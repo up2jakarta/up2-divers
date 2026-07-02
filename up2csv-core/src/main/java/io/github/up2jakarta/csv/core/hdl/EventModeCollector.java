@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.core.hdl;
 import io.github.up2jakarta.csv.api.ICreator;
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.IException;
 import io.github.up2jakarta.lov.SeverityType;
 
@@ -12,9 +12,9 @@ import static io.github.up2jakarta.lov.core.AccessException.notNull;
 /**
  * Base {@link EventCollector} implementation that delegates partial event creation to {@link #mode}.
  *
- * @param <D> the business data type
+ * @param <D> the business term type
  */
-public abstract class EventModeCollector<D extends DataType<D>, R extends IRecord<?>, E extends IEvent<D>, B extends IException> extends EventCollector<D, E> {
+public abstract class EventModeCollector<D extends ITerm<D>, R extends IRecord<?>, E extends IEvent<D>, B extends IException> extends EventCollector<D, E> {
 
     final R source;
     final EventModeType<? extends B> mode;

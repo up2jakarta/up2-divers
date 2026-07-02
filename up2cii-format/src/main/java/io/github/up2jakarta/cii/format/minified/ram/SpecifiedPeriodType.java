@@ -10,18 +10,19 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SpecifiedPeriodType", propOrder = {
         "startDateTime",
         "endDateTime"
 })
 public class SpecifiedPeriodType {
 
+    @XmlElement(name = "StartDateTime")
     private DateTimeType startDateTime;
 
+    @XmlElement(name = "EndDateTime")
     private DateTimeType endDateTime;
 
-    @XmlElement(name = "StartDateTime")
     public DateTimeType getStartDateTime() {
         return this.startDateTime;
     }
@@ -30,7 +31,6 @@ public class SpecifiedPeriodType {
         this.startDateTime = startDateTime;
     }
 
-    @XmlElement(name = "EndDateTime")
     public DateTimeType getEndDateTime() {
         return this.endDateTime;
     }

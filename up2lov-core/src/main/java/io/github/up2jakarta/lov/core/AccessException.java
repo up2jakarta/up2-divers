@@ -1,6 +1,5 @@
 package io.github.up2jakarta.lov.core;
 
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
 
 import static io.github.up2jakarta.lov.core.Beans.getTypeName;
@@ -21,6 +20,12 @@ public final class AccessException extends RuntimeException implements Localizab
 
     public AccessException(Class<?> type, String locator, Throwable cause) {
         super(cause.getMessage(), cause);
+        this.locator = locator;
+        this.source = type;
+    }
+
+    public AccessException(Class<?> type, String locator, String message, Throwable cause) {
+        super(message, cause);
         this.locator = locator;
         this.source = type;
     }
@@ -46,13 +51,14 @@ public final class AccessException extends RuntimeException implements Localizab
     }
 
     public static <T> T notNull(T bean, Class<?> type, String locator) {
-        if (bean == null)
+        if (bean == null) {
             throw new AccessException(type, locator, "must not be null");
+        }
         return bean;
     }
 
     @Override
-    public AnnotatedElement getSource() {
+    public Class<?> getSource() {
         return source;
     }
 

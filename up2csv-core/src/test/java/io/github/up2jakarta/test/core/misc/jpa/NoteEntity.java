@@ -1,10 +1,10 @@
 package io.github.up2jakarta.test.core.misc.jpa;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2EnableJPA;
 import io.github.up2jakarta.csv.cfg.ValidOverride;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.test.core.misc.lov.CountryCodeType;
 import io.github.up2jakarta.test.core.misc.lov.CountryConverter;
 import io.github.up2jakarta.test.core.misc.lov.CurrencyCodeType;

@@ -6,8 +6,8 @@ import io.github.up2jakarta.csv.io.UnitFileReader;
 import io.github.up2jakarta.csv.io.UnitFileWriter;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.dto.Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import io.github.up2jakarta.test.misc.AUnitTests;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
@@ -22,11 +22,11 @@ import static io.github.up2jakarta.test.misc.Tests.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class UnitInvoiceTests extends AUnitTests<TURecord, UnitImporter<GroupType, SegmentType, Invoice, TURecord, TUError>> {
+public class UnitInvoiceTests extends AUnitTests<TURecord, UnitImporter<TermType, SegmentType, Invoice, TURecord, TUError>> {
 
     @Autowired
-    UnitInvoiceTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
-        super(new UnitImporter<>(factory, Invoice.class, SegmentType.S01) {
+    UnitInvoiceTests(Up2Factory<TermType> factory, CSVFormat format) throws IOException, BeanException {
+        super(new UnitImporter<>(factory, Invoice.class, SegmentType.class) {
             @Override
             protected TUHandler.Builder newBuilder(int size) {
                 return new TUHandler.Builder(size);
@@ -36,13 +36,13 @@ public class UnitInvoiceTests extends AUnitTests<TURecord, UnitImporter<GroupTyp
     }
 
     @Override
-    protected UnitFileWriter<Invoice> writer(UnitImporter<GroupType, SegmentType, Invoice, TURecord, TUError> importer, CSVFormat format) throws BeanException {
+    protected UnitFileWriter<Invoice> writer(UnitImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer, CSVFormat format) throws BeanException {
         return new UnitFileWriter<>(importer.toExporter(), format);
     }
 
     @Override
-    protected UnitFileReader<Invoice, GroupType, SegmentType, TURecord, TUError> reader(
-            UnitImporter<GroupType, SegmentType, Invoice, TURecord, TUError> importer, CSVFormat format
+    protected UnitFileReader<Invoice, TermType, SegmentType, TURecord, TUError> reader(
+            UnitImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer, CSVFormat format
     ) {
         return new UnitFileReader<>(importer, format, "-") {
             @Override

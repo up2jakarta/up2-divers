@@ -2,7 +2,6 @@ package io.github.up2jakarta.lov;
 
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.TypeContext;
-import io.github.up2jakarta.lov.core.TypeSupport;
 
 import java.util.List;
 import java.util.Objects;
@@ -19,10 +18,24 @@ public abstract class CodeListProvider<T extends CodeList<?>> implements CodeLis
         final List<T> values = this.values(type, context).stream().filter(Objects::nonNull).toList();
         final String name = context.getTypeName();
         if (values.isEmpty()) {
-            final TypeConverter<T> parser = v -> {
-                throw new CodeListException(name, v, context.getLevel(), context.getCode());
+            final String code = context.getCode();
+            final SeverityType level = context.getLevel();
+            return new TypeAdapter<>() {
+                @Override
+                public Class<T> getType() {
+                    return type;
+                }
+
+                @Override
+                public T parse(String value) throws TypeException {
+                    throw new CodeListException(name, value, level, code);
+                }
+
+                @Override
+                public String format(T value) throws TypeException {
+                    return value.getCode();
+                }
             };
-            return new TypeSupport<>(type, parser, CodeList::getCode);
         }
         for (final CodeList<?> value : values) {
             if (!type.isInstance(value)) {

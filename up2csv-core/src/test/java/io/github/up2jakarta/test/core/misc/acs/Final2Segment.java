@@ -1,10 +1,13 @@
 package io.github.up2jakarta.test.core.misc.acs;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Creator;
 import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.data.Segment;
+import jakarta.persistence.Access;
 import jakarta.validation.constraints.NotBlank;
+
+import static jakarta.persistence.AccessType.PROPERTY;
 
 public class Final2Segment implements Segment {
 
@@ -14,6 +17,7 @@ public class Final2Segment implements Segment {
     @Fragment(1)
     public SFragment fragment;
 
+    @Access(PROPERTY)
     public static class SFragment implements Segment {
 
         @Position(0)

@@ -9,8 +9,8 @@ import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
 import io.github.up2jakarta.test.fmt.misc.AFastTest;
 import io.github.up2jakarta.test.fmt.misc.Dummy1Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,24 +24,27 @@ import java.util.List;
 import static io.github.up2jakarta.csv.api.IEvent.EC_CODE_LIST;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.test.fmt.misc.Tests.fastInvoice;
-import static io.github.up2jakarta.test.impl.SegmentType.*;
+import static io.github.up2jakarta.test.impl.SegmentType.S02;
+import static io.github.up2jakarta.test.impl.SegmentType.S11;
+import static io.github.up2jakarta.test.impl.TermType.A002;
+import static io.github.up2jakarta.test.impl.TermType.D009;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-class FastDummy1Tests extends AFastTest<Dummy1Invoice, FastRecord<SegmentType, String>, PropertyEvent<GroupType, FastRecord<SegmentType, String>>> {
+class FastDummy1Tests extends AFastTest<Dummy1Invoice, FastRecord<SegmentType>, PropertyEvent<TermType, FastRecord<SegmentType>>> {
 
-    private final SimpleFastImporter<Dummy1Invoice, GroupType, SegmentType> fastImporter;
+    private final SimpleFastImporter<Dummy1Invoice, TermType, SegmentType> fastImporter;
 
     @Autowired
-    FastDummy1Tests(Up2Factory<GroupType> factory) throws BeanException {
-        super(new SimpleFastImporter<>(factory, Dummy1Invoice.class, S11));
+    FastDummy1Tests(Up2Factory<TermType> factory) throws BeanException {
+        super(new SimpleFastImporter<>(factory, Dummy1Invoice.class, SegmentType.class));
         this.fastImporter = this.get();
     }
 
-    private FastRecord<SegmentType, String> record(String... row) throws CodeListException {
+    private FastRecord<SegmentType> record(String... row) throws CodeListException {
         return fastImporter.transform(row);
     }
 
@@ -54,7 +57,7 @@ class FastDummy1Tests extends AFastTest<Dummy1Invoice, FastRecord<SegmentType, S
     void testTypeException() throws BeanException {
         // Given
         final List<String[]> rows = Arrays.asList(
-                new String[]{"RT", "TU2025R0099", null}, new String[]{"01", "TU2025R0099", null}
+                new String[]{"RT", "TU2025R0099", null}, new String[]{"11", "TU2025R0099", null}
         );
         var pingPong = this.fastImporter.toExporter().toImporter();
         // When
@@ -68,7 +71,7 @@ class FastDummy1Tests extends AFastTest<Dummy1Invoice, FastRecord<SegmentType, S
     @Test
     void testCardinality1() {
         // Given
-        final FastRecord<SegmentType, String>[] rows = new FastRecord[]{
+        final FastRecord<SegmentType>[] rows = new FastRecord[]{
                 record("11", "TU2025R0099", "2025-03-12", "120", "100", "20"),
                 record("11", "TU2025R0088", "2025-03-12", "120", "100", "20"),
         };
@@ -79,7 +82,7 @@ class FastDummy1Tests extends AFastTest<Dummy1Invoice, FastRecord<SegmentType, S
     @Test
     void testCardinality2() {
         // Given
-        final FastRecord<SegmentType, String>[] rows = new FastRecord[]{
+        final FastRecord<SegmentType>[] rows = new FastRecord[]{
                 record("11", "TU2025R0099", "2025-03-12", "120", "100", "20")
         };
         // When & Then
@@ -89,48 +92,48 @@ class FastDummy1Tests extends AFastTest<Dummy1Invoice, FastRecord<SegmentType, S
     @Test
     void testCardinality3() {
         // Given
-        final FastRecord<SegmentType, String>[] rows = new FastRecord[]{
+        final FastRecord<SegmentType>[] rows = new FastRecord[]{
                 record("11", "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record("12", "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record("12", "TU2025R0099", "SEL0088", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record("13", "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record("14", "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
+                record("02", "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record("02", "TU2025R0099", "SEL0088", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record("03", "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record("04", "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
         };
         // When & Then
-        checkCardinality3(S12, rows);
+        checkCardinality3(S02, rows);
     }
 
     @Test
     void testCardinality4() {
         // Given
-        final FastRecord<SegmentType, String>[] rows = new FastRecord[]{
+        final FastRecord<SegmentType>[] rows = new FastRecord[]{
                 record("11", "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record("12", "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record("13", "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record("02", "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record("03", "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
         };
         // When & Then
-        checkCardinality4(S14, S11, rows);
+        checkCardinality4(S11, rows);
     }
 
     @Test
     void testDetached() {
         // Given
-        final FastRecord<SegmentType, String> detached = record("90", "TU2025R0099", "9999", "Warning", "Detached");
-        final FastRecord<SegmentType, String>[] rows = new FastRecord[]{
+        final FastRecord<SegmentType> detached = record("09", "TU2025R0099", "9999", "Warning", "Detached");
+        final FastRecord<SegmentType>[] rows = new FastRecord[]{
                 record("11", "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record("12", "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record("13", "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record("14", "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
+                record("02", "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record("03", "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record("04", "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
                 detached,
         };
         // When & Then
-        checkDetached(detached, rows);
+        checkDetached(detached, D009, rows);
     }
 
     @Test
     void testValid1() throws BeanException, IOException {
         // Given
-        final FastRecord<SegmentType, String>[] rows = fastInvoice(S11);
+        final FastRecord<SegmentType>[] rows = fastInvoice(S11);
         // When & Then
         checkValid1(rows);
     }
@@ -138,12 +141,12 @@ class FastDummy1Tests extends AFastTest<Dummy1Invoice, FastRecord<SegmentType, S
     @Test
     void testValid2() throws IOException {
         // Given
-        final FastRecord<SegmentType, String>[] rows = new FastRecord[]{
+        final FastRecord<SegmentType>[] rows = new FastRecord[]{
                 record("11", "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record("12", "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record("13", "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record("14", "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
-                record("14", "TU2025R0099", "2299", "Hardware", "1", "600", "500", "100"),
+                record("02", "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record("03", "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record("04", "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
+                record("04", "TU2025R0099", "2299", "Hardware", "1", "600", "500", "100"),
         };
         // When & Then
         checkValid2(rows);
@@ -152,16 +155,16 @@ class FastDummy1Tests extends AFastTest<Dummy1Invoice, FastRecord<SegmentType, S
     @Test
     void testValidation() {
         // Given
-        final FastRecord<SegmentType, String> invalid = record("90", "TU2025R0099", "1199", "Support", null);
-        final FastRecord<SegmentType, String>[] rows = new FastRecord[]{
+        final FastRecord<SegmentType> invalid = record("09", "TU2025R0099", "1199", "Support", null);
+        final FastRecord<SegmentType>[] rows = new FastRecord[]{
                 record("11", "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record("12", "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record("13", "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record("14", "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
+                record("02", "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record("03", "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record("04", "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
                 invalid,
         };
         // When & Then
-        checkValidation(invalid, rows);
+        checkValidation(invalid, A002, rows);
     }
 
 }

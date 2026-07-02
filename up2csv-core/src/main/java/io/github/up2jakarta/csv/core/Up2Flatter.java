@@ -1,15 +1,16 @@
 package io.github.up2jakarta.csv.core;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
 import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.BSNode.Flat;
 import io.github.up2jakarta.csv.core.hdl.ComplianceCollector;
 import io.github.up2jakarta.csv.core.hdl.ComplianceHandler;
-import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
 
 import java.util.List;
 
@@ -19,37 +20,41 @@ import static io.github.up2jakarta.csv.core.BSManager.*;
  * Up2J Processor that maps and validates java-beans to flat-data, based on java annotations configuration.
  *
  * @param <S> the segment type
- * @param <D> The business data type
+ * @param <D> The business term type
  */
-public final class Up2Flatter<S extends Segment, D extends DataType<D>> extends Pod<S, D, Flat<S, D>> {
+public final class Up2Flatter<S extends Segment, D extends ITerm<D>> extends Pod<S, D, Flat<S, D>> {
 
-    Up2Flatter(Key<D, S> key, Flat<S, D> node) throws BeanException {
-        super(key, node);
+    Up2Flatter(Validator validator, Key<D, S> key, Flat<S, D> node) throws BeanException {
+        super(validator, key, node);
     }
 
     /**
-     * Computes and returns the header record from the business data types, depending on {@link Up2Factory} resolver.
+     * Computes and returns the header record from the business term types, depending on {@link Up2Factory} resolver.
      *
      * @return the header record
-     * @see io.github.up2jakarta.csv.data.DataResolver
-     * @see io.github.up2jakarta.csv.data.Definition
+     * @see io.github.up2jakarta.csv.data.TermResolver
+     * @see io.github.up2jakarta.csv.data.Header
      */
     public String[] header() {
         return this.header(offset);
     }
 
     /**
-     * Computes and returns the header record from the business data types, depending on {@link Up2Factory} resolver.
+     * Computes and returns the header record from the business term types, depending on {@link Up2Factory} resolver.
      *
      * @param offset the number of columns reserved {@link Truncated#value()}
      * @return the header record
-     * @see io.github.up2jakarta.csv.data.DataResolver
-     * @see io.github.up2jakarta.csv.data.Definition
+     * @see io.github.up2jakarta.csv.data.TermResolver
+     * @see io.github.up2jakarta.csv.data.Header
      */
-    public String[] header(int offset) {
+    public String[] header(final int offset) {
         final String[] result = new String[length + offset];
         if (this.length != 0) {
-            this.node.header(result, offset);
+            this.node.visit(p -> {
+                if (p.dataType != null) {
+                    result[offset + p.offset] = p.dataType.getName();
+                }
+            });
         }
         return result;
     }
@@ -74,9 +79,7 @@ public final class Up2Flatter<S extends Segment, D extends DataType<D>> extends 
      * @throws AccessException for any problem when reading properties from the specified segment
      */
     public String[] unmap(S segment, int offset) throws AccessException {
-        if (segment == null) {
-            return null;
-        }
+        if (segment == null) return null;
         final String[] result = new String[offset + length];
         if (length != 0) {
             node.format(result, offset, segment);
@@ -93,7 +96,9 @@ public final class Up2Flatter<S extends Segment, D extends DataType<D>> extends 
      * @throws AccessException for any problem when reading properties from the specified segment
      */
     public void validate(S segment, int offset, ComplianceHandler<D> handler) throws AccessException {
-        node.validate(handler, segment, offset);
+        if (segment != null && validate) {
+            node.validate(validator, handler, segment, offset);
+        }
     }
 
     /**
@@ -134,14 +139,14 @@ public final class Up2Flatter<S extends Segment, D extends DataType<D>> extends 
 
     /**
      * Converts the current mapper to mapper that is able to map bean-segment to flat-data.
-     * This method is faster then {@link Up2Factory#build(Class, io.github.up2jakarta.csv.data.DataResolver)}
+     * This method is faster then {@link Up2Factory#mapper(Class)}
      * because the bean is already scanned.
      *
      * @return preconfigured CSV Mapper for the same segment
      * @throws BeanException if any property is not accessible for write or cannot create segment instances
      */
     public Up2Mapper<S, D> toMapper() throws BeanException {
-        return of(this).build(Up2Mapper::new);
+        return mp(this).build(validator, Up2Mapper::new);
     }
 
 }

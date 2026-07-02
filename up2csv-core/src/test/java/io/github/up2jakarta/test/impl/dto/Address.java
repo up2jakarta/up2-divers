@@ -1,74 +1,69 @@
 package io.github.up2jakarta.test.impl.dto;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Converter;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.test.core.misc.lov.CountryCodeType;
 import io.github.up2jakarta.test.core.misc.lov.CountryConverter;
+import io.github.up2jakarta.test.impl.BusinessType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-@SuppressWarnings("unused")
+import static io.github.up2jakarta.test.impl.TermType.*;
+
 @Valid
 public class Address implements Segment {
 
-    @Position(0)
+    @Position(value = 0, defaultValue = "TN")
     @Up2Converter(CountryConverter.class)
     @NotNull
-    private CountryCodeType country;
+    @BusinessType(P002)
+    private final CountryCodeType country;
 
     @Position(1)
-    private String city;
+    @BusinessType(P003)
+    private final String city;
 
     @Position(2)
     @NotEmpty
-    private String zipCode;
+    @BusinessType(P004)
+    private final String zipCode;
 
     @Position(3)
     @NotEmpty
-    private String addressLine1;
+    @BusinessType(P005)
+    private final String addressLine1;
 
     @Position(4)
-    private String addressLine2;
+    @BusinessType(P006)
+    private final String addressLine2;
 
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
+    public Address(CountryCodeType country, String city, String zipCode, String addressLine1, String addressLine2) {
+        this.country = country;
         this.city = city;
+        this.zipCode = zipCode;
+        this.addressLine1 = addressLine1;
+        this.addressLine2 = addressLine2;
     }
 
     public CountryCodeType getCountry() {
         return country;
     }
 
-    public void setCountry(CountryCodeType country) {
-        this.country = country;
+    public String getCity() {
+        return city;
     }
 
     public String getZipCode() {
         return zipCode;
     }
 
-    public void setZipCode(String zipCode) {
-        this.zipCode = zipCode;
-    }
-
     public String getAddressLine1() {
         return addressLine1;
     }
 
-    public void setAddressLine1(String addressLine1) {
-        this.addressLine1 = addressLine1;
-    }
-
     public String getAddressLine2() {
         return addressLine2;
-    }
-
-    public void setAddressLine2(String addressLine2) {
-        this.addressLine2 = addressLine2;
     }
 }

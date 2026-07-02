@@ -7,8 +7,8 @@ import io.github.up2jakarta.csv.io.FullFileReader;
 import io.github.up2jakarta.csv.io.FullFileWriter;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.dto.Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.apache.commons.csv.CSVFormat;
 
 import java.io.IOException;
@@ -17,11 +17,11 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public abstract class AFullTests<R extends IFullRecord<SegmentType, ?>, A extends FullImporter<GroupType, SegmentType, Invoice, R, ?>> extends Tests.AbstractTests<R> {
+public abstract class AFullTests<R extends IFullRecord<SegmentType>, A extends FullImporter<TermType, SegmentType, Invoice, R, ?>> extends Tests.AbstractTests<R> {
 
     private final FullFileWriter<Invoice> writer;
-    private final FullFileReader<Invoice, GroupType, SegmentType, R, ?> reader1;
-    private final FullFileReader<Invoice, GroupType, SegmentType, R, ?> reader2;
+    private final FullFileReader<Invoice, TermType, SegmentType, R, ?> reader1;
+    private final FullFileReader<Invoice, TermType, SegmentType, R, ?> reader2;
 
     protected AFullTests(A importer, CSVFormat format) throws IOException, BeanException {
         super(ModeType.FULL, format);
@@ -32,7 +32,7 @@ public abstract class AFullTests<R extends IFullRecord<SegmentType, ?>, A extend
 
     protected abstract FullFileWriter<Invoice> writer(A importer, CSVFormat format) throws BeanException;
 
-    protected abstract FullFileReader<Invoice, GroupType, SegmentType, R, ?> reader(A importer, CSVFormat format);
+    protected abstract FullFileReader<Invoice, TermType, SegmentType, R, ?> reader(A importer, CSVFormat format);
 
     @Override
     final void assertRecord(R data, R source) {

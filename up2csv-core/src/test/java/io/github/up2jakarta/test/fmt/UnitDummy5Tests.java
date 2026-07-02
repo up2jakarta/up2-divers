@@ -10,8 +10,8 @@ import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
 import io.github.up2jakarta.test.fmt.misc.AUnitTest;
 import io.github.up2jakarta.test.fmt.misc.Dummy5Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,20 +25,23 @@ import java.util.List;
 import static io.github.up2jakarta.csv.api.IEvent.EC_CODE_LIST;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.test.fmt.misc.Tests.unitInvoice;
-import static io.github.up2jakarta.test.impl.SegmentType.*;
+import static io.github.up2jakarta.test.impl.SegmentType.S02;
+import static io.github.up2jakarta.test.impl.SegmentType.S51;
+import static io.github.up2jakarta.test.impl.TermType.A002;
+import static io.github.up2jakarta.test.impl.TermType.D009;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, UnitRecord<SegmentType>, PropertyEvent<GroupType, UnitRecord<SegmentType>>> {
+class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, UnitRecord<SegmentType>, PropertyEvent<TermType, UnitRecord<SegmentType>>> {
 
-    private final SimpleUnitImporter<Dummy5Invoice, GroupType, SegmentType> unitImporter;
+    private final SimpleUnitImporter<Dummy5Invoice, TermType, SegmentType> unitImporter;
 
     @Autowired
-    UnitDummy5Tests(Up2Factory<GroupType> factory) throws BeanException {
-        super(new SimpleUnitImporter<>(factory, Dummy5Invoice.class, S51));
+    UnitDummy5Tests(Up2Factory<TermType> factory) throws BeanException {
+        super(new SimpleUnitImporter<>(factory, Dummy5Invoice.class, SegmentType.class));
         this.unitImporter = this.get();
     }
 
@@ -92,13 +95,13 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, UnitRecord<SegmentType>, 
         // Given
         final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("51", null, "2025-03-12", "120", "100", "20"),
-                record("52", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record("52", "SEL0088", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record("53", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record("54", "1199", "Software", "2", "120", "100", "20"),
+                record("02", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record("02", "SEL0088", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record("03", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record("04", "1199", "Software", "2", "120", "100", "20"),
         };
         // When & Then
-        checkCardinality3(S52, rows);
+        checkCardinality3(S02, rows);
     }
 
     @Test
@@ -106,32 +109,32 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, UnitRecord<SegmentType>, 
         // Given
         final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("51", null, "2025-03-12", "120", "100", "20"),
-                record("52", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record("53", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record("02", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record("03", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
         };
         // When & Then
-        checkCardinality4(S54, S51, rows);
+        checkCardinality4(S51, rows);
     }
 
     @Test
     void testDetached() {
         // Given
-        final UnitRecord<SegmentType> detached = record("90", "9999", "Warning", "Detached");
+        final UnitRecord<SegmentType> detached = record("09", "9999", "Warning", "Detached");
         final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("51", null, "2025-03-12", "120", "100", "20"),
-                record("52", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record("53", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record("54", "1199", "Software", "2", "120", "100", "20"),
+                record("02", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record("03", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record("04", "1199", "Software", "2", "120", "100", "20"),
                 detached,
         };
         // When & Then
-        checkDetached(detached, rows);
+        checkDetached(detached, D009, rows);
     }
 
     @Test
     void testValid1() throws BeanException, IOException {
         // Given
-        final UnitRecord<SegmentType>[] rows = unitInvoice(S54, UnitRecord::new);
+        final UnitRecord<SegmentType>[] rows = unitInvoice(S51, UnitRecord::new);
         // When & Then
         checkValid1(rows);
     }
@@ -141,10 +144,10 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, UnitRecord<SegmentType>, 
         // Given
         final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("51", null, "2025-03-12", "120", "100", "20"),
-                record("52", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record("53", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record("54", "1199", "Software", "2", "120", "100", "20"),
-                record("54", "2299", "Hardware", "1", "600", "500", "100"),
+                record("02", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record("03", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record("04", "1199", "Software", "2", "120", "100", "20"),
+                record("04", "2299", "Hardware", "1", "600", "500", "100"),
         };
         // When & Then
         checkValid2(rows);
@@ -153,16 +156,16 @@ class UnitDummy5Tests extends AUnitTest<Dummy5Invoice, UnitRecord<SegmentType>, 
     @Test
     void testValidation() {
         // Given
-        final UnitRecord<SegmentType> invalid = record("90", "1199", "Support", null);
+        final UnitRecord<SegmentType> invalid = record("09", "1199", "Support", null);
         final UnitRecord<SegmentType>[] rows = new UnitRecord[]{
                 record("51", null, "2025-03-12", "120", "100", "20"),
-                record("52", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record("53", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record("54", "1199", "Software", "2", "120", "100", "20"),
+                record("02", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record("03", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record("04", "1199", "Software", "2", "120", "100", "20"),
                 invalid,
         };
         // When & Then
-        checkValidation(invalid, rows);
+        checkValidation(invalid, A002, rows);
     }
 
 }

@@ -10,7 +10,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "NoteType", propOrder = {
         "content",
         "subjectCode"
@@ -18,12 +18,13 @@ import javax.annotation.processing.Generated;
 public class NoteType {
 
     // BT-22, BT-127
+    @XmlElement(name = "Content")
     private String content;
 
     // BT-21, EXT-FR-FE-183
+    @XmlElement(name = "SubjectCode")
     private SubjectCodeType subjectCode;
 
-    @XmlElement(name = "Content")
     public String getContent() {
         return this.content;
     }
@@ -32,7 +33,6 @@ public class NoteType {
         this.content = content;
     }
 
-    @XmlElement(name = "SubjectCode")
     public SubjectCodeType getSubjectCode() {
         return this.subjectCode;
     }

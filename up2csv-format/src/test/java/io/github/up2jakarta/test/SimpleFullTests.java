@@ -8,8 +8,8 @@ import io.github.up2jakarta.csv.io.FullFileWriter;
 import io.github.up2jakarta.csv.io.SimpleFullReader;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.dto.Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import io.github.up2jakarta.test.misc.AFullTests;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
@@ -22,20 +22,20 @@ import java.io.IOException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class SimpleFullTests extends AFullTests<FullRecord<SegmentType, String>, SimpleFullImporter<Invoice, GroupType, SegmentType>> {
+public class SimpleFullTests extends AFullTests<FullRecord<SegmentType>, SimpleFullImporter<Invoice, TermType, SegmentType>> {
 
     @Autowired
-    SimpleFullTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
-        super(new SimpleFullImporter<>(factory, Invoice.class, SegmentType.S01), format);
+    SimpleFullTests(Up2Factory<TermType> factory, CSVFormat format) throws IOException, BeanException {
+        super(new SimpleFullImporter<>(factory, Invoice.class, SegmentType.class), format);
     }
 
     @Override
-    protected FullFileWriter<Invoice> writer(SimpleFullImporter<Invoice, GroupType, SegmentType> importer, CSVFormat format) throws BeanException {
+    protected FullFileWriter<Invoice> writer(SimpleFullImporter<Invoice, TermType, SegmentType> importer, CSVFormat format) throws BeanException {
         return new FullFileWriter<>(importer.toExporter(), format, new Fixed06Generator());
     }
 
     @Override
-    protected SimpleFullReader<Invoice, GroupType, SegmentType> reader(SimpleFullImporter<Invoice, GroupType, SegmentType> importer, CSVFormat format) {
+    protected SimpleFullReader<Invoice, TermType, SegmentType> reader(SimpleFullImporter<Invoice, TermType, SegmentType> importer, CSVFormat format) {
         return new SimpleFullReader<>(importer, format);
     }
 

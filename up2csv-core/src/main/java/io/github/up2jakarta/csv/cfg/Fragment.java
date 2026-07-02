@@ -1,13 +1,18 @@
 package io.github.up2jakarta.csv.cfg;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Up2J Annotation that supports embeddable types in order to override {@link Position#value()}.
  */
 @Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target(FIELD)
+@Retention(RUNTIME)
 public @interface Fragment {
 
     /**

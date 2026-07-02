@@ -11,11 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class InvoiceFullImporter extends FullImporter<GroupType, SegmentType, Invoice, InputRecord, InputError> {
+public class InvoiceFullImporter extends FullImporter<TermType, SegmentType, Invoice, InputRecord, InputError> {
 
     @Autowired
-    public InvoiceFullImporter(Up2Factory<GroupType> factory) throws BeanException {
-        super(factory, Invoice.class, SegmentType.S01);
+    public InvoiceFullImporter(Up2Factory<TermType> factory) throws BeanException {
+        super(factory, Invoice.class, SegmentType.class);
     }
 
     @Override

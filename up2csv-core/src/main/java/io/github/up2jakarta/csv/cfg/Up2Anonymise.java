@@ -2,14 +2,19 @@ package io.github.up2jakarta.csv.cfg;
 
 import io.github.up2jakarta.csv.prc.AnonymiseProcessor;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Up2J Shortcut Annotation for {@link Processor} that anonymise confidential data like IBAN and CB.
  */
 @Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target(FIELD)
+@Retention(RUNTIME)
 @Processor(AnonymiseProcessor.class)
 public @interface Up2Anonymise {
 

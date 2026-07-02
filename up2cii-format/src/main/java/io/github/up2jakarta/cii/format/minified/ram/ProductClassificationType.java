@@ -10,14 +10,14 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ProductClassificationType", propOrder = {"classCode"})
 public class ProductClassificationType {
 
     // BT-158
+    @XmlElement(name = "ClassCode")
     private ProductClassCodeType classCode;
 
-    @XmlElement(name = "ClassCode")
     public ProductClassCodeType getClassCode() {
         return this.classCode;
     }

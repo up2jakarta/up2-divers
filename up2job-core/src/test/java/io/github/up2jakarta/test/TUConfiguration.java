@@ -1,10 +1,10 @@
 package io.github.up2jakarta.test;
 
-import io.github.up2jakarta.csv.core.BeanContext;
+import io.github.up2jakarta.csv.api.Container;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.prc.TokenProcessor;
 import io.github.up2jakarta.csv.slv.DecimalResolver;
-import io.github.up2jakarta.test.impl.GroupType;
+import io.github.up2jakarta.test.impl.TermType;
 import jakarta.validation.Validator;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.QuoteMode;
@@ -32,7 +32,7 @@ import java.util.Locale;
 import java.util.Set;
 
 @Configuration
-@ComponentScan(basePackageClasses = {TokenProcessor.class, DecimalResolver.class, GroupType.class})
+@ComponentScan(basePackageClasses = {TokenProcessor.class, DecimalResolver.class, TermType.class})
 @EnableTransactionManagement
 @EnableAutoConfiguration
 public class TUConfiguration {
@@ -71,7 +71,7 @@ public class TUConfiguration {
     }
 
     @Bean
-    public BeanContext beanContext(final ApplicationContext context) {
+    public Container container(final ApplicationContext context) {
         return context::getBean;
     }
 

@@ -1,8 +1,9 @@
 package io.github.up2jakarta.test.core.misc;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Position;
+import io.github.up2jakarta.csv.cfg.Up2Character;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
-import io.github.up2jakarta.csv.data.Segment;
 
 public class Test4Primitive implements Segment {
 
@@ -14,6 +15,10 @@ public class Test4Primitive implements Segment {
     @Up2Decimal(4)
     private double aDouble = 2.0;
 
+    @Position(2)
+    @Up2Character
+    private char aChar = '*';
+
     public float getAFloat() {
         return aFloat;
     }
@@ -22,4 +27,7 @@ public class Test4Primitive implements Segment {
         return aDouble;
     }
 
+    public char getAChar() {
+        return aChar;
+    }
 }

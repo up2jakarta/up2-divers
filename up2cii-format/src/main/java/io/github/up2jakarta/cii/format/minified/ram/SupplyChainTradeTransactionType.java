@@ -10,7 +10,7 @@ import java.util.List;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SupplyChainTradeTransactionType", propOrder = {
         "includedSupplyChainTradeLineItem",
         "applicableHeaderTradeAgreement",
@@ -20,16 +20,19 @@ import java.util.List;
 public class SupplyChainTradeTransactionType {
 
     // BG-25
+    @XmlElement(name = "IncludedSupplyChainTradeLineItem")
     private List<SupplyChainTradeLineItemType> includedSupplyChainTradeLineItem;
 
+    @XmlElement(name = "ApplicableHeaderTradeAgreement", required = true)
     private HeaderTradeAgreementType applicableHeaderTradeAgreement;
 
+    @XmlElement(name = "ApplicableHeaderTradeDelivery", required = true)
     private HeaderTradeDeliveryType applicableHeaderTradeDelivery;
 
     // BG-19
+    @XmlElement(name = "ApplicableHeaderTradeSettlement", required = true)
     private HeaderTradeSettlementType applicableHeaderTradeSettlement;
 
-    @XmlElement(name = "IncludedSupplyChainTradeLineItem")
     public List<SupplyChainTradeLineItemType> getIncludedSupplyChainTradeLineItem() {
         return this.includedSupplyChainTradeLineItem;
     }
@@ -38,7 +41,6 @@ public class SupplyChainTradeTransactionType {
         this.includedSupplyChainTradeLineItem = includedSupplyChainTradeLineItem;
     }
 
-    @XmlElement(name = "ApplicableHeaderTradeAgreement", required = true)
     public HeaderTradeAgreementType getApplicableHeaderTradeAgreement() {
         return this.applicableHeaderTradeAgreement;
     }
@@ -47,7 +49,6 @@ public class SupplyChainTradeTransactionType {
         this.applicableHeaderTradeAgreement = applicableHeaderTradeAgreement;
     }
 
-    @XmlElement(name = "ApplicableHeaderTradeDelivery", required = true)
     public HeaderTradeDeliveryType getApplicableHeaderTradeDelivery() {
         return this.applicableHeaderTradeDelivery;
     }
@@ -56,7 +57,6 @@ public class SupplyChainTradeTransactionType {
         this.applicableHeaderTradeDelivery = applicableHeaderTradeDelivery;
     }
 
-    @XmlElement(name = "ApplicableHeaderTradeSettlement", required = true)
     public HeaderTradeSettlementType getApplicableHeaderTradeSettlement() {
         return this.applicableHeaderTradeSettlement;
     }

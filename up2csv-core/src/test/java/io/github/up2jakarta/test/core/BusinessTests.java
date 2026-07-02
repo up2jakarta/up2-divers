@@ -12,19 +12,19 @@ import io.github.up2jakarta.csv.core.hdl.*;
 import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.csv.fmt.SimpleUnitImporter;
 import io.github.up2jakarta.csv.fmt.UnitRecord;
-import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.BuilderTests.BSError;
 import io.github.up2jakarta.test.BuilderTests.BSRecord;
 import io.github.up2jakarta.test.TUConfiguration;
-import io.github.up2jakarta.test.core.bs.CyclicInvoice;
-import io.github.up2jakarta.test.core.bs.DummyAttribute;
-import io.github.up2jakarta.test.core.bs.DummyReference;
-import io.github.up2jakarta.test.impl.GroupType;
+import io.github.up2jakarta.test.core.bs.*;
+import io.github.up2jakarta.test.core.misc.acs.BIdInvalidObject;
+import io.github.up2jakarta.test.core.misc.acs.BIdOptionalObject;
+import io.github.up2jakarta.test.core.misc.acs.BIdWrapperObject;
+import io.github.up2jakarta.test.fmt.sln.DummyAttributeLinker;
 import io.github.up2jakarta.test.impl.SegmentType;
-import io.github.up2jakarta.test.impl.dto.Invoice;
+import io.github.up2jakarta.test.impl.TermType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +34,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static io.github.up2jakarta.lov.core.Localizable.CLASS;
-import static io.github.up2jakarta.test.core.Up2ErrorTests.assertTrace;
+import static io.github.up2jakarta.csv.api.IEvent.EC_COMPLIANCE;
+import static io.github.up2jakarta.csv.api.IEvent.EC_CONVERTER;
+import static io.github.up2jakarta.csv.core.BusinessImporter.DETACHED;
+import static io.github.up2jakarta.lov.SeverityType.*;
+import static io.github.up2jakarta.test.core.Up2ErrorTests.*;
 import static io.github.up2jakarta.test.impl.SegmentType.*;
+import static io.github.up2jakarta.test.impl.TermType.*;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,29 +49,106 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BusinessTests {
 
     static final String EX_ACCESS = AccessException.class.getName();
-    static final String CSV_MODULE = DummyReference.class.getModule().getName();
-    static final String CSV_DUMMY_REFERENCE = CSV_MODULE + "/" + DummyReference.class.getName();
+    static final String TU_MODULE = DummyReference.class.getModule().getName();
 
-    private final Up2Factory<GroupType> factory;
+    private final Up2Factory<TermType> factory;
 
     @Autowired
-    BusinessTests(Up2Factory<GroupType> factory) {
+    BusinessTests(Up2Factory<TermType> factory) {
         this.factory = factory;
     }
 
-    @Test
-    void testTypingException() {
+    private <I extends VirtualItem, T extends VirtualReference<I>> T assertVirtual(Class<T> type) throws BeanException {
+        // GIVEN
+        final UnitImporter<TermType, SegmentType, T, BSRecord, BSError> importer = factory.builder()
+                .unit(type)
+                .build(SegmentType.class)
+                .build(BSError::new);
         // WHEN
-        final BeanException ex = assertThrows(
-                BeanException.class,
-                () -> factory.builder().full(Invoice.class).build(S11).build((r) -> 0)
-        );
-        assertNotNull(ex);
+        final BSRecord vr = new BSRecord(S71, null, "$");
+        final BSRecord vi = new BSRecord(S73, null, "1");
+        final BSRecord va = new BSRecord(S72, null, "I1", "K", "V");
+        final Up2Result<T, BSError> result = importer.parse(List.of(vr, vi, va));
+        final T bean = result.get();
+        //THEN
+        assertNotNull(bean);
+        assertEquals(0, vr.getEvents().size());
+        assertEquals(0, vi.getEvents().size());
+        assertEquals(2, va.getEvents().size());
+        assertEquals("$", bean.getReference());
+        assertEquals(1, bean.getItems().size());
+        final I item = bean.getItems().getFirst();
+        assertEquals(1, item.getId());
+        assertEquals(0, item.getAttributes().size());
+        assertEquals(2, result.toList().size());
+        //THEN
+        {
+            final BSError error = va.getEvents().getFirst();
+            assertSame(va, error.getKey().getRecord());
+            assertEquals(0, error.getKey().getOrder());
+            assertEquals(1, error.getOffset());
+            assertEquals(ERROR, error.getLevel());
+            assertEquals(EC_CONVERTER, error.getCode());
+            assertEquals(I006, error.getType());
+            assertEquals("For input string: \"I1\"", error.getMessage());
+            assertTrace(error.getTrace(),
+                    "java.lang.NumberFormatException: For input string: \"I1\"",
+                    "\tjava.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:67)",
+                    "\tjava.base/java.lang.Integer.parseInt(Integer.java:662)",
+                    "\tjava.base/java.lang.Integer.parseInt(Integer.java:778)"
+            );
+        }
+        {
+            final BSError error = va.getEvents().getLast();
+            assertSame(va, error.getKey().getRecord());
+            assertEquals(1, error.getKey().getOrder());
+            assertNull(error.getOffset());
+            assertEquals(WARNING, error.getLevel());
+            assertEquals("CSV-C72", error.getCode());
+            assertEquals(D009, error.getType());
+            assertEquals(DETACHED, error.getMessage());
+            assertNull(error.getTrace());
+        }
+        return bean;
+    }
+
+    @Test
+    void testBusinessId() throws BeanException {
+        // GIVEN
+        final FastImporter<TermType, SegmentType, ComplexBId, BSRecord, BSError> importer = factory.builder()
+                .fast(ComplexBId.class)
+                .build(SegmentType.class)
+                .build(BSError::new);
+        final BSRecord record = new BSRecord(S00, "7");
+        // WHEN
+        final Up2Result<ComplexBId, BSError> result = importer.parse(List.of(record));
         // THEN
-        assertEquals(Invoice.class, ex.getSource());
-        assertEquals(CLASS, ex.getLocator());
-        assertEquals("invalid business typing", ex.getMessage());
-        assertEquals("Invoice[class] invalid business typing", ex.getLocalizedMessage());
+        assertEquals(0, result.toList().size());
+        assertEquals(0, record.getEvents().size());
+        assertEquals(7, result.get().get().get().getId());
+    }
+
+    @Test
+    void testValidateBusinessId() throws BeanException {
+        // GIVEN
+        final FastImporter<TermType, SegmentType, ComplexBId, BSRecord, BSError> importer = factory.builder()
+                .fast(ComplexBId.class)
+                .build(SegmentType.class)
+                .build(BSError::new);
+        final BSRecord record = new BSRecord(S00, null);
+        // WHEN
+        final Up2Result<ComplexBId, BSError> result = importer.parse(List.of(record));
+        // THEN
+        assertEquals(1, result.toList().size());
+        assertEquals(1, record.getEvents().size());
+        {
+            final BSError error = result.toList().getFirst();
+            assertNull(error.getOffset());
+            assertEquals(ERROR, error.getLevel());
+            assertEquals(EC_COMPLIANCE, error.getCode());
+            assertEquals(UUID, error.getType());
+            assertEquals("must not be null", error.getMessage());
+        }
     }
 
     @Test
@@ -77,7 +158,7 @@ public class BusinessTests {
                 BeanException.class,
                 () -> factory.builder()
                         .full(CyclicInvoice.class)
-                        .build(S61)
+                        .build(SegmentType.class)
                         .build()
         );
         assertNotNull(ex);
@@ -90,9 +171,9 @@ public class BusinessTests {
     @Test
     void testNullRecord() throws BeanException {
         // GIVEN
-        final UnitImporter<GroupType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
+        final UnitImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
                 .unit(DummyReference.class)
-                .build(S71)
+                .build(SegmentType.class)
                 .build(BSError::new);
         // WHEN
         final Up2Result<DummyReference, ?> result = importer.parse(singletonList(null));
@@ -105,9 +186,9 @@ public class BusinessTests {
     @Test
     void testNullType() throws BeanException {
         // GIVEN
-        final UnitImporter<GroupType, SegmentType, DummyReference, MyRecord, MyError> importer = factory.builder()
+        final UnitImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = factory.builder()
                 .unit(DummyReference.class)
-                .build(S71)
+                .build(SegmentType.class)
                 .build(MyError::new);
         final MyRecord record = new MyRecord(null, "*");
         // WHEN
@@ -119,8 +200,8 @@ public class BusinessTests {
         final MyError error = result.toList().getFirst();
         assertSame(record, error.getRecord());
         assertEquals(0, error.getOffset());
-        assertEquals(SeverityType.ERROR, error.getLevel());
-        assertEquals(IEvent.EC_COMPLIANCE, error.getCode());
+        assertEquals(ERROR, error.getLevel());
+        assertEquals(EC_COMPLIANCE, error.getCode());
         assertNull(error.getType());
         assertEquals("must not be null", error.getMessage());
     }
@@ -128,27 +209,32 @@ public class BusinessTests {
     @Test
     void testNullData() throws BeanException {
         // GIVEN
-        final UnitImporter<GroupType, SegmentType, DummyReference, MyRecord, MyError> importer = factory.builder()
+        final UnitImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = factory.builder()
                 .unit(DummyReference.class)
-                .build(S71)
+                .build(SegmentType.class)
                 .build(MyError::new);
         final MyRecord record = new MyRecord(S71, (String[]) null);
         // WHEN
         final Up2Result<DummyReference, MyError> result = importer.parse(singletonList(record));
         //THEN
         assertNotNull(result);
-        assertNotNull(result.get());
-        assertEquals(0, result.toList().size());
-        assertNull(result.get().getReference());
-        assertEquals(0, result.get().getAttributes().size());
+        assertNull(result.get());
+        assertEquals(1, result.toList().size());
+        final MyError error = result.toList().getFirst();
+        //THEN
+        assertNull(error.getOffset());
+        assertEquals(FATAL, error.getLevel());
+        assertEquals("CSV-C71", error.getCode());
+        assertEquals(NONE, error.getType());
+        assertEquals("must not be null", error.getMessage());
     }
 
     @Test
     void testNullBuilder() throws BeanException {
         // GIVEN
-        final UnitImporter<GroupType, SegmentType, DummyReference, MyRecord, MyError> importer = new UnitImporter<>(factory, DummyReference.class, S71) {
+        final UnitImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = new UnitImporter<>(factory, DummyReference.class, SegmentType.class) {
             @Override
-            protected PropertyCollector.Builder<GroupType, MyRecord, MyError> newBuilder(int size) {
+            protected PropertyCollector.Builder<TermType, MyRecord, MyError> newBuilder(int size) {
                 return null;
             }
         };
@@ -164,12 +250,12 @@ public class BusinessTests {
     @Test
     void testNullHandler() throws BeanException {
         // GIVEN
-        final UnitImporter<GroupType, SegmentType, DummyReference, MyRecord, MyError> importer = new UnitImporter<>(factory, DummyReference.class, S71) {
+        final UnitImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = new UnitImporter<>(factory, DummyReference.class, SegmentType.class) {
             @Override
-            protected IEventBuilder<GroupType, MyRecord, MyError> newBuilder(int size) {
+            protected IEventBuilder<TermType, MyRecord, MyError> newBuilder(int size) {
                 return new IEventBuilder<>() {
                     @Override
-                    public BusinessHandler<GroupType> of(MyRecord record) {
+                    public BusinessHandler<TermType> of(MyRecord record) {
                         return null;
                     }
 
@@ -192,7 +278,7 @@ public class BusinessTests {
     @Test
     void testNullSource() throws BeanException {
         // GIVEN
-        final UnitImporter<GroupType, SegmentType, DummyReference, MyRecord, SimpleEvent<GroupType>> importer = new UnitImporter<>(factory, DummyReference.class, S71) {
+        final UnitImporter<TermType, SegmentType, DummyReference, MyRecord, SimpleEvent<TermType>> importer = new UnitImporter<>(factory, DummyReference.class, SegmentType.class) {
             @Override
             protected MyHandler newBuilder(int size) {
                 MyHandler.INSTANCE.toList().clear(); // Not Thread-Safe
@@ -202,20 +288,30 @@ public class BusinessTests {
         final MyRecord record1 = new MyRecord(S71, "#1");
         final MyRecord record2 = new MyRecord(S72, "*", "*", "*");
         // WHEN
-        final Up2Result<DummyReference, SimpleEvent<GroupType>> result = importer.parse(List.of(record1, record2));
+        final Up2Result<DummyReference, SimpleEvent<TermType>> result = importer.parse(List.of(record1, record2));
         // THEN
         assertEquals(0, result.get().getAttributes().size());
         assertEquals(3, result.toList().size());
+        for (final SimpleEvent<TermType> error : result.toList()) {
+            assertIn(error.getMessage(),
+                    DETACHED, "cannot retrieve the business identifier",
+                    "cannot retrieve the @ReferenceId(\"71\") value"
+            );
+            assertNull(error.getOffset());
+            assertEquals(WARNING, error.getLevel());
+            assertEquals("CSV-C72", error.getCode());
+            assertEquals(D009, error.getType());
+        }
     }
 
     @Test
     void testNullEvent() throws BeanException {
         // GIVEN
         final AtomicInteger counter = new AtomicInteger();
-        final UnitImporter<GroupType, SegmentType, DummyReference, MyRecord, MyError> importer = new UnitImporter<>(factory, DummyReference.class, S71) {
+        final UnitImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = new UnitImporter<>(factory, DummyReference.class, SegmentType.class) {
             @Override
-            protected PropertyCollector.Builder<GroupType, MyRecord, MyError> newBuilder(int size) {
-                final IPropertyCreator<GroupType, MyRecord, MyError> creator = (a, b, c, d) -> {
+            protected PropertyCollector.Builder<TermType, MyRecord, MyError> newBuilder(int size) {
+                final IPropertyCreator<TermType, MyRecord, MyError> creator = (a, b, c, d) -> {
                     counter.incrementAndGet();
                     return null;
                 };
@@ -235,9 +331,9 @@ public class BusinessTests {
     @Test
     void testDummyUnitImporter() throws BeanException {
         // GIVEN
-        final SimpleUnitImporter<DummyReference, GroupType, SegmentType> importer = factory.builder()
+        final SimpleUnitImporter<DummyReference, TermType, SegmentType> importer = factory.builder()
                 .unit(DummyReference.class)
-                .build(S71)
+                .build(SegmentType.class)
                 .build();
         // WHEN
         final Up2Result<DummyReference, ?> result = importer.parse(List.of(new UnitRecord<>(S71, "#01")));
@@ -251,37 +347,62 @@ public class BusinessTests {
     @Test
     void testDummyFastImporter() throws BeanException {
         // GIVEN
-        final FastImporter<GroupType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
-                .fast(DummyReference.class)
-                .build(S71)
+        final FastImporter<TermType, SegmentType, UnmanagedReference, BSRecord, BSError> importer = factory.builder()
+                .fast(UnmanagedReference.class)
+                .build(SegmentType.class)
                 .build(BSError::new);
-        final BSRecord record = new BSRecord(S71, "*");
+        final BSRecord dr = new BSRecord(S71, "$");
+        final BSRecord da = new BSRecord(S72, "", "$", "1", "2");
         // WHEN
-        final Up2Result<DummyReference, BSError> result = importer.parse(List.of(record));
-        assertEquals(1, result.toList().size());
-        assertEquals(1, record.getEvents().size());
-        final BSError error = result.toList().getFirst();
+        final Up2Result<UnmanagedReference, BSError> result = importer.parse(List.of(dr, da));
+        assertEquals(1, result.get().getAttributes().size());
+        assertEquals(2, result.toList().size());
+        assertEquals(2, dr.getEvents().size());
         //THEN
-        assertSame(record, error.getKey().getRecord());
-        assertEquals(0, error.getKey().getOrder());
-        assertNull(error.getOffset());
-        assertEquals(S71.getEventLevel(), error.getLevel());
-        assertEquals(S71.getEventCode(), error.getCode());
-        assertEquals(S71.getDataType(), error.getType());
-        assertEquals("cannot update the business identifier", error.getMessage());
-        assertTrace(error.getTrace(),
-                EX_ACCESS + ": DummyReference[businessId] invalid identifier",
-                "\t" + CSV_DUMMY_REFERENCE + ".setReference(DummyReference.java:36)",
-                "\t" + CSV_DUMMY_REFERENCE + ".setReference(DummyReference.java:19)"
-        );
+        {
+            final BSError error = result.toList().getFirst();
+            assertSame(dr, error.getKey().getRecord());
+            assertEquals(0, error.getKey().getOrder());
+            assertNull(error.getOffset());
+            assertEquals(FATAL, error.getLevel());
+            assertEquals("CSV-C71", error.getCode());
+            assertEquals(NONE, error.getType());
+            assertEquals("cannot update the business identifier", error.getMessage());
+            assertTrace(error.getTrace(),
+                    EX_ACCESS + ": DummyReference[reference] invalid identifier",
+                    "\t" + name(TU_MODULE, DummyReference.class) + ".setReference(DummyReference.java:49)"
+            );
+        }
+        {
+            final BSError error = result.toList().getLast();
+            assertSame(dr, error.getKey().getRecord());
+            assertEquals(1, error.getKey().getOrder());
+            assertNull(error.getOffset());
+            assertEquals(ERROR, error.getLevel());
+            assertEquals(EC_COMPLIANCE, error.getCode());
+            assertEquals(UUID, error.getType());
+            assertEquals("must not be blank", error.getMessage());
+        }
+    }
+
+    @Test
+    void testVirtual1Importer() throws BeanException {
+        this.assertVirtual(Virtual1Reference.class);
+    }
+
+    @Test
+    void testVirtual2Importer() throws BeanException {
+        final Virtual2Reference bean = this.assertVirtual(Virtual2Reference.class);
+        final Virtual2Item item = bean.getItems().getFirst();
+        assertSame(item.getId(), item.getKey().getId());
     }
 
     @Test
     void testDummy1Importer() throws BeanException {
         // GIVEN
-        final UnitImporter<GroupType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
+        final UnitImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
                 .unit(DummyReference.class)
-                .build(S71)
+                .build(SegmentType.class)
                 .build(BSError::new);
         final BSRecord record1 = new BSRecord(S71, null, "#01");
         final BSRecord record2 = new BSRecord(S72, null, "#01", "B01", "V01");
@@ -298,9 +419,9 @@ public class BusinessTests {
     @Test
     void testDummy2Importer() throws BeanException {
         // GIVEN
-        final UnitImporter<GroupType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
+        final UnitImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
                 .unit(DummyReference.class)
-                .build(S71)
+                .build(SegmentType.class)
                 .build(BSError::new);
         final BSRecord record1 = new BSRecord(S71, null, "#01");
         final BSRecord record2 = new BSRecord(S72, null, "*", "B01", "V01");
@@ -315,21 +436,22 @@ public class BusinessTests {
         assertSame(record2, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
         assertNull(error.getOffset());
-        assertEquals(S72.getEventLevel(), error.getLevel());
-        assertEquals(S72.getEventCode(), error.getCode());
-        assertEquals(S72.getDataType(), error.getType());
-        assertEquals("cannot retrieve the parent identifier", error.getMessage());
+        assertEquals(WARNING, error.getLevel());
+        assertEquals("CSV-C72", error.getCode());
+        assertEquals(D009, error.getType());
+        assertEquals("cannot retrieve the @ReferenceId(\"71\") value", error.getMessage());
         assertTrace(error.getTrace(),
-                EX_ACCESS + ": DummyAttribute[getParentId] invalid identifier"
+                EX_ACCESS + ": DummyAttribute[parentId] invalid identifier",
+                "\t" + name(TU_MODULE, DummyAttribute.class) + ".getParentId(DummyAttribute.java:41)"
         );
     }
 
     @Test
     void testDummy3Importer() throws BeanException {
         // GIVEN
-        final UnitImporter<GroupType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
+        final UnitImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
                 .unit(DummyReference.class)
-                .build(S71)
+                .build(SegmentType.class)
                 .build(BSError::new);
         final BSRecord record1 = new BSRecord(S71, null, "#01");
         final BSRecord record2 = new BSRecord(S72, null, "#01", "*", "V01");
@@ -344,54 +466,57 @@ public class BusinessTests {
         assertSame(record2, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
         assertNull(error.getOffset());
-        assertEquals(S72.getEventLevel(), error.getLevel());
-        assertEquals(S72.getEventCode(), error.getCode());
-        assertEquals(S72.getDataType(), error.getType());
+        assertEquals(WARNING, error.getLevel());
+        assertEquals("CSV-C72", error.getCode());
+        assertEquals(D009, error.getType());
         assertEquals("cannot retrieve the business identifier", error.getMessage());
         assertTrace(error.getTrace(),
-                EX_ACCESS + ": DummyAttribute[getBusinessId] invalid identifier"
+                EX_ACCESS + ": DummyAttribute[businessId] invalid identifier",
+                "\t" + name(TU_MODULE, DummyAttribute.class) + ".getBusinessId(DummyAttribute.java:52)"
         );
     }
 
     @Test
     void testDummy4Importer() throws BeanException {
         // GIVEN
-        final UnitImporter<GroupType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
+        final UnitImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
                 .unit(DummyReference.class)
-                .build(S71)
+                .build(SegmentType.class)
                 .build(BSError::new);
         final BSRecord record1 = new BSRecord(S71, null, "#01");
         final BSRecord record2 = new BSRecord(S72, null, "#01", "B01", "*");
         // WHEN
         final Up2Result<DummyReference, BSError> result = importer.parse(List.of(record1, record2));
         assertEquals(0, result.get().getAttributes().size());
-        assertEquals(2, result.toList().size());
-        assertEquals(2, record2.getEvents().size());
+        assertEquals(1, result.toList().size());
+        assertEquals(1, record2.getEvents().size());
         assertEquals(0, record1.getEvents().size());
         final BSError error = result.toList().getFirst();
         //THEN
         assertSame(record2, error.getKey().getRecord());
         assertEquals(0, error.getKey().getOrder());
         assertNull(error.getOffset());
-        assertEquals(S72.getEventLevel(), error.getLevel());
-        assertEquals(S72.getEventCode(), error.getCode());
-        assertEquals(S72.getDataType(), error.getType());
+        assertEquals(WARNING, error.getLevel());
+        assertEquals("CSV-C72", error.getCode());
+        assertEquals(D009, error.getType());
         assertEquals("cannot link with Segment#[71]", error.getMessage());
+        final String cn = name(TU_MODULE, DummyAttributeLinker.class);
         assertTrace(error.getTrace(),
                 EX_ACCESS + ": DummyAttribute[value] invalid value",
-                "\t" + CSV_MODULE + "/io.github.up2jakarta.test.impl.DummyTypes.lambda$dummyAttributes$0(DummyTypes.java:98)"
+                "\t" + cn + ".link(DummyAttributeLinker.java:22)",
+                "\t" + cn + ".link(DummyAttributeLinker.java:11)"
         );
     }
 
     @Test
     void test1Validator() throws BeanException {
         // GIVEN
-        final UnitExporter<GroupType, SegmentType, DummyReference> importer = factory.builder()
+        final UnitExporter<TermType, SegmentType, DummyReference> importer = factory.builder()
                 .unit(DummyReference.class)
-                .build(S71)
+                .build(SegmentType.class)
                 .export();
         // WHEN
-        final SimpleCollector<GroupType> collector = new SimpleCollector<>();
+        final SimpleCollector<TermType> collector = new SimpleCollector<>();
         importer.validate(null, collector);
         //THEN
         assertEquals(0, collector.toList().size());
@@ -400,48 +525,91 @@ public class BusinessTests {
     @Test
     void test2Validator() throws BeanException {
         // GIVEN
-        final UnitExporter<GroupType, SegmentType, DummyReference> importer = factory.builder()
+        final UnitExporter<TermType, SegmentType, DummyReference> importer = factory.builder()
                 .unit(DummyReference.class)
-                .build(S71)
+                .build(SegmentType.class)
                 .export();
         final DummyReference bean = new DummyReference();
         {
+            bean.setReference("TU");
             bean.getAttributes().add(null);
         }
         // WHEN
-        final SimpleCollector<GroupType> collector = new SimpleCollector<>();
+        final SimpleCollector<TermType> collector = new SimpleCollector<>();
         importer.validate(bean, collector);
         assertEquals(1, collector.toList().size());
-        final SimpleEvent<GroupType> error = collector.toList().getFirst();
+        final SimpleEvent<TermType> error = collector.toList().getFirst();
         //THEN
         assertNull(error.getOffset());
-        assertEquals(S72.getEventLevel(), error.getLevel());
-        assertEquals(S72.getEventCode(), error.getCode());
-        assertEquals(S72.getDataType(), error.getType());
+        assertEquals(WARNING, error.getLevel());
+        assertEquals("CSV-C72", error.getCode());
+        assertEquals(D009, error.getType());
         assertEquals("must not be null", error.getMessage());
     }
 
     @Test
     void test3Validator() throws BeanException {
         // GIVEN
-        final UnitExporter<GroupType, SegmentType, DummyReference> importer = factory.builder()
+        final UnitExporter<TermType, SegmentType, DummyReference> importer = factory.builder()
                 .unit(DummyReference.class)
-                .build(S71)
+                .build(SegmentType.class)
                 .export();
         final DummyReference bean = new DummyReference();
         {
-            bean.getAttributes().add(new DummyAttribute());
+            bean.setReference("TU");
+            final DummyAttribute attribute = new DummyAttribute();
+            bean.getAttributes().add(attribute);
+            attribute.setBusinessId("*");
+            attribute.setParentId("*");
         }
         // WHEN
-        final List<? extends IEvent<GroupType>> events = importer.validate(bean);
+        final List<? extends IEvent<TermType>> events = importer.validate(bean);
         assertEquals(1, events.size());
-        final IEvent<GroupType> error = events.getFirst();
+        final IEvent<TermType> error = events.getFirst();
         //THEN
         assertEquals(3, error.getOffset());
-        assertEquals(SeverityType.ERROR, error.getLevel());
-        assertEquals(IEvent.EC_COMPLIANCE, error.getCode());
-        assertEquals(GroupType.D005, error.getType());
+        assertEquals(ERROR, error.getLevel());
+        assertEquals(EC_COMPLIANCE, error.getCode());
+        assertEquals(A002, error.getType());
         assertEquals("must not be blank", error.getMessage());
+    }
+
+    @Test
+    void testBIdWrapper() throws BeanException {
+        // WHEN
+        final UnitExporter<TermType, SegmentType, BIdWrapperObject> importer = factory.builder()
+                .unit(BIdWrapperObject.class)
+                .build(SegmentType.class)
+                .export();
+        // THEN
+        assertNotNull(importer);
+    }
+
+    @Test
+    void testBIdOptional() throws BeanException {
+        // WHEN
+        final UnitExporter<TermType, SegmentType, BIdOptionalObject> importer = factory.builder()
+                .unit(BIdOptionalObject.class)
+                .build(SegmentType.class)
+                .export();
+        // THEN
+        assertNotNull(importer);
+    }
+
+    @Test
+    void testBIdInvalid() {
+        // WHEN
+        final BeanException ex = assertThrows(
+                BeanException.class,
+                () -> factory.builder()
+                        .unit(BIdInvalidObject.class)
+                        .build(SegmentType.class)
+                        .build()
+        );
+        // THEN
+        assertEquals(BIdInvalidObject.class, ex.getSource());
+        assertEquals("key", ex.getLocator());
+        assertEquals("should be annotated with @NotBlank because @BusinessId", ex.getMessage());
     }
 
     static final class MyRecord implements IRecord<SegmentType> {
@@ -465,20 +633,20 @@ public class BusinessTests {
         }
     }
 
-    static final class MyError extends PropertyEvent<GroupType, MyRecord> {
-        public MyError(MyRecord row, Integer offset, GroupType type, TypeException cause) {
+    static final class MyError extends PropertyEvent<TermType, MyRecord> {
+        public MyError(MyRecord row, Integer offset, TermType type, TypeException cause) {
             super(row, offset, type, cause);
         }
     }
 
-    static final class MyHandler extends SimpleCollector<GroupType> implements IEventBuilder<GroupType, MyRecord, SimpleEvent<GroupType>> {
+    static final class MyHandler extends SimpleCollector<TermType> implements IEventBuilder<TermType, MyRecord, SimpleEvent<TermType>> {
         static final MyHandler INSTANCE = new MyHandler();
 
         private MyHandler() {
         }
 
         @Override
-        public BusinessHandler<GroupType> of(MyRecord record) {
+        public BusinessHandler<TermType> of(MyRecord record) {
             return INSTANCE;
         }
 

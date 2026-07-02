@@ -1,18 +1,23 @@
 package io.github.up2jakarta.test.core.misc.vld;
 
 import io.github.up2jakarta.csv.cfg.Error;
-import io.github.up2jakarta.lov.SeverityType;
-import io.github.up2jakarta.test.fmt.misc.Tests;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static io.github.up2jakarta.lov.SeverityType.WARNING;
+import static io.github.up2jakarta.test.fmt.misc.Tests.ERROR_CODE;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Documented
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
+@Target(FIELD)
+@Retention(RUNTIME)
 @Constraint(validatedBy = {Up2NotEmptyValidator.class})
-@Error(value = Tests.ERROR_CODE, level = SeverityType.WARNING)
+@Error(value = ERROR_CODE, level = WARNING)
 @SuppressWarnings("unused")
 public @interface Up2NotEmpty {
 

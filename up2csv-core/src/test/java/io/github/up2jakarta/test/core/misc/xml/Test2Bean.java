@@ -1,9 +1,9 @@
 package io.github.up2jakarta.test.core.misc.xml;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2EnableXML;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.test.core.misc.lov.CurrencyCodeType;
 import io.github.up2jakarta.test.core.misc.lov.TestCodeList;

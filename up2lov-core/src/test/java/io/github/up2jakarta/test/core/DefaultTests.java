@@ -1,7 +1,5 @@
 package io.github.up2jakarta.test.core;
 
-import io.github.up2jakarta.lov.core.BeanException;
-import io.github.up2jakarta.lov.core.Beans;
 import io.github.up2jakarta.lov.core.Defaults;
 import org.junit.jupiter.api.Test;
 
@@ -13,15 +11,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class DefaultTests {
 
     @Test
-    void testPrimitives() throws BeanException {
+    void testPrimitives() throws Exception {
         // GIVEN
         // WHEN
-        final Constructor<Primitive> constructor = Beans.getDeclaredConstructor(
-                Primitive.class,
+        final Constructor<Primitive> constructor = Primitive.class.getDeclaredConstructor(
                 boolean.class, byte.class, char.class, short.class, int.class, long.class, float.class, double.class
         );
         final Object[] arguments = Defaults.prototype(constructor);
-        final Primitive bean = Beans.newInstance(constructor, arguments);
+        final Primitive bean = constructor.newInstance(arguments);
         //THEN
         assertFalse(bean.aBoolean);
         assertEquals(0, bean.aByte);

@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.lov.core.AccessException;
 
 import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
@@ -21,9 +21,7 @@ public abstract class Up2Reader<S extends Segment> {
 
     public final S next() throws AccessException {
         final String[] record = this.record();
-        if (record == null) {
-            return null;
-        }
+        if (record == null) return null;
         return mapper.map(of(ERROR), 0, record);
     }
 

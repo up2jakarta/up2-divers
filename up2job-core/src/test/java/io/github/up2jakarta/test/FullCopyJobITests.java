@@ -3,14 +3,14 @@ package io.github.up2jakarta.test;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Flatter;
-import io.github.up2jakarta.csv.data.DynamicType;
+import io.github.up2jakarta.csv.data.HeaderType;
 import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.job.CompositeWriter;
 import io.github.up2jakarta.job.SynchronizedReader;
 import io.github.up2jakarta.job.SynchronizedWriter;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.dto.Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
+import io.github.up2jakarta.test.impl.TermType;
 import io.github.up2jakarta.test.impl.full.*;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.IOException;
 
-import static io.github.up2jakarta.csv.data.DataResolver.dynamic;
+import static io.github.up2jakarta.csv.data.TermResolver.header;
 
 @SpringBatchTest
 @SpringJUnitConfig(TUConfiguration.class)
@@ -44,15 +44,15 @@ class FullCopyJobITests extends AbstractJobITest {
         this.job = this.fullJob(context, context.getBean(PlatformTransactionManager.class));
     }
 
-    private ErrorWriter errorWriter(Up2Factory<GroupType> factory, CSVFormat format) throws BeanException {
-        final Up2Flatter<InputError, DynamicType> mapper = factory.format(InputError.class, dynamic());
+    private ErrorWriter errorWriter(Up2Factory<TermType> factory, CSVFormat format) throws BeanException {
+        final Up2Flatter<InputError, HeaderType> mapper = new Up2Factory<>(factory, header()).flatter(InputError.class);
         return new ErrorWriter(mapper, format);
     }
 
     private Job fullJob(ApplicationContext context, PlatformTransactionManager txm) throws BeanException {
         final CSVFormat format = context.getBean(CSVFormat.class);
         final JobRepository repository = context.getBean(JobRepository.class);
-        final Up2Factory<GroupType> factory = new Up2Factory<>(context::getBean);
+        final Up2Factory<TermType> factory = new Up2Factory<>(context::getBean);
         final InvoiceImporter importer = new InvoiceImporter(factory);
         final CompositeWriter<Up2Result<Invoice, InputError>> writer = new CompositeWriter<>(
                 new SynchronizedWriter<>(this.errorWriter(factory, format)),

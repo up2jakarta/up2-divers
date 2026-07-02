@@ -6,7 +6,7 @@ import io.github.up2jakarta.test.misc.InputError;
 import io.github.up2jakarta.test.misc.InputRecord;
 import org.apache.commons.csv.CSVFormat;
 
-public class InvoiceFullReader extends FullFileReader<Invoice, GroupType, SegmentType, InputRecord, InputError> {
+public class InvoiceFullReader extends FullFileReader<Invoice, TermType, SegmentType, InputRecord, InputError> {
 
     public InvoiceFullReader(InvoiceFullImporter importer, CSVFormat format) {
         super(importer, format, "-");

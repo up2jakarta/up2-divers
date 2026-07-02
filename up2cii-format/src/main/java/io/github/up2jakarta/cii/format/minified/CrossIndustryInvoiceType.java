@@ -12,7 +12,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CrossIndustryInvoiceType", propOrder = {
         "exchangedDocumentContext",
         "exchangedDocument",
@@ -21,13 +21,15 @@ import javax.annotation.processing.Generated;
 public class CrossIndustryInvoiceType {
 
     // BG-2
+    @XmlElement(name = "ExchangedDocumentContext", required = true)
     private ExchangedDocumentContextType exchangedDocumentContext;
 
+    @XmlElement(name = "ExchangedDocument", required = true)
     private ExchangedDocumentType exchangedDocument;
 
+    @XmlElement(name = "SupplyChainTradeTransaction", required = true)
     private SupplyChainTradeTransactionType supplyChainTradeTransaction;
 
-    @XmlElement(name = "ExchangedDocumentContext", required = true)
     public ExchangedDocumentContextType getExchangedDocumentContext() {
         return this.exchangedDocumentContext;
     }
@@ -36,7 +38,6 @@ public class CrossIndustryInvoiceType {
         this.exchangedDocumentContext = exchangedDocumentContext;
     }
 
-    @XmlElement(name = "ExchangedDocument", required = true)
     public ExchangedDocumentType getExchangedDocument() {
         return this.exchangedDocument;
     }
@@ -45,7 +46,6 @@ public class CrossIndustryInvoiceType {
         this.exchangedDocument = exchangedDocument;
     }
 
-    @XmlElement(name = "SupplyChainTradeTransaction", required = true)
     public SupplyChainTradeTransactionType getSupplyChainTradeTransaction() {
         return this.supplyChainTradeTransaction;
     }

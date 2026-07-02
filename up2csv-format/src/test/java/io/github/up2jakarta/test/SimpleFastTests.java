@@ -8,8 +8,8 @@ import io.github.up2jakarta.csv.io.FastFileWriter;
 import io.github.up2jakarta.csv.io.SimpleFastReader;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.dto.Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import io.github.up2jakarta.test.misc.AFastTests;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
@@ -22,21 +22,21 @@ import java.io.IOException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class SimpleFastTests extends AFastTests<FastRecord<SegmentType, String>, SimpleFastImporter<Invoice, GroupType, SegmentType>> {
+public class SimpleFastTests extends AFastTests<FastRecord<SegmentType>, SimpleFastImporter<Invoice, TermType, SegmentType>> {
 
     @Autowired
-    SimpleFastTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
-        super(new SimpleFastImporter<>(factory, Invoice.class, SegmentType.S01), format);
+    SimpleFastTests(Up2Factory<TermType> factory, CSVFormat format) throws IOException, BeanException {
+        super(new SimpleFastImporter<>(factory, Invoice.class, SegmentType.class), format);
     }
 
     @Override
-    protected FastFileWriter<Invoice> writer(SimpleFastImporter<Invoice, GroupType, SegmentType> importer, CSVFormat format) throws BeanException {
+    protected FastFileWriter<Invoice> writer(SimpleFastImporter<Invoice, TermType, SegmentType> importer, CSVFormat format) throws BeanException {
         return new FastFileWriter<>(importer.toExporter(), format);
     }
 
     @Override
-    protected FastFileReader<Invoice, GroupType, SegmentType, FastRecord<SegmentType, String>, ?> reader(
-            SimpleFastImporter<Invoice, GroupType, SegmentType> importer, CSVFormat format
+    protected FastFileReader<Invoice, TermType, SegmentType, FastRecord<SegmentType>, ?> reader(
+            SimpleFastImporter<Invoice, TermType, SegmentType> importer, CSVFormat format
     ) {
         return new SimpleFastReader<>(importer, format);
     }

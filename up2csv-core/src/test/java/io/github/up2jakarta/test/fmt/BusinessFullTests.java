@@ -21,6 +21,8 @@ import static io.github.up2jakarta.csv.core.ModeType.FULL;
 import static io.github.up2jakarta.lov.core.Codes.encodeInt;
 import static io.github.up2jakarta.test.fmt.misc.Tests.invoice;
 import static io.github.up2jakarta.test.impl.SegmentType.*;
+import static io.github.up2jakarta.test.impl.TermType.A002;
+import static io.github.up2jakarta.test.impl.TermType.D009;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
@@ -86,7 +88,7 @@ class BusinessFullTests extends AFullTest<Invoice, InputRecord, InputError> {
                 record(S03, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
         };
         // When & Then
-        checkCardinality4(S04, S01, rows);
+        checkCardinality4(S01, rows);
     }
 
     @Test
@@ -101,7 +103,7 @@ class BusinessFullTests extends AFullTest<Invoice, InputRecord, InputError> {
                 detached,
         };
         // When & Then
-        checkDetached(detached, rows);
+        checkDetached(detached, D009, rows);
     }
 
     @Test
@@ -138,7 +140,7 @@ class BusinessFullTests extends AFullTest<Invoice, InputRecord, InputError> {
                 invalid,
         };
         // When & Then
-        checkValidation(invalid, rows);
+        checkValidation(invalid, A002, rows);
     }
 
 }

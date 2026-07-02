@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.io;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.core.Up2Mapper;
 import io.github.up2jakarta.csv.core.Up2Reader;
-import io.github.up2jakarta.csv.data.Segment;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;

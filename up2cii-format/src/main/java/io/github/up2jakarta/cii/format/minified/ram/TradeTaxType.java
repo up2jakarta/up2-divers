@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TradeTaxType", propOrder = {
         "calculatedAmount",
         "typeCode",
@@ -30,32 +30,40 @@ import java.math.BigDecimal;
 public class TradeTaxType {
 
     // BT-117
+    @XmlElement(name = "CalculatedAmount")
     private BigDecimal calculatedAmount;
 
     // BT-31-0, BT-32-0, BT-96, BT-103, BT-119, BT-152
+    @XmlElement(name = "TypeCode")
     private TaxTypeCodeType typeCode;
 
     // BT-120
+    @XmlElement(name = "ExemptionReason")
     private String exemptionReason;
 
     // BT-116
+    @XmlElement(name = "BasisAmount")
     private BigDecimal basisAmount;
 
     // BT-95, BT-102, BT-118, BT-151
+    @XmlElement(name = "CategoryCode")
     private TaxCategoryCodeType categoryCode;
 
     // BT-121
+    @XmlElement(name = "ExemptionReasonCode")
     private TaxExemptionReasonCodeType exemptionReasonCode;
 
+    @XmlElement(name = "TaxPointDate")
     private DateType taxPointDate;
 
     // BT-8
+    @XmlElement(name = "DueDateTypeCode")
     private TimeReferenceCodeType dueDateTypeCode;
 
     // BT-96, BT-103, BT-119, BT-152
+    @XmlElement(name = "RateApplicablePercent")
     private BigDecimal rateApplicablePercent;
 
-    @XmlElement(name = "CalculatedAmount")
     public BigDecimal getCalculatedAmount() {
         return this.calculatedAmount;
     }
@@ -64,7 +72,6 @@ public class TradeTaxType {
         this.calculatedAmount = calculatedAmount;
     }
 
-    @XmlElement(name = "TypeCode")
     public TaxTypeCodeType getTypeCode() {
         return this.typeCode;
     }
@@ -73,7 +80,6 @@ public class TradeTaxType {
         this.typeCode = typeCode;
     }
 
-    @XmlElement(name = "ExemptionReason")
     public String getExemptionReason() {
         return this.exemptionReason;
     }
@@ -82,7 +88,6 @@ public class TradeTaxType {
         this.exemptionReason = exemptionReason;
     }
 
-    @XmlElement(name = "BasisAmount")
     public BigDecimal getBasisAmount() {
         return this.basisAmount;
     }
@@ -91,7 +96,6 @@ public class TradeTaxType {
         this.basisAmount = basisAmount;
     }
 
-    @XmlElement(name = "CategoryCode")
     public TaxCategoryCodeType getCategoryCode() {
         return this.categoryCode;
     }
@@ -100,7 +104,6 @@ public class TradeTaxType {
         this.categoryCode = categoryCode;
     }
 
-    @XmlElement(name = "ExemptionReasonCode")
     public TaxExemptionReasonCodeType getExemptionReasonCode() {
         return this.exemptionReasonCode;
     }
@@ -109,7 +112,6 @@ public class TradeTaxType {
         this.exemptionReasonCode = exemptionReasonCode;
     }
 
-    @XmlElement(name = "TaxPointDate")
     public DateType getTaxPointDate() {
         return this.taxPointDate;
     }
@@ -118,7 +120,6 @@ public class TradeTaxType {
         this.taxPointDate = taxPointDate;
     }
 
-    @XmlElement(name = "DueDateTypeCode")
     public TimeReferenceCodeType getDueDateTypeCode() {
         return this.dueDateTypeCode;
     }
@@ -127,7 +128,6 @@ public class TradeTaxType {
         this.dueDateTypeCode = dueDateTypeCode;
     }
 
-    @XmlElement(name = "RateApplicablePercent")
     public BigDecimal getRateApplicablePercent() {
         return this.rateApplicablePercent;
     }

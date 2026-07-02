@@ -41,7 +41,7 @@ public class InvoiceValidator<I> extends XBuilder<I> implements XValidator<I> {
     }
 
     @Override
-    public List<IValidationError> validate(StreamSource xmlFile) throws IOException {
+    public List<IValidationError> validate(StreamSource xmlFile) {
         var handler = new FailSafeHandler(ErrorEnhancer::enhance, false);
         try {
             var unmarshaller = newUnmarshaller(handler);

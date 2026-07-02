@@ -2,7 +2,13 @@ package io.github.up2jakarta.csv.cfg;
 
 import io.github.up2jakarta.lov.SeverityType;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Up2J Annotation that supports {@link io.github.up2jakarta.csv.api.IEvent#getLevel()}
@@ -11,8 +17,8 @@ import java.lang.annotation.*;
  * @see io.github.up2jakarta.csv.api.IEvent
  */
 @Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.TYPE})
+@Retention(RUNTIME)
+@Target({FIELD, TYPE})
 public @interface Error {
 
     /**

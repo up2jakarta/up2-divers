@@ -13,7 +13,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ReferencedDocumentType", propOrder = {
         "issuerAssignedId",
         "uriId",
@@ -27,29 +27,36 @@ import javax.annotation.processing.Generated;
 public class ReferencedDocumentType {
 
     // BT-12, BT-13, BT-14, BT-15, BT-16, BT-17, BT-18, BT-25, BT-122, BT-128, EXT-FR-FE-135 and (4) specifications too.
+    @XmlElement(name = "IssuerAssignedID")
     private String issuerAssignedId;
 
     // BT-124
+    @XmlElement(name = "URIID")
     private String uriId;
 
     // BT-132, EXT-FR-FE-139, EXT-FR-FE-141, EXT-FR-FE-143, EXT-FR-FE-145
+    @XmlElement(name = "LineID")
     private String lineId;
 
     // EXT-FR-FE-02, EXT-FR-FE-137
+    @XmlElement(name = "TypeCode")
     private DocumentCodeType typeCode;
 
     // BT-123
+    @XmlElement(name = "Name")
     private String name;
 
     // BT-125
+    @XmlElement(name = "AttachmentBinaryObject")
     private BinaryObjectType attachmentBinaryObject;
 
     // EXT-FR-FE-01, BT-18-1, BT-128-1
+    @XmlElement(name = "ReferenceTypeCode")
     private ReferenceCodeType referenceTypeCode;
 
+    @XmlElement(name = "FormattedIssueDateTime")
     private FormattedDateTimeType formattedIssueDateTime;
 
-    @XmlElement(name = "IssuerAssignedID")
     public String getIssuerAssignedId() {
         return this.issuerAssignedId;
     }
@@ -58,7 +65,6 @@ public class ReferencedDocumentType {
         this.issuerAssignedId = issuerAssignedId;
     }
 
-    @XmlElement(name = "URIID")
     public String getUriId() {
         return this.uriId;
     }
@@ -67,7 +73,6 @@ public class ReferencedDocumentType {
         this.uriId = uriId;
     }
 
-    @XmlElement(name = "LineID")
     public String getLineId() {
         return this.lineId;
     }
@@ -76,7 +81,6 @@ public class ReferencedDocumentType {
         this.lineId = lineId;
     }
 
-    @XmlElement(name = "TypeCode")
     public DocumentCodeType getTypeCode() {
         return this.typeCode;
     }
@@ -85,7 +89,6 @@ public class ReferencedDocumentType {
         this.typeCode = typeCode;
     }
 
-    @XmlElement(name = "Name")
     public String getName() {
         return this.name;
     }
@@ -94,7 +97,6 @@ public class ReferencedDocumentType {
         this.name = name;
     }
 
-    @XmlElement(name = "AttachmentBinaryObject")
     public BinaryObjectType getAttachmentBinaryObject() {
         return this.attachmentBinaryObject;
     }
@@ -103,7 +105,6 @@ public class ReferencedDocumentType {
         this.attachmentBinaryObject = attachmentBinaryObject;
     }
 
-    @XmlElement(name = "ReferenceTypeCode")
     public ReferenceCodeType getReferenceTypeCode() {
         return this.referenceTypeCode;
     }
@@ -112,7 +113,6 @@ public class ReferencedDocumentType {
         this.referenceTypeCode = referenceTypeCode;
     }
 
-    @XmlElement(name = "FormattedIssueDateTime")
     public FormattedDateTimeType getFormattedIssueDateTime() {
         return this.formattedIssueDateTime;
     }

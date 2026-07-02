@@ -10,18 +10,19 @@ import java.time.LocalDate;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {"value"})
 public class DateStringType {
 
     // EXT-FR-FE-158
+    @XmlValue
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate value;
 
     // EXT-FR-FE-158-1
+    @XmlAttribute(name = "format")
     private TimePointFormatCodeType format;
 
-    @XmlValue
-    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     public LocalDate getValue() {
         return this.value;
     }
@@ -30,7 +31,6 @@ public class DateStringType {
         this.value = value;
     }
 
-    @XmlAttribute(name = "format")
     public TimePointFormatCodeType getFormat() {
         return this.format;
     }

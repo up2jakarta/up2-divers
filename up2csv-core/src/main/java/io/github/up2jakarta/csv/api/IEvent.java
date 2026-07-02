@@ -1,14 +1,14 @@
 package io.github.up2jakarta.csv.api;
 
-import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.IError;
 
 /**
  * Contact interface for an input event.
  *
- * @param <D> the business data type
+ * @param <D> the business term type
  */
-public interface IEvent<D extends DataType<D>> extends IError {
+public interface IEvent<D extends ITerm<D>> extends IError {
 
     /**
      * Default event code for JSR-303 {@link jakarta.validation.ConstraintViolation}
@@ -39,15 +39,19 @@ public interface IEvent<D extends DataType<D>> extends IError {
      */
     String EC_BOOLEAN = "UP2-C005";
     /**
-     * Default event code for {@link io.github.up2jakarta.csv.cfg.Up2Base64}
+     * Default event code for {@link io.github.up2jakarta.csv.cfg.Up2Date}
      */
-    String EC_BASE_64 = "UP2-C006";
+    String EC_UTIL_DATE = "UP2-C006";
+    /**
+     * Default event code for {@link io.github.up2jakarta.csv.cfg.Up2Character}
+     */
+    String EC_CHARACTER = "UP2-C007";
 
     /**
      * <ul>
      *      Note that the offset can be <code>null</code> in the following cases:
      *      <li>Unknown property violates JSR-303 constraint</li>
-     *      <li>Segment violates the cardinalities of join relationship ({@link DataType#isValid(DataType, int)})</li>
+     *      <li>Segment violates cardinality constraint</li>
      * </ul>
      *
      * @return the data offset of the input record
@@ -55,7 +59,7 @@ public interface IEvent<D extends DataType<D>> extends IError {
     Integer getOffset();
 
     /**
-     * @return the business data type
+     * @return the business term
      */
     D getType();
 

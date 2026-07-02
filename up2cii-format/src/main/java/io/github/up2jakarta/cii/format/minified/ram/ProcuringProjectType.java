@@ -9,7 +9,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ProcuringProjectType", propOrder = {
         "id",
         "name"
@@ -17,12 +17,13 @@ import javax.annotation.processing.Generated;
 public class ProcuringProjectType {
 
     // BT-11
+    @XmlElement(name = "ID", required = true)
     private String id;
 
     // BT-11
+    @XmlElement(name = "Name", required = true)
     private String name;
 
-    @XmlElement(name = "ID", required = true)
     public String getId() {
         return this.id;
     }
@@ -31,7 +32,6 @@ public class ProcuringProjectType {
         this.id = id;
     }
 
-    @XmlElement(name = "Name", required = true)
     public String getName() {
         return this.name;
     }

@@ -10,7 +10,6 @@ import jakarta.persistence.EntityManager;
 import java.util.List;
 
 import static io.github.up2jakarta.lov.EntityResolver.JPA_CODE;
-import static io.github.up2jakarta.lov.Support.Parameter;
 import static io.github.up2jakarta.lov.core.Beans.getPropertyType;
 import static io.github.up2jakarta.lov.core.Beans.getTypeName;
 import static io.github.up2jakarta.lov.core.Overrides.get;
@@ -37,7 +36,7 @@ public final class EntityResolver implements CodeListResolver<EntityList<?, ?>> 
         final String codeName = context.get(JPA_CODE);
         final Class<?> codeType = getPropertyType(type, codeName, p -> p.isAnnotationPresent(Column.class));
         if (codeType == null) {
-            throw new BeanException(context, "#argument[" + JPA_CODE + "] must be annotated by @Column");
+            throw new BeanException(context, "#argument[" + JPA_CODE + "] must be annotated with @Column");
         }
         if (String.class != codeType) {
             throw new BeanException(context, "#argument[" + JPA_CODE + "] type must be " + String.class);

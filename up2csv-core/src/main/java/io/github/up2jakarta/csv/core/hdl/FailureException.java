@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.core.hdl;
 
 import io.github.up2jakarta.csv.api.IEvent;
-import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.TypeException;
 
@@ -17,23 +17,23 @@ public class FailureException extends TypeException implements IEvent {
 
     protected static final String FORMAT = "#[%s] throws %s";
 
-    protected final transient DataType<?> dataType;
+    protected final transient ITerm<?> dataType;
     protected final Integer offset;
 
-    FailureException(DataType<?> type, Integer offset, SeverityType level, String code, String message) {
+    FailureException(ITerm<?> type, Integer offset, SeverityType level, String code, String message) {
         super(level, code, message);
         this.offset = offset;
         this.dataType = type;
     }
 
-    FailureException(DataType<?> type, Integer offset, SeverityType level, String code, Throwable cause) {
+    FailureException(ITerm<?> type, Integer offset, SeverityType level, String code, Throwable cause) {
         super(level, code, cause.toString(), cause);
         this.offset = offset;
         this.dataType = type;
     }
 
     @Override
-    public final DataType<?> getType() {
+    public final ITerm<?> getType() {
         return dataType;
     }
 

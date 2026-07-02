@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.api.ext;
 
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.lov.core.BeanException;
 
 /**

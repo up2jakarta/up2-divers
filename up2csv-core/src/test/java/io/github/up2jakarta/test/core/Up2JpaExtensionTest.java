@@ -32,17 +32,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 public class Up2JpaExtensionTest {
 
-    private final Up2Factory<GroupType> factory;
+    private final Up2Factory<TermType> factory;
 
     @Autowired
-    Up2JpaExtensionTest(Up2Factory<GroupType> factory) {
+    Up2JpaExtensionTest(Up2Factory<TermType> factory) {
         this.factory = factory;
     }
 
     @Test
     void testValidBean() throws BeanException {
         // Given
-        final Up2Mapper<Test1Bean, GroupType> mapper = factory.build(Test1Bean.class);
+        final Up2Mapper<Test1Bean, TermType> mapper = factory.mapper(Test1Bean.class);
         final String[] data = {"ONE", "TWO", "0", "0", "*"};
         // When
         final Test1Bean bean = mapper.map(data);
@@ -54,7 +54,7 @@ public class Up2JpaExtensionTest {
         assertEquals(XML2Enum.TWO, bean.getEnum4());
         assertEquals(TestCodeList.ANY, bean.getAdapter());
         // When Unmapping
-        final Up2Flatter<Test1Bean, GroupType> format = factory.format(Test1Bean.class);
+        final Up2Flatter<Test1Bean, TermType> format = factory.flatter(Test1Bean.class);
         final String[] out = format.unmap(bean);
         // Then
         assertNotNull(out);
@@ -67,7 +67,7 @@ public class Up2JpaExtensionTest {
     @Test
     void testDefaultErrors() throws BeanException {
         // Given
-        final Up2Mapper<Test1Bean, GroupType> mapper = factory.build(Test1Bean.class);
+        final Up2Mapper<Test1Bean, TermType> mapper = factory.mapper(Test1Bean.class);
         final InputRecord row = record(SegmentType.S00, "11", "22", "33", "44", "ANY");
         // When
         final InputCollector handler = new InputCollector(row);
@@ -133,7 +133,7 @@ public class Up2JpaExtensionTest {
     @Test
     void testOverrideErrors() throws BeanException {
         // Given
-        final Up2Mapper<Test2Bean, GroupType> mapper = factory.build(Test2Bean.class);
+        final Up2Mapper<Test2Bean, TermType> mapper = factory.mapper(Test2Bean.class);
         final InputRecord row = record(SegmentType.S00, "11", "22", "ANY");
         // When
         final InputCollector handler = new InputCollector(row);
@@ -178,7 +178,7 @@ public class Up2JpaExtensionTest {
     @Test
     void test1UniqueOffset() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test1Offset.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test1Offset.class));
         // THEN
         assertEquals(Test1Offset.class, error.getSource());
         assertEquals("value", error.getLocator());
@@ -188,7 +188,7 @@ public class Up2JpaExtensionTest {
     @Test
     void test2UniqueOffset() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test2Offset.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test2Offset.class));
         // THEN
         assertEquals(Test2Offset.class, error.getSource());
         assertEquals("class", error.getLocator());
@@ -198,7 +198,7 @@ public class Up2JpaExtensionTest {
     @Test
     void test3UniqueOffset() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test3Offset.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test3Offset.class));
         // THEN
         assertEquals(Test3Offset.class, error.getSource());
         assertEquals("fragment", error.getLocator());
@@ -208,7 +208,7 @@ public class Up2JpaExtensionTest {
     @Test
     void test4UniqueOffset() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test4Offset.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test4Offset.class));
         // THEN
         assertEquals(Test4Offset.class, error.getSource());
         assertEquals("fragment", error.getLocator());
@@ -218,7 +218,7 @@ public class Up2JpaExtensionTest {
     @Test
     void test5UniqueOffset() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test5Offset.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test5Offset.class));
         // THEN
         assertEquals(Test5Offset.class, error.getSource());
         assertEquals("fragment", error.getLocator());

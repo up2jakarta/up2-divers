@@ -8,8 +8,8 @@ import io.github.up2jakarta.csv.io.UnitFileReader;
 import io.github.up2jakarta.csv.io.UnitFileWriter;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.dto.Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import io.github.up2jakarta.test.misc.AUnitTests;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
@@ -22,21 +22,21 @@ import java.io.IOException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-public class SimpleUnitTests extends AUnitTests<UnitRecord<SegmentType>, SimpleUnitImporter<Invoice, GroupType, SegmentType>> {
+public class SimpleUnitTests extends AUnitTests<UnitRecord<SegmentType>, SimpleUnitImporter<Invoice, TermType, SegmentType>> {
 
     @Autowired
-    SimpleUnitTests(Up2Factory<GroupType> factory, CSVFormat format) throws IOException, BeanException {
-        super(new SimpleUnitImporter<>(factory, Invoice.class, SegmentType.S01), format);
+    SimpleUnitTests(Up2Factory<TermType> factory, CSVFormat format) throws IOException, BeanException {
+        super(new SimpleUnitImporter<>(factory, Invoice.class, SegmentType.class), format);
     }
 
     @Override
-    protected UnitFileWriter<Invoice> writer(SimpleUnitImporter<Invoice, GroupType, SegmentType> importer, CSVFormat format) throws BeanException {
+    protected UnitFileWriter<Invoice> writer(SimpleUnitImporter<Invoice, TermType, SegmentType> importer, CSVFormat format) throws BeanException {
         return new UnitFileWriter<>(importer.toExporter(), format);
     }
 
     @Override
-    protected UnitFileReader<Invoice, GroupType, SegmentType, UnitRecord<SegmentType>, ?> reader(
-            SimpleUnitImporter<Invoice, GroupType, SegmentType> importer, CSVFormat format
+    protected UnitFileReader<Invoice, TermType, SegmentType, UnitRecord<SegmentType>, ?> reader(
+            SimpleUnitImporter<Invoice, TermType, SegmentType> importer, CSVFormat format
     ) {
         return new SimpleUnitReader<>(importer, format);
     }

@@ -3,14 +3,19 @@ package io.github.up2jakarta.csv.cfg;
 import io.github.up2jakarta.csv.prc.DefaultProcessor;
 import io.github.up2jakarta.lov.core.StringAdapter;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Up2J Annotation that supports the index of data in {@link io.github.up2jakarta.csv.api.IRecord#getData()}.
  */
 @Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target(FIELD)
+@Retention(RUNTIME)
 @Processor(DefaultProcessor.class)
 public @interface Position {
 
@@ -42,33 +47,37 @@ public @interface Position {
      * {@link Fragment#nullable()} is set to <code>true</code> then the fragment value will be <code>null</code>
      * <p>
      * Here is a business case of how annotations can be used:
-     * <blockquote><pre>
-     *         public class ThirdParty implements Segment {
+     * {@snippet lang = "java":
+     *       import io.github.up2jakarta.csv.Segment;
+     *       import io.github.up2jakarta.csv.BusinessId;
+     *       import io.github.up2jakarta.csv.cfg.Position;
+     *       import io.github.up2jakarta.csv.cfg.Fragment;
      *
-     *              &#064;BusinessId
-     *              &#064;Position(0)
-     *              private String key;
+     *       public class ThirdParty implements Segment {
      *
-     *              // ... other properties
+     *            @BusinessId
+     *            @Position(0)
+     *            private String key;
      *
-     *              &#064;Fragment(value = 1, nullable = true)
-     *              private final Contact contact;
+     *            // ... other properties
      *
-     *              // ... getters and setters
-     *         }
+     *            @Fragment(value = 1, nullable = true)
+     *            private final Contact contact;
      *
-     *         public class TradeContact implements Segment {
+     *            // ... getters and setters
+     *       }
      *
-     *              &#064;Position(0)
+     *       public class Contact implements Segment {
+     *
+     *              @Position(0)
      *              private String type;
      *
-     *              &#064;Position(1)
-     *              &#064;Required // if null, contact should be null
+     *              @Position(value = 1, required = true) // if null, contact should be null
      *              private String value;
      *
      *              // ... getters and setters
-     *         }
-     * </pre></blockquote>
+     *       }
+     *}
      *
      * @return the required flag
      */

@@ -12,15 +12,15 @@ import java.time.LocalDate;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "FormattedDateTimeType", propOrder = {"dateTimeString"})
 public class FormattedDateTimeType {
 
     // BT-26, EXT-FR-FE-138
-    private LocalDate dateTimeString;
-
     @XmlElement(name = "DateTimeString", required = true)
     @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    private LocalDate dateTimeString;
+
     public LocalDate getDateTimeString() {
         return this.dateTimeString;
     }

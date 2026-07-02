@@ -7,7 +7,7 @@ import io.github.up2jakarta.job.SynchronizedReader;
 import io.github.up2jakarta.job.SynchronizedWriter;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.dto.Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
+import io.github.up2jakarta.test.impl.TermType;
 import io.github.up2jakarta.test.impl.unit.InputError;
 import io.github.up2jakarta.test.impl.unit.InvoiceImporter;
 import io.github.up2jakarta.test.impl.unit.InvoiceReader;
@@ -45,7 +45,7 @@ class UnitCopyJobITests extends AbstractJobITest {
     private Job fastJob(ApplicationContext context, PlatformTransactionManager txm) throws BeanException {
         final CSVFormat format = context.getBean(CSVFormat.class);
         final JobRepository repository = context.getBean(JobRepository.class);
-        final Up2Factory<GroupType> factory = new Up2Factory<>(context::getBean);
+        final Up2Factory<TermType> factory = new Up2Factory<>(context::getBean);
         final InvoiceImporter importer = new InvoiceImporter(factory);
         final InvoiceReader reader = new InvoiceReader(importer, format);
         final InvoiceWriter writer = new InvoiceWriter(importer, format);

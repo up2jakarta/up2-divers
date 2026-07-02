@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.core.ext;
 
+import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.api.Container;
 import io.github.up2jakarta.csv.api.ext.TypeExtension;
 import io.github.up2jakarta.csv.cfg.Error;
-import io.github.up2jakarta.csv.core.BeanContext;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.TypeAdapter;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -31,10 +31,10 @@ import static io.github.up2jakarta.lov.SeverityType.ERROR;
 @Singleton
 public final class XmlAdapterExtension implements TypeExtension<Object, XmlJavaTypeAdapter> {
 
-    private final BeanContext context;
+    private final Container context;
 
     @Inject
-    public XmlAdapterExtension(BeanContext context) {
+    public XmlAdapterExtension(Container context) {
         this.context = context;
     }
 
@@ -62,7 +62,7 @@ public final class XmlAdapterExtension implements TypeExtension<Object, XmlJavaT
 
     @Override
     public TypeAdapter<?> resolve(Field pf, Class<Object> pt, XmlJavaTypeAdapter pc) throws BeanException {
-        final XmlAdapter<String, Object> adapter = getBean(context, pc.value(), "");
+        final XmlAdapter<String, Object> adapter = Container.from(context, pc.value(), "");
         if (adapter instanceof TypeAdapter<?> pa) {
             return pa;
         }

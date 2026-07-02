@@ -1,8 +1,8 @@
 package io.github.up2jakarta.test.core.misc.map;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.test.core.misc.ext.Dummy1;
 

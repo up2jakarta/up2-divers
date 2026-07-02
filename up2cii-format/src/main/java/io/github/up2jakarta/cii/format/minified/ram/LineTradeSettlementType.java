@@ -10,7 +10,7 @@ import java.util.List;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "LineTradeSettlementType", propOrder = {
         "applicableTradeTax",
         "billingSpecifiedPeriod",
@@ -23,25 +23,31 @@ import java.util.List;
 public class LineTradeSettlementType {
 
     // BG-30
+    @XmlElement(name = "ApplicableTradeTax")
     private TradeTaxType applicableTradeTax;
 
     // BG-26
+    @XmlElement(name = "BillingSpecifiedPeriod")
     private SpecifiedPeriodType billingSpecifiedPeriod;
 
     // BG-27, BG-28
+    @XmlElement(name = "SpecifiedTradeAllowanceCharge")
     private List<TradeAllowanceChargeType> specifiedTradeAllowanceCharge;
 
+    @XmlElement(name = "SpecifiedTradeSettlementLineMonetarySummation")
     private TradeSettlementLineMonetarySummationType specifiedTradeSettlementLineMonetarySummation;
 
     // EXT-FR-FE-BG-06
+    @XmlElement(name = "InvoiceReferencedDocument")
     private ReferencedDocumentType invoiceReferencedDocument;
 
     // BT-128
+    @XmlElement(name = "AdditionalReferencedDocument")
     private List<ReferencedDocumentType> additionalReferencedDocument;
 
+    @XmlElement(name = "ReceivableSpecifiedTradeAccountingAccount")
     private TradeAccountingAccountType receivableSpecifiedTradeAccountingAccount;
 
-    @XmlElement(name = "ApplicableTradeTax")
     public TradeTaxType getApplicableTradeTax() {
         return this.applicableTradeTax;
     }
@@ -50,7 +56,6 @@ public class LineTradeSettlementType {
         this.applicableTradeTax = applicableTradeTax;
     }
 
-    @XmlElement(name = "BillingSpecifiedPeriod")
     public SpecifiedPeriodType getBillingSpecifiedPeriod() {
         return this.billingSpecifiedPeriod;
     }
@@ -59,7 +64,6 @@ public class LineTradeSettlementType {
         this.billingSpecifiedPeriod = billingSpecifiedPeriod;
     }
 
-    @XmlElement(name = "SpecifiedTradeAllowanceCharge")
     public List<TradeAllowanceChargeType> getSpecifiedTradeAllowanceCharge() {
         return this.specifiedTradeAllowanceCharge;
     }
@@ -68,7 +72,6 @@ public class LineTradeSettlementType {
         this.specifiedTradeAllowanceCharge = specifiedTradeAllowanceCharge;
     }
 
-    @XmlElement(name = "SpecifiedTradeSettlementLineMonetarySummation")
     public TradeSettlementLineMonetarySummationType getSpecifiedTradeSettlementLineMonetarySummation() {
         return this.specifiedTradeSettlementLineMonetarySummation;
     }
@@ -77,7 +80,6 @@ public class LineTradeSettlementType {
         this.specifiedTradeSettlementLineMonetarySummation = specifiedTradeSettlementLineMonetarySummation;
     }
 
-    @XmlElement(name = "InvoiceReferencedDocument")
     public ReferencedDocumentType getInvoiceReferencedDocument() {
         return this.invoiceReferencedDocument;
     }
@@ -86,7 +88,6 @@ public class LineTradeSettlementType {
         this.invoiceReferencedDocument = invoiceReferencedDocument;
     }
 
-    @XmlElement(name = "AdditionalReferencedDocument")
     public List<ReferencedDocumentType> getAdditionalReferencedDocument() {
         return this.additionalReferencedDocument;
     }
@@ -95,7 +96,6 @@ public class LineTradeSettlementType {
         this.additionalReferencedDocument = additionalReferencedDocument;
     }
 
-    @XmlElement(name = "ReceivableSpecifiedTradeAccountingAccount")
     public TradeAccountingAccountType getReceivableSpecifiedTradeAccountingAccount() {
         return this.receivableSpecifiedTradeAccountingAccount;
     }

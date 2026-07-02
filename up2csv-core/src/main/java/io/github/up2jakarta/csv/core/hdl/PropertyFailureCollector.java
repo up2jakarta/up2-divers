@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.core.hdl;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.hdl.IPropertyCreator;
 import io.github.up2jakarta.csv.api.hdl.IPropertyEvent;
-import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.TypeException;
 
@@ -15,10 +15,10 @@ import io.github.up2jakarta.lov.TypeException;
  * attached to {@link PropertyFailureException#toList()} or returned after processing done.
  *
  * @param <R> the input record type
- * @param <D> the business data type
+ * @param <D> the business term type
  * @param <E> the event type
  */
-public class PropertyFailureCollector<D extends DataType<D>, R extends IRecord<?>, E extends IPropertyEvent<D, R>> extends EventModeCollector<D, R, E, TypeException> {
+public class PropertyFailureCollector<D extends ITerm<D>, R extends IRecord<?>, E extends IPropertyEvent<D, R>> extends EventModeCollector<D, R, E, TypeException> {
 
     private final IPropertyCreator<D, R, E> creator;
     private final int level;
@@ -48,7 +48,7 @@ public class PropertyFailureCollector<D extends DataType<D>, R extends IRecord<?
     /**
      * {@link PropertyFailureCollector} builder.
      */
-    public static final class Builder<D extends DataType<D>, R extends IRecord<?>, E extends IPropertyEvent<D, R>> extends EventModeBuilder<D, R, E> {
+    public static final class Builder<D extends ITerm<D>, R extends IRecord<?>, E extends IPropertyEvent<D, R>> extends EventModeBuilder<D, R, E> {
         private final IPropertyCreator<D, R, E> creator;
         private final SeverityType level;
 

@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.io;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Writer;
-import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.data.ITerm;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public final class SingleWriter<S extends Segment, D extends DataType<D>> extends Up2Writer<S, D> {
+public final class SingleWriter<S extends Segment, D extends ITerm<D>> extends Up2Writer<S, D> {
 
     private final CSVFormat format;
 

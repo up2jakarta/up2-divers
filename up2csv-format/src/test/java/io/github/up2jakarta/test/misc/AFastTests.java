@@ -7,8 +7,8 @@ import io.github.up2jakarta.csv.io.FastFileReader;
 import io.github.up2jakarta.csv.io.FastFileWriter;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.dto.Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.apache.commons.csv.CSVFormat;
 
 import java.io.IOException;
@@ -16,11 +16,11 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public abstract class AFastTests<R extends IFastRecord<SegmentType, ?>, A extends FastImporter<GroupType, SegmentType, Invoice, R, ?>> extends Tests.AbstractTests<R> {
+public abstract class AFastTests<R extends IFastRecord<SegmentType>, A extends FastImporter<TermType, SegmentType, Invoice, R, ?>> extends Tests.AbstractTests<R> {
 
     private final FastFileWriter<Invoice> writer;
-    private final FastFileReader<Invoice, GroupType, SegmentType, R, ?> reader1;
-    private final FastFileReader<Invoice, GroupType, SegmentType, R, ?> reader2;
+    private final FastFileReader<Invoice, TermType, SegmentType, R, ?> reader1;
+    private final FastFileReader<Invoice, TermType, SegmentType, R, ?> reader2;
 
     protected AFastTests(A importer, CSVFormat format) throws IOException, BeanException {
         super(ModeType.FAST, format);
@@ -31,7 +31,7 @@ public abstract class AFastTests<R extends IFastRecord<SegmentType, ?>, A extend
 
     protected abstract FastFileWriter<Invoice> writer(A importer, CSVFormat format) throws BeanException;
 
-    protected abstract FastFileReader<Invoice, GroupType, SegmentType, R, ?> reader(A importer, CSVFormat format);
+    protected abstract FastFileReader<Invoice, TermType, SegmentType, R, ?> reader(A importer, CSVFormat format);
 
     @Override
     final void assertRecord(R data, R origin) {

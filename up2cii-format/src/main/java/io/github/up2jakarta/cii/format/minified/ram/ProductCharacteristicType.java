@@ -9,7 +9,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ProductCharacteristicType", propOrder = {
         "description",
         "value"
@@ -17,12 +17,13 @@ import javax.annotation.processing.Generated;
 public class ProductCharacteristicType {
 
     // BT-160
+    @XmlElement(name = "Description")
     private String description;
 
     // BT-161
+    @XmlElement(name = "Value")
     private String value;
 
-    @XmlElement(name = "Description")
     public String getDescription() {
         return this.description;
     }
@@ -31,7 +32,6 @@ public class ProductCharacteristicType {
         this.description = description;
     }
 
-    @XmlElement(name = "Value")
     public String getValue() {
         return this.value;
     }

@@ -1,55 +1,29 @@
 package io.github.up2jakarta.csv.core;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.IEvent;
-import io.github.up2jakarta.csv.api.IFastRecord;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.core.BeanException;
-
-import java.util.List;
-import java.util.Objects;
-
-import static io.github.up2jakarta.lov.ConstantProvider.values;
 
 /**
  * Up2J {@link ModeType#UNIT} Processor that's able to aggregate and import java-bean from flat-data.
  *
  * @param <T> the business object type
- * @param <B> the business data type
+ * @param <B> the business term type
  * @param <I> the input segment type
  * @param <R> the input record type
  * @param <E> the event type
  */
-public abstract non-sealed class UnitImporter<B extends DataType<B>, I extends IType<B, I>, T extends Segment, R extends IRecord<I>, E extends IEvent<B>> extends BusinessImporter<B, I, T, R, E> {
+public abstract non-sealed class UnitImporter<B extends ITerm<B>, I extends Enum<I> & IType<I>, T extends Segment, R extends IRecord<I>, E extends IEvent<B>> extends BusinessImporter<B, I, T, R, E> {
 
-    protected UnitImporter(Up2Factory<B> factory, Class<T> type, I root) throws BeanException {
-        this(factory, type, root, values(root));
-    }
-
-    protected UnitImporter(Up2Factory<B> factory, Class<T> type, I root, List<I> nodes) throws BeanException {
-        super(factory, ModeType.UNIT, type, root, nodes);
+    protected UnitImporter(Up2Factory<B> factory, Class<T> st, Class<I> it) throws BeanException {
+        super(ModeType.UNIT, factory, st, it);
     }
 
     protected UnitImporter(UnitExporter<B, I, T> source) throws BeanException {
         super(source);
-    }
-
-    @Override
-    final Object nullPivot(T bean, R record) {
-        if (record instanceof IFastRecord<?, ?> fr) {
-            return bid.set(bean, fr.getPivot());
-        }
-        return null;
-    }
-
-    @Override
-    final boolean testPivot(R root, R record) {
-        if (root instanceof IFastRecord<?, ?> rt && record instanceof IFastRecord<?, ?> fr) {
-            return Objects.equals(rt.getPivot(), fr.getPivot());
-        }
-        return true;
     }
 
     /**

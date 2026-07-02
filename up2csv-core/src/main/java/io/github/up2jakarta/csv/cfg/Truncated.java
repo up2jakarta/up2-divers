@@ -1,6 +1,12 @@
 package io.github.up2jakarta.csv.cfg;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Up2J Annotation that supports {@link io.github.up2jakarta.csv.api.IEvent#getOffset()}, helpful to truncate meta-data.
@@ -19,9 +25,10 @@ import java.lang.annotation.*;
  *
  * @see io.github.up2jakarta.csv.api.IRecord
  */
+@Inherited
 @Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target(TYPE)
+@Retention(RUNTIME)
 public @interface Truncated {
 
     /**

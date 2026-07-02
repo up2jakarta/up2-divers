@@ -1,11 +1,15 @@
 package io.github.up2jakarta.test.core.misc.acs;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.data.Segment;
+import jakarta.persistence.Access;
 
 import java.util.Optional;
 
+import static jakarta.persistence.AccessType.PROPERTY;
+
+@Access(PROPERTY)
 public final class Optional1Bean implements Segment {
 
     @Position(0)
@@ -13,7 +17,7 @@ public final class Optional1Bean implements Segment {
     private int id;
 
     @Position(1)
-    private Optional<String> content;
+    private Optional<String> content = Optional.empty();
 
     public int getId() {
         return id;

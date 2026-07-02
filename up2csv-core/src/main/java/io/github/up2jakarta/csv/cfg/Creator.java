@@ -1,6 +1,11 @@
 package io.github.up2jakarta.csv.cfg;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Up2J Annotation that permits to select the right constructor for immutable segments like java-records,
@@ -20,44 +25,51 @@ import java.lang.annotation.*;
  * <p>
  * Another solution, the use of {@link io.github.up2jakarta.lov.core.Wrapper} to wrap each non-final property,
  * note that the wrapper supports the JSR-303 validation.
+ * {@snippet lang = "java":
+ *       import jakarta.validation.Valid;
+ *       import io.github.up2jakarta.csv.Segment;
+ *       import io.github.up2jakarta.csv.BusinessId;
+ *       import io.github.up2jakarta.csv.cfg.Position;
+ *       import io.github.up2jakarta.csv.cfg.Fragment;
+ *       import io.github.up2jakarta.lov.core.Wrapper;
+ *       import jakarta.validation.constraints.NotBlank;
  *
- * <blockquote><pre>
- *         public class ThirdParty implements Segment {
+ *       public class ThirdParty implements Segment {
  *
- *              &#064;BusinessId
- *              &#064;Position(0)
- *              private String key;
+ *            @BusinessId
+ *            @Position(0)
+ *            private String key;
  *
- *              &#064;Position(1)
- *              private final Wrapper&lt;&#064;NotBlank String&gt; code;
+ *            @Position(1)
+ *            private final Wrapper<@NotBlank String> code;
  *
- *              &#064;Position(2)
- *              &#064;NotBlank
- *              private final Wrapper&lt;String&gt; label;
+ *            @Position(2)
+ *            @NotBlank
+ *            private final Wrapper<String> label;
  *
- *              &#064;Fragment(3)
- *              private final Wrapper&lt;&#064;Valid TradeContact&gt; contact;
+ *            @Fragment(3)
+ *            private final Wrapper<@Valid TradeContact> contact;
  *
- *              // ... getters and setters
- *         }
+ *            // ... getters and setters
+ *       }
  *
- *         public class TradeContact implements Segment {
+ *       public class TradeContact implements Segment {
  *
- *              &#064;Position(0)
- *              &#064;NotBlank
- *              private String type;
+ *            @Position(0)
+ *            @NotBlank
+ *            private String type;
  *
- *              &#064;Position(1)
- *              &#064;NotBlank
- *              private String value;
+ *            @Position(1)
+ *            @NotBlank
+ *            private String value;
  *
- *              // ... getters and setters
- *         }
- * </pre></blockquote>
+ *            // ... getters and setters
+ *       }
+ *}
  */
 @Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.CONSTRUCTOR)
+@Retention(RUNTIME)
+@Target(CONSTRUCTOR)
 public @interface Creator {
 
 }

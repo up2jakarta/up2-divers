@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.fmt;
 
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.cfg.Up2CodeList;
-import io.github.up2jakarta.csv.data.Definition;
+import io.github.up2jakarta.csv.data.Header;
 import io.github.up2jakarta.lov.CodeList;
 
 import java.util.Arrays;
@@ -18,7 +18,7 @@ import static io.github.up2jakarta.lov.core.AccessException.notNull;
 public class UnitRecord<T extends CodeList<T>> implements IRecord<T> {
 
     @Up2CodeList
-    @Definition(code = "TID", value = "Type")
+    @Header(code = "TID", name = "Type")
     protected final T type;
     protected final String[] data;
 

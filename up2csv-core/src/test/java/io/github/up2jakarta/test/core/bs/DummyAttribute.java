@@ -1,39 +1,44 @@
 package io.github.up2jakarta.test.core.bs;
 
+import io.github.up2jakarta.csv.BusinessId;
+import io.github.up2jakarta.csv.ReferenceId;
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.data.BusinessId;
-import io.github.up2jakarta.csv.data.ParentId;
-import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.test.core.misc.Parsable;
-import io.github.up2jakarta.test.impl.GroupType;
-import io.github.up2jakarta.test.impl.InputType;
+import io.github.up2jakarta.test.impl.BusinessType;
 import jakarta.persistence.Access;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
+import static io.github.up2jakarta.test.impl.TermType.A002;
+import static io.github.up2jakarta.test.impl.TermType.D009;
 import static jakarta.persistence.AccessType.PROPERTY;
 
 @Valid
 @Access(PROPERTY)
-@InputType(GroupType.D005)
+@BusinessType(D009)
 @SuppressWarnings("unused")
 public class DummyAttribute extends Parsable {
 
+    @NotEmpty
     @Position(0)
-    @ParentId
+    @ReferenceId("71")
     private String parentId;
 
+    @NotBlank
     @Position(1)
     @BusinessId
     private String businessId;
 
     @Position(2)
     @NotBlank
+    @BusinessType(A002)
     private String value;
 
-    public String getParentId() throws BeanException {
+    public String getParentId() {
         if ("*".equals(parentId)) {
-            throw new BeanException(DummyAttribute.class, "parentId", "invalid identifier");
+            throw new AccessException(DummyAttribute.class, "parentId", "invalid identifier");
         }
         return parentId;
     }
@@ -42,9 +47,9 @@ public class DummyAttribute extends Parsable {
         this.parentId = parentId;
     }
 
-    public String getBusinessId() throws BeanException {
+    public String getBusinessId() {
         if ("*".equals(businessId)) {
-            throw new BeanException(DummyAttribute.class, "businessId", "invalid identifier");
+            throw new AccessException(DummyAttribute.class, "businessId", "invalid identifier");
         }
         return businessId;
     }

@@ -10,9 +10,9 @@ import javax.annotation.processing.Generated;
 public class ScopeContextParameterType extends DocumentContextParameterType<ScopeType> {
 
     // BT-23
+    @XmlElement(name = "ID")
     private ScopeType id;
 
-    @XmlElement(name = "ID")
     @Override
     public ScopeType getId() {
         return this.id;

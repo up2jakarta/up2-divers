@@ -1,29 +1,29 @@
 package io.github.up2jakarta.test.core;
 
+import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.api.Container;
 import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.cfg.FragmentOverride;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.PositionOverride;
-import io.github.up2jakarta.csv.core.BeanContext;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Mapper;
-import io.github.up2jakarta.csv.data.DynamicType;
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.data.HeaderType;
 import io.github.up2jakarta.lov.IError;
 import io.github.up2jakarta.lov.IException;
 import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
 import io.github.up2jakarta.test.core.misc.acs.Access4Bean;
-import io.github.up2jakarta.test.core.misc.acs.BIdOptionalBean;
+import io.github.up2jakarta.test.core.misc.acs.BIdOptionalSegment;
 import io.github.up2jakarta.test.core.misc.acs.Final2Segment;
 import io.github.up2jakarta.test.core.misc.cvr.SupportEntity;
 import io.github.up2jakarta.test.core.misc.cvr.ValidEntity;
 import io.github.up2jakarta.test.core.misc.map.*;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.InputError;
 import io.github.up2jakarta.test.impl.InputRecord;
+import io.github.up2jakarta.test.impl.TermType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +32,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
-import static io.github.up2jakarta.csv.data.DataResolver.dynamic;
+import static io.github.up2jakarta.csv.data.TermResolver.header;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.test.core.Reflections.list;
 import static io.github.up2jakarta.test.core.Reflections.node;
-import static io.github.up2jakarta.test.impl.GroupType.D001;
-import static io.github.up2jakarta.test.impl.GroupType.NONE;
 import static io.github.up2jakarta.test.impl.SegmentType.S11;
+import static io.github.up2jakarta.test.impl.TermType.D001;
+import static io.github.up2jakarta.test.impl.TermType.NONE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,18 +46,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 class Up2FormatTests {
 
-    private final Up2Factory<GroupType> factory;
+    private final Up2Factory<TermType> factory;
 
     @Autowired
-    Up2FormatTests(Up2Factory<GroupType> factory, BeanContext context) {
+    Up2FormatTests(Up2Factory<TermType> factory, Container context) {
         this.factory = factory;
     }
 
     @Test
     void testCache1() throws BeanException {
         // GIVEN
-        final Up2Flatter<ValidEntity, ?> flatter1 = factory.format(ValidEntity.class);
-        final Up2Flatter<ValidEntity, ?> flatter2 = factory.format(ValidEntity.class);
+        final Up2Flatter<ValidEntity, ?> flatter1 = factory.flatter(ValidEntity.class);
+        final Up2Flatter<ValidEntity, ?> flatter2 = factory.flatter(ValidEntity.class);
         // THEN
         assertNotSame(flatter1, flatter2);
         assertSame(node(flatter1), node(flatter2));
@@ -66,8 +66,8 @@ class Up2FormatTests {
     @Test
     void testCache2() throws BeanException {
         // GIVEN
-        final Up2Flatter<ValidEntity, ?> flatter1 = factory.format(ValidEntity.class);
-        final Up2Flatter<ValidEntity, ?> flatter2 = factory.format(ValidEntity.class, dynamic());
+        final Up2Flatter<ValidEntity, ?> flatter1 = factory.flatter(ValidEntity.class);
+        final Up2Flatter<ValidEntity, ?> flatter2 = new Up2Factory<>(factory, header()).flatter(ValidEntity.class);
         // THEN
         assertNotSame(flatter1, flatter2);
         assertNotSame(node(flatter1), node(flatter2));
@@ -76,7 +76,7 @@ class Up2FormatTests {
     @Test
     void testCache3() throws BeanException {
         // GIVEN
-        final Up2Flatter<ValidEntity, ?> flatter1 = factory.format(ValidEntity.class);
+        final Up2Flatter<ValidEntity, ?> flatter1 = factory.flatter(ValidEntity.class);
         final Up2Flatter<ValidEntity, ?> flatter2 = flatter1.toMapper().toFlatter();
         // THEN
         assertNotSame(flatter1, flatter2);
@@ -86,8 +86,8 @@ class Up2FormatTests {
     @Test
     void testReverse1() throws BeanException {
         // GIVEN
-        final Up2Flatter<ValidEntity, ?> flatter = factory.format(ValidEntity.class);
-        final Up2Mapper<ValidEntity, ?> mapper = factory.build(ValidEntity.class);
+        final Up2Flatter<ValidEntity, ?> flatter = factory.flatter(ValidEntity.class);
+        final Up2Mapper<ValidEntity, ?> mapper = factory.mapper(ValidEntity.class);
         // THEN
         assertSame(list(flatter), list(mapper));
     }
@@ -95,8 +95,8 @@ class Up2FormatTests {
     @Test
     void testReverse2() throws BeanException {
         // GIVEN
-        final Up2Flatter<Access4Bean, ?> flatter1 = factory.format(Access4Bean.class);
-        final Up2Mapper<ValidEntity, ?> mapper = factory.build(ValidEntity.class);
+        final Up2Flatter<Access4Bean, ?> flatter1 = factory.flatter(Access4Bean.class);
+        final Up2Mapper<ValidEntity, ?> mapper = factory.mapper(ValidEntity.class);
         final Up2Flatter<ValidEntity, ?> flatter2 = mapper.toFlatter();
         // THEN
         assertNotSame(list(flatter1), list(mapper));
@@ -106,8 +106,8 @@ class Up2FormatTests {
     @Test
     void testReverse3() throws BeanException {
         // GIVEN
-        final Up2Flatter<Final2Segment, ?> flatter = factory.format(Final2Segment.class);
-        final Up2Mapper<Final2Segment, ?> mapper = factory.build(Final2Segment.class);
+        final Up2Flatter<Final2Segment, ?> flatter = factory.flatter(Final2Segment.class);
+        final Up2Mapper<Final2Segment, ?> mapper = factory.mapper(Final2Segment.class);
         // THEN
         assertNotSame(list(flatter), list(mapper));
     }
@@ -123,7 +123,7 @@ class Up2FormatTests {
             }
         }
         // When
-        final Up2Flatter<LocalSegment, GroupType> format = factory.format(LocalSegment.class);
+        final Up2Flatter<LocalSegment, TermType> format = factory.flatter(LocalSegment.class);
         final LocalSegment bean = new LocalSegment("TU");
         final String[] data = format.unmap(bean);
         // THEN
@@ -134,7 +134,7 @@ class Up2FormatTests {
     @Test
     void testInnerClass() throws BeanException {
         // When
-        final Up2Flatter<Inner1Segment, GroupType> format = factory.format(Inner1Segment.class);
+        final Up2Flatter<Inner1Segment, TermType> format = factory.flatter(Inner1Segment.class);
         final Inner1Segment bean = new Inner1Segment();
         bean.setFragment(bean.new InnerFragment());
         bean.setId("TU");
@@ -152,11 +152,11 @@ class Up2FormatTests {
         final String trace = "java.time.format.DateTimeParseException: " + msg + " ...";
         final InputError error = new InputError(row, 99, D001, 3, new TypeException(ERROR, "CSV-DT", msg), trace);
         // When
-        final Up2Flatter<InputError, GroupType> format = factory.format(InputError.class);
+        final Up2Flatter<InputError, TermType> format = factory.flatter(InputError.class);
         final String[] export = format.unmap(error);
         // Then
         assertEquals(9, export.length);
-        assertArrayEquals(new String[]{"R0099", "11", "I2025", "0001", "3", "E", "CSV-DT", msg, trace}, export);
+        assertArrayEquals(new String[]{"R0099", "11", "I2025", "001", "3", "E", "CSV-DT", msg, trace}, export);
     }
 
     @Test
@@ -164,7 +164,7 @@ class Up2FormatTests {
         // Given
         final InputRecord source = new InputRecord("R0099", S11, "I2025", "D1", "D2");
         // When
-        final Up2Flatter<InputRecord, GroupType> format = factory.format(InputRecord.class);
+        final Up2Flatter<InputRecord, TermType> format = factory.flatter(InputRecord.class);
         final String[] export = format.unmap(source);
         // Then
         assertNotNull(export);
@@ -174,7 +174,7 @@ class Up2FormatTests {
     @Test
     void testErrorHeader1() throws BeanException {
         // Given
-        final Up2Flatter<InputError, GroupType> format = factory.format(InputError.class);
+        final Up2Flatter<InputError, TermType> format = factory.flatter(InputError.class);
         // When
         final String[] export = format.header();
         // Then
@@ -185,7 +185,7 @@ class Up2FormatTests {
     @Test
     void testErrorHeader2() throws BeanException {
         // Given
-        final Up2Flatter<InputError, DynamicType> format = factory.format(InputError.class, dynamic());
+        final Up2Flatter<InputError, HeaderType> format = new Up2Factory<>(factory, header()).flatter(InputError.class);
         // When
         final String[] export = format.header();
         // Then
@@ -198,7 +198,7 @@ class Up2FormatTests {
     void testNull() throws BeanException {
         // Given
         final ValidBean bean = null;
-        final Up2Flatter<ValidBean, GroupType> format = factory.format(ValidBean.class);
+        final Up2Flatter<ValidBean, TermType> format = factory.flatter(ValidBean.class);
         // When
         final String[] out = format.unmap(bean);
         // Then
@@ -209,7 +209,7 @@ class Up2FormatTests {
     void testDefault1() throws BeanException {
         // Given
         final Default1Bean bean = new Default1Bean();
-        final Up2Flatter<Default1Bean, GroupType> mapper = factory.format(Default1Bean.class);
+        final Up2Flatter<Default1Bean, TermType> mapper = factory.flatter(Default1Bean.class);
         // When
         final String[] out = mapper.unmap(bean);
         // Then Bean
@@ -226,7 +226,7 @@ class Up2FormatTests {
     @Test
     void testDefault2Nullable() throws BeanException {
         // Given
-        final Up2Flatter<Default2Bean, GroupType> mapper = factory.format(Default2Bean.class);
+        final Up2Flatter<Default2Bean, TermType> mapper = factory.flatter(Default2Bean.class);
         // When
         final String[] out = mapper.unmap(new Default2Bean());
         // Then Bean
@@ -240,7 +240,7 @@ class Up2FormatTests {
     void testDefault3Values() throws BeanException {
         // Given
         final Default3Bean src = new Default3Bean();
-        final Up2Flatter<Default3Bean, GroupType> mapper = factory.format(Default3Bean.class);
+        final Up2Flatter<Default3Bean, TermType> mapper = factory.flatter(Default3Bean.class);
         // When
         final String[] out = mapper.unmap(src);
         // Then
@@ -262,7 +262,7 @@ class Up2FormatTests {
     @Test
     void testDefault4Values() throws BeanException {
         // Given
-        final Up2Flatter<Default4Bean, GroupType> mapper = factory.format(Default4Bean.class);
+        final Up2Flatter<Default4Bean, TermType> mapper = factory.flatter(Default4Bean.class);
         // When
         final String[] out = mapper.unmap(new Default4Bean());
         // Then
@@ -274,7 +274,7 @@ class Up2FormatTests {
     @Test
     void testDefault5Values() throws BeanException {
         // Given
-        final Up2Flatter<Default5Bean, GroupType> mapper = factory.format(Default5Bean.class);
+        final Up2Flatter<Default5Bean, TermType> mapper = factory.flatter(Default5Bean.class);
         // When
         final String[] out = mapper.unmap(new Default5Bean());
         // Then
@@ -286,7 +286,7 @@ class Up2FormatTests {
     @Test
     void testDefault6Values() throws BeanException {
         // Given
-        final Up2Flatter<Default6Bean, GroupType> mapper = factory.format(Default6Bean.class);
+        final Up2Flatter<Default6Bean, TermType> mapper = factory.flatter(Default6Bean.class);
         // When
         final String[] out = mapper.unmap(new Default6Bean());
         // Then
@@ -298,14 +298,14 @@ class Up2FormatTests {
     @Test
     void testDefault6Input1Error() throws BeanException {
         // Given
-        final Up2Flatter<InputError, GroupType> mapper = factory.format(InputError.class);
+        final Up2Flatter<InputError, TermType> mapper = factory.flatter(InputError.class);
         // When
         final IException cause = new TypeException(ERROR, "CSV", "Test");
         final String[] out = mapper.unmap(new InputError(null, 0, NONE, 9, cause, "Error"));
         // Then
         assertNotNull(out);
         assertEquals(9, out.length);
-        assertArrayEquals(new String[]{null, null, null, "0000", "9", "E", "CSV", "Test", "Error"}, out);
+        assertArrayEquals(new String[]{null, null, null, "D00", "9", "E", "CSV", "Test", "Error"}, out);
     }
 
     @Test
@@ -314,25 +314,25 @@ class Up2FormatTests {
         @FragmentOverride(path = {"key", "record"}, value = @Fragment(value = 0, prototype = true))
         @PositionOverride(path = {"key", "record", "type"}, value = @Position(value = 1, defaultValue = "01"))
         final class DefaultError extends InputError {
-            public DefaultError(InputRecord row, int order, GroupType type, Integer offset, IError cause, String trace) {
+            public DefaultError(InputRecord row, int order, TermType type, Integer offset, IError cause, String trace) {
                 super(row, order, type, offset, cause, trace);
             }
         }
         final IException cause = new TypeException(ERROR, "CSV", "Test");
-        final Up2Flatter<DefaultError, GroupType> mapper = factory.format(DefaultError.class);
+        final Up2Flatter<DefaultError, TermType> mapper = factory.flatter(DefaultError.class);
         // When
         final String[] out = mapper.unmap(new DefaultError(null, 0, NONE, 9, cause, "Error"));
         // Then
         assertNotNull(out);
         assertEquals(9, out.length);
-        assertArrayEquals(new String[]{null, "01", null, "0000", "9", "E", "CSV", "Test", "Error"}, out);
+        assertArrayEquals(new String[]{null, "01", null, "D00", "9", "E", "CSV", "Test", "Error"}, out);
     }
 
     @Test
     void testEmpty() throws BeanException {
         // Given
         final ValidBean bean = new ValidBean();
-        final Up2Flatter<ValidBean, GroupType> mapper = factory.format(ValidBean.class);
+        final Up2Flatter<ValidBean, TermType> mapper = factory.flatter(ValidBean.class);
         // When
         final String[] out = mapper.unmap(bean);
         // Then
@@ -344,13 +344,13 @@ class Up2FormatTests {
     void testSize() throws BeanException {
         // GIVEN
         final String[] data = {"100", "Test 100", "2024-07-25", "57.00", "TND", "4.0625", "C62", "Y", "P9D", "TN", "dGVzdA=="};
-        final Up2Mapper<SupportEntity, GroupType> parser = factory.build(SupportEntity.class);
+        final Up2Mapper<SupportEntity, TermType> parser = factory.mapper(SupportEntity.class);
         // WHEN
         final SupportEntity entity = parser.map(data);
         assertNotNull(entity);
         assertArrayEquals("test".getBytes(UTF_8), entity.getBase64());
         // When Unmapping
-        final Up2Flatter<SupportEntity, GroupType> format = factory.format(SupportEntity.class);
+        final Up2Flatter<SupportEntity, TermType> format = factory.flatter(SupportEntity.class);
         final String[] out = format.unmap(entity);
         // Then
         assertNotNull(out);
@@ -364,9 +364,9 @@ class Up2FormatTests {
     @Test
     void testOptional() throws BeanException {
         // Given
-        final Up2Flatter<BIdOptionalBean, ?> format = factory.format(BIdOptionalBean.class);
+        final Up2Flatter<BIdOptionalSegment, ?> format = factory.flatter(BIdOptionalSegment.class);
         // When
-        final BIdOptionalBean bean = new BIdOptionalBean();
+        final BIdOptionalSegment bean = new BIdOptionalSegment();
         // Then Null Fragment
         assertEquals(0, format.validate(bean).size());
         assertArrayEquals(new String[]{null}, format.unmap(bean));
@@ -375,7 +375,7 @@ class Up2FormatTests {
         assertEquals(0, format.validate(bean).size());
         assertArrayEquals(new String[]{null}, format.unmap(bean));
         // Null ID
-        bean.fragment = Optional.of(new BIdOptionalBean.OFragment());
+        bean.fragment = Optional.of(new BIdOptionalSegment.OFragment());
         assertEquals(0, format.validate(bean).size());
         assertArrayEquals(new String[]{null}, format.unmap(bean));
         // Empty ID

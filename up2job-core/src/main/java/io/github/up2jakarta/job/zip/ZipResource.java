@@ -2,6 +2,7 @@ package io.github.up2jakarta.job.zip;
 
 import io.github.up2jakarta.job.core.BusinessContext;
 import io.github.up2jakarta.job.core.BusinessTranslator;
+import io.github.up2jakarta.job.core.LocalFile;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -10,11 +11,19 @@ import java.util.zip.ZipFile;
 
 public abstract class ZipResource<T extends BusinessContext> extends ZipCleaner<T> {
 
+    protected final File resource;
     private final String name;
 
-    protected ZipResource(T context, Logger logger, String name, File resource, ArchiveTranslator translator) {
-        super(context, logger, resource, translator);
-        this.name = name;
+    protected ZipResource(T context, Logger logger, LocalFile file, ArchiveTranslator translator) {
+        super(context, logger, translator);
+        this.resource = file.getResource();
+        this.name = file.toString();
+    }
+
+    protected ZipResource(T context, Logger logger, File resource, ArchiveTranslator translator) {
+        super(context, logger, translator);
+        this.name = resource.getName();
+        this.resource = resource;
     }
 
     static boolean isValid(ZipResource<?> zip, BusinessTranslator interceptor) {

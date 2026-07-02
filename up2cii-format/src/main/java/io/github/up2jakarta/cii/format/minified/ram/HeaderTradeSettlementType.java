@@ -12,7 +12,7 @@ import java.util.List;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HeaderTradeSettlementType", propOrder = {
         "creditorReferenceId",
         "paymentReference",
@@ -34,52 +34,67 @@ import java.util.List;
 public class HeaderTradeSettlementType {
 
     // BT-90
+    @XmlElement(name = "CreditorReferenceID")
     private IDType creditorReferenceId;
 
     // BT-83
+    @XmlElement(name = "PaymentReference")
     private String paymentReference;
 
     // BT-6
+    @XmlElement(name = "TaxCurrencyCode")
     private CurrencyCodeType taxCurrencyCode;
 
     // BT-5
+    @XmlElement(name = "InvoiceCurrencyCode")
     private CurrencyCodeType invoiceCurrencyCode;
 
     // EXT-FR-FE-BG-05
+    @XmlElement(name = "InvoicerTradeParty")
     private TradePartyType invoicerTradeParty;
 
     // EXT-FR-FE-BG-04
+    @XmlElement(name = "InvoiceeTradeParty")
     private TradePartyType invoiceeTradeParty;
 
     // BG-10
+    @XmlElement(name = "PayeeTradeParty")
     private TradePartyType payeeTradeParty;
 
     // EXT-FR-FE-BG-02
+    @XmlElement(name = "PayerTradeParty")
     private TradePartyType payerTradeParty;
 
     // BG-16
+    @XmlElement(name = "SpecifiedTradeSettlementPaymentMeans")
     private List<TradeSettlementPaymentMeansType> specifiedTradeSettlementPaymentMeans;
 
     // BG-23
+    @XmlElement(name = "ApplicableTradeTax")
     private List<TradeTaxType> applicableTradeTax;
 
     // BG-14
+    @XmlElement(name = "BillingSpecifiedPeriod")
     private SpecifiedPeriodType billingSpecifiedPeriod;
 
     // BG-20, BG-21
+    @XmlElement(name = "SpecifiedTradeAllowanceCharge")
     private List<TradeAllowanceChargeType> specifiedTradeAllowanceCharge;
 
+    @XmlElement(name = "SpecifiedTradePaymentTerms")
     private TradePaymentTermsType specifiedTradePaymentTerms;
 
     // BG-22
+    @XmlElement(name = "SpecifiedTradeSettlementHeaderMonetarySummation")
     private TradeSettlementHeaderMonetarySummationType specifiedTradeSettlementHeaderMonetarySummation;
 
     // BG-3
+    @XmlElement(name = "InvoiceReferencedDocument")
     private List<ReferencedDocumentType> invoiceReferencedDocument;
 
+    @XmlElement(name = "ReceivableSpecifiedTradeAccountingAccount")
     private TradeAccountingAccountType receivableSpecifiedTradeAccountingAccount;
 
-    @XmlElement(name = "CreditorReferenceID")
     public IDType getCreditorReferenceId() {
         return this.creditorReferenceId;
     }
@@ -88,7 +103,6 @@ public class HeaderTradeSettlementType {
         this.creditorReferenceId = creditorReferenceId;
     }
 
-    @XmlElement(name = "PaymentReference")
     public String getPaymentReference() {
         return this.paymentReference;
     }
@@ -97,7 +111,6 @@ public class HeaderTradeSettlementType {
         this.paymentReference = paymentReference;
     }
 
-    @XmlElement(name = "TaxCurrencyCode")
     public CurrencyCodeType getTaxCurrencyCode() {
         return this.taxCurrencyCode;
     }
@@ -106,7 +119,6 @@ public class HeaderTradeSettlementType {
         this.taxCurrencyCode = taxCurrencyCode;
     }
 
-    @XmlElement(name = "InvoiceCurrencyCode")
     public CurrencyCodeType getInvoiceCurrencyCode() {
         return this.invoiceCurrencyCode;
     }
@@ -115,7 +127,6 @@ public class HeaderTradeSettlementType {
         this.invoiceCurrencyCode = invoiceCurrencyCode;
     }
 
-    @XmlElement(name = "InvoicerTradeParty")
     public TradePartyType getInvoicerTradeParty() {
         return this.invoicerTradeParty;
     }
@@ -124,7 +135,6 @@ public class HeaderTradeSettlementType {
         this.invoicerTradeParty = invoicerTradeParty;
     }
 
-    @XmlElement(name = "InvoiceeTradeParty")
     public TradePartyType getInvoiceeTradeParty() {
         return this.invoiceeTradeParty;
     }
@@ -133,7 +143,6 @@ public class HeaderTradeSettlementType {
         this.invoiceeTradeParty = invoiceeTradeParty;
     }
 
-    @XmlElement(name = "PayeeTradeParty")
     public TradePartyType getPayeeTradeParty() {
         return this.payeeTradeParty;
     }
@@ -142,7 +151,6 @@ public class HeaderTradeSettlementType {
         this.payeeTradeParty = payeeTradeParty;
     }
 
-    @XmlElement(name = "PayerTradeParty")
     public TradePartyType getPayerTradeParty() {
         return this.payerTradeParty;
     }
@@ -151,7 +159,6 @@ public class HeaderTradeSettlementType {
         this.payerTradeParty = payerTradeParty;
     }
 
-    @XmlElement(name = "SpecifiedTradeSettlementPaymentMeans")
     public List<TradeSettlementPaymentMeansType> getSpecifiedTradeSettlementPaymentMeans() {
         return this.specifiedTradeSettlementPaymentMeans;
     }
@@ -160,7 +167,6 @@ public class HeaderTradeSettlementType {
         this.specifiedTradeSettlementPaymentMeans = specifiedTradeSettlementPaymentMeans;
     }
 
-    @XmlElement(name = "ApplicableTradeTax")
     public List<TradeTaxType> getApplicableTradeTax() {
         return this.applicableTradeTax;
     }
@@ -169,7 +175,6 @@ public class HeaderTradeSettlementType {
         this.applicableTradeTax = applicableTradeTax;
     }
 
-    @XmlElement(name = "BillingSpecifiedPeriod")
     public SpecifiedPeriodType getBillingSpecifiedPeriod() {
         return this.billingSpecifiedPeriod;
     }
@@ -178,7 +183,6 @@ public class HeaderTradeSettlementType {
         this.billingSpecifiedPeriod = billingSpecifiedPeriod;
     }
 
-    @XmlElement(name = "SpecifiedTradeAllowanceCharge")
     public List<TradeAllowanceChargeType> getSpecifiedTradeAllowanceCharge() {
         return this.specifiedTradeAllowanceCharge;
     }
@@ -187,7 +191,6 @@ public class HeaderTradeSettlementType {
         this.specifiedTradeAllowanceCharge = specifiedTradeAllowanceCharge;
     }
 
-    @XmlElement(name = "SpecifiedTradePaymentTerms")
     public TradePaymentTermsType getSpecifiedTradePaymentTerms() {
         return this.specifiedTradePaymentTerms;
     }
@@ -196,7 +199,6 @@ public class HeaderTradeSettlementType {
         this.specifiedTradePaymentTerms = specifiedTradePaymentTerms;
     }
 
-    @XmlElement(name = "SpecifiedTradeSettlementHeaderMonetarySummation")
     public TradeSettlementHeaderMonetarySummationType getSpecifiedTradeSettlementHeaderMonetarySummation() {
         return this.specifiedTradeSettlementHeaderMonetarySummation;
     }
@@ -205,7 +207,6 @@ public class HeaderTradeSettlementType {
         this.specifiedTradeSettlementHeaderMonetarySummation = specifiedTradeSettlementHeaderMonetarySummation;
     }
 
-    @XmlElement(name = "InvoiceReferencedDocument")
     public List<ReferencedDocumentType> getInvoiceReferencedDocument() {
         return this.invoiceReferencedDocument;
     }
@@ -214,7 +215,6 @@ public class HeaderTradeSettlementType {
         this.invoiceReferencedDocument = invoiceReferencedDocument;
     }
 
-    @XmlElement(name = "ReceivableSpecifiedTradeAccountingAccount")
     public TradeAccountingAccountType getReceivableSpecifiedTradeAccountingAccount() {
         return this.receivableSpecifiedTradeAccountingAccount;
     }

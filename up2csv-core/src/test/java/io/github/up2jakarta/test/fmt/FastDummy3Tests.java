@@ -6,8 +6,8 @@ import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
 import io.github.up2jakarta.test.fmt.misc.AFastTest;
 import io.github.up2jakarta.test.fmt.misc.Dummy3Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +19,16 @@ import java.io.IOException;
 import static io.github.up2jakarta.csv.BusinessBuilder.MAX_LEVEL;
 import static io.github.up2jakarta.test.fmt.misc.Tests.*;
 import static io.github.up2jakarta.test.impl.SegmentType.*;
+import static io.github.up2jakarta.test.impl.TermType.A002;
+import static io.github.up2jakarta.test.impl.TermType.D009;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
 class FastDummy3Tests extends AFastTest<Dummy3Invoice, TURecord, TUError> {
 
     @Autowired
-    FastDummy3Tests(Up2Factory<GroupType> factory) throws BeanException {
-        super(factory.builder().fast(Dummy3Invoice.class).build(S31).build(TUError::new, MAX_LEVEL));
+    FastDummy3Tests(Up2Factory<TermType> factory) throws BeanException {
+        super(factory.builder().fast(Dummy3Invoice.class).build(SegmentType.class).build(TUError::new, MAX_LEVEL));
     }
 
     private TURecord record(SegmentType type, String key, String... data) throws CodeListException {
@@ -64,13 +66,13 @@ class FastDummy3Tests extends AFastTest<Dummy3Invoice, TURecord, TUError> {
         // Given
         final TURecord[] rows = new TURecord[]{
                 record(S31, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record(S32, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S32, "TU2025R0099", "SEL0088", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S33, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record(S34, "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
+                record(S02, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S02, "TU2025R0099", "SEL0088", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S03, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record(S04, "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
         };
         // When & Then
-        checkCardinality3(S32, rows);
+        checkCardinality3(S02, rows);
     }
 
     @Test
@@ -78,11 +80,11 @@ class FastDummy3Tests extends AFastTest<Dummy3Invoice, TURecord, TUError> {
         // Given
         final TURecord[] rows = new TURecord[]{
                 record(S31, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record(S32, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S33, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record(S02, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S03, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
         };
         // When & Then
-        checkCardinality4(S34, S31, rows);
+        checkCardinality4(S31, rows);
     }
 
     @Test
@@ -91,13 +93,13 @@ class FastDummy3Tests extends AFastTest<Dummy3Invoice, TURecord, TUError> {
         final TURecord detached = record(S09, "TU2025R0099", "9999", "Warning", "Detached");
         final TURecord[] rows = new TURecord[]{
                 record(S31, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record(S32, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S33, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record(S34, "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
+                record(S02, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S03, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record(S04, "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
                 detached,
         };
         // When & Then
-        checkDetached(detached, rows);
+        checkDetached(detached, D009, rows);
     }
 
     @Test
@@ -113,10 +115,10 @@ class FastDummy3Tests extends AFastTest<Dummy3Invoice, TURecord, TUError> {
         // Given
         final TURecord[] rows = new TURecord[]{
                 record(S31, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record(S32, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S33, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record(S34, "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
-                record(S34, "TU2025R0099", "2299", "Hardware", "1", "600", "500", "100"),
+                record(S02, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S03, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record(S04, "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
+                record(S04, "TU2025R0099", "2299", "Hardware", "1", "600", "500", "100"),
         };
         // When & Then
         checkValid2(rows);
@@ -128,13 +130,13 @@ class FastDummy3Tests extends AFastTest<Dummy3Invoice, TURecord, TUError> {
         final TURecord invalid = record(S09, "TU2025R0099", "1199", "Support", null);
         final TURecord[] rows = new TURecord[]{
                 record(S31, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record(S32, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S33, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record(S34, "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
+                record(S02, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S03, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record(S04, "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
                 invalid,
         };
         // When & Then
-        checkValidation(invalid, rows);
+        checkValidation(invalid, A002, rows);
     }
 
 }

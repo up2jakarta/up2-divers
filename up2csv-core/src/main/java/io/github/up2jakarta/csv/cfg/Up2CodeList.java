@@ -1,13 +1,17 @@
 package io.github.up2jakarta.csv.cfg;
 
-import io.github.up2jakarta.csv.core.BeanContext;
+import io.github.up2jakarta.csv.api.Argument;
 import io.github.up2jakarta.csv.slv.CodeListChecker;
 import io.github.up2jakarta.lov.CodeListResolver;
 import io.github.up2jakarta.lov.ConstantProvider;
-import io.github.up2jakarta.lov.Support.Argument;
 import io.github.up2jakarta.lov.core.TypeContext;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Up2J {@link io.github.up2jakarta.lov.TypeAdapter} resolver that supports {@link io.github.up2jakarta.lov.CodeList} types.
@@ -15,8 +19,8 @@ import java.lang.annotation.*;
  * @see CodeListResolver
  */
 @Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target(FIELD)
+@Retention(RUNTIME)
 @Resolver(CodeListChecker.class)
 public @interface Up2CodeList {
 
@@ -29,7 +33,7 @@ public @interface Up2CodeList {
     String value() default "";
 
     /**
-     * The resolver must be managed by {@link BeanContext}.
+     * The resolver must be managed by {@link io.github.up2jakarta.csv.api.Container}.
      *
      * @return the code-list resolver.
      */
@@ -38,7 +42,7 @@ public @interface Up2CodeList {
     /**
      * Returns the qualified name of the resolver, by default is <code>null</code>.
      * <p>
-     * Useful when the {@link BeanContext} contains many beans of the specified resolver.
+     * Useful when the {@link io.github.up2jakarta.csv.api.Container} contains many beans of the specified resolver.
      *
      * @return the qualified name
      * @see jakarta.inject.Named

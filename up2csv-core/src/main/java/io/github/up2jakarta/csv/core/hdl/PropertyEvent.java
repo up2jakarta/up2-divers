@@ -2,16 +2,16 @@ package io.github.up2jakarta.csv.core.hdl;
 
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.hdl.IPropertyEvent;
-import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.TypeException;
 
 /**
  * Simple implementation of input event based on cause exceptions, it's compatible with all modes.
  *
- * @param <B> the business data type
+ * @param <B> the business term type
  * @param <R> the input record type
  */
-public class PropertyEvent<B extends DataType<B>, R extends IRecord<?>> extends Event<B> implements IPropertyEvent<B, R> {
+public class PropertyEvent<B extends ITerm<B>, R extends IRecord<?>> extends Event<B> implements IPropertyEvent<B, R> {
 
     private final TypeException cause;
     private final R record;

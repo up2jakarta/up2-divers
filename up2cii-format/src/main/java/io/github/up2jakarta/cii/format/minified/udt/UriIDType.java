@@ -10,9 +10,9 @@ import javax.annotation.processing.Generated;
 public class UriIDType extends AbstractIDType<EASchemeIDType> {
 
     // BT-34-1, BT-49-1, EXT-FR-FE-13, EXT-FR-FE-30, EXT-FR-FE-53, EXT-FR-FE-76, EXT-FR-FE-99 and (1) specifications too.
+    @XmlAttribute(name = "schemeID")
     private EASchemeIDType schemeId;
 
-    @XmlAttribute(name = "schemeID")
     @Override
     public EASchemeIDType getSchemeId() {
         return this.schemeId;

@@ -29,17 +29,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 public class Up2XmlExtensionTests {
 
-    private final Up2Factory<GroupType> factory;
+    private final Up2Factory<TermType> factory;
 
     @Autowired
-    Up2XmlExtensionTests(Up2Factory<GroupType> factory) {
+    Up2XmlExtensionTests(Up2Factory<TermType> factory) {
         this.factory = factory;
     }
 
     @Test
     void testValidBean() throws BeanException {
         // Given
-        final Up2Mapper<Test1Bean, GroupType> mapper = factory.build(Test1Bean.class);
+        final Up2Mapper<Test1Bean, TermType> mapper = factory.mapper(Test1Bean.class);
         final String[] data = {"ALL", "2", "THREE", "TND", "*"};
         // When
         final Test1Bean bean = mapper.map(data);
@@ -51,7 +51,7 @@ public class Up2XmlExtensionTests {
         assertEquals(CurrencyCodeType.TND, bean.getAdapter1());
         assertEquals(TestCodeList.ANY, bean.getAdapter2());
         // When Unmapping
-        final Up2Flatter<Test1Bean, GroupType> format = factory.format(Test1Bean.class);
+        final Up2Flatter<Test1Bean, TermType> format = factory.flatter(Test1Bean.class);
         final String[] out = format.unmap(bean);
         // Then
         assertNotNull(out);
@@ -64,7 +64,7 @@ public class Up2XmlExtensionTests {
     @Test
     void testDefaultErrors() throws BeanException {
         // Given
-        final Up2Mapper<Test1Bean, GroupType> mapper = factory.build(Test1Bean.class);
+        final Up2Mapper<Test1Bean, TermType> mapper = factory.mapper(Test1Bean.class);
         final InputRecord row = record(SegmentType.S00, "11", "2", "33", "ILS", "ANY");
         // When
         final InputCollector handler = new InputCollector(row);
@@ -119,7 +119,7 @@ public class Up2XmlExtensionTests {
     @Test
     void testOverrideErrors() throws BeanException {
         // Given
-        final Up2Mapper<Test2Bean, GroupType> mapper = factory.build(Test2Bean.class);
+        final Up2Mapper<Test2Bean, TermType> mapper = factory.mapper(Test2Bean.class);
         final InputRecord row = record(SegmentType.S00, "11", "22", "ILS", "ANY");
         // When
         final InputCollector handler = new InputCollector(row);
@@ -174,7 +174,7 @@ public class Up2XmlExtensionTests {
     @Test
     void testUniqueXmlValue() {
         // WHEN
-        final BeanException ex = assertThrows(BeanException.class, () -> factory.build(Test3Bean.class));
+        final BeanException ex = assertThrows(BeanException.class, () -> factory.mapper(Test3Bean.class));
         assertNotNull(ex);
         // THEN
         assertEquals(XML4Enum.class, ex.getSource());

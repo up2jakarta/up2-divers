@@ -9,7 +9,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HeaderTradeDeliveryType", propOrder = {
         "shipToTradeParty",
         "actualDeliverySupplyChainEvent",
@@ -19,15 +19,18 @@ import javax.annotation.processing.Generated;
 public class HeaderTradeDeliveryType {
 
     // BG-13
+    @XmlElement(name = "ShipToTradeParty")
     private TradePartyType shipToTradeParty;
 
+    @XmlElement(name = "ActualDeliverySupplyChainEvent")
     private SupplyChainEventType actualDeliverySupplyChainEvent;
 
+    @XmlElement(name = "DespatchAdviceReferencedDocument")
     private ReferencedDocumentType despatchAdviceReferencedDocument;
 
+    @XmlElement(name = "ReceivingAdviceReferencedDocument")
     private ReferencedDocumentType receivingAdviceReferencedDocument;
 
-    @XmlElement(name = "ShipToTradeParty")
     public TradePartyType getShipToTradeParty() {
         return this.shipToTradeParty;
     }
@@ -36,7 +39,6 @@ public class HeaderTradeDeliveryType {
         this.shipToTradeParty = shipToTradeParty;
     }
 
-    @XmlElement(name = "ActualDeliverySupplyChainEvent")
     public SupplyChainEventType getActualDeliverySupplyChainEvent() {
         return this.actualDeliverySupplyChainEvent;
     }
@@ -45,7 +47,6 @@ public class HeaderTradeDeliveryType {
         this.actualDeliverySupplyChainEvent = actualDeliverySupplyChainEvent;
     }
 
-    @XmlElement(name = "DespatchAdviceReferencedDocument")
     public ReferencedDocumentType getDespatchAdviceReferencedDocument() {
         return this.despatchAdviceReferencedDocument;
     }
@@ -54,7 +55,6 @@ public class HeaderTradeDeliveryType {
         this.despatchAdviceReferencedDocument = despatchAdviceReferencedDocument;
     }
 
-    @XmlElement(name = "ReceivingAdviceReferencedDocument")
     public ReferencedDocumentType getReceivingAdviceReferencedDocument() {
         return this.receivingAdviceReferencedDocument;
     }

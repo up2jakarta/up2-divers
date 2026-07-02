@@ -1,16 +1,16 @@
 package io.github.up2jakarta.test.core;
 
-import io.github.up2jakarta.csv.core.BeanContext;
+import io.github.up2jakarta.csv.api.Container;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Mapper;
 import io.github.up2jakarta.csv.core.hdl.FailureException;
-import io.github.up2jakarta.csv.data.DataResolver;
-import io.github.up2jakarta.csv.data.DynamicType;
+import io.github.up2jakarta.csv.data.HeaderType;
+import io.github.up2jakarta.csv.data.TermResolver;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
-import io.github.up2jakarta.test.core.misc.cvr.Test1Definition;
 import io.github.up2jakarta.test.core.misc.cvr.Test3Resolver;
+import io.github.up2jakarta.test.core.misc.cvr.TestHeader;
 import io.github.up2jakarta.test.core.misc.lov.EnumLike;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,22 +26,22 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 class Up2ResolverTests {
 
-    private final Up2Factory<DynamicType> factory;
+    private final Up2Factory<HeaderType> factory;
 
     @Autowired
-    Up2ResolverTests(BeanContext context) {
-        this.factory = new Up2Factory<>(context, DataResolver.dynamic());
+    Up2ResolverTests(Container context) {
+        this.factory = new Up2Factory<>(context, TermResolver.header());
     }
 
     @Test
     void test1() throws BeanException {
         // Given
-        final Up2Mapper<Test1Definition, DynamicType> mapper = factory.build(Test1Definition.class);
+        final Up2Mapper<TestHeader, HeaderType> mapper = factory.mapper(TestHeader.class);
         final FailureException error = assertThrows(FailureException.class, () -> mapper.map("TON", "PT24H"));
         // Then
         assertNotNull(error.getType());
         assertNotNull(error.getType().getName());
-        assertEquals(Test1Definition.D01, error.getType().getCode());
+        assertEquals(TestHeader.D01, error.getType().getCode());
         assertEquals(0, error.getOffset());
         assertEquals(SeverityType.ERROR, error.getLevel());
         assertEquals(EC_CODE_LIST, error.getCode());
@@ -52,12 +52,12 @@ class Up2ResolverTests {
     @Test
     void test2() throws BeanException {
         // Given
-        final Up2Mapper<Test1Definition, DynamicType> mapper = factory.build(Test1Definition.class);
+        final Up2Mapper<TestHeader, HeaderType> mapper = factory.mapper(TestHeader.class);
         final FailureException error = assertThrows(FailureException.class, () -> mapper.map("KGM", "24H"));
         // Then
         assertNotNull(error.getType());
         assertNotNull(error.getType().getName());
-        assertEquals(Test1Definition.D02, error.getType().getCode());
+        assertEquals(TestHeader.D02, error.getType().getCode());
         assertEquals(1, error.getOffset());
         assertEquals(SeverityType.ERROR, error.getLevel());
         assertEquals(EC_CONVERTER, error.getCode());
@@ -68,7 +68,7 @@ class Up2ResolverTests {
     @Test
     void testDeprecatedConstant() throws BeanException {
         // Given
-        final Up2Mapper<Test3Resolver, DynamicType> mapper = factory.build(Test3Resolver.class);
+        final Up2Mapper<Test3Resolver, HeaderType> mapper = factory.mapper(Test3Resolver.class);
         final FailureException error = assertThrows(FailureException.class, () -> mapper.map("N"));
         // Then
         assertEquals(SeverityType.ERROR, error.getLevel());
@@ -80,7 +80,7 @@ class Up2ResolverTests {
     @Test
     void testValidConstant() throws BeanException {
         // Given
-        final Up2Mapper<Test3Resolver, DynamicType> mapper = factory.build(Test3Resolver.class);
+        final Up2Mapper<Test3Resolver, HeaderType> mapper = factory.mapper(Test3Resolver.class);
         final Test3Resolver bean = mapper.map("1");
         // Then
         assertNotNull(bean);

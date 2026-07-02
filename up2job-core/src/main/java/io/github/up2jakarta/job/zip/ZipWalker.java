@@ -5,6 +5,7 @@ import io.github.up2jakarta.job.core.BusinessId;
 import io.github.up2jakarta.job.core.BusinessType;
 import io.github.up2jakarta.job.core.LocalFile;
 import io.github.up2jakarta.job.flux.FluxIndex;
+import io.github.up2jakarta.lov.core.Codes;
 import org.slf4j.Logger;
 import org.springframework.batch.core.StepExecution;
 
@@ -27,7 +28,7 @@ public class ZipWalker<B extends BusinessType<B>, C extends BusinessContext> ext
     private final Enumeration<? extends ZipEntry> entries;
 
     public ZipWalker(ArchiveHandler<B, C> handler, FluxIndex<B> index, LocalFile file, Logger logger) throws IOException {
-        super(handler.getContext(), logger, file.toString(), file.getResource(), handler.getTranslator());
+        super(handler.getContext(), logger, file, handler.getTranslator());
         this.archive = new ZipFile(resource);
         this.decoder = handler.getDecoder();
         this.entries = archive.entries();
@@ -40,10 +41,13 @@ public class ZipWalker<B extends BusinessType<B>, C extends BusinessContext> ext
     }
 
     protected final Optional<BusinessId> decode(ZipEntry entry) {
-        if (entry == null || entry.getSize() == 0) {
+        try {
+            final String reference = decoder.decode(entry, () -> archive.getInputStream(entry));
+            final long id = Codes.decode(entry.getComment());
+            return Optional.of(new BusinessId(id, reference));
+        } catch (Exception ex) {
             return Optional.empty();
         }
-        return decoder.decode(entry, () -> archive.getInputStream(entry));
     }
 
     protected void handle(StepExecution execution) {
@@ -56,7 +60,7 @@ public class ZipWalker<B extends BusinessType<B>, C extends BusinessContext> ext
         } else if (this.isClean()) {
             handler.onSuccess(this, this.count(), execution, logger);
         } else {
-            this.clean(execution, true);
+            this.clean(resource, execution, true);
             final long count = this.count();
             if (count == 0) {
                 handler.onEmpty(this, execution, logger);

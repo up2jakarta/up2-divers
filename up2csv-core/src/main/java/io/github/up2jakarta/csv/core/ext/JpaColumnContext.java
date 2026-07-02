@@ -1,10 +1,10 @@
 package io.github.up2jakarta.csv.core.ext;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
 import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;

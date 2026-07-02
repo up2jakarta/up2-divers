@@ -7,7 +7,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Environment;
-import org.hibernate.dialect.H2Dialect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -35,7 +34,7 @@ public class TUConfiguration {
     public EntityManagerFactory entityManagerFactory(DataSource dataSource) {
         final org.hibernate.cfg.Configuration configuration = new org.hibernate.cfg.Configuration()
                 .addAnnotatedClass(SystemEntity.class)
-                .setProperty(Environment.DIALECT, H2Dialect.class)
+                //.setProperty(Environment.DIALECT, H2Dialect.class)
                 .setProperty(Environment.HBM2DDL_AUTO, "none")
                 .setProperty(Environment.SHOW_SQL, false);
         final StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()

@@ -10,7 +10,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "LegalOrganizationType", propOrder = {
         "id",
         "tradingBusinessName"
@@ -18,12 +18,13 @@ import javax.annotation.processing.Generated;
 public class LegalOrganizationType {
 
     // BT-30, BT-47, EXT-FR-FE-08, BT-61, EXT-FR-FE-48, EXT-FR-FE-71, EXT-FR-FE-94, EXT-FR-FE-117
+    @XmlElement(name = "ID")
     private PartyIDType id;
 
     // BT-28, BT-45, EXT-FR-FE-05, EXT-FR-FE-45, EXT-FR-FE-68, EXT-FR-FE-91, EXT-FR-FE-114
+    @XmlElement(name = "TradingBusinessName")
     private String tradingBusinessName;
 
-    @XmlElement(name = "ID")
     public PartyIDType getId() {
         return this.id;
     }
@@ -32,7 +33,6 @@ public class LegalOrganizationType {
         this.id = id;
     }
 
-    @XmlElement(name = "TradingBusinessName")
     public String getTradingBusinessName() {
         return this.tradingBusinessName;
     }

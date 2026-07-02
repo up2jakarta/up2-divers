@@ -1,8 +1,8 @@
 package io.github.up2jakarta.test.core.misc.jpa;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2EnableJPA;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.test.core.misc.lov.TestCodeList;
 import io.github.up2jakarta.test.core.misc.lov.TestCodeListConverter;
 import jakarta.persistence.*;

@@ -1,15 +1,13 @@
 package io.github.up2jakarta.test;
 
-import io.github.up2jakarta.csv.core.BeanContext;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Mapper;
-import io.github.up2jakarta.csv.data.DataResolver;
-import io.github.up2jakarta.csv.data.DynamicType;
 import io.github.up2jakarta.csv.io.SingleReader;
 import io.github.up2jakarta.csv.io.SingleWriter;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.dto.Note;
+import io.github.up2jakarta.test.impl.TermType;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +18,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.File;
 import java.io.IOException;
 
+import static io.github.up2jakarta.test.impl.TermType.A001;
+import static io.github.up2jakarta.test.impl.TermType.A004;
 import static io.github.up2jakarta.test.misc.Tests.TUGenerator.path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,11 +35,10 @@ public class SingleNoteTests {
     private final File file;
 
     @Autowired
-    SingleNoteTests(BeanContext context, CSVFormat fmt) throws BeanException, IOException {
-        final Up2Factory<DynamicType> factory = new Up2Factory<>(context, DataResolver.dynamic());
-        final Up2Flatter<Note, DynamicType> format = factory.format(Note.class);
-        final SingleWriter<Note, DynamicType> writer = new SingleWriter<>(format, fmt);
-        final Up2Mapper<Note, DynamicType> mapper = factory.build(Note.class);
+    SingleNoteTests(Up2Factory<TermType> factory, CSVFormat fmt) throws BeanException, IOException {
+        final Up2Flatter<Note, TermType> format = factory.flatter(Note.class);
+        final SingleWriter<Note, TermType> writer = new SingleWriter<>(format, fmt);
+        final Up2Mapper<Note, TermType> mapper = factory.mapper(Note.class);
         this.reader = new SingleReader<>(mapper, fmt);
         this.file = path(this.getClass()).resolve("notes.csv").toFile();
         // Generating file
@@ -76,8 +75,8 @@ public class SingleNoteTests {
         // THEN
         assertNotNull(header);
         assertEquals(2, header.length);
-        assertEquals("Key", header[0]);
-        assertEquals("Content", header[1]);
+        assertEquals(A001.getName(), header[0]);
+        assertEquals(A004.getName(), header[1]);
     }
 
 }

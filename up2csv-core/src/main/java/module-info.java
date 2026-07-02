@@ -8,7 +8,6 @@ module up2jakarta.csv.core {
     exports io.github.up2jakarta.csv;
     exports io.github.up2jakarta.csv.api;
     exports io.github.up2jakarta.csv.api.ext;
-    exports io.github.up2jakarta.csv.api.fct;
     exports io.github.up2jakarta.csv.api.hdl;
     exports io.github.up2jakarta.csv.cfg;
     exports io.github.up2jakarta.csv.core;

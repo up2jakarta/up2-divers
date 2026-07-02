@@ -1,5 +1,7 @@
 package io.github.up2jakarta.csv.data;
 
+import io.github.up2jakarta.csv.Segment;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,9 +24,7 @@ public abstract class Up2Aggregator<R extends Segment> implements Iterator<List<
 
     @Override
     public final List<R> next() {
-        if (current == null) {
-            return null;
-        }
+        if (current == null) return null;
         final List<R> records = new LinkedList<>();
         final R pivot = current;
         do {

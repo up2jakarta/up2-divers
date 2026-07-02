@@ -8,17 +8,18 @@ import java.math.BigDecimal;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AmountType", propOrder = {"value"})
 public class AmountType {
 
     // BT-110, BT-111
+    @XmlValue
     private BigDecimal value;
 
     // BT-110-1, BT-111-1
+    @XmlAttribute(name = "currencyID")
     private CurrencyCodeType currencyId;
 
-    @XmlValue
     public BigDecimal getValue() {
         return this.value;
     }
@@ -27,7 +28,6 @@ public class AmountType {
         this.value = value;
     }
 
-    @XmlAttribute(name = "currencyID")
     public CurrencyCodeType getCurrencyId() {
         return this.currencyId;
     }

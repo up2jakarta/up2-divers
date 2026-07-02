@@ -10,7 +10,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TradeSettlementPaymentMeansType", propOrder = {
         "typeCode",
         "information",
@@ -22,22 +22,27 @@ import javax.annotation.processing.Generated;
 public class TradeSettlementPaymentMeansType {
 
     // BT-81
+    @XmlElement(name = "TypeCode")
     private PaymentMeansCodeType typeCode;
 
     // BT-82
+    @XmlElement(name = "Information")
     private String information;
 
     // BG-18
+    @XmlElement(name = "ApplicableTradeSettlementFinancialCard")
     private TradeSettlementFinancialCardType applicableTradeSettlementFinancialCard;
 
+    @XmlElement(name = "PayerPartyDebtorFinancialAccount")
     private DebtorFinancialAccountType payerPartyDebtorFinancialAccount;
 
     // BG-17
+    @XmlElement(name = "PayeePartyCreditorFinancialAccount")
     private CreditorFinancialAccountType payeePartyCreditorFinancialAccount;
 
+    @XmlElement(name = "PayeeSpecifiedCreditorFinancialInstitution")
     private CreditorFinancialInstitutionType payeeSpecifiedCreditorFinancialInstitution;
 
-    @XmlElement(name = "TypeCode")
     public PaymentMeansCodeType getTypeCode() {
         return this.typeCode;
     }
@@ -46,7 +51,6 @@ public class TradeSettlementPaymentMeansType {
         this.typeCode = typeCode;
     }
 
-    @XmlElement(name = "Information")
     public String getInformation() {
         return this.information;
     }
@@ -55,7 +59,6 @@ public class TradeSettlementPaymentMeansType {
         this.information = information;
     }
 
-    @XmlElement(name = "ApplicableTradeSettlementFinancialCard")
     public TradeSettlementFinancialCardType getApplicableTradeSettlementFinancialCard() {
         return this.applicableTradeSettlementFinancialCard;
     }
@@ -64,7 +67,6 @@ public class TradeSettlementPaymentMeansType {
         this.applicableTradeSettlementFinancialCard = applicableTradeSettlementFinancialCard;
     }
 
-    @XmlElement(name = "PayerPartyDebtorFinancialAccount")
     public DebtorFinancialAccountType getPayerPartyDebtorFinancialAccount() {
         return this.payerPartyDebtorFinancialAccount;
     }
@@ -73,7 +75,6 @@ public class TradeSettlementPaymentMeansType {
         this.payerPartyDebtorFinancialAccount = payerPartyDebtorFinancialAccount;
     }
 
-    @XmlElement(name = "PayeePartyCreditorFinancialAccount")
     public CreditorFinancialAccountType getPayeePartyCreditorFinancialAccount() {
         return this.payeePartyCreditorFinancialAccount;
     }
@@ -82,7 +83,6 @@ public class TradeSettlementPaymentMeansType {
         this.payeePartyCreditorFinancialAccount = payeePartyCreditorFinancialAccount;
     }
 
-    @XmlElement(name = "PayeeSpecifiedCreditorFinancialInstitution")
     public CreditorFinancialInstitutionType getPayeeSpecifiedCreditorFinancialInstitution() {
         return this.payeeSpecifiedCreditorFinancialInstitution;
     }

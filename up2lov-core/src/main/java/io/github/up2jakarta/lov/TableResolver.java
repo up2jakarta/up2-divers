@@ -1,7 +1,6 @@
 package io.github.up2jakarta.lov;
 
 import io.github.up2jakarta.lov.bst.Cache;
-import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.lov.core.SVCache;
 import io.github.up2jakarta.lov.core.SafeAdapter;
 import io.github.up2jakarta.lov.core.TypeContext;
@@ -14,7 +13,6 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-import static io.github.up2jakarta.lov.Support.Parameter;
 import static io.github.up2jakarta.lov.TableResolver.*;
 import static java.sql.ResultSet.CONCUR_READ_ONLY;
 import static java.sql.ResultSet.TYPE_FORWARD_ONLY;
@@ -50,7 +48,7 @@ public final class TableResolver implements CodeListResolver<DynamicCode> {
     }
 
     @Override
-    public TypeAdapter<DynamicCode> resolve(Class<DynamicCode> type, TypeContext context) throws BeanException {
+    public TypeAdapter<DynamicCode> resolve(Class<DynamicCode> type, TypeContext context) {
         final String query = sqlQuery(context);
         final String name = context.getTypeName();
         return new SafeAdapter<>(type, context.getLevel(), context.getCode()) {

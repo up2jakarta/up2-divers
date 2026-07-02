@@ -1,11 +1,11 @@
 package io.github.up2jakarta.csv.core.hdl;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.hdl.EventCode;
 import io.github.up2jakarta.csv.api.hdl.EventLevel;
 import io.github.up2jakarta.csv.cfg.Error;
-import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.SeverityType;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.metadata.ConstraintDescriptor;
@@ -20,11 +20,11 @@ import static java.util.Optional.ofNullable;
 /**
  * Input events handler that accepts compliance events only.
  *
- * @param <D> the business data type
+ * @param <D> the business term type
  * @see io.github.up2jakarta.csv.core.Up2Flatter#validate(Segment, ComplianceHandler)
  * @see io.github.up2jakarta.csv.core.Up2Flatter#validate(Segment, int, ComplianceHandler)
  */
-public abstract class ComplianceHandler<D extends DataType<D>> {
+public abstract class ComplianceHandler<D extends ITerm<D>> {
 
     private static Optional<Error> error(ConstraintViolation<?> violation) {
         final ConstraintDescriptor<?> descriptor = violation.getConstraintDescriptor();
@@ -54,13 +54,13 @@ public abstract class ComplianceHandler<D extends DataType<D>> {
     /**
      * Handles the JSR-303 constraint violation caused by the input at the given offset.
      *
-     * @param data      the business data type
+     * @param type      the business term
      * @param offset    the input offset in the record
      * @param violation the JSR-303 constraint violation
      * @param config    the error annotation defined at property level
      */
-    public final void handle(D data, Integer offset, ConstraintViolation<?> violation, Error config) {
-        this.handle(() -> level(violation, config), () -> code(violation, config), data, offset, violation);
+    public final void handle(D type, Integer offset, ConstraintViolation<?> violation, Error config) {
+        this.handle(() -> level(violation, config), () -> code(violation, config), type, offset, violation);
     }
 
     /**
@@ -68,11 +68,11 @@ public abstract class ComplianceHandler<D extends DataType<D>> {
      *
      * @param level  the event level supplier
      * @param code   the event code supplier
-     * @param data   the business data type
+     * @param type   the business term
      * @param offset the input offset in the record
      * @param cause  the JSR-303 constraint violation
      */
 
-    public abstract void handle(EventLevel level, EventCode code, D data, Integer offset, ConstraintViolation<?> cause);
+    public abstract void handle(EventLevel level, EventCode code, D type, Integer offset, ConstraintViolation<?> cause);
 
 }

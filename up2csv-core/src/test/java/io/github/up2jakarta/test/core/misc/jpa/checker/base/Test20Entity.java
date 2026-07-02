@@ -2,7 +2,7 @@ package io.github.up2jakarta.test.core.misc.jpa.checker.base;
 
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2EnableJPA;
-import io.github.up2jakarta.csv.core.ext.Prefix;
+import io.github.up2jakarta.csv.core.ext.Up2Prefix;
 import io.github.up2jakarta.test.core.misc.ParsedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +12,7 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Up2EnableJPA
-@Prefix("TU_")
+@Up2Prefix("TU_")
 @Table(name = "TB_TESTS")
 public class Test20Entity extends ParsedEntity<String> {
 

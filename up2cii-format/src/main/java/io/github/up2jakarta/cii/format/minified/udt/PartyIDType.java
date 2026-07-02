@@ -10,9 +10,9 @@ import javax.annotation.processing.Generated;
 public class PartyIDType extends AbstractIDType<SchemeCodeType> {
 
     // BT-29a-1, BT-29b-1, BT-29c-1, BT-29d-1, BT-30-1, BT-46a-1, BT-46b-1, BT-46c-1 and (28) specifications too.
+    @XmlAttribute(name = "schemeID")
     private SchemeCodeType schemeId;
 
-    @XmlAttribute(name = "schemeID")
     @Override
     public SchemeCodeType getSchemeId() {
         return this.schemeId;

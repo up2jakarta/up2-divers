@@ -1,82 +1,90 @@
 package io.github.up2jakarta.csv.core;
 
+import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.api.Container;
+import io.github.up2jakarta.csv.api.ext.InputProcessor;
+import io.github.up2jakarta.csv.api.hdl.EventLevel;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.core.BSBuilder.Input;
+import io.github.up2jakarta.csv.cfg.Processor;
+import io.github.up2jakarta.csv.core.BSAccessor.Mode;
 import io.github.up2jakarta.csv.core.BSBuilder.MST;
-import io.github.up2jakarta.csv.core.BSOperator.BId.DP;
+import io.github.up2jakarta.csv.core.BSOperator.PId;
+import io.github.up2jakarta.csv.core.BSProperty.PFragment;
+import io.github.up2jakarta.csv.core.BSProperty.PPosition;
 import io.github.up2jakarta.csv.core.hdl.EventHandler;
-import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.TypeAdapter;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.lov.core.Wrapper;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Member;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import static io.github.up2jakarta.csv.core.BSAccessor.FA;
-import static io.github.up2jakarta.csv.core.BSAccessor.Mode;
-import static io.github.up2jakarta.csv.core.BSProperty.PFragment.*;
-import static io.github.up2jakarta.csv.core.BSProperty.PPosition.*;
+import static io.github.up2jakarta.csv.api.IEvent.EC_PROCESSOR;
+import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
+import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
+import static io.github.up2jakarta.lov.SeverityType.WARNING;
+import static io.github.up2jakarta.lov.core.Beans.getTypeArgument;
+import static io.github.up2jakarta.lov.core.Beans.getTypeName;
+import static io.github.up2jakarta.lov.core.Localizable.CREATOR;
 import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Optional.ofNullable;
 
 /**
- * Internal property representation.
+ * Internal {@link Segment} property.
  */
-abstract sealed class BSProperty<T, V, D extends DataType<D>> implements MST permits PFragment, PPosition {
+abstract sealed class BSProperty<T, D extends ITerm<D>> implements MST permits PFragment, PPosition {
     protected final int offset;
     protected final D dataType;
     protected final Error error;
-    private final BSAccessor<V> access;
+    private final BSAccessor<T> access;
 
-    private BSProperty(BSAccessor<V> access, D dataType, int offset) {
+    private BSProperty(BSAccessor<T> access, D dataType, int offset) {
         this.error = access.source.getAnnotation(Error.class);
         this.dataType = dataType;
         this.access = access;
         this.offset = offset;
     }
 
-    BSProperty(BSProperty<T, ?, D> source, BSAccessor<V> access) {
+    BSProperty(BSProperty<T, D> source, BSAccessor<T> access) {
         this.dataType = source.dataType;
         this.offset = source.offset;
         this.error = source.error;
         this.access = access;
     }
 
-    BSProperty(BSProperty<T, V, D> source) throws BeanException {
+    BSProperty(BSProperty<T, D> source) throws BeanException {
         this(source, source.access.reverse(null));
     }
 
-    BSProperty(BSAccessor<V> access, D dataType, int offset, Fragment fp) {
+    BSProperty(BSAccessor<T> access, D dataType, int offset, Fragment fp) {
         this(access, dataType, offset + fp.value());
     }
 
-    BSProperty(BSAccessor<V> access, D dt, int fo, Position pp) {
+    BSProperty(BSAccessor<T> access, D dt, int fo, Position pp) {
         this(access, dt, fo + pp.value());
     }
 
-    static DP id(Mode mode, PFragment<Segment, ?, ?>[] fs, PPosition<Object, Object, ?> pp) throws BeanException {
-        final BSAccessor<Object> accessor = ((BSProperty<Object, Object, ?>) pp).access;
-        final List<PFragment<Segment, ?, ?>> path;
-        final PPosition<Object, Object, ?> getter;
+    static <B extends ITerm<B>> PId<B> toPId(Mode mode, PFragment<Segment, B>[] fs, PPosition<Object, B> pp) throws BeanException {
+        final BSAccessor<Object> accessor = ((BSProperty<Object, B>) pp).access;
+        final List<PFragment<Segment, B>> path;
+        final PPosition<Object, B> getter;
         final BSAccessor<Object> setter;
         if (mode == Mode.WO) {
             setter = accessor;
             getter = pp.reverse();
             if (fs.length != 0) {
-                List<PFragment<Segment, ?, ?>> ps = new ArrayList<>(fs.length);
-                for (final PFragment<Segment, ?, ?> fp : fs) {
+                final List<PFragment<Segment, B>> ps = new ArrayList<>(fs.length);
+                for (final PFragment<Segment, B> fp : fs) {
                     ps.add(fp.reverse());
                 }
-                path = unmodifiableList(ps);
+                path = List.copyOf(ps);
             } else {
                 path = List.of();
             }
@@ -89,35 +97,54 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> implements MST per
                 setter = accessor;
             }
         }
-        return DP.of(path, getter, setter);
+        return PId.of(path, getter, setter);
     }
 
     abstract Class<T> getType();
 
-    abstract V wrap(T value);
+    abstract BSProperty<T, D> reverse() throws BeanException;
 
-    abstract T from(V value);
-
-    abstract BSProperty<T, V, D> reverse() throws BeanException;
-
-    <A extends Annotation> A getAnnotation(Class<A> type) {
+    final <A extends Annotation> A getAnnotation(Class<A> type) {
         return access.source.getAnnotation(type);
     }
 
-    final boolean isReversible() {
-        return !(access instanceof FA<V>);
-    }
-
-    final Type getGenericType() {
-        return access.source.getGenericType();
+    @SafeVarargs
+    final boolean isAnnotationAbsent(Class<? extends Annotation>... types) {
+        return !BSBuilder.isAnnotationPresent(access.source, types);
     }
 
     final Member getSource() {
         return access.source;
     }
 
+    final boolean isReversible() {
+        return access.isReversible();
+    }
+
+    final IParameter toParameter(Class<? extends Segment> st, Type type, int index) throws BeanException {
+        final Type gt = access.source.getGenericType();
+        if ((gt instanceof ParameterizedType pt) && IParameter.TYPES.contains(pt.getRawType())) {
+            final Type rt = pt.getRawType();
+            final Type at = pt.getActualTypeArguments()[0];
+            if (type.equals(at) || this.getType() == type) {
+                return new SParameter(index);
+            }
+            if (type instanceof ParameterizedType wt) {
+                final Type ct = wt.getActualTypeArguments()[0];
+                if ((wt.getRawType() == rt) && (ct == at || this.getType() == ct)) {
+                    return (rt == Optional.class) ? new OParameter(index) : new WParameter(index);
+                }
+            }
+            throw new BeanException(st, CREATOR, this.getName() + " should be of type " + gt.getTypeName());
+        }
+        if (type.equals(gt) || ((gt instanceof TypeVariable<?>) && type == this.getType())) {
+            return new SParameter(index);
+        }
+        throw new BeanException(st, CREATOR, this.getName() + " should be of type " + gt.getTypeName());
+    }
+
     final boolean isFinal() {
-        return access.isFinal();
+        return Modifier.isFinal(access.source.getModifiers());
     }
 
     final String getName() {
@@ -125,17 +152,16 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> implements MST per
     }
 
     final T value(Segment bean) {
-        final V wrapped = access.value(bean);
-        if (wrapped != null) {
-            return this.from(wrapped);
-        }
-        return null;
+        return access.value(bean);
     }
 
-    final void value(Segment bean, V value) {
-        if (value != null) {
-            access.value(bean, value);
-        }
+    final void value(Segment bean, T value) {
+        access.value(bean, value);
+    }
+
+    @Override
+    public final int hashCode() {
+        return offset;
     }
 
     @Override
@@ -144,158 +170,90 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> implements MST per
     }
 
     /**
-     * Internal {@link Fragment} implementation.
+     * Internal {@link Fragment} property
      */
-    abstract static sealed class PFragment<S extends Segment, V, B extends DataType<B>> extends BSProperty<S, V, B> permits FS, FO, FW {
-        protected final BSNode<S, B> node;
+    static final class PFragment<S extends Segment, B extends ITerm<B>> extends BSProperty<S, B> {
+        final BSNode<S, B> node;
 
-        private PFragment(BSNode<S, B> node, BSAccessor<V> va, B type, int offset, Fragment pf) {
+        PFragment(BSNode<S, B> node, BSAccessor<S> va, B type, int offset, Fragment pf) {
             super(va, type, offset, pf);
             this.node = node;
         }
 
-        private PFragment(BSNode<S, B> node, PFragment<S, V, B> source) throws BeanException {
+        private PFragment(BSNode<S, B> node, PFragment<S, B> source) throws BeanException {
             super(source);
             this.node = node;
         }
 
         @Override
-        final Class<S> getType() {
+        Class<S> getType() {
             return node.type;
         }
 
         @Override
-        abstract PFragment<S, V, B> reverse() throws BeanException;
-
-        /**
-         * Internal representation for {@link Segment} fragment.
-         */
-        static final class FS<S extends Segment, B extends DataType<B>> extends PFragment<S, S, B> {
-            FS(BSNode<S, B> node, BSAccessor<S> va, B type, int offset, Fragment pf) {
-                super(node, va, type, offset, pf);
-            }
-
-            private FS(BSNode<S, B> node, PFragment<S, S, B> source) throws BeanException {
-                super(node, source);
-            }
-
-            @Override
-            S wrap(S value) {
-                return value;
-            }
-
-            @Override
-            S from(S value) {
-                return value;
-            }
-
-            @Override
-            FS<S, B> reverse() throws BeanException {
-                return new FS<>(node.reverse(), this);
-            }
-        }
-
-        /**
-         * Internal representation for {@link Optional} fragment.
-         */
-        static final class FO<S extends Segment, B extends DataType<B>> extends PFragment<S, Optional<S>, B> {
-            FO(BSNode<S, B> n, BSAccessor<Optional<S>> a, B pt, int po, Fragment pf) {
-                super(n, a, pt, po, pf);
-            }
-
-            private FO(BSNode<S, B> node, FO<S, B> source) throws BeanException {
-                super(node, source);
-            }
-
-            @Override
-            Optional<S> wrap(S value) {
-                return ofNullable(value);
-            }
-
-            @Override
-            S from(Optional<S> value) {
-                return value.orElse(null);
-            }
-
-            @Override
-            FO<S, B> reverse() throws BeanException {
-                return new FO<>(node.reverse(), this);
-            }
-        }
-
-        /**
-         * Internal representation for {@link Wrapper} fragment.
-         */
-        static final class FW<S extends Segment, B extends DataType<B>> extends PFragment<S, Wrapper<S>, B> {
-            FW(BSNode<S, B> n, BSAccessor<Wrapper<S>> a, B pt, int po, Fragment pf) {
-                super(n, a, pt, po, pf);
-            }
-
-            private FW(BSNode<S, B> node, FW<S, B> source) throws BeanException {
-                super(node, source);
-            }
-
-            @Override
-            Wrapper<S> wrap(S value) {
-                return new Wrapper<>(value);
-            }
-
-            @Override
-            S from(Wrapper<S> value) {
-                return value.get();
-            }
-
-            @Override
-            FW<S, B> reverse() throws BeanException {
-                return new FW<>(node.reverse(), this);
-            }
+        PFragment<S, B> reverse() throws BeanException {
+            return new PFragment<>(node.reverse(), this);
         }
     }
 
     /**
-     * Internal {@link Position} implementation.
+     * Internal {@link Position} property
      */
-    abstract static sealed class PPosition<T, V, D extends DataType<D>> extends BSProperty<T, V, D> permits PS, PO, PW {
-        protected final Class<T> type;
-        protected final T defaultValue;
-        protected final boolean required;
-        protected final String formatted;
-        private final Input<D> processor;
+    static final class PPosition<T, D extends ITerm<D>> extends BSProperty<T, D> {
+        final T defaultValue;
+        final boolean required;
+        private final String sequenceValue;
         private final TypeAdapter<T> adapter;
+        private final IProcessor<D> processor;
 
-        private PPosition(BSAccessor<V> va, D dt, int fo, Position pp, Input<D> ps, TypeAdapter<T> pa) throws BeanException {
+        PPosition(BSAccessor<T> va, D dt, int fo, Position pp, IProcessor<D> ps, TypeAdapter<T> pa) throws BeanException {
             super(va, dt, fo, pp);
-            this.defaultValue = ps.parse(this, pa);
-            this.formatted = ps.format(this.getSource(), defaultValue, pa);
-            this.required = pp.required();
-            this.type = pa.getType();
-            this.processor = ps;
             this.adapter = pa;
+            this.processor = ps;
+            this.required = pp.required();
+            this.defaultValue = this.defaultValue();
+            this.sequenceValue = this.sequenceValue();
         }
 
-        private PPosition(PPosition<T, V, D> source, T defaultValue) throws BeanException {
+        private PPosition(PPosition<T, D> source) throws BeanException {
             super(source);
+            this.sequenceValue = source.sequenceValue;
+            this.defaultValue = source.defaultValue;
             this.processor = source.processor;
-            this.formatted = source.formatted;
-            this.defaultValue = defaultValue;
             this.required = source.required;
             this.adapter = source.adapter;
-            this.type = source.type;
+        }
+
+        private T defaultValue() throws BeanException {
+            try {
+                final String value = processor.process(null, 0, this, of(ERROR));
+                return (value != null) ? this.adapter.parse(value) : null;
+            } catch (Exception cause) {
+                throw new BeanException(this.getSource(), "@Position[defaultValue] cannot be parsed");
+            }
+        }
+
+        private String sequenceValue() throws BeanException {
+            try {
+                return (defaultValue != null) ? adapter.format(defaultValue) : null;
+            } catch (Exception cause) {
+                throw new BeanException(this.getSource(), "@Position[defaultValue] cannot be formatted");
+            }
         }
 
         @Override
-        final Class<T> getType() {
-            return type;
+        Class<T> getType() {
+            return this.adapter.getType();
         }
 
-        final String format(T value) {
-            if (value != defaultValue && value != null) {
+        String format(T value) {
+            if (value != null && !value.equals(defaultValue)) {
                 return adapter.format(value);
             }
-            return formatted;
+            return sequenceValue;
         }
 
-        final T parse(String data, int offset, EventHandler<D> handler) {
+        T parse(String data, int offset, EventHandler<D> handler) {
             if (data != null) {
                 data = processor.process(data, offset, this, handler);
             } else {
@@ -305,125 +263,188 @@ abstract sealed class BSProperty<T, V, D extends DataType<D>> implements MST per
                 try {
                     return adapter.parse(data);
                 } catch (RuntimeException cause) {
-                    handler.handle(this.dataType, offset + this.offset, cause, this.error);
+                    handler.handle(this.error, this.dataType, offset + this.offset, cause);
                 }
             }
             return null;
         }
 
-        final String toString(Segment bean) {
-            final T value = this.value(bean);
-            return this.format(value);
-        }
-
-        final T setValue(BSAccessor<V> setter, Segment bean, T value) {
-            final V wrapped = this.wrap(value);
-            if (wrapped != null) {
-                setter.value(bean, wrapped);
-            }
-            return value;
-        }
-
         @Override
-        final PPosition<T, V, D> reverse() throws BeanException {
+        PPosition<T, D> reverse() throws BeanException {
             if (this.isReversible()) {
-                return this.doReverse();
+                return new PPosition<>(this);
             }
             return this;
         }
+    }
 
-        abstract PPosition<T, V, D> doReverse() throws BeanException;
+    /**
+     * Internal {@link Constructor} Parameter
+     */
+    static abstract sealed class IParameter permits OParameter, SParameter, WParameter {
+        static final List<Type> TYPES = List.of(Optional.class, Wrapper.class);
+        final int index;
 
-        /**
-         * Internal representation for {@link Object} property.
-         */
-        static final class PS<T, D extends DataType<D>> extends PPosition<T, T, D> {
-            PS(BSAccessor<T> va, D type, int fo, Position pp, Input<D> ps, TypeAdapter<T> pa) throws BeanException {
-                super(va, type, fo, pp, ps, pa);
-            }
-
-            private PS(PS<T, D> source) throws BeanException {
-                super(source, source.defaultValue);
-            }
-
-            @Override
-            T wrap(T value) {
-                return value;
-            }
-
-            @Override
-            T from(T value) {
-                return value;
-            }
-
-            @Override
-            PS<T, D> doReverse() throws BeanException {
-                return new PS<>(this);
-            }
+        private IParameter(int index) {
+            this.index = index;
         }
 
-        /**
-         * Internal representation for {@link Optional} property.
-         */
-        static final class PO<T, D extends DataType<D>> extends PPosition<T, Optional<T>, D> {
-            private final Optional<T> wrapped;
-
-            PO(BSAccessor<Optional<T>> va, D type, int fo, Position pp, Input<D> ps, TypeAdapter<T> pa) throws BeanException {
-                super(va, type, fo, pp, ps, pa);
-                this.wrapped = Optional.ofNullable(defaultValue);
+        static IParameter of(Class<?> type, int index) {
+            if (type == Optional.class) {
+                return new OParameter(index);
             }
-
-            private PO(PO<T, D> source) throws BeanException {
-                super(source, source.defaultValue);
-                this.wrapped = source.wrapped;
+            if (type == Wrapper.class) {
+                return new WParameter(index);
             }
+            return new SParameter(index);
+        }
 
-            @Override
-            Optional<T> wrap(T value) {
-                if (value == defaultValue) {
-                    return wrapped;
+        abstract Object wrap(Object argument);
+    }
+
+    /**
+     * Internal {@link Object} Parameter
+     */
+    private static final class SParameter extends IParameter {
+        private SParameter(int index) {
+            super(index);
+        }
+
+        Object wrap(Object argument) {
+            return argument;
+        }
+    }
+
+    /**
+     * Internal {@link Optional} Parameter
+     */
+    private static final class OParameter extends IParameter {
+        private OParameter(int index) {
+            super(index);
+        }
+
+        Object wrap(Object argument) {
+            return Optional.ofNullable(argument);
+        }
+    }
+
+    /**
+     * Internal {@link Wrapper} Parameter
+     */
+    private static final class WParameter extends IParameter {
+        private WParameter(int index) {
+            super(index);
+        }
+
+        Object wrap(Object argument) {
+            return new Wrapper<>(argument);
+        }
+    }
+
+    /**
+     * Internal Input Processor
+     */
+    abstract static sealed class IProcessor<D extends ITerm<D>> implements MST permits SProcessor, MProcessor, NProcessor {
+
+        private static <D extends ITerm<D>> SProcessor<?, D> build(Container ctx, Annotation ppa) throws BeanException {
+            final Class<? extends Annotation> type = ppa.annotationType();
+            final Processor processor = type.getAnnotation(Processor.class);
+            final Class<? extends InputProcessor<?>> pType = processor.value();
+            final Class<?> support = getTypeArgument(pType, InputProcessor.class, 0, void.class);
+            if (type != support) {
+                final CharSequence cn = getTypeName(type);
+                throw new BeanException(type, "@Processor[value] must implements InputProcessor<" + cn + ">");
+            }
+            final InputProcessor<Annotation> delegate = Container.from(ctx, pType, processor.name());
+            return new SProcessor<>(delegate, processor.skip(), ppa);
+        }
+
+        static <D extends ITerm<D>> IProcessor<D> build(Container ctx, Field pf, Position pc) throws BeanException {
+            final List<SProcessor<?, D>> result = new LinkedList<>();
+            if (!undefined(pc)) {
+                result.addFirst(build(ctx, pc));
+            }
+            for (final Annotation ppa : pf.getAnnotations()) {
+                final Class<? extends Annotation> type = ppa.annotationType();
+                if (type != Position.class && type.isAnnotationPresent(Processor.class)) {
+                    result.addLast(build(ctx, ppa));
                 }
-                return Optional.ofNullable(value);
             }
-
-            @Override
-            T from(Optional<T> value) {
-                return value.orElse(null);
+            if (result.isEmpty()) {
+                //noinspection unchecked
+                return (IProcessor<D>) NProcessor.INSTANCE;
             }
-
-            @Override
-            PO<T, D> doReverse() throws BeanException {
-                return new PO<>(this);
+            if (result.size() == 1) {
+                return result.getFirst();
             }
+            return new MProcessor<>(result);
         }
 
-        /**
-         * Internal representation for {@link Optional} property.
-         */
-        static final class PW<T, D extends DataType<D>> extends PPosition<T, Wrapper<T>, D> {
-            PW(BSAccessor<Wrapper<T>> va, D type, int fo, Position pp, Input<D> ps, TypeAdapter<T> pa) throws BeanException {
-                super(va, type, fo, pp, ps, pa);
-            }
+        abstract String process(String value, int offset, PPosition<?, D> property, EventHandler<D> handler);
+    }
 
-            private PW(PW<T, D> source) throws BeanException {
-                super(source, source.defaultValue);
-            }
+    /**
+     * Internal Multiple Processor
+     */
+    private static final class MProcessor<D extends ITerm<D>> extends IProcessor<D> {
+        private final List<SProcessor<?, D>> processors;
 
-            @Override
-            Wrapper<T> wrap(T value) {
-                return new Wrapper<>(value);
-            }
+        private MProcessor(List<SProcessor<?, D>> processors) {
+            this.processors = List.copyOf(processors);
+        }
 
-            @Override
-            T from(Wrapper<T> value) {
-                return value.get();
+        @Override
+        public String process(String value, int offset, PPosition<?, D> property, EventHandler<D> handler) {
+            for (final SProcessor<?, D> processor : processors) {
+                value = processor.process(value, offset, property, handler);
             }
+            return value;
+        }
+    }
 
-            @Override
-            PW<T, D> doReverse() throws BeanException {
-                return new PW<>(this);
+    /**
+     * Internal Single Processor
+     */
+    private static final class SProcessor<A extends Annotation, D extends ITerm<D>> extends IProcessor<D> {
+        private final A config;
+        private final InputProcessor<A> delegate;
+        private final Class<? extends RuntimeException> skip;
+
+        private SProcessor(InputProcessor<A> delegate, Class<? extends RuntimeException> skip, A config) {
+            this.delegate = delegate;
+            this.config = config;
+            this.skip = skip;
+        }
+
+        @Override
+        public String process(String value, int offset, PPosition<?, D> property, EventHandler<D> handler) {
+            try {
+                return delegate.process(value, config);
+            } catch (RuntimeException cause) {
+                offset += property.offset;
+                if (property.error != null) {
+                    handler.handle(property.error, property.dataType, offset, cause);
+                } else {
+                    final EventLevel level = () -> skip.isInstance(cause) ? WARNING : ERROR;
+                    handler.handle(level, () -> EC_PROCESSOR, property.dataType, offset, cause);
+                }
+                return value;
             }
         }
     }
 
+    /**
+     * Internal None Processor
+     */
+    private static final class NProcessor<D extends ITerm<D>> extends IProcessor<D> {
+        private static final NProcessor<?> INSTANCE = new NProcessor<>();
+
+        private NProcessor() {
+        }
+
+        @Override
+        public String process(String value, int offset, PPosition<?, D> property, EventHandler<D> handler) {
+            return value;
+        }
+    }
 }

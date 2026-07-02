@@ -7,8 +7,8 @@ import io.github.up2jakarta.csv.core.FullImporter;
 import io.github.up2jakarta.csv.fmt.Fixed06Generator;
 import io.github.up2jakarta.csv.fmt.Fixed13Generator;
 import io.github.up2jakarta.lov.core.BeanException;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import io.github.up2jakarta.test.impl.dto.Invoice;
 import io.github.up2jakarta.test.impl.dto.Item;
 import org.junit.jupiter.api.Test;
@@ -20,12 +20,12 @@ import static io.github.up2jakarta.csv.core.ModeType.FULL;
 import static io.github.up2jakarta.test.fmt.misc.Tests.assertInvoice;
 import static org.junit.jupiter.api.Assertions.*;
 
-public abstract class AFullTest<T extends Invoice, R extends IFullRecord<SegmentType, ?>, E extends IEvent<GroupType>> extends ABusinessTest<T, R, E> {
+public abstract class AFullTest<T extends Invoice, R extends IFullRecord<SegmentType>, E extends IEvent<TermType>> extends ABusinessTest<T, R, E> {
 
-    protected final FullImporter<GroupType, SegmentType, T, R, E> importer;
-    protected final FullExporter<GroupType, SegmentType, T> exporter;
+    protected final FullImporter<TermType, SegmentType, T, R, E> importer;
+    protected final FullExporter<TermType, SegmentType, T> exporter;
 
-    protected AFullTest(FullImporter<GroupType, SegmentType, T, R, E> importer) throws BeanException {
+    protected AFullTest(FullImporter<TermType, SegmentType, T, R, E> importer) throws BeanException {
         super(FULL, importer);
         this.importer = importer;
         this.exporter = importer.toExporter();

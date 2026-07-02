@@ -10,7 +10,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TradePaymentTermsType", propOrder = {
         "description",
         "dueDateDateTime",
@@ -19,14 +19,16 @@ import javax.annotation.processing.Generated;
 public class TradePaymentTermsType {
 
     // BT-20
+    @XmlElement(name = "Description")
     private String description;
 
+    @XmlElement(name = "DueDateDateTime")
     private DateTimeType dueDateDateTime;
 
     // BT-89
+    @XmlElement(name = "DirectDebitMandateID")
     private String directDebitMandateId;
 
-    @XmlElement(name = "Description")
     public String getDescription() {
         return this.description;
     }
@@ -35,7 +37,6 @@ public class TradePaymentTermsType {
         this.description = description;
     }
 
-    @XmlElement(name = "DueDateDateTime")
     public DateTimeType getDueDateDateTime() {
         return this.dueDateDateTime;
     }
@@ -44,7 +45,6 @@ public class TradePaymentTermsType {
         this.dueDateDateTime = dueDateDateTime;
     }
 
-    @XmlElement(name = "DirectDebitMandateID")
     public String getDirectDebitMandateId() {
         return this.directDebitMandateId;
     }

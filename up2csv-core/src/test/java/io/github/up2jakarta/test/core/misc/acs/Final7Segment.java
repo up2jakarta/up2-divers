@@ -1,8 +1,8 @@
 package io.github.up2jakarta.test.core.misc.acs;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Creator;
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.test.core.misc.acs.Final1Segment.Source;
 
 public record Final7Segment(@Position(0) String code, Source source) implements Segment {

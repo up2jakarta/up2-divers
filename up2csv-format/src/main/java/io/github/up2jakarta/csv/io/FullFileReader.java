@@ -1,12 +1,12 @@
 package io.github.up2jakarta.csv.io;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IFullRecord;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.FullImporter;
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.data.ITerm;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
@@ -16,21 +16,23 @@ import java.util.Objects;
  * Base CSV file {@link ModeType#FULL} reader implementation.
  *
  * @param <T> the business object type
- * @param <B> the input data type
+ * @param <B> the business term type
  * @param <I> the segment type
  * @param <R> the record type
  * @param <E> the error type
  */
-public abstract class FullFileReader<T extends Segment, B extends DataType<B>, I extends IType<B, I>, R extends IFullRecord<I, ?>, E extends IEvent<B>> extends BaseFileReader<T, B, I, R, E> {
+public abstract class FullFileReader<T extends Segment, B extends ITerm<B>, I extends Enum<I> & IType<I>, R extends IFullRecord<I>, E extends IEvent<B>> extends AbstractReader<T, B, I, R, E> {
 
     protected FullFileReader(FullImporter<B, I, T, R, E> importer, CSVFormat format, String... nullValues) {
         super(importer, format, nullValues);
     }
 
     @Override
-    final R create(CSVRecord source, I type, String[] data) {
+    final R transform(CSVRecord source) {
         final String[] values = source.values();
-        return this.create(source.getRecordNumber(), values[0], type, values[2], data);
+        final String rid = values[0];
+        final String bid = values[2];
+        return importer.transform((t, d) -> this.create(source.getRecordNumber(), rid, t, bid, d), values);
     }
 
     @Override

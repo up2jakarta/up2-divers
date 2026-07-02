@@ -10,7 +10,7 @@ import javax.annotation.processing.Generated;
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
 @XmlTransient
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DocumentContextParameterType", propOrder = {"id"})
 public abstract class DocumentContextParameterType<I> {
 

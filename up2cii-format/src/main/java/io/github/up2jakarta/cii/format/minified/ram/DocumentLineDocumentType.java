@@ -10,7 +10,7 @@ import java.util.List;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DocumentLineDocumentType", propOrder = {
         "lineId",
         "includedNote"
@@ -18,12 +18,13 @@ import java.util.List;
 public class DocumentLineDocumentType {
 
     // BT-126
+    @XmlElement(name = "LineID")
     private String lineId;
 
     // BT-127-00
+    @XmlElement(name = "IncludedNote")
     private List<NoteType> includedNote;
 
-    @XmlElement(name = "LineID")
     public String getLineId() {
         return this.lineId;
     }
@@ -32,7 +33,6 @@ public class DocumentLineDocumentType {
         this.lineId = lineId;
     }
 
-    @XmlElement(name = "IncludedNote")
     public List<NoteType> getIncludedNote() {
         return this.includedNote;
     }

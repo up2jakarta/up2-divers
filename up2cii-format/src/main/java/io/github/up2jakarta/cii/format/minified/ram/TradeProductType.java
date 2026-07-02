@@ -11,7 +11,7 @@ import java.util.List;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TradeProductType", propOrder = {
         "globalId",
         "sellerAssignedId",
@@ -25,28 +25,35 @@ import java.util.List;
 public class TradeProductType {
 
     // BT-157
+    @XmlElement(name = "GlobalID")
     private PartyIDType globalId;
 
     // BT-155
+    @XmlElement(name = "SellerAssignedID")
     private String sellerAssignedId;
 
     // BT-156
+    @XmlElement(name = "BuyerAssignedID")
     private String buyerAssignedId;
 
     // BT-153
+    @XmlElement(name = "Name")
     private String name;
 
     // BT-154
+    @XmlElement(name = "Description")
     private String description;
 
     // BG-32
+    @XmlElement(name = "ApplicableProductCharacteristic")
     private List<ProductCharacteristicType> applicableProductCharacteristic;
 
+    @XmlElement(name = "DesignatedProductClassification")
     private ProductClassificationType designatedProductClassification;
 
+    @XmlElement(name = "OriginTradeCountry")
     private TradeCountryType originTradeCountry;
 
-    @XmlElement(name = "GlobalID")
     public PartyIDType getGlobalId() {
         return this.globalId;
     }
@@ -55,7 +62,6 @@ public class TradeProductType {
         this.globalId = globalId;
     }
 
-    @XmlElement(name = "SellerAssignedID")
     public String getSellerAssignedId() {
         return this.sellerAssignedId;
     }
@@ -64,7 +70,6 @@ public class TradeProductType {
         this.sellerAssignedId = sellerAssignedId;
     }
 
-    @XmlElement(name = "BuyerAssignedID")
     public String getBuyerAssignedId() {
         return this.buyerAssignedId;
     }
@@ -73,7 +78,6 @@ public class TradeProductType {
         this.buyerAssignedId = buyerAssignedId;
     }
 
-    @XmlElement(name = "Name")
     public String getName() {
         return this.name;
     }
@@ -82,7 +86,6 @@ public class TradeProductType {
         this.name = name;
     }
 
-    @XmlElement(name = "Description")
     public String getDescription() {
         return this.description;
     }
@@ -91,7 +94,6 @@ public class TradeProductType {
         this.description = description;
     }
 
-    @XmlElement(name = "ApplicableProductCharacteristic")
     public List<ProductCharacteristicType> getApplicableProductCharacteristic() {
         return this.applicableProductCharacteristic;
     }
@@ -100,7 +102,6 @@ public class TradeProductType {
         this.applicableProductCharacteristic = applicableProductCharacteristic;
     }
 
-    @XmlElement(name = "DesignatedProductClassification")
     public ProductClassificationType getDesignatedProductClassification() {
         return this.designatedProductClassification;
     }
@@ -109,7 +110,6 @@ public class TradeProductType {
         this.designatedProductClassification = designatedProductClassification;
     }
 
-    @XmlElement(name = "OriginTradeCountry")
     public TradeCountryType getOriginTradeCountry() {
         return this.originTradeCountry;
     }

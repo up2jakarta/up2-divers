@@ -10,8 +10,7 @@ import java.util.function.Consumer;
 import static io.github.up2jakarta.lov.core.AccessException.notNull;
 import static io.github.up2jakarta.lov.core.Beans.cast;
 import static io.github.up2jakarta.lov.core.Beans.getTypeArgument;
-import static java.lang.reflect.Modifier.isFinal;
-import static java.lang.reflect.Modifier.isStatic;
+import static java.lang.reflect.Modifier.*;
 
 /**
  * Simple implementation of {@link CodeListProvider} that supports {@link Enum} values registry
@@ -27,11 +26,11 @@ public final class ConstantProvider extends CodeListProvider<CodeList<?>> {
 
     private static boolean isValid(Field field) {
         final int fms = field.getModifiers();
-        if (!isStatic(fms) || !isFinal(fms)) {
-            return false;
+        if (isStatic(fms) && isFinal(fms) && !field.isSynthetic()) {
+            final Deprecated config = field.getAnnotation(Deprecated.class);
+            return (config == null || !config.exclude());
         }
-        final Deprecated config = field.getAnnotation(Deprecated.class);
-        return (config == null || !config.exclude());
+        return false;
     }
 
     @SuppressWarnings("unchecked")
@@ -40,7 +39,9 @@ public final class ConstantProvider extends CodeListProvider<CodeList<?>> {
         for (final Field field : nd.getDeclaredFields()) {
             if (isValid(field)) {
                 try {
-                    field.setAccessible(true);
+                    if (!isPublic(field.getModifiers())) {
+                        field.setAccessible(true);
+                    }
                     final Object constant = field.get(null);
                     if (type.isInstance(constant)) {
                         cl.accept((C) constant);

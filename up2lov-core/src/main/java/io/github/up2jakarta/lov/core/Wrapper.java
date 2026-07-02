@@ -7,8 +7,31 @@ import java.util.function.Supplier;
 
 /**
  * Alternative of {@link java.util.Optional}, but isn't immutable.
+ * <p>
+ * <b>It should be used in <code>final</code> properties only, like <code>record</code></b>
+ * </p>
+ * {@snippet lang = "java":
+ *       public class BusinessObject {
+ *
+ *            private final Wrapper<String> reference = new Wrapper<>();
+ *
+ *            // ... other properties
+ *
+ *            public Wrapper<String> getReference() {
+ *                 return this.reference;
+ *            }
+ *
+ *            @Deprecated(forRemoval = true)
+ *            public void setReference(String reference) {
+ *                 this.reference.accept(reference);
+ *            }
+ *
+ *            // ... getters and setters
+ *     }
+ *}
  *
  * @param <T> the value type
+ * @see Beans#unwrapType(java.lang.reflect.Field, java.lang.reflect.Type...)
  */
 public final class Wrapper<T> implements Supplier<T>, Consumer<T> {
 
@@ -64,6 +87,16 @@ public final class Wrapper<T> implements Supplier<T>, Consumer<T> {
         } else {
             throw causeSupplier.get();
         }
+    }
+
+    /**
+     * @see java.util.Optional#or(Supplier)
+     */
+    public Wrapper<T> orElse(Supplier<? extends T> supplier) {
+        if (this.value == null) {
+            this.value = supplier.get();
+        }
+        return this;
     }
 
     /**

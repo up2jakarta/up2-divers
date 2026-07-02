@@ -13,7 +13,7 @@ import static io.github.up2jakarta.job.ctx.FlowSource.STEP;
 import static io.github.up2jakarta.job.ctx.Flows.*;
 
 @SuppressWarnings("unused")
-public abstract class StepListener<T extends ContextAware> extends Timer implements StepExecutionListener {
+public abstract class StepListener<T extends ContextAware> extends Loggable implements StepExecutionListener {
 
     protected final int order;
     protected final T context;
@@ -77,7 +77,7 @@ public abstract class StepListener<T extends ContextAware> extends Timer impleme
         final long failures = this.addFailures(execution);
         final ExitStatus status = this.decide(execution, failures);
         handler.finalize(execution, this.getLogger(), order);
-        super.log(context.toString(), execution.getId());
+        this.logDuration(context.toString(), execution.getId(), execution.getStartTime());
         return status;
     }
 

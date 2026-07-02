@@ -1,193 +1,209 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.api.Container;
 import io.github.up2jakarta.csv.cfg.Truncated;
+import io.github.up2jakarta.csv.core.BSAccessor.Mode;
 import io.github.up2jakarta.csv.core.BSBuilder.MEP;
+import io.github.up2jakarta.csv.core.BSBuilder.MST;
 import io.github.up2jakarta.csv.core.BSNode.Bean;
 import io.github.up2jakarta.csv.core.BSNode.Flat;
-import io.github.up2jakarta.csv.core.BSOperator.BId;
-import io.github.up2jakarta.csv.core.BSOperator.Factory;
-import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
-import io.github.up2jakarta.csv.data.*;
+import io.github.up2jakarta.csv.core.ext.Beans;
+import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.data.TermResolver;
+import io.github.up2jakarta.lov.IException;
 import io.github.up2jakarta.lov.bst.Cache;
-import io.github.up2jakarta.lov.core.*;
+import io.github.up2jakarta.lov.core.AccessException;
+import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.WKCache;
+import jakarta.validation.Validator;
 
-import java.lang.annotation.Annotation;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
 
-import static io.github.up2jakarta.csv.core.BSAccessor.Mode.RO;
-import static io.github.up2jakarta.csv.core.BSAccessor.Mode.WO;
-import static io.github.up2jakarta.csv.core.BSOperator.BId.unknown;
-import static io.github.up2jakarta.csv.core.ext.Beans.isInnerType;
+import static io.github.up2jakarta.csv.core.BSOperator.*;
+import static io.github.up2jakarta.csv.core.ext.Beans.getPermittedTypes;
 import static io.github.up2jakarta.lov.core.AccessException.notNull;
 import static io.github.up2jakarta.lov.core.Beans.getTypeName;
-import static java.lang.String.join;
-import static java.util.function.Predicate.not;
+import static java.util.regex.Pattern.compile;
 
 /**
  * Internal cache manager.
  */
-class BSManager<D extends DataType<D>, S extends Segment> {
+class BSManager<D extends ITerm<D>, S extends Segment> {
 
-    private static final BSManager<?, ?> INSTANCE = new BSManager<>();
+    private static final Map<MKey, BSManager<?, ?>> CACHE = new HashMap<>();
     private final Cache<Key<D, S>, Value<D, S>> cache = new WKCache<>();
 
     private BSManager() {
     }
 
     @SuppressWarnings("unchecked")
-    private static <D extends DataType<D>, S extends Segment> BSManager<D, S> get() {
-        return (BSManager<D, S>) INSTANCE;
+    private static <D extends ITerm<D>, S extends Segment> BSManager<D, S> of(TermResolver<D> r, Validator v) {
+        final MKey key = new MKey(r, v);
+        return (BSManager<D, S>) CACHE.computeIfAbsent(key, k -> new BSManager<D, S>());
     }
 
-    static <D extends DataType<D>, S extends Segment> MBuilder<D, S> of(Factory<?> f, Class<S> t, DataResolver<D> r) {
-        final BSManager<D, S> that = BSManager.get();
-        final Key<D, S> key = new Key<>(t, r);
+    @SuppressWarnings("unchecked")
+    static <D extends ITerm<D>, S extends Segment> BSManager<D, S> of(Factory<D> factory) {
+        return (BSManager<D, S>) factory.manager;
+    }
+
+    static <D extends ITerm<D>, S extends Segment> MBuilder<D, S> mp(Pod<S, D, Flat<S, D>> source) {
+        final BSManager<D, S> that = source.key.manager;
         return new MBuilder<>() {
             @Override
-            public <M extends Pod<S, D, Bean<S, D, ?>>> M build(BCreator<D, S, M> c) throws BeanException {
-                return that.cache.get(key, v -> {
+            public <M extends Pod<S, D, Bean<S, D, ?>>> M build(Validator p, BCreator<D, S, M> c) throws BeanException {
+                return that.cache.get(source.key, v -> {
                     if (v instanceof RO<D, S> ro) {
                         return ro.complete();
                     } else if (v == null) {
-                        return new WO<>(that.build(key, f));
+                        return new RW<>(source.node);
                     }
                     return v;
-                }, (k, v) -> c.apply(k, v.beanValue()));
+                }, (k, v) -> c.apply(p, k, v.beanValue()));
             }
         };
     }
 
-    static <D extends DataType<D>, S extends Segment> MBuilder<D, S> of(Pod<S, D, Flat<S, D>> s) {
-        final BSManager<D, S> that = BSManager.get();
+    static <D extends ITerm<D>, S extends Segment> FBuilder<D, S> ft(Pod<S, D, Bean<S, D, ?>> source) {
+        final BSManager<D, S> that = source.key.manager;
+        return new FBuilder<>() {
+            @Override
+            public <M extends Pod<S, D, Flat<S, D>>> M build(Validator p, FCreator<D, S, M> c) throws BeanException {
+                return that.cache.get(source.key, v -> {
+                    if (v instanceof WO<D, S> wo) {
+                        return wo.complete();
+                    } else if (v == null) {
+                        return new RW<>(source.node);
+                    }
+                    return v;
+                }, (k, v) -> c.apply(p, k, v.flatValue()));
+            }
+        };
+    }
+
+    MBuilder<D, S> mp(Factory<D> factory, Class<S> type) {
+        final Key<D, S> key = new Key<>(type, this);
         return new MBuilder<>() {
             @Override
-            public <M extends Pod<S, D, Bean<S, D, ?>>> M build(BCreator<D, S, M> c) throws BeanException {
-                return that.cache.get(s.key, v -> {
+            public <M extends Pod<S, D, Bean<S, D, ?>>> M build(Validator p, BCreator<D, S, M> c) throws BeanException {
+                return cache.get(key, v -> {
                     if (v instanceof RO<D, S> ro) {
                         return ro.complete();
                     } else if (v == null) {
-                        return new RW<>(s.node);
+                        return new WO<>(mp(factory, key));
                     }
                     return v;
-                }, (k, v) -> c.apply(k, v.beanValue()));
+                }, (k, v) -> c.apply(p, k, v.beanValue()));
             }
         };
     }
 
-    static <D extends DataType<D>, S extends Segment> FBuilder<D, S> ft(Factory<?> f, DataResolver<D> r, Class<S> t) {
-        final BSManager<D, S> that = BSManager.get();
-        final Key<D, S> key = new Key<>(t, r);
+    FBuilder<D, S> ft(Factory<D> factory, Class<S> type) {
+        final Key<D, S> key = new Key<>(type, this);
         return new FBuilder<>() {
             @Override
-            public <M extends Pod<S, D, Flat<S, D>>> M build(FCreator<D, S, M> c) throws BeanException {
-                return that.cache.get(key, v -> {
+            public <M extends Pod<S, D, Flat<S, D>>> M build(Validator p, FCreator<D, S, M> c) throws BeanException {
+                return cache.get(key, v -> {
                     if (v instanceof WO<D, S> wo) {
                         return wo.complete();
                     } else if (v == null) {
-                        return new RO<>(that.build(f, key));
+                        return new RO<>(ft(factory, key));
                     }
                     return v;
-                }, (k, v) -> c.apply(k, v.flatValue()));
+                }, (k, v) -> c.apply(p, k, v.flatValue()));
             }
         };
     }
 
-    static <D extends DataType<D>, S extends Segment> FBuilder<D, S> ft(Pod<S, D, Bean<S, D, ?>> s) {
-        final BSManager<D, S> that = BSManager.get();
-        return new FBuilder<>() {
-            @Override
-            public <M extends Pod<S, D, Flat<S, D>>> M build(FCreator<D, S, M> c) throws BeanException {
-                return that.cache.get(s.key, v -> {
-                    if (v instanceof WO<D, S> wo) {
-                        return wo.complete();
-                    } else if (v == null) {
-                        return new RW<>(s.node);
-                    }
-                    return v;
-                }, (k, v) -> c.apply(k, v.flatValue()));
-            }
-        };
-    }
-
-    private Bean<S, D, ?> build(Key<D, S> key, Factory<?> factory) throws BeanException {
+    private Bean<S, D, ?> mp(Factory<D> factory, Key<D, S> key) throws BeanException {
         final Class<S> type = key.type;
-        final BSContext<D> mc = new BSContext<>(factory, type, WO, key.resolver);
-        final List<BSProperty<?, ?, D>> ps = mc.build();
+        final BSContext<D> mc = new BSContext<>(factory, type, Mode.WO);
+        final List<BSProperty<?, D>> ps = mc.build();
         final Constructor<S> cs = BSContext.from(type, ps);
         if (cs == null) {
             if (type.isRecord()) {
-                return new Bean.JR<>(type, factory.validator, mc.context(), ps);
+                return new Bean.JR<>(type, mc, ps);
             }
-            return new Bean.BM<>(type, factory.validator, mc.context(), ps);
+            return new Bean.BM<>(type, mc, ps);
         }
-        return new Bean.JB<>(type, factory.validator, mc.context(), ps, cs);
+        return new Bean.JB<>(type, mc, ps, cs);
     }
 
-    private Flat<S, D> build(Factory<?> factory, Key<D, S> key) throws BeanException {
+    private Flat<S, D> ft(Factory<D> factory, Key<D, S> key) throws BeanException {
         final Class<S> type = key.type;
-        final BSContext<D> mc = new BSContext<>(factory, type, RO, key.resolver);
-        return new Flat<>(type, factory.validator, mc.context(), mc.build());
+        final BSContext<D> mc = new BSContext<>(factory, type, Mode.RO);
+        return new Flat<>(type, mc, mc.context(), mc.build());
     }
 
-    interface MBuilder<D extends DataType<D>, S extends Segment> {
-        <M extends Pod<S, D, Bean<S, D, ?>>> M build(BCreator<D, S, M> creator) throws BeanException;
+    interface MBuilder<D extends ITerm<D>, S extends Segment> {
+        <M extends Pod<S, D, Bean<S, D, ?>>> M build(Validator validator, BCreator<D, S, M> creator) throws BeanException;
     }
 
-    interface FBuilder<D extends DataType<D>, S extends Segment> {
-        <M extends Pod<S, D, Flat<S, D>>> M build(FCreator<D, S, M> creator) throws BeanException;
+    interface FBuilder<D extends ITerm<D>, S extends Segment> {
+        <M extends Pod<S, D, Flat<S, D>>> M build(Validator validator, FCreator<D, S, M> creator) throws BeanException;
     }
 
-    interface BCreator<D extends DataType<D>, S extends Segment, M extends Pod<S, D, Bean<S, D, ?>>> {
-        M apply(Key<D, S> key, Bean<S, D, ?> node) throws BeanException;
+    @FunctionalInterface
+    interface BCreator<D extends ITerm<D>, S extends Segment, M extends Pod<S, D, Bean<S, D, ?>>> {
+        M apply(Validator validator, Key<D, S> key, Bean<S, D, ?> node) throws BeanException;
     }
 
-    interface FCreator<D extends DataType<D>, S extends Segment, M extends Pod<S, D, Flat<S, D>>> {
-        M apply(Key<D, S> key, Flat<S, D> node) throws BeanException;
+    @FunctionalInterface
+    interface FCreator<D extends ITerm<D>, S extends Segment, M extends Pod<S, D, Flat<S, D>>> {
+        M apply(Validator validator, Key<D, S> key, Flat<S, D> node) throws BeanException;
+    }
+
+    /**
+     * Internal Key
+     */
+    private static final class MKey {
+        private final TermResolver<?> k1;
+        private final Validator k2;
+
+        MKey(TermResolver<?> k1, Validator k2) {
+            this.k1 = k1;
+            this.k2 = k2;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof BSManager.MKey that)) {
+                return false;
+            }
+            return (k1 == that.k1) && (k2 == that.k2);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(k1, k2);
+        }
     }
 
     /**
      * Internal Cache Key
      */
-    static final class Key<D extends DataType<D>, S extends Segment> implements Comparable<Key<D, S>> {
-        private final DataResolver<D> resolver;
+    static final class Key<D extends ITerm<D>, S extends Segment> implements Comparable<Key<D, S>> {
+        private final BSManager<D, S> manager;
         private final Class<S> type;
 
-        private Key(Class<S> type, DataResolver<D> resolver) {
-            this.resolver = notNull(resolver, Up2Factory.class, "resolver");
+        private Key(Class<S> type, BSManager<D, S> manager) {
             this.type = notNull(type, Up2Factory.class, "type");
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            if (other == this) {
-                return true;
-            }
-            if (!(other instanceof Key<?, ?> that)) {
-                return false;
-            }
-            return (this.type == that.type) && (this.resolver == that.resolver);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(type, resolver);
+            this.manager = manager;
         }
 
         @Override
         public int compareTo(Key<D, S> that) {
-            final Class<S> type = that.type;
+            assert manager == that.manager : "same manager";
+            // Fine: generic segment is not allowed
             if (this.type == that.type) {
-                return this.resolver.compareTo(that.resolver);
+                return 0;
             }
-            if (this.type.getName().compareTo(type.getName()) < 1) {
-                return -1;
-            }
-            return 1;
+            return this.type.getName().compareTo(that.type.getName());
         }
 
         @Override
@@ -197,9 +213,99 @@ class BSManager<D extends DataType<D>, S extends Segment> {
     }
 
     /**
+     * Internal Business Factory.
+     */
+    abstract static sealed class Factory<D extends ITerm<D>> permits Up2Factory {
+        private static final List<String> CN_ENTRIES = getPermittedTypes(MEP.class).toList();
+        private static final List<String> EXCLUSIONS = getPermittedTypes(MEP.class, MST.class, Beans.class).toList();
+        private static final Predicate<String> MA = compile("^jdk\\.internal\\.reflect\\.\\w*Accessor\\w*$").asMatchPredicate();
+
+        final Container context;
+        final Validator validator;
+        final TermResolver<D> resolver;
+        private final BSManager<D, ?> manager;
+
+        Factory(Container context, TermResolver<D> resolver) {
+            this.context = notNull(context, Up2Factory.class, "context");
+            this.resolver = notNull(resolver, Up2Factory.class, "resolver");
+            this.validator = defaultValidator(context);
+            this.manager = BSManager.of(resolver, validator);
+        }
+
+        /**
+         * Builds and returns the stack trace of the cause of the specified event.
+         *
+         * @param event the source event
+         * @return the stack-trace if exists
+         */
+        public static Optional<String> trace(IException event) {
+            while (event.getCause() instanceof IException cause) {
+                event = cause;
+            }
+            return Optional.ofNullable(event.getCause()).map(c -> stackTrace(CN_ENTRIES, c).trim());
+        }
+
+        /**
+         * Returns the stack trace of the specified <code>cause</code> exception.
+         * <p>
+         * Notes that the stack elements will be truncated from the given <code>cns</code> entry-point class names
+         *
+         * @param cause       the cause exception
+         * @param entryPoints the list class names of entry-points
+         * @return the stack trace
+         */
+        public static String stackTrace(List<String> entryPoints, Throwable cause) {
+            final StringWriter writer = new StringWriter();
+            stackTrace(entryPoints, cause, "", new PrintWriter(writer));
+            return writer.toString();
+        }
+
+        private static Validator defaultValidator(Container context) {
+            try {
+                return context.getBean(Validator.class);
+            } catch (Exception ignore) {
+            }
+            try {
+                return Up2Factory.validator(null);
+            } catch (Exception ignore) {
+                return null;
+            }
+        }
+
+        private static void stackTrace(List<String> cns, Throwable cause, String prefix, PrintWriter printer) {
+            printer.println(prefix + cause);
+            final StackTraceElement[] traces = cause.getStackTrace();
+            for (final StackTraceElement element : traces) {
+                final String cn = element.getClassName();
+                if (MA.test(cn)) {
+                    break;
+                }
+                if (!EXCLUSIONS.contains(cn)) {
+                    printer.println("\t" + element);
+                }
+                if (cns.contains(cn)) {
+                    break;
+                }
+            }
+            cause = cause.getCause();
+            if (cause != null) {
+                stackTrace(cns, cause, "Caused by ", printer);
+            }
+        }
+
+        <S extends Segment> Mapper<S, D> mp(Class<S> type) throws BeanException {
+            return BSManager.<D, S>of(this).mp(this, type).build(validator, Mapper::new);
+        }
+
+        <S extends Segment> Format<S, D> ft(Class<S> type) throws BeanException {
+            return BSManager.<D, S>of(this).ft(this, type).build(validator, Format::new);
+        }
+    }
+
+    /**
      * Internal Cache Value
      */
-    abstract static sealed class Value<D extends DataType<D>, S extends Segment> permits RO, WO, RW {
+    abstract static sealed class Value<D extends ITerm<D>, S extends Segment> permits RO, WO, RW {
         abstract Flat<S, D> flatValue();
 
         abstract Bean<S, D, ?> beanValue();
@@ -212,7 +318,7 @@ class BSManager<D extends DataType<D>, S extends Segment> {
         }
     }
 
-    private static final class RO<D extends DataType<D>, S extends Segment> extends Value<D, S> {
+    private static final class RO<D extends ITerm<D>, S extends Segment> extends Value<D, S> {
         private final Flat<S, D> value;
 
         private RO(Flat<S, D> value) {
@@ -239,7 +345,7 @@ class BSManager<D extends DataType<D>, S extends Segment> {
         }
     }
 
-    private static final class WO<D extends DataType<D>, S extends Segment> extends Value<D, S> {
+    private static final class WO<D extends ITerm<D>, S extends Segment> extends Value<D, S> {
         private final Bean<S, D, ?> value;
 
         private WO(Bean<S, D, ?> value) {
@@ -266,7 +372,7 @@ class BSManager<D extends DataType<D>, S extends Segment> {
         }
     }
 
-    private static final class RW<D extends DataType<D>, S extends Segment> extends Value<D, S> {
+    private static final class RW<D extends ITerm<D>, S extends Segment> extends Value<D, S> {
         private final Bean<S, D, ?> bValue;
         private final Flat<S, D> fValue;
 
@@ -299,49 +405,32 @@ class BSManager<D extends DataType<D>, S extends Segment> {
     /**
      * Internal Segment Processor.
      */
-    abstract static sealed class Pod<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> implements MEP permits Up2Mapper, Up2Flatter, Node {
+    abstract static sealed class Pod<S extends Segment, D extends ITerm<D>, T extends BSNode<S, D>> implements MEP permits Up2Mapper, Up2Flatter, Node {
+        final T node;
         final int length;
         final int offset;
-        final T node;
+        final boolean validate;
+        final Validator validator;
         private final Key<D, S> key;
 
-        Pod(Key<D, S> key, T node) throws BeanException {
+        Pod(Validator validator, Key<D, S> key, T node) throws BeanException {
             this.key = key;
             this.node = node;
+            this.validator = validator;
             this.length = max(node) + 1;
-            final Truncated truncated = Overrides.get(node.type, Segment.class, Truncated.class);
+            this.validate = node.context.enabled(validator);
+            final Truncated truncated = node.type.getAnnotation(Truncated.class);
             this.offset = (truncated != null) ? truncated.value() : 0;
             if (offset < 0) {
                 throw new BeanException(node.type, "@Truncated[value] must be positive");
             }
         }
 
-        private static void check(List<Bean<?, ?, ?>> stack, Bean<?, ?, ?> node) throws BeanException {
-            final Class<?> t = node.type;
-            if (isInnerType(node.type)) {
-                final Class<?> et = node.type.getEnclosingClass();
-                final Optional<Bean<?, ?, ?>> parent = stack.stream().filter(n -> n.type.equals(et)).findAny();
-                if (parent.isEmpty()) {
-                    var cn = stack.stream().filter(not(Bean.BC.class::isInstance)).map(n -> getTypeName(n.type)).toList();
-                    throw new BeanException(t, "inner class is not allowed outside enclosing segments: " + join(", ", cn));
-                }
-                if (parent.get() instanceof Bean.BC<?, ?> n) {
-                    throw new BeanException(t, "inner class is not allowed inside enclosing segment: " + getTypeName(n.type));
-                }
-            }
-            stack.addLast(node);
-            for (final BSProperty<?, ?, ?> p : node.properties) {
-                if (p instanceof BSProperty.PFragment<?, ?, ?> fp) {
-                    check(stack, (Bean<?, ?, ?>) fp.node);
-                }
-            }
-        }
-
         static int max(BSNode<?, ?> node) {
             int max = -1;
-            for (final BSProperty<?, ?, ?> p : node.properties) {
+            for (final BSProperty<?, ?> p : node.properties) {
                 final int offset;
-                if (p instanceof BSProperty.PFragment<?, ?, ?> fp) {
+                if (p instanceof BSProperty.PFragment<?, ?> fp) {
                     offset = max(fp.node);
                 } else {
                     offset = p.offset;
@@ -353,9 +442,9 @@ class BSManager<D extends DataType<D>, S extends Segment> {
 
         static int min(BSNode<?, ?> node) {
             int min = Integer.MAX_VALUE;
-            for (final BSProperty<?, ?, ?> p : node.properties) {
+            for (final BSProperty<?, ?> p : node.properties) {
                 final int offset;
-                if (p instanceof BSProperty.PFragment<?, ?, ?> fp) {
+                if (p instanceof BSProperty.PFragment<?, ?> fp) {
                     offset = max(fp.node);
                 } else {
                     offset = p.offset;
@@ -366,77 +455,36 @@ class BSManager<D extends DataType<D>, S extends Segment> {
         }
 
         protected void check(Bean<S, D, ?> node) throws BeanException {
-            check(new LinkedList<>(), node);
-        }
-    }
-
-    /**
-     * Internal Business Processor.
-     */
-    abstract static sealed class Node<S extends Segment, D extends DataType<D>, T extends BSNode<S, D>> extends Pod<S, D, T> permits Mapper, Format {
-        final BId<Segment, Object> businessId;
-        final boolean hasBusinessId;
-
-        Node(BSAccessor.Mode mode, Key<D, S> key, T node) throws BeanException {
-            super(key, node);
-            this.businessId = this.id(BusinessId.class, mode).or(() -> unknown(node.type));
-            this.hasBusinessId = this.businessId.supports(BSAccessor.Mode.RO);
+            BeanChecker.check(new LinkedList<>(), node);
         }
 
-        <A extends Annotation> Wrapper<BId<Segment, Object>> id(Class<A> type, BSAccessor.Mode mode) throws BeanException {
-            final Wrapper<BId<Segment, Object>> result = new Wrapper<>();
-            BSBuilder.id(node, type, (fs, pp) -> {
-                if (result.isPresent()) {
-                    throw new BeanException(node.type, "multiple @" + getTypeName(type) + " are found");
+        /**
+         * Returns {@code true} if the specified arguments have the same business identifiers and {@code false} otherwise.
+         *
+         * @param first  the first segment
+         * @param second the second segment
+         * @return {@code true} if the arguments have the same business identifiers and {@code false} otherwise
+         * @see Object#equals(Object)
+         */
+        public final boolean equals(S first, S second) {
+            if (first == second) {
+                return true;
+            } else if (first == null || second == null) {
+                return false;
+            } else if (node.bsIds.isEmpty()) {
+                return first.equals(second);
+            }
+            for (final PId<D> key : node.bsIds) {
+                try {
+                    if (!Objects.equals(key.get(first), key.get(second))) {
+                        return false;
+                    }
+                } catch (RuntimeException ex) {
+                    return false;
                 }
-                result.accept(BSProperty.id(mode, fs, pp));
-            });
-            return result;
-        }
-    }
-
-    /**
-     * Internal Business Flatter.
-     */
-    static final class Format<S extends Segment, D extends DataType<D>> extends Node<S, D, Flat<S, D>> {
-        Format(Key<D, S> key, Flat<S, D> node) throws BeanException {
-            super(BSAccessor.Mode.RO, key, node);
-        }
-
-        Mapper<S, D> reverse() throws BeanException {
-            return BSManager.of(this).build(Mapper::new);
-        }
-    }
-
-    /**
-     * Internal Business Mapper.
-     */
-    static final class Mapper<S extends Segment, D extends DataType<D>> extends Node<S, D, Bean<S, D, ?>> {
-        final BId<Segment, Object> parentId;
-        final boolean hasParentId;
-
-        Mapper(Key<D, S> key, Bean<S, D, ?> node) throws BeanException {
-            super(BSAccessor.Mode.WO, key, node);
-            this.check(node);
-            this.parentId = this.id(ParentId.class, BSAccessor.Mode.WO).or(BId::undefined);
-            this.hasParentId = parentId.supports(BSAccessor.Mode.RO);
-        }
-
-        <R extends IRecord<?>> S map(R record, int offset, boolean validate, BusinessHandler<D> handler) {
-            var data = record.getData();
-            if (data == null) {
-                data = new String[0];
             }
-            final S bean = node.parse(handler, offset, data);
-            node.update(bean, record);
-            if (validate) {
-                node.validate(bean, offset, handler);
-            }
-            return bean;
-        }
-
-        public Format<S, D> reverse() throws BeanException {
-            return BSManager.ft(this).build(Format::new);
+            return true;
         }
     }
+
 }

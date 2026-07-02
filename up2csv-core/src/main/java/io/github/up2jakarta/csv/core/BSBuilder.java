@@ -1,41 +1,50 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.api.ext.InputProcessor;
+import io.github.up2jakarta.csv.BusinessLink;
+import io.github.up2jakarta.csv.ReferenceId;
+import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.api.Container;
+import io.github.up2jakarta.csv.api.Linker;
+import io.github.up2jakarta.csv.api.Overlink;
 import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.api.ext.TypeListener;
-import io.github.up2jakarta.csv.api.hdl.EventLevel;
-import io.github.up2jakarta.csv.cfg.*;
+import io.github.up2jakarta.csv.cfg.Checker;
+import io.github.up2jakarta.csv.cfg.Error;
+import io.github.up2jakarta.csv.cfg.Fragment;
+import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.core.BSAccessor.Mode;
+import io.github.up2jakarta.csv.core.BSLink.RId;
+import io.github.up2jakarta.csv.core.BSLink.VId;
 import io.github.up2jakarta.csv.core.BSManager.Pod;
+import io.github.up2jakarta.csv.core.BSOperator.BId;
+import io.github.up2jakarta.csv.core.BSProperty.IProcessor;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
-import io.github.up2jakarta.csv.core.hdl.EventHandler;
-import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.lov.TypeAdapter;
+import io.github.up2jakarta.csv.core.BusinessImporter.Item;
+import io.github.up2jakarta.csv.core.ext.Beans;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.lov.core.Wrapper;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
-import jakarta.validation.Valid;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.lang.reflect.*;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
-import static io.github.up2jakarta.csv.api.IEvent.EC_PROCESSOR;
-import static io.github.up2jakarta.csv.core.BSBuilder.Input.*;
-import static io.github.up2jakarta.csv.core.BSOperator.BId;
+import static io.github.up2jakarta.csv.core.BeanAccessor.IGetter;
+import static io.github.up2jakarta.csv.core.BeanAccessor.ISetter;
 import static io.github.up2jakarta.csv.core.ext.Beans.*;
-import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
-import static io.github.up2jakarta.lov.SeverityType.ERROR;
-import static io.github.up2jakarta.lov.SeverityType.WARNING;
 import static io.github.up2jakarta.lov.core.Localizable.CLASS;
-import static java.util.Collections.unmodifiableList;
+import static io.github.up2jakarta.lov.core.Overrides.get;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 
 /**
  * Internal business builder.
@@ -46,75 +55,33 @@ final class BSBuilder {
     private BSBuilder() {
     }
 
-    private static Class<?> checkProperty(Field field, Type type, Position csv) throws BeanException {
-        if (csv.value() < 0) {
-            throw new BeanException(field, "@Position[value] must be positive");
-        }
-        if (field.isAnnotationPresent(Valid.class)) {
-            throw new BeanException(field, "must not be annotated with @Valid");
-        }
-        if (field.getAnnotationsByType(ValidOverride.class).length != 0) {
-            throw new BeanException(field, "must not be annotated with @ValidOverride");
-        }
-        if (field.getAnnotationsByType(PositionOverride.class).length != 0) {
-            throw new BeanException(field, "must not be annotated with @PositionOverride");
-        }
-        if (field.getAnnotationsByType(FragmentOverride.class).length != 0) {
-            throw new BeanException(field, "must not be annotated with @FragmentOverride");
-        }
+    private static Class<?> getClass(Field field, Type type, Position csv) throws BeanException {
+        BeanChecker.check(field, csv);
         return getPropertyClass(field, type);
+    }
+
+    private static Class<? extends Segment> getClass(Field field, Type type, Fragment csv) throws BeanException {
+        final Class<?> fType = getPropertyClass(field, type);
+        BeanChecker.check(field, fType, csv);
+        return (Class<? extends Segment>) fType;
     }
 
     private static Method getRepeatableValue(Class<? extends Annotation> annotationType) throws BeanException {
         final Repeatable repeatable = annotationType.getDeclaredAnnotation(Repeatable.class);
         if (repeatable != null) {
-            return getMethod(repeatable.value(), "value", CLASS, "value()");
+            return findMethod(repeatable.value(), "value", CLASS, "value()");
         }
         return null;
     }
 
-    private static Class<? extends Segment> checkFragment(Field field, Type type, Fragment csv) throws BeanException {
-        final Class<?> fType = getPropertyClass(field, type);
-        if (csv.value() < 0) {
-            throw new BeanException(field, "@Fragment[value] must be positive");
-        }
-        if (Segment.class.isAssignableFrom(fType)) {
-            return (Class<? extends Segment>) fType;
-        }
-        throw new BeanException(field, "type must implements Segment");
-    }
-
-    static <D extends DataType<D>> WP<?, D> build(BeanContext ctx, Annotation ppa) throws BeanException {
-        final Class<? extends Annotation> type = ppa.annotationType();
-        final Processor processor = type.getAnnotation(Processor.class);
-        final Class<? extends InputProcessor<?>> pType = processor.value();
-        final Class<?> support = getTypeArgument(pType, InputProcessor.class, 0, void.class);
-        if (type != support) {
-            final CharSequence cn = getTypeName(type);
-            throw new BeanException(type, "@Processor[value] must implements InputProcessor<" + cn + ">");
-        }
-        final InputProcessor<Annotation> delegate = getBean(ctx, pType, processor.name());
-        return new WP<>(delegate, processor.skip(), ppa);
-    }
-
-    static <D extends DataType<D>> Input<D> build(BeanContext ctx, Field pf, Position pc) throws BeanException {
-        final List<WP<?, D>> result = new LinkedList<>();
-        if (!undefined(pc)) {
-            result.addFirst(build(ctx, pc));
-        }
-        for (final Annotation ppa : pf.getAnnotations()) {
-            final Class<? extends Annotation> type = ppa.annotationType();
-            if (type.isAnnotationPresent(Processor.class) && type != Position.class) {
-                result.addLast(build(ctx, ppa));
+    private static AnnotatedType unwrapType(Field field) {
+        final Class<?> ft = field.getType();
+        if (Optional.class == ft || Wrapper.class == ft) {
+            if (field.getAnnotatedType() instanceof AnnotatedParameterizedType apt) {
+                return apt.getAnnotatedActualTypeArguments()[0];
             }
         }
-        if (result.isEmpty()) {
-            return (Input<D>) NP.INSTANCE;
-        }
-        if (result.size() == 1) {
-            return result.getFirst();
-        }
-        return new CP<>(result);
+        return null;
     }
 
     static Optional<AccessType> getAccessType(Optional<AccessType> first, Class<? extends Segment> type) {
@@ -145,42 +112,53 @@ final class BSBuilder {
             if (repeatValue != null && repeatValue.getDeclaringClass().equals(aType)) {
                 try {
                     final A[] indirectArray = (A[]) repeatValue.invoke(annotation);
-                    result.addAll(Arrays.asList(indirectArray));
+                    result.addAll(asList(indirectArray));
                 } catch (Exception t) {
                     throw new BeanException(repeatValue.getDeclaringClass(), t.getMessage());
                 }
             }
             // shortcuts
             final A[] shortcutArray = aType.getAnnotationsByType(type);
-            result.addAll(Arrays.asList(shortcutArray));
+            result.addAll(asList(shortcutArray));
         }
         return result;
     }
 
-    static <A extends Annotation> void id(BSNode<?, ?> pn, Class<A> ct, BIdPath bc, PFragment<Segment, ?, ?>... pp) throws BeanException {
-        for (final BSProperty<?, ?, ?> p : pn.properties) {
-            final A annotation = p.getAnnotation(ct);
-            if (p instanceof PFragment<?, ?, ?> fp) {
-                if (annotation != null) {
+    static <A extends Annotation, B extends ITerm<B>> void id(BSNode<?, B> pn, Class<A> ct, BIdPath<A, B> bc, PFragment<Segment, B>... pp) throws BeanException {
+        for (final BSProperty<?, B> p : pn.properties) {
+            final A config = p.getAnnotation(ct);
+            if (p.getClass() == PFragment.class) {
+                if (config != null) {
                     throw new BeanException(p.getSource(), "must not be annotated with @" + getTypeName(ct));
                 }
-                id(fp.node, ct, bc, concat(pp, (PFragment<Segment, ?, ?>) fp));
-            } else if (annotation != null) {
-                bc.accept(pp, (PPosition<Object, Object, ?>) p);
+                final PFragment<Segment, B> fn = (PFragment<Segment, B>) p;
+                id(fn.node, ct, bc, concat(pp, fn));
+            } else if (config != null) {
+                final PPosition<Object, B> property = (PPosition<Object, B>) p;
+                BeanChecker.check(property, ct);
+                bc.accept(pp, property, config);
             }
         }
     }
 
-    static <D extends DataType<D>> List<BSProperty<?, ?, D>> build(Class<? extends Segment> beanType, BSContext<D> context) throws BeanException {
+    static boolean isAnnotationPresent(Field fp, Class<? extends Annotation>... types) {
+        if (stream(types).anyMatch(fp::isAnnotationPresent)) {
+            return true;
+        }
+        final AnnotatedType at = unwrapType(fp);
+        return at != null && stream(types).anyMatch(at::isAnnotationPresent);
+    }
+
+    static <D extends ITerm<D>> List<BSProperty<?, D>> build(Class<? extends Segment> beanType, BSContext<D> context) throws BeanException {
         if (context.push(beanType)) {
             throw new BeanException(beanType, "cyclic fragment is not allowed");
         }
-        final List<BSProperty<?, ?, D>> result = new LinkedList<>();
+        final List<BSProperty<?, D>> result = new LinkedList<>();
         final Class<?> superClass = beanType.getSuperclass();
         if (Segment.class.isAssignableFrom(superClass)) {
             final Class<? extends Segment> superType = (Class<? extends Segment>) superClass;
             final BSContext<D> superContext = context.with(superType, beanType.getGenericSuperclass());
-            final List<BSProperty<?, ?, D>> superProperties = build(superType, superContext);
+            final List<BSProperty<?, D>> superProperties = build(superType, superContext);
             superContext.end();
             result.addAll(superProperties);
         }
@@ -190,8 +168,8 @@ final class BSBuilder {
             final Fragment fragment = context.fragment(field);
             final Position position = context.position(field);
             if (fragment != null) {
-                final Class<? extends Segment> fType = checkFragment(field, fieldType, fragment);
-                final List<BSProperty<?, ?, D>> fps = build(fType, context.with(field, fragment, fType));
+                final Class<? extends Segment> fType = getClass(field, fieldType, fragment);
+                final List<BSProperty<?, D>> fps = build(fType, context.with(field, fragment, fType));
                 if (!(fragment.nullable() && fps.isEmpty())) {
                     try {
                         result.add(context.node(fType, field, fragment, fps));
@@ -200,10 +178,10 @@ final class BSBuilder {
                     }
                 }
             } else if (position != null) {
-                final Class<?> fieldClass = checkProperty(field, fieldType, position);
-                final BSProperty<?, ?, D> property = context.property(fieldClass, field, position);
+                final Class<?> fieldClass = getClass(field, fieldType, position);
+                final BSProperty<?, D> property = context.property(fieldClass, field, position);
                 result.add(property);
-            } else {
+            } else if (!field.isSynthetic() && !isStatic(field.getModifiers())) {
                 final Class<?> type = getPropertyClass(field, fieldType);
                 context.unknown(field, type);
             }
@@ -211,140 +189,132 @@ final class BSBuilder {
         return result;
     }
 
-    interface BIdPath {
-        void accept(PFragment<Segment, ?, ?>[] path, PPosition<Object, Object, ?> property) throws BeanException;
-    }
-
-    /**
-     * Class Marker for Stack Trace.
-     */
-    sealed interface MST permits BSProperty, Input, BSAccessor, BSNode {
-    }
-
-    /**
-     * Class Marker for Entry Point.
-     */
-    sealed interface MEP permits Pod, BId, BeanLinker {
-    }
-
-    /**
-     * Internal Property processor.
-     */
-    abstract static sealed class Input<D extends DataType<D>> implements MST permits WP, CP, NP {
-
-        final <T, V> T parse(PPosition<T, V, D> p, TypeAdapter<T> adapter) throws BeanException {
-            try {
-                final String value = this.process(null, 0, p, null);
-                if (value != null) {
-                    return adapter.parse(value);
-                }
-                return null;
-            } catch (Exception cause) {
-                throw new BeanException(p.getSource(), "@Position[defaultValue] cannot be parsed");
-            }
-        }
-
-        final <T> String format(Member source, T value, TypeAdapter<T> adapter) throws BeanException {
-            try {
-                if (value != null) {
-                    return adapter.format(value);
-                }
-                return null;
-            } catch (Exception cause) {
-                throw new BeanException(source, "@Position[defaultValue] cannot be formatted");
-            }
-        }
-
-        abstract String process(String value, int offset, PPosition<?, ?, D> property, EventHandler<D> handler);
-
-        /**
-         * Internal composite processor.
-         */
-        static final class CP<D extends DataType<D>> extends Input<D> {
-            private final List<WP<?, D>> processors;
-
-            private CP(List<WP<?, D>> processors) {
-                this.processors = unmodifiableList(processors);
-            }
-
-            @Override
-            public String process(String value, int offset, PPosition<?, ?, D> property, EventHandler<D> handler) {
-                for (final WP<?, D> processor : processors) {
-                    value = processor.process(value, offset, property, handler);
-                }
-                return value;
-            }
-        }
-
-        /**
-         * Internal processor wrapper.
-         */
-        static final class WP<A extends Annotation, D extends DataType<D>> extends Input<D> {
-            private final A config;
-            private final InputProcessor<A> delegate;
-            private final Class<? extends RuntimeException> skip;
-
-            private WP(InputProcessor<A> delegate, Class<? extends RuntimeException> skip, A config) {
-                this.delegate = delegate;
-                this.config = config;
-                this.skip = skip;
-            }
-
-            @Override
-            public String process(String value, int offset, PPosition<?, ?, D> property, EventHandler<D> handler) {
-                try {
-                    return delegate.process(value, config);
-                } catch (RuntimeException cause) {
-                    offset += property.offset;
-                    if (property.error != null) {
-                        handler.handle(property.dataType, offset, cause, property.error);
-                    } else {
-                        final EventLevel level = () -> skip.isInstance(cause) ? WARNING : ERROR;
-                        handler.handle(level, () -> EC_PROCESSOR, property.dataType, offset, cause);
+    static <D extends ITerm<D>> void path(List<BSProperty<?, D>> ps, List<Field> fs, int index, Consumer<PFragment<?, D>> fc) {
+        if (index < fs.size()) {
+            final Field current = fs.get(index);
+            for (BSProperty<?, D> p : ps) {
+                if (p.getClass() == PFragment.class) {
+                    final PFragment<?, D> fr = (PFragment<?, D>) p;
+                    if (current == fr.getSource()) {
+                        fc.accept(fr);
+                        path(fr.node.properties, fs, index + 1, fc);
+                        break;
                     }
-                    return value;
                 }
-            }
-        }
-
-        /**
-         * Internal Null wrapper.
-         */
-        static final class NP<D extends DataType<D>> extends Input<D> {
-            private static final NP<?> INSTANCE = new NP<>();
-
-            private NP() {
-            }
-
-            @Override
-            public String process(String value, int offset, PPosition<?, ?, D> property, EventHandler<D> handler) {
-                return value;
             }
         }
     }
 
+    static Error getError(Class<Segment> type) throws BeanException {
+        final Error tc = get(type, Segment.class, Error.class);
+        if (tc == null) {
+            throw new BeanException(type, "must be annotated with @Error");
+        }
+        return tc;
+    }
+
+    static Error getError(Field field, Class<Segment> type) throws BeanException {
+        final Error fc = field.getAnnotation(Error.class);
+        if (fc == null) {
+            final Error tc = get(type, Segment.class, Error.class);
+            if (tc == null) {
+                throw new BeanException(field, "must be annotated with @Error");
+            }
+            return tc;
+        }
+        return fc;
+    }
+
+    static String name(BusinessLink bl) {
+        return "@BusinessLink(\"" + bl.value() + "\")";
+    }
+
+    static String name(Overlink bl) {
+        return "@Overlink(@BusinessLink(\"" + bl.value() + "\"))";
+    }
+
+    static String name(ReferenceId id) {
+        return "@ReferenceId(\"" + id.value() + "\")";
+    }
+
+    static Linker getLinker(BusinessLink override, BusinessLink source) {
+        if (override != null && override.bean().value() != BusinessLink.Void.class) {
+            return override.bean();
+        }
+        return source.bean();
+    }
+
+    static Linker getLinker(Overlink override, BusinessLink source) {
+        if (override != null) {
+            return getLinker(override.value(), source);
+        }
+        return source.bean();
+    }
+
+    static Class<? extends Segment> getTarget(Overlink override, BusinessLink source, Linker linker) {
+        if (override != null && (override.value().bean() == linker || override.value().target() != Segment.class)) {
+            return override.value().target();
+        }
+        return source.target();
+    }
+
+    static Class<Segment> linkerType(Class<? extends Segment> pc, Field fp, int max, BusinessLink link) throws BeanException {
+        final Type type = Beans.unwrapType(fp, NO_TYPES);
+        final Class<?> ut = getPropertyClass(fp, type);
+        final Class<?> fc = fp.getDeclaringClass();
+        if (max == 1 && fc.isAssignableFrom(pc) && Segment.class.isAssignableFrom(ut)) {
+            return cast(ut);
+        }
+        throw new BeanException(fp, name(link) + " must provide @Linker");
+    }
+
+    @FunctionalInterface
+    interface BIdPath<A extends Annotation, B extends ITerm<B>> {
+        void accept(PFragment<Segment, B>[] path, PPosition<Object, B> property, A config) throws BeanException;
+    }
+
     /**
-     * Internal composite checker.
+     * Class Marker for Stack Trace
+     */
+    sealed interface MST permits BSAccessor, IProcessor, BSNode, BSProperty {
+    }
+
+    /**
+     * Class Marker for Entry Point
+     */
+    sealed interface MEP permits BSLink, RId, VId, Pod, BId, IGetter, ISetter, Item, Up2Adapter {
+    }
+
+    /**
+     * Internal Composite Checker
      */
     static final class Listener implements TypeContext, TypeListener {
+        private static final Listener RO = new Listener(Mode.RO);
+        private static final Listener WO = new Listener(Mode.WO);
 
         private final TypeListener[] listeners;
         private final TypeContext[] contexts;
+
+        private Listener(Mode mode) {
+            this.listeners = new TypeListener[]{BeanChecker.of(mode)};
+            this.contexts = new TypeContext[1];
+        }
 
         private Listener(TypeListener[] listeners, TypeContext[] contexts) {
             this.listeners = listeners;
             this.contexts = contexts;
         }
 
-        static Listener of(Class<? extends Segment> type, BeanContext context, Mode mode) throws BeanException {
-            if (type.getTypeParameters().length != 0) {
-                throw new BeanException(type, "generic class is not allowed");
+        static Listener of(Class<? extends Segment> type, Container context, Mode mode, boolean ea) throws BeanException {
+            BeanChecker.check(type);
+            if (!ea) {
+                return (mode == Mode.RO) ? RO : WO;
             }
             final Checker[] checkers = getAnnotationsByType(Checker.class, type).toArray(Checker[]::new);
             final List<TypeListener> result = new LinkedList<>();
             result.add(BeanChecker.of(mode));
             for (final Checker checker : checkers) {
-                final TypeListener bean = getBean(context, checker.value(), checker.name());
+                final TypeListener bean = Container.from(context, checker.value(), checker.name());
                 if (bean.isActivated(type)) {
                     result.add(bean);
                 }
@@ -413,4 +383,5 @@ final class BSBuilder {
         }
 
     }
+
 }

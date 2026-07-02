@@ -7,20 +7,22 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "BinaryObjectType", propOrder = {"value"})
 public class BinaryObjectType {
 
     // BT-125
+    @XmlValue
     private byte[] value;
 
     // BT-125-1
+    @XmlAttribute(name = "mimeCode")
     private MimeCodeType mimeCode;
 
     // BT-125-2
+    @XmlAttribute(name = "filename")
     private String filename;
 
-    @XmlValue
     public byte[] getValue() {
         return this.value;
     }
@@ -29,7 +31,6 @@ public class BinaryObjectType {
         this.value = value;
     }
 
-    @XmlAttribute(name = "mimeCode")
     public MimeCodeType getMimeCode() {
         return this.mimeCode;
     }
@@ -38,7 +39,6 @@ public class BinaryObjectType {
         this.mimeCode = mimeCode;
     }
 
-    @XmlAttribute(name = "filename")
     public String getFilename() {
         return this.filename;
     }

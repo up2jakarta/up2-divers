@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.core.ext;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.api.ext.TypeListener;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;

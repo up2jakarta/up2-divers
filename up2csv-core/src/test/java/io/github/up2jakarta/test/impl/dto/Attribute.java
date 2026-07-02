@@ -1,60 +1,41 @@
 package io.github.up2jakarta.test.impl.dto;
 
+import io.github.up2jakarta.csv.BusinessId;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.data.ParentId;
 import io.github.up2jakarta.test.core.misc.Parsable;
-import io.github.up2jakarta.test.impl.GroupType;
-import io.github.up2jakarta.test.impl.InputType;
+import io.github.up2jakarta.test.impl.BusinessType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 
 import static io.github.up2jakarta.lov.SeverityType.WARNING;
+import static io.github.up2jakarta.test.impl.TermType.*;
 
 @Valid
-@Error(value = "CSV-C05", level = WARNING)
-@InputType(GroupType.D005)
-@SuppressWarnings("unused")
+@Error(value = "CSV-C09", level = WARNING)
+@BusinessType(D009)
 public class Attribute extends Parsable {
 
     @Position(0)
-    @Up2Number
-    @NotNull
-    @ParentId
-    private Long itemId;
+    @BusinessId
+    @BusinessType(A001)
+    private final @NotEmpty String key;
 
-    @Position(1)
-    @NotEmpty
-    private String key;
+    @Position(value = 1, required = true)
+    @BusinessType(A002)
+    private final @NotEmpty String value;
 
-    @Position(value = 2, required = true)
-    @NotEmpty
-    private String value;
+    public Attribute(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
 
     public String getKey() {
         return key;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public Long getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(Long itemId) {
-        this.itemId = itemId;
-    }
-
     public String getValue() {
         return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 
 }

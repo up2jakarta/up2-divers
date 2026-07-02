@@ -7,8 +7,7 @@ import io.github.up2jakarta.csv.cfg.Up2Trim;
 
 public class Test7Processor {
 
-    @Up2Token
-    @Up2Trim("undefined")
+    @Up2Token("undefined")
     @Position(value = 0, defaultValue = "default")
     String value;
 

@@ -2,18 +2,16 @@ package io.github.up2jakarta.csv.slv;
 
 import io.github.up2jakarta.csv.api.ext.TypeResolver;
 import io.github.up2jakarta.csv.cfg.Up2Decimal;
+import io.github.up2jakarta.csv.core.Up2Adapter;
 import io.github.up2jakarta.lov.TypeAdapter;
 import io.github.up2jakarta.lov.TypeConverter;
 import io.github.up2jakarta.lov.TypeFormatter;
 import io.github.up2jakarta.lov.core.BeanException;
-import io.github.up2jakarta.lov.core.TypeSupport;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-
-import static java.math.BigDecimal.valueOf;
 
 @Named
 @Singleton
@@ -31,17 +29,17 @@ public final class DecimalResolver implements TypeResolver<Number, Up2Decimal> {
         if (BigDecimal.class.equals(pt)) {
             final TypeConverter<BigDecimal> parser = v -> round(new BigDecimal(v), pc);
             final TypeFormatter<BigDecimal> format = v -> round(v, pc).toString();
-            return new TypeSupport<>(BigDecimal.class, parser, format);
+            return new Up2Adapter<>(BigDecimal.class, parser, format);
         }
         if (Double.class.equals(pt) || double.class.equals(pt)) {
             final TypeConverter<Double> parser = v -> round(new BigDecimal(v), pc).doubleValue();
-            final TypeFormatter<Double> format = v -> round(valueOf(v), pc).toString();
-            return new TypeSupport<>(Double.class, parser, format);
+            final TypeFormatter<Double> format = v -> round(BigDecimal.valueOf(v), pc).toString();
+            return new Up2Adapter<>(Double.class, parser, format);
         }
         if (Float.class.equals(pt) || float.class.equals(pt)) {
             final TypeConverter<Float> parser = v -> round(new BigDecimal(v), pc).floatValue();
-            final TypeFormatter<Float> format = v -> round(valueOf(v), pc).toString();
-            return new TypeSupport<>(Float.class, parser, format);
+            final TypeFormatter<Float> format = v -> round(BigDecimal.valueOf(v), pc).toString();
+            return new Up2Adapter<>(Float.class, parser, format);
         }
         throw new BeanException(pf, "must not be annotated with @Up2Decimal");
     }

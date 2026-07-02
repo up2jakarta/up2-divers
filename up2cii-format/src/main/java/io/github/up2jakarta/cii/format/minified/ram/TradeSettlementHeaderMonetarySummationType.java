@@ -12,7 +12,7 @@ import java.util.List;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TradeSettlementHeaderMonetarySummationType", propOrder = {
         "lineTotalAmount",
         "chargeTotalAmount",
@@ -27,33 +27,41 @@ import java.util.List;
 public class TradeSettlementHeaderMonetarySummationType {
 
     // BT-106
+    @XmlElement(name = "LineTotalAmount")
     private BigDecimal lineTotalAmount;
 
     // BT-108
+    @XmlElement(name = "ChargeTotalAmount")
     private BigDecimal chargeTotalAmount;
 
     // BT-107
+    @XmlElement(name = "AllowanceTotalAmount")
     private BigDecimal allowanceTotalAmount;
 
     // BT-109
+    @XmlElement(name = "TaxBasisTotalAmount")
     private BigDecimal taxBasisTotalAmount;
 
     // BT-110, BT-111
+    @XmlElement(name = "TaxTotalAmount")
     private List<AmountType> taxTotalAmount;
 
     // BT-114
+    @XmlElement(name = "RoundingAmount")
     private BigDecimal roundingAmount;
 
     // BT-112
+    @XmlElement(name = "GrandTotalAmount")
     private BigDecimal grandTotalAmount;
 
     // BT-113
+    @XmlElement(name = "TotalPrepaidAmount")
     private BigDecimal totalPrepaidAmount;
 
     // BT-115
+    @XmlElement(name = "DuePayableAmount")
     private BigDecimal duePayableAmount;
 
-    @XmlElement(name = "LineTotalAmount")
     public BigDecimal getLineTotalAmount() {
         return this.lineTotalAmount;
     }
@@ -62,7 +70,6 @@ public class TradeSettlementHeaderMonetarySummationType {
         this.lineTotalAmount = lineTotalAmount;
     }
 
-    @XmlElement(name = "ChargeTotalAmount")
     public BigDecimal getChargeTotalAmount() {
         return this.chargeTotalAmount;
     }
@@ -71,7 +78,6 @@ public class TradeSettlementHeaderMonetarySummationType {
         this.chargeTotalAmount = chargeTotalAmount;
     }
 
-    @XmlElement(name = "AllowanceTotalAmount")
     public BigDecimal getAllowanceTotalAmount() {
         return this.allowanceTotalAmount;
     }
@@ -80,7 +86,6 @@ public class TradeSettlementHeaderMonetarySummationType {
         this.allowanceTotalAmount = allowanceTotalAmount;
     }
 
-    @XmlElement(name = "TaxBasisTotalAmount")
     public BigDecimal getTaxBasisTotalAmount() {
         return this.taxBasisTotalAmount;
     }
@@ -89,7 +94,6 @@ public class TradeSettlementHeaderMonetarySummationType {
         this.taxBasisTotalAmount = taxBasisTotalAmount;
     }
 
-    @XmlElement(name = "TaxTotalAmount")
     public List<AmountType> getTaxTotalAmount() {
         return this.taxTotalAmount;
     }
@@ -98,7 +102,6 @@ public class TradeSettlementHeaderMonetarySummationType {
         this.taxTotalAmount = taxTotalAmount;
     }
 
-    @XmlElement(name = "RoundingAmount")
     public BigDecimal getRoundingAmount() {
         return this.roundingAmount;
     }
@@ -107,7 +110,6 @@ public class TradeSettlementHeaderMonetarySummationType {
         this.roundingAmount = roundingAmount;
     }
 
-    @XmlElement(name = "GrandTotalAmount")
     public BigDecimal getGrandTotalAmount() {
         return this.grandTotalAmount;
     }
@@ -116,7 +118,6 @@ public class TradeSettlementHeaderMonetarySummationType {
         this.grandTotalAmount = grandTotalAmount;
     }
 
-    @XmlElement(name = "TotalPrepaidAmount")
     public BigDecimal getTotalPrepaidAmount() {
         return this.totalPrepaidAmount;
     }
@@ -125,7 +126,6 @@ public class TradeSettlementHeaderMonetarySummationType {
         this.totalPrepaidAmount = totalPrepaidAmount;
     }
 
-    @XmlElement(name = "DuePayableAmount")
     public BigDecimal getDuePayableAmount() {
         return this.duePayableAmount;
     }

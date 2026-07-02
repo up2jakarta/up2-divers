@@ -1,16 +1,36 @@
 package io.github.up2jakarta.csv.api;
 
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.Segment;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
- * Link accessor that's able to link beans of a relationship parent-child (association)
+ * Link accessor that's able to link beans of parent-child relationship (association)
  *
  * @param <C> the child type
  * @param <P> the parent type
+ * @see Linker
  */
-public interface ILinker<C extends Segment, P extends Segment> {
+public interface ILinker<P extends Segment, C extends Segment> {
+
+    /**
+     * Constant holding the positive infinity.
+     */
+    int N = Integer.MAX_VALUE;
+
+    /**
+     * Creates and returns list of the specified <code>element</code> if not <code>null</code>, or else empty list.
+     *
+     * @param element the list element
+     * @return the appropriate list
+     */
+    default List<C> of(C element) {
+        if (element != null) {
+            return List.of(element);
+        }
+        return List.of();
+    }
 
     /**
      * Gets and returns the children memberships from the given parent.

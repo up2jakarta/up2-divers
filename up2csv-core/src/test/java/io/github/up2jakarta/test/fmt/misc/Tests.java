@@ -5,8 +5,8 @@ import io.github.up2jakarta.csv.api.IFastRecord;
 import io.github.up2jakarta.csv.api.IFullRecord;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.hdl.IMutualRecord;
-import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.*;
+import io.github.up2jakarta.csv.core.BusinessExporter.Spec;
 import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
 import io.github.up2jakarta.csv.core.hdl.PropertyFailureCollector;
 import io.github.up2jakarta.csv.data.IMutual;
@@ -16,28 +16,31 @@ import io.github.up2jakarta.csv.fmt.UnitRecord;
 import io.github.up2jakarta.lov.CodeListAdapter;
 import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.BeanException;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.InputRecord;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import io.github.up2jakarta.test.impl.dto.Invoice;
 import io.github.up2jakarta.test.impl.dto.Item;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
 
+import static io.github.up2jakarta.csv.api.ILinker.N;
 import static io.github.up2jakarta.csv.core.ModeType.*;
+import static io.github.up2jakarta.csv.data.MatrixPrinter.CONSOLE;
+import static io.github.up2jakarta.csv.data.MatrixPrinter.MARKDOWN;
 import static io.github.up2jakarta.csv.fmt.Fixed06Generator.FV_SM;
 import static io.github.up2jakarta.lov.SeverityType.FATAL;
 import static io.github.up2jakarta.lov.core.Codes.encodeInt;
 import static io.github.up2jakarta.lov.core.Codes.fixed;
 import static io.github.up2jakarta.test.fmt.misc.ABusinessTest.assertValid;
-import static io.github.up2jakarta.test.impl.GroupType.D001;
-import static io.github.up2jakarta.test.impl.SegmentType.S01;
-import static io.github.up2jakarta.test.impl.SegmentType.S09;
+import static io.github.up2jakarta.test.impl.SegmentType.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.copyOfRange;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,11 +55,11 @@ public final class Tests {
             new String[]{"03", "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"},
             new String[]{"04", "TU2025R0099", "1199", "Software", "2", "120", "100", "20"},
             new String[]{"04", "TU2025R0099", "2299", "Hardware", "1", "600", "500", "100"},
-            new String[]{"90", "TU2025R0099", "1199", "Support", "Yes"},
-            new String[]{"90", "TU2025R0099", "1199", "Duration", "one year"},
-            new String[]{"90", "TU2025R0099", "2299", "Type", "Net"},
-            new String[]{"90", "TU2025R0099", "2299", "Generation", "5th"},
-            new String[]{"06", "TU2025R0099", "90", "10.00", "Delivery fees"},
+            new String[]{"09", "TU2025R0099", "1199", "Support", "Yes"},
+            new String[]{"09", "TU2025R0099", "1199", "Duration", "one year"},
+            new String[]{"09", "TU2025R0099", "2299", "Type", "Net"},
+            new String[]{"09", "TU2025R0099", "2299", "Generation", "5th"},
+            new String[]{"06", "TU2025R0099", "88", "10.00", "Delivery fees"},
             new String[]{"06", "TU2025R0099", "99", "10.00", "Delivery discount"},
             new String[]{"05", "TU2025R0099", "DD", "Due date: 31/12/2025"},
             new String[]{"05", "TU2025R0099", "ES", "S.A. of capital 100.000$"},
@@ -90,10 +93,7 @@ public final class Tests {
     }
 
     private static SegmentType type(String code, SegmentType target) {
-        if ("90".equals(code)) {
-            return S09;
-        }
-        if (target == S01) {
+        if (target == S01 || !code.endsWith("1")) {
             return PARSER.parse(code);
         }
         final char[] result = new char[]{target.getCode().charAt(0), code.charAt(1)};
@@ -105,7 +105,7 @@ public final class Tests {
         return copyOfRange(data, from, data.length);
     }
 
-    private static <T extends Invoice, R extends IRecord<SegmentType>> T aggregate(ModeType mode, BusinessImporter<GroupType, SegmentType, T, R, ?> importer, R[] rows) {
+    private static <T extends Invoice, R extends IRecord<SegmentType>> T aggregate(ModeType mode, BusinessImporter<TermType, SegmentType, T, R, ?> importer, R[] rows) {
         // When Parsing
         final T invoice = importer.parse(rows, (i, r) -> {
             assertEquals(0, r.size());
@@ -124,32 +124,86 @@ public final class Tests {
         return invoice;
     }
 
+    private static void tx(List<Spec<SegmentType, TermType>> specs, ModeType mode) throws IOException {
+        try (final PrintStream out = new PrintStream("./src/test/resources/" + mode + "_SPECS.txt", UTF_8)) {
+            out.printf("Specification of Invoice %s Format", mode);
+            out.println();
+            specs.forEach(s -> {
+                out.println();
+                out.printf(s.term().toString());
+                out.println();
+                out.printf("- Segment: %s", s.key());
+                out.println();
+                out.printf("- Cardinality: %d..%s", s.min(), (s.max() == N) ? "n" : String.valueOf(s.max()));
+                out.println();
+                out.printf("- Class: %s", s.type().getName());
+                out.println();
+                CONSOLE.print(out, s.get());
+            });
+        }
+    }
+
+    private static void md(List<Spec<SegmentType, TermType>> specs, ModeType mode) throws IOException {
+        try (final PrintStream out = new PrintStream("./src/test/resources/" + mode + "_SPECS.md", UTF_8)) {
+            out.printf("# Specification of Invoice `%s` Format", mode);
+            out.println();
+            out.println();
+            specs.forEach(s -> {
+                final int tab = (s.depth() - 1) * 4;
+                final TermType t = s.term();
+                out.printf("%s- `%s` [%s](#%s)", " ".repeat(tab), t.getCode(), t.getName(), t.name().toLowerCase());
+                out.println();
+            });
+            out.println();
+            specs.forEach(s -> {
+                final TermType t = s.term();
+                out.printf("<h2 id=\"%s\">`%s` %s </h2>", t.name().toLowerCase(), t.getCode(), t.getName());
+                out.println();
+                out.println();
+                out.printf("- <b>Segment:</b> `%s` %s", s.key().getCode(), s.key().getName());
+                out.println();
+                out.printf("- <b>Cardinality:</b> `%d..%s`", s.min(), (s.max() == N) ? "n" : String.valueOf(s.max()));
+                out.println();
+                final String cn = s.type().getName();
+                out.printf("- <b>Class:</b> [%s](../java/%s.java)", cn, cn.replace('.', '/'));
+                out.println();
+                out.println();
+                MARKDOWN.print(out, s.get());
+                out.println();
+            });
+        }
+    }
+
     public static void assertReference(ModeType mode, Invoice invoice) {
         assertNotNull(invoice.getRecord());
         if (mode == ModeType.UNIT) {
             if (invoice instanceof Dummy4Invoice || invoice instanceof Dummy5Invoice) {
                 assertNull(invoice.getReference());
-                assertFalse(invoice.getRecord() instanceof IFastRecord<?, ?>);
+                assertFalse(invoice.getRecord() instanceof IFastRecord<?>);
             } else if (invoice instanceof Dummy1Invoice) {
                 // Manual setting : BusinessObject#setReference(String)
                 assertNotNull(invoice.getReference());
                 assertInstanceOf(IFastRecord.class, invoice.getRecord());
-                assertEquals(((IFastRecord<?, ?>) invoice.getRecord()).getPivot(), invoice.getReference());
+                assertEquals(((IFastRecord<?>) invoice.getRecord()).getPivot(), invoice.getReference());
             } else {
                 assertNotNull(invoice.getReference());
                 assertInstanceOf(IFastRecord.class, invoice.getRecord());
-                assertNull(((IFastRecord<?, ?>) invoice.getRecord()).getPivot());
+                assertNull(((IFastRecord<?>) invoice.getRecord()).getPivot());
             }
         } else {
             assertNotNull(invoice.getReference());
             assertInstanceOf(IFastRecord.class, invoice.getRecord());
-            assertEquals(((IFastRecord<?, ?>) invoice.getRecord()).getPivot(), invoice.getReference());
+            assertEquals(((IFastRecord<?>) invoice.getRecord()).getPivot(), invoice.getReference());
         }
     }
 
     public static int offset(ModeType mode, SegmentType type) {
-        if (type.getDataType() == D001 && !type.getClassType().isAnnotationPresent(Truncated.class)) {
-            // keep the invoice key for roots
+        if (type == S01 || type == S11 || type == S41 || type == S51) {
+            // keep the invoice key for roots When @Truncated is absent
+            return mode.getBeanIdIndex();
+        }
+        if (type == S90) {
+            // keep the node key for roots
             return mode.getBeanIdIndex();
         }
         return mode.getLength();
@@ -200,8 +254,8 @@ public final class Tests {
         return result;
     }
 
-    public static <T extends Invoice, R extends IFastRecord<SegmentType, ?>> void assertInvoice(
-            FastImporter<GroupType, SegmentType, T, R, ?> importer, R[] rows
+    public static <T extends Invoice, R extends IFastRecord<SegmentType>> void assertInvoice(
+            FastImporter<TermType, SegmentType, T, R, ?> importer, R[] rows
     ) throws BeanException, IOException {
         // When Parsing
         final T invoice = aggregate(FAST, importer, rows);
@@ -211,8 +265,8 @@ public final class Tests {
         tc.assertEmpty();
     }
 
-    public static <T extends Invoice, R extends IFullRecord<SegmentType, ?>> void assertInvoice(
-            FullImporter<GroupType, SegmentType, T, R, ?> importer, R[] rows
+    public static <T extends Invoice, R extends IFullRecord<SegmentType>> void assertInvoice(
+            FullImporter<TermType, SegmentType, T, R, ?> importer, R[] rows
     ) throws BeanException, IOException {
         // When Parsing
         final T invoice = aggregate(FULL, importer, rows);
@@ -222,8 +276,8 @@ public final class Tests {
         tc.assertEmpty();
     }
 
-    public static <T extends Invoice, R extends IRecord<SegmentType>, E extends IEvent<GroupType>> void assertInvoice(
-            UnitImporter<GroupType, SegmentType, T, R, E> importer, R[] rows
+    public static <T extends Invoice, R extends IRecord<SegmentType>, E extends IEvent<TermType>> void assertInvoice(
+            UnitImporter<TermType, SegmentType, T, R, E> importer, R[] rows
     ) throws BeanException, IOException {
         // When Parsing
         final T invoice = aggregate(UNIT, importer, rows);
@@ -233,13 +287,13 @@ public final class Tests {
         tc.assertEmpty();
     }
 
-    public static class TUCollector extends PropertyFailureCollector<GroupType, TURecord, TUError> {
+    public static class TUCollector extends PropertyFailureCollector<TermType, TURecord, TUError> {
         public TUCollector(TURecord row) {
             super(row, TUError::new, FATAL);
         }
     }
 
-    public static class TURecord extends FullRecord<SegmentType, String> implements IMutualRecord<TUError, TURecord> {
+    public static class TURecord extends FullRecord<SegmentType> implements IMutualRecord<TUError, TURecord> {
 
         private final List<TUError> errors = new LinkedList<>();
 
@@ -259,10 +313,16 @@ public final class Tests {
         }
     }
 
-    public static class TUError extends PropertyEvent<GroupType, TURecord> implements IMutual<TURecord, TUError> {
+    public static class TUError extends PropertyEvent<TermType, TURecord> implements IMutual<TURecord, TUError> {
 
-        public TUError(TURecord row, Integer offset, GroupType type, TypeException cause) {
+        public TUError(TURecord row, Integer offset, TermType type, TypeException cause) {
             super(row, offset, type, cause);
         }
+    }
+
+    public static void specs(BusinessExporter<TermType, SegmentType, Invoice> exporter, ModeType mode) throws IOException {
+        final List<Spec<SegmentType, TermType>> specs = exporter.specs("", "Code", "Name", "Default");
+        tx(specs, mode);
+        md(specs, mode);
     }
 }

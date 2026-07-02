@@ -1,10 +1,10 @@
 package io.github.up2jakarta.test;
 
-import io.github.up2jakarta.csv.core.BeanContext;
+import io.github.up2jakarta.csv.api.Container;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Flatter;
-import io.github.up2jakarta.csv.data.DataResolver;
-import io.github.up2jakarta.csv.data.DynamicType;
+import io.github.up2jakarta.csv.data.HeaderType;
+import io.github.up2jakarta.csv.data.TermResolver;
 import io.github.up2jakarta.csv.fmt.FullError;
 import io.github.up2jakarta.csv.fmt.FullRecord;
 import io.github.up2jakarta.csv.io.SingleWriter;
@@ -41,13 +41,13 @@ public class SingleErrorTests {
     private static final String MSG = "Text cannot be parsed to a LocalDate";
     private static final String TRACE = "java.time.format.DateTimeParseException: " + MSG + " ...";
 
-    private final SingleWriter<TSError, DynamicType> writer;
+    private final SingleWriter<TSError, HeaderType> writer;
     private final CSVFormat format;
 
     @Autowired
-    SingleErrorTests(BeanContext context, CSVFormat fmt) throws BeanException {
-        final Up2Factory<DynamicType> factory = new Up2Factory<>(context, DataResolver.dynamic());
-        final Up2Flatter<TSError, DynamicType> format = factory.format(TSError.class);
+    SingleErrorTests(Container container, CSVFormat fmt) throws BeanException {
+        final Up2Factory<HeaderType> factory = new Up2Factory<>(container, TermResolver.header());
+        final Up2Flatter<TSError, HeaderType> format = factory.flatter(TSError.class);
         this.writer = new SingleWriter<>(format, fmt);
         this.format = fmt;
     }
@@ -114,13 +114,13 @@ public class SingleErrorTests {
         assertEquals(MAX, i - 1);
     }
 
-    public static class TSError extends FullError<DynamicType, String, TSRecord> {
+    public static class TSError extends FullError<HeaderType, TSRecord> {
         public TSError(TSRecord row, int order, String code) {
             super(row, order, null, 3, new TypeException(ERROR, code, MSG), TRACE);
         }
     }
 
-    public static class TSRecord extends FullRecord<SegmentType, String> {
+    public static class TSRecord extends FullRecord<SegmentType> {
         public TSRecord(String rowKey, SegmentType type, String invoiceNumber, String... data) {
             super(rowKey, type, invoiceNumber, data);
         }

@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TradePriceType", propOrder = {
         "chargeAmount",
         "basisQuantity",
@@ -20,14 +20,16 @@ import java.math.BigDecimal;
 public class TradePriceType {
 
     // BT-146, BT-148
+    @XmlElement(name = "ChargeAmount", required = true)
     private BigDecimal chargeAmount;
 
     // BT-149
+    @XmlElement(name = "BasisQuantity")
     private QuantityType basisQuantity;
 
+    @XmlElement(name = "AppliedTradeAllowanceCharge")
     private TradeAllowanceChargeType appliedTradeAllowanceCharge;
 
-    @XmlElement(name = "ChargeAmount", required = true)
     public BigDecimal getChargeAmount() {
         return this.chargeAmount;
     }
@@ -36,7 +38,6 @@ public class TradePriceType {
         this.chargeAmount = chargeAmount;
     }
 
-    @XmlElement(name = "BasisQuantity")
     public QuantityType getBasisQuantity() {
         return this.basisQuantity;
     }
@@ -45,7 +46,6 @@ public class TradePriceType {
         this.basisQuantity = basisQuantity;
     }
 
-    @XmlElement(name = "AppliedTradeAllowanceCharge")
     public TradeAllowanceChargeType getAppliedTradeAllowanceCharge() {
         return this.appliedTradeAllowanceCharge;
     }

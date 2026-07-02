@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.core.ext;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.api.ext.TypeListener;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -38,7 +38,7 @@ public final class JpaColumnChecker implements TypeListener {
     }
 
     static String getPrefix(AnnotatedElement source) throws BeanException {
-        final Prefix config = source.getAnnotation(Prefix.class);
+        final Up2Prefix config = source.getAnnotation(Up2Prefix.class);
         if (config != null && !config.value().isBlank()) {
             final String prefix = config.value();
             if (!prefix.equals(prefix.toUpperCase())) {

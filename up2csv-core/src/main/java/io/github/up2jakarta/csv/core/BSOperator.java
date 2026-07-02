@@ -1,73 +1,72 @@
 package io.github.up2jakarta.csv.core;
 
+import io.github.up2jakarta.csv.BusinessId;
+import io.github.up2jakarta.csv.BusinessLink;
+import io.github.up2jakarta.csv.ReferenceId;
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.IType;
+import io.github.up2jakarta.csv.core.BSAccessor.Mode;
 import io.github.up2jakarta.csv.core.BSBuilder.MEP;
-import io.github.up2jakarta.csv.core.BSBuilder.MST;
+import io.github.up2jakarta.csv.core.BSContext.VContext;
+import io.github.up2jakarta.csv.core.BSLink.RId;
+import io.github.up2jakarta.csv.core.BSLink.TreeBuilder;
+import io.github.up2jakarta.csv.core.BSLink.TreeContext;
+import io.github.up2jakarta.csv.core.BSManager.Key;
+import io.github.up2jakarta.csv.core.BSManager.Pod;
+import io.github.up2jakarta.csv.core.BSNode.Flat;
+import io.github.up2jakarta.csv.core.BSOperator.Node;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
-import io.github.up2jakarta.csv.data.*;
-import io.github.up2jakarta.lov.IException;
+import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
-import io.github.up2jakarta.lov.core.Beans;
-import io.github.up2jakarta.lov.core.WVCache;
 import jakarta.validation.Validator;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.*;
-import java.util.function.BiConsumer;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.IntStream;
 
-import static io.github.up2jakarta.csv.core.BSAccessor.Mode;
-import static io.github.up2jakarta.csv.core.BSManager.*;
-import static io.github.up2jakarta.csv.core.BSOperator.BId.*;
-import static io.github.up2jakarta.csv.core.ext.Beans.*;
+import static io.github.up2jakarta.csv.core.BSBuilder.name;
+import static io.github.up2jakarta.csv.core.BSBuilder.path;
+import static io.github.up2jakarta.csv.core.ext.Beans.cast;
 import static io.github.up2jakarta.lov.core.AccessException.notNull;
-import static java.util.Collections.*;
-import static java.util.stream.Collectors.joining;
 
 /**
  * Internal business operator.
  */
-abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P extends Node<Segment, B, ?>, S extends Node<Segment, B, ?>> permits BusinessExporter, BusinessImporter {
-    protected final I root;
-    protected final int offset;
+abstract sealed class BSOperator<B extends ITerm<B>, I extends Enum<I> & IType<I>, P extends Node<Segment, B, ?>, S extends Node<Segment, B, ?>> permits BusinessExporter, BusinessImporter {
     protected final ModeType mode;
-
-    final List<I> nodes;
     final Up2Factory<B> factory;
-    final BId<Segment, Object> bid;
-    final Map<IType<B, I>, P> mappers;
-    final Map<IType<B, I>, Set<I>> joins;
+    final BSLink<B, I, P> tree;
+    final Class<I> type;
+    final int length;
 
-    BSOperator(Up2Factory<B> factory, Class<?> type, ModeType mode, I root, List<I> nodes) throws BeanException {
-        this.factory = notNull(factory, BSOperator.class, "factory");
-        this.nodes = unmodifiableList(notNull(nodes, BSOperator.class, "nodes"));
-        if (root == null || !notNull(type, BSOperator.class, "type").equals(root.getClassType())) {
-            throw new BeanException(type, "invalid business typing");
-        }
-        this.root = root;
+    BSOperator(ModeType mode, Up2Factory<B> factory, Class<Segment> st, Class<I> it) throws BeanException {
+        this.type = it;
         this.mode = mode;
-        final Map<I, Set<I>> joins = new HashMap<>();
-        this.mappers = this.joins(new LinkedList<>(), root, joins::put);
-        this.joins = unmodifiableMap(joins);
-        final P rootMapper = mappers.get(root);
-        this.offset = offset(rootMapper, mode);
-        this.bid = rootMapper.businessId;
+        this.factory = notNull(factory, this.getClass(), "factory");
+        final B bt = factory.resolver.get(Optional.empty(), st).orElse(null);
+        final TreeContext<B, I> tc = new TreeContext<>(it, st);
+        final P mapper = this.build(factory, st, null);
+        final ICreator<B, I, P> mc = (m, l) -> new BSLink<>(mode, tc.type(), this.offset(m), m, bt, l);
+        this.tree = this.tree(st, tc.type(), mapper, tc, mc);
+        this.length = this.tree.maxOrdinal();
+        tc.finalize(st);
     }
 
     BSOperator(BSOperator<B, I, S, P> source) throws BeanException {
-        this.bid = source.bid;
-        this.root = source.root;
+        this.type = source.type;
         this.mode = source.mode;
-        this.joins = source.joins;
-        this.nodes = source.nodes;
-        this.offset = source.offset;
+        this.length = source.length;
         this.factory = source.factory;
-        this.mappers = this.joins(root, source.mappers);
+        this.tree = this.tree(source.tree);
     }
 
-    private static int offset(Pod<?, ?, ?> mapper, ModeType mode) throws BeanException {
+    private int offset(P mapper) throws BeanException {
         final int min = mode.getBeanIdIndex();
         if (mapper.offset != 0) {
             if (mapper.offset < min) {
@@ -78,127 +77,81 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
         return min;
     }
 
-    private Map<IType<B, I>, P> joins(I rn, Map<IType<B, I>, S> source) throws BeanException {
-        final Map<IType<B, I>, P> result = new LinkedHashMap<>();
-        result.put(rn, this.build(factory, rn, source.get(rn)));
-        for (final I node : joins.getOrDefault(rn, Set.of())) {
-            final Map<IType<B, I>, P> mappers = this.joins(node, source);
-            result.putAll(mappers);
-        }
-        return unmodifiableMap(result);
-    }
-
-    private Map<IType<B, I>, P> joins(List<I> cp, I rn, BiConsumer<I, Set<I>> cb) throws BeanException {
-        final Map<IType<B, I>, P> result = new LinkedHashMap<>();
-        final P pm = this.build(factory, rn, null);
-        cp.addLast(rn);
-        result.put(rn, pm);
-        final Set<I> children = new LinkedHashSet<>();
-        for (final I node : nodes) {
-            if (rn.holds(node)) {
-                if (cp.contains(node)) {
-                    final String p = cp.stream().map(i -> getTypeName(i.getClassType())).collect(joining(" > "));
-                    throw new BeanException(rn.getClass(), rn.getCode(), "cyclic segment is not allowed: " + p);
+    private BSLink<B, I, P> tree(Class<Segment> pc, I pt, P pm, TreeContext<B, I> tc, ICreator<B, I, P> cr) throws BeanException {
+        tc.pushNode(pc, pt, pm);
+        final TreeBuilder<B, I> cc = new TreeBuilder<>(factory.context, tc, mode);
+        final List<BSLink<B, I, P>> links = new ArrayList<>(pm.node.bsLinks.size());
+        for (final Field field : pm.node.bsLinks) {
+            for (final BusinessLink link : field.getAnnotationsByType(BusinessLink.class)) {
+                final I ct = tc.parse(field, link);
+                if (ct == null) continue;
+                tc.pushLink(ct);
+                final Class<Segment> sc = tc.type(pc, field, ct, link);
+                if (tc.paths().anyMatch(i -> ct.getCode().equals(i.getCode()))) {
+                    throw new BeanException(type, pt.getCode(), "cyclic segment is not allowed: " + tc.path());
                 }
-                children.add(node);
-                final Map<IType<B, I>, P> mappers = this.joins(cp, node, cb);
-                result.putAll(mappers);
+                final B term = factory.resolver.get(Optional.of(field), cast(sc)).orElse(null);
+                final P cm = this.build(factory, sc, null);
+                final BSLink<B, I, P> node;
+                if (tc.requireKey(ct, link, cm.node.bsLinks)) {
+                    if (!cm.identifiable) {
+                        throw new BeanException(sc, "must have one property annotated with @BusinessId");
+                    }
+                    tc.pushKey(ct);
+                    node = this.tree(sc, ct, cm, tc, (m, l) -> new BSLink<>(field, link, ct, m, term, l, cc));
+                    tc.pollKey();
+                } else {
+                    node = this.tree(sc, ct, cm, tc, (m, l) -> new BSLink<>(field, link, ct, m, term, l, cc));
+                }
+                tc.pollLink();
+                links.add(node);
             }
         }
-        cp.removeLast();
-        cb.accept(rn, unmodifiableSet(children));
-        return unmodifiableMap(result);
+        tc.pollNode();
+        return cr.apply(pm, links);
     }
 
-    abstract P build(Up2Factory<B> factory, I type, S source) throws BeanException;
+    private BSLink<B, I, P> tree(BSLink<B, I, S> tree) throws BeanException {
+        final List<BSLink<B, I, P>> links = new ArrayList<>(tree.links.size());
+        final P mapper = this.build(factory, null, tree.computer);
+        for (final BSLink<B, I, S> link : tree.links) {
+            final BSLink<B, I, P> node = this.tree(link);
+            links.add(node);
+        }
+        return new BSLink<>(tree, mapper, links);
+    }
+
+    abstract P build(Up2Factory<B> factory, Class<Segment> type, S source) throws BeanException;
+
+    @FunctionalInterface
+    private interface ICreator<B extends ITerm<B>, I extends Enum<I> & IType<I>, P extends Node<Segment, B, ?>> {
+        BSLink<B, I, P> apply(P mapper, List<BSLink<B, I, P>> nodes) throws BeanException;
+    }
 
     /**
-     * Internal Business Factory.
+     * Internal Segment identifier
      */
-    abstract static sealed class Factory<D extends DataType<D>> permits Up2Factory {
-        private static final List<String> CN_ENTRIES = getPermittedTypes(MEP.class).toList();
-        private static final List<String> EXCLUSIONS = getPermittedTypes(MEP.class, MST.class, Beans.class).toList();
-        final DataResolver<D> resolver;
-        final BeanContext context;
-        final Validator validator;
+    static final class SId<D extends ITerm<D>> {
+        private final PPosition<?, D> pp;
+        private final List<Field> fs;
 
-        Factory(BeanContext context, DataResolver<D> resolver) {
-            this.context = notNull(context, Up2Factory.class, "context");
-            this.resolver = notNull(resolver, Up2Factory.class, "resolver");
-            this.validator = defaultValidator(context);
+        SId(List<Field> fs, PPosition<?, D> pp) {
+            this.fs = fs;
+            this.pp = pp;
         }
 
-        /**
-         * Builds and returns the stack trace of the cause of the specified event.
-         *
-         * @param event the source event
-         * @return the stack-trace if exists
-         */
-        public static Optional<String> trace(IException event) {
-            while (event.getCause() instanceof IException cause) {
-                event = cause;
-            }
-            return Optional.ofNullable(event.getCause()).map(c -> stackTrace(CN_ENTRIES, c).trim());
-        }
-
-        /**
-         * Returns the stack trace of the specified <code>cause</code> exception.
-         * <p>
-         * Notes that the stack elements will be truncated from the given <code>cns</code> entry-point class names
-         *
-         * @param cause       the cause exception
-         * @param entryPoints the list class names of entry-points
-         * @return the stack trace
-         */
-        public static String stackTrace(List<String> entryPoints, Throwable cause) {
-            final StringWriter writer = new StringWriter();
-            stackTrace(entryPoints, cause, "", new PrintWriter(writer));
-            return writer.toString();
-        }
-
-        private static Validator defaultValidator(BeanContext context) {
-            try {
-                return context.getBean(Validator.class);
-            } catch (Exception ignore) {
-            }
-            try {
-                return Up2Factory.validator(null);
-            } catch (Exception ignore) {
-                return null;
-            }
-        }
-
-        private static void stackTrace(List<String> cns, Throwable cause, String prefix, PrintWriter printer) {
-            printer.println(prefix + cause);
-            final StackTraceElement[] traces = cause.getStackTrace();
-            for (final StackTraceElement element : traces) {
-                final String cn = element.getClassName();
-                if (!EXCLUSIONS.contains(cn)) {
-                    printer.println("\t" + element);
-                }
-                if (cns.contains(cn)) {
-                    break;
-                }
-            }
-            cause = cause.getCause();
-            if (cause != null) {
-                stackTrace(cns, cause, "Caused by ", printer);
-            }
-        }
-
-        <S extends Segment> Mapper<S, D> of(Class<S> type) throws BeanException {
-            return BSManager.of(this, type, resolver).build(Mapper::new);
-        }
-
-        <S extends Segment> Format<S, D> ft(Class<S> type) throws BeanException {
-            return BSManager.ft(this, resolver, type).build(Format::new);
+        @SuppressWarnings("unchecked")
+        PId<D> build(List<BSProperty<?, D>> ps, Mode mode) throws BeanException {
+            final List<PFragment<?, D>> path = new ArrayList<>(fs.size());
+            path(ps, fs, 0, path::addLast);
+            return BSProperty.toPId(mode, path.toArray(PFragment[]::new), (PPosition<Object, D>) pp);
         }
     }
 
     /**
      * Internal Business ID Accessor.
      */
-    abstract static sealed class BId<S extends Segment, K> implements MEP permits BO, BU, BR, DP {
+    abstract static sealed class BId<S extends Segment, K, T extends ITerm<T>> implements MEP permits NId, PId {
         protected final Class<K> type;
         protected final String locator;
 
@@ -207,183 +160,96 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             this.locator = locator;
         }
 
-        static BId<Segment, Object> undefined() {
-            return BU.UNDEFINED;
-        }
-
-        @SuppressWarnings({"rawtypes", "unchecked"})
-        static BId<Segment, Object> unknown(Class<? extends Segment> type) {
-            if (Referencable.class.isAssignableFrom(type)) {
-                final Class<Comparable> rt = getTypeArgument(type, Referencable.class, 0, Comparable.class);
-                if (BusinessObject.class.isAssignableFrom(type)) {
-                    return BO.CACHE.get(rt, () -> new BO(rt));
-                }
-                return BR.CACHE.get(rt, () -> new BR(rt));
-            }
-            return undefined();
-        }
-
-        final <P extends Segment> void check(Class<P> type, BId<?, ?> that) throws BeanException {
-            if (!(this instanceof BU) && this.type != that.type) {
-                throw new BeanException(type, locator, "must be of type #[" + that.type + ']');
+        final void check(Member source, ReferenceId pid, BId<?, ?, ?> that) throws BeanException {
+            if (this.getClass() != NId.class && this.type != that.type) {
+                throw new BeanException(source, "must be of type #[" + that.type + "] because " + name(pid));
             }
         }
 
         abstract boolean supports(Mode mode);
 
+        abstract boolean isVirtual();
+
         abstract String format(S bean) throws AccessException;
+
+        abstract K parse(String data, int offset, BusinessHandler<T> handler);
 
         abstract K get(S bean) throws AccessException;
 
-        abstract K set(S bean, K key) throws AccessException;
+        abstract void set(S bean, K key) throws AccessException;
 
-        /**
-         * Internal {@link BusinessObject} accessor.
-         */
-        static final class BO<R extends Comparable<R>> extends BId<BusinessObject<R>, R> {
-            private static final WVCache<Class<?>, BId<Segment, Object>> CACHE = new WVCache<>(Class::getName);
+        @Override
+        public final String toString() {
+            return locator;
+        }
+    }
 
-            @SuppressWarnings("unchecked")
-            private BO(Class<? extends Comparable<?>> type) {
-                super((Class<R>) type, "reference");
-            }
+    /**
+     * Internal Property BId Accessor.
+     */
+    abstract static sealed class PId<B extends ITerm<B>> extends BId<Segment, Object, B> permits PId.SP, PId.MP {
+        protected final PPosition<Object, B> property;
+        protected final BSAccessor<Object> setter;
+        private final boolean settable;
 
-            @Override
-            boolean supports(Mode mode) {
-                return true;
-            }
-
-            @Override
-            R get(BusinessObject<R> bean) {
-                return bean.getReference();
-            }
-
-            @Override
-            R set(BusinessObject<R> bean, R reference) throws AccessException {
-                bean.setReference(reference);
-                return reference;
-            }
-
-            @Override
-            String format(BusinessObject<R> bean) {
-                return Optional.ofNullable(bean.getReference()).map(Object::toString).orElse(null);
-            }
+        private PId(PPosition<Object, B> property, BSAccessor<Object> setter) {
+            super(property.getType(), property.getName());
+            this.settable = !property.isFinal();
+            this.property = property;
+            this.setter = setter;
         }
 
-        /**
-         * Internal {@link Referencable} accessor.
-         */
-        static final class BR<R extends Comparable<R>> extends BId<Referencable<R>, R> {
-            private static final WVCache<Class<?>, BId<Segment, Object>> CACHE = new WVCache<>(Class::getName);
-
-            @SuppressWarnings("unchecked")
-            private BR(Class<? extends Comparable<?>> type) {
-                super((Class<R>) type, "reference");
+        static <B extends ITerm<B>> PId<B> of(List<? extends PFragment<Segment, B>> ps, PPosition<Object, B> pp, BSAccessor<Object> st) {
+            if (ps.isEmpty()) {
+                return new SP<>(pp, st);
             }
-
-            @Override
-            boolean supports(Mode mode) {
-                return mode != Mode.WO;
-            }
-
-            @Override
-            R get(Referencable<R> bean) {
-                return bean.getReference();
-            }
-
-            @Override
-            R set(Referencable<R> bean, R reference) throws AccessException {
-                throw new AccessException(bean.getClass(), locator, "unsupported write operation");
-            }
-
-            @Override
-            String format(Referencable<R> bean) {
-                return Optional.ofNullable(bean.getReference()).map(Object::toString).orElse(null);
-            }
+            return new MP<>(ps, pp, st);
         }
 
-        /**
-         * Internal Undefined Business Accessor.
-         */
-        static final class BU extends BId<Segment, Object> {
-            private static final BId<Segment, Object> UNDEFINED = new BU();
-
-            private BU() {
-                super(Object.class, null);
-            }
-
-            @Override
-            boolean supports(Mode mode) {
-                return false;
-            }
-
-            @Override
-            String format(Segment bean) {
-                throw new AccessException(bean.getClass(), "reference", "unsupported read operation");
-            }
-
-            @Override
-            Object get(Segment bean) {
-                throw new AccessException(bean.getClass(), "reference", "unsupported read operation");
-            }
-
-            @Override
-            Object set(Segment bean, Object ignore) {
-                throw new AccessException(bean.getClass(), "reference", "unsupported write operation");
-            }
+        @Override
+        final boolean supports(Mode mode) {
+            return settable || mode != Mode.WO;
         }
 
-        /**
-         * Internal Accessor based on defined property.
-         */
-        abstract static sealed class DP extends BId<Segment, Object> permits SP, MP {
-
-            protected final PPosition<Object, Object, ?> property;
-            protected final BSAccessor<Object> setter;
-            private final boolean settable;
-
-            private DP(PPosition<Object, Object, ?> property, BSAccessor<Object> setter) {
-                super(property.getType(), property.getName());
-                this.settable = !setter.isFinal();
-                this.property = property;
-                this.setter = setter;
-            }
-
-            static DP of(List<? extends PFragment<Segment, ?, ?>> fs, PPosition<Object, Object, ?> pp, BSAccessor<Object> ps) {
-                if (fs.isEmpty()) {
-                    return new SP(pp, ps);
-                }
-                return new MP(fs, pp, ps);
-            }
-
-            @Override
-            final boolean supports(Mode mode) {
-                return settable || mode != Mode.WO;
-            }
-
-            @Override
-            final String format(Segment bean) {
-                final Object wrapped = this.value(bean);
-                if (wrapped != null) {
-                    return property.format(wrapped);
-                }
-                return null;
-            }
-
-            protected abstract Object value(Segment bean);
+        @Override
+        final boolean isVirtual() {
+            return property.offset < 0;
         }
 
+        @Override
+        final String format(Segment bean) {
+            final Object value = this.get(bean);
+            if (value != null) {
+                return property.format(value);
+            }
+            return null;
+        }
+
+        @Override
+        final Object parse(String data, int offset, BusinessHandler<B> handler) {
+            return property.parse(data, offset, handler);
+        }
+
+        abstract boolean isYours(String[] path);
+
+        abstract VContext context(VContext sc);
+
         /**
-         * Internal Accessor based on simple property.
+         * Internal Accessor based on single property.
          */
-        static final class SP extends DP {
-            private SP(PPosition<Object, Object, ?> property, BSAccessor<Object> setter) {
+        private static final class SP<B extends ITerm<B>> extends PId<B> {
+            private SP(PPosition<Object, B> property, BSAccessor<Object> setter) {
                 super(property, setter);
             }
 
             @Override
-            protected Object value(Segment bean) {
-                return property.value(bean);
+            boolean isYours(String[] path) {
+                return path.length == 1 && property.getName().equals(path[0]);
+            }
+
+            @Override
+            VContext context(VContext sc) {
+                return sc;
             }
 
             @Override
@@ -392,58 +258,209 @@ abstract sealed class BSOperator<B extends DataType<B>, I extends IType<B, I>, P
             }
 
             @Override
-            Object set(Segment bean, Object bid) throws AccessException {
-                return property.setValue(setter, bean, bid);
+            void set(Segment bean, Object bid) throws AccessException {
+                setter.value(bean, bid);
             }
         }
 
         /**
          * Internal Accessor based on multiple property.
          */
-        static final class MP extends DP {
-            private final List<? extends PFragment<Segment, ?, ?>> path;
+        private static final class MP<B extends ITerm<B>> extends PId<B> {
+            private final List<? extends PFragment<Segment, B>> path;
 
-            private MP(List<? extends PFragment<Segment, ?, ?>> fs, PPosition<Object, Object, ?> pp, BSAccessor<Object> ps) {
-                super(pp, ps);
-                this.path = fs;
+            private MP(List<? extends PFragment<Segment, B>> ps, PPosition<Object, B> pp, BSAccessor<Object> st) {
+                super(pp, st);
+                this.path = ps;
             }
 
             private Segment from(Segment bean) {
-                for (final BSProperty<Segment, ?, ?> getter : path) {
+                for (final BSProperty<Segment, ?> getter : path) {
                     bean = getter.value(bean);
-                    if (bean == null) {
-                        break;
-                    }
+                    if (bean == null) break;
                 }
                 return bean;
             }
 
             @Override
-            protected Object value(Segment bean) {
-                bean = this.from(bean);
-                if (bean != null) {
-                    return property.value(bean);
+            boolean isYours(String[] path) {
+                final int size = this.path.size();
+                if (path.length == size + 1 && property.getName().equals(path[size])) {
+                    return IntStream.range(0, size).allMatch(i -> this.path.get(i).getName().equals(path[i]));
                 }
-                return null;
+                return false;
+            }
+
+            @Override
+            VContext context(VContext sc) {
+                for (int i = path.size() - 1; i >= 0; i--) {
+                    final VContext fc = path.get(i).node.context;
+                    if (fc.enabled) {
+                        return fc;
+                    }
+                }
+                return sc;
             }
 
             @Override
             Object get(Segment bean) throws AccessException {
-                bean = this.from(bean);
-                if (bean != null) {
-                    return property.value(bean);
+                if ((bean = this.from(bean)) != null) {
+                    property.value(bean);
                 }
                 return null;
             }
 
             @Override
-            Object set(Segment bean, Object bid) throws AccessException {
-                bean = this.from(bean);
-                if (bean != null) {
-                    return property.setValue(setter, bean, bid);
+            void set(Segment bean, Object bid) throws AccessException {
+                if ((bean = this.from(bean)) != null) {
+                    setter.value(bean, bid);
                 }
-                return null;
             }
+        }
+    }
+
+    /**
+     * Internal Undefined BId Accessor.
+     */
+    private static final class NId<B extends ITerm<B>> extends BId<Segment, Object, B> {
+        private static final BId<Segment, Object, ?> INSTANCE = new NId<>();
+
+        private NId() {
+            super(Object.class, null);
+        }
+
+        @Override
+        boolean supports(Mode mode) {
+            return false;
+        }
+
+        @Override
+        boolean isVirtual() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        String format(Segment bean) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        Object parse(String data, int offset, BusinessHandler<B> handler) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        Object get(Segment bean) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        void set(Segment bean, Object ignore) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    /**
+     * Internal Business Processor.
+     */
+    abstract static sealed class Node<S extends Segment, D extends ITerm<D>, T extends BSNode<S, D>> extends Pod<S, D, T> permits Mapper, Format {
+        final BId<Segment, Object, D> businessId;
+        final boolean identifiable;
+
+        Node(Validator validator, BSManager.Key<D, S> key, T node) throws BeanException {
+            super(validator, key, node);
+            if (node.bsIds.isEmpty()) {
+                //noinspection unchecked
+                this.businessId = (BId<Segment, Object, D>) NId.INSTANCE;
+            } else if (node.bsIds.size() == 1) {
+                final PId<D> bid = node.bsIds.getFirst();
+                BeanChecker.check(bid.property, BusinessId.class);
+                this.businessId = bid;
+            } else {
+                throw new BeanException(node.type, "multiple @BusinessId are found");
+            }
+            this.identifiable = this.businessId.supports(Mode.RO);
+        }
+
+        @Override
+        public String toString() {
+            return node.toString();
+        }
+    }
+
+    /**
+     * Internal Business Flatter.
+     */
+    static final class Format<S extends Segment, D extends ITerm<D>> extends Node<S, D, BSNode.Flat<S, D>> {
+        Format(Validator validator, BSManager.Key<D, S> key, BSNode.Flat<S, D> node) throws BeanException {
+            super(validator, key, node);
+        }
+
+        private void format(Flat<?, D> node, String[] result, int offset, Segment bean, List<RId<D>> rids) {
+            if (bean == null) {
+                node.defaultValues(result, offset);
+            } else {
+                for (final BSProperty<?, D> p : node.properties) {
+                    if (p.getClass() == PFragment.class) {
+                        //noinspection unchecked
+                        final PFragment<Segment, D> fp = (PFragment<Segment, D>) p;
+                        format((Flat<?, D>) fp.node, result, offset, fp.value(bean), rids);
+                    } else {
+                        boolean mapped = true;
+                        for (final RId<D> rid : rids) {
+                            if (rid.reference.property.offset == p.offset) {
+                                mapped = false;
+                                break;
+                            }
+                        }
+                        if (mapped) {
+                            //noinspection unchecked
+                            final PPosition<Object, D> pp = (PPosition<Object, D>) p;
+                            result[offset + p.offset] = pp.format(pp.value(bean));
+                        }
+                    }
+                }
+            }
+        }
+
+        void format(String[] result, int offset, Segment bean, List<RId<D>> rids) {
+            this.format(this.node, result, offset, bean, rids);
+        }
+
+        String[][] specs(int offset) {
+            final String[][] result = new String[4][length + offset];
+            if (this.length != 0) {
+                this.node.visit(p -> {
+                    final int i = offset + p.offset;
+                    result[0][i] = String.valueOf(i);
+                    if (p.dataType != null) {
+                        result[1][i] = p.dataType.getCode();
+                        result[2][i] = p.dataType.getName();
+                    } else {
+                        result[1][i] = p.getName();
+                    }
+                    result[3][i] = p.format(null);
+                });
+            }
+            return result;
+        }
+
+        Mapper<S, D> reverse() throws BeanException {
+            return BSManager.mp(this).build(validator, Mapper::new);
+        }
+    }
+
+    /**
+     * Internal Business Mapper.
+     */
+    static final class Mapper<S extends Segment, D extends ITerm<D>> extends Node<S, D, BSNode.Bean<S, D, ?>> {
+        Mapper(Validator validator, Key<D, S> key, BSNode.Bean<S, D, ?> node) throws BeanException {
+            super(validator, key, node);
+            this.check(node);
+        }
+
+        public Format<S, D> reverse() throws BeanException {
+            return BSManager.ft(this).build(validator, Format::new);
         }
     }
 }

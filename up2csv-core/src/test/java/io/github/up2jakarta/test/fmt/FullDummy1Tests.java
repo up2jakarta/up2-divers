@@ -10,9 +10,9 @@ import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
 import io.github.up2jakarta.test.fmt.misc.AFullTest;
 import io.github.up2jakarta.test.fmt.misc.Dummy1Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.InputRecord;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,19 +27,21 @@ import static io.github.up2jakarta.csv.core.ModeType.FULL;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.test.fmt.misc.Tests.invoice;
 import static io.github.up2jakarta.test.impl.SegmentType.*;
+import static io.github.up2jakarta.test.impl.TermType.A002;
+import static io.github.up2jakarta.test.impl.TermType.D009;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
-class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType, String>, FullError<GroupType, String, FullRecord<SegmentType, String>>> {
+class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, FullError<TermType, FullRecord<SegmentType>>> {
 
     private final Fixed06Generator rid = new Fixed06Generator();
-    private final SimpleFullImporter<Dummy1Invoice, GroupType, SegmentType> fullImporter;
+    private final SimpleFullImporter<Dummy1Invoice, TermType, SegmentType> fullImporter;
 
     @Autowired
-    FullDummy1Tests(Up2Factory<GroupType> factory) throws BeanException {
-        super(factory.builder().full(Dummy1Invoice.class).build(S11).build());
+    FullDummy1Tests(Up2Factory<TermType> factory) throws BeanException {
+        super(factory.builder().full(Dummy1Invoice.class).build(SegmentType.class).build());
         this.fullImporter = this.get();
     }
 
@@ -93,13 +95,13 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType, S
         // Given
         final InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record(S12, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S12, "SEL0088", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S13, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record(S14, "1199", "Software", "2", "120", "100", "20"),
+                record(S02, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S02, "SEL0088", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S03, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record(S04, "1199", "Software", "2", "120", "100", "20"),
         };
         // When & Then
-        checkCardinality3(S12, rows);
+        checkCardinality3(S02, rows);
     }
 
     @Test
@@ -107,11 +109,11 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType, S
         // Given
         final InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record(S12, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S13, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record(S02, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S03, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
         };
         // When & Then
-        checkCardinality4(S14, S11, rows);
+        checkCardinality4(S11, rows);
     }
 
     @Test
@@ -120,13 +122,13 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType, S
         final InputRecord detached = record(S09, "9999", "Warning", "Detached");
         final InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record(S12, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S13, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record(S14, "1199", "Software", "2", "120", "100", "20"),
+                record(S02, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S03, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record(S04, "1199", "Software", "2", "120", "100", "20"),
                 detached,
         };
         // When & Then
-        checkDetached(detached, rows);
+        checkDetached(detached, D009, rows);
     }
 
     @Test
@@ -142,10 +144,10 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType, S
         // Given
         final InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record(S12, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S13, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record(S14, "1199", "Software", "2", "120", "100", "20"),
-                record(S14, "2299", "Hardware", "1", "600", "500", "100"),
+                record(S02, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S03, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record(S04, "1199", "Software", "2", "120", "100", "20"),
+                record(S04, "2299", "Hardware", "1", "600", "500", "100"),
         };
         // When & Then
         checkValid2(rows);
@@ -157,13 +159,13 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType, S
         final InputRecord invalid = record(S09, "1199", "Support", null);
         final InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
-                record(S12, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
-                record(S13, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
-                record(S14, "1199", "Software", "2", "120", "100", "20"),
+                record(S02, "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S03, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record(S04, "1199", "Software", "2", "120", "100", "20"),
                 invalid,
         };
         // When & Then
-        checkValidation(invalid, rows);
+        checkValidation(invalid, A002, rows);
     }
 
 }

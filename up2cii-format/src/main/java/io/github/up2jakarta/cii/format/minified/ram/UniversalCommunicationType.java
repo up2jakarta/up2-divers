@@ -10,7 +10,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "UniversalCommunicationType", propOrder = {
         "uriId",
         "completeNumber"
@@ -18,12 +18,13 @@ import javax.annotation.processing.Generated;
 public class UniversalCommunicationType {
 
     // BT-34, BT-43, BT-49, BT-58, EXT-FR-FE-12, EXT-FR-FE-25, EXT-FR-FE-29, EXT-FR-FE-42 and (8) specifications too.
+    @XmlElement(name = "URIID")
     private UriIDType uriId;
 
     // BT-42, BT-57, EXT-FR-FE-24, EXT-FR-FE-41, EXT-FR-FE-64, EXT-FR-FE-87, EXT-FR-FE-110 and (1) specifications too.
+    @XmlElement(name = "CompleteNumber")
     private String completeNumber;
 
-    @XmlElement(name = "URIID")
     public UriIDType getUriId() {
         return this.uriId;
     }
@@ -32,7 +33,6 @@ public class UniversalCommunicationType {
         this.uriId = uriId;
     }
 
-    @XmlElement(name = "CompleteNumber")
     public String getCompleteNumber() {
         return this.completeNumber;
     }

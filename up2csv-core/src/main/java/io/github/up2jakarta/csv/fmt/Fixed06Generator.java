@@ -13,7 +13,7 @@ import static io.github.up2jakarta.lov.core.Codes.fixed;
 /**
  * Simple record-id generator that produces fixed-length of 8 characters.
  *
- * @see io.github.up2jakarta.csv.core.FullExporter#format(io.github.up2jakarta.csv.data.Segment, Supplier, SegmentWriter)
+ * @see io.github.up2jakarta.csv.core.FullExporter#format(io.github.up2jakarta.csv.Segment, Supplier, SegmentWriter)
  */
 public final class Fixed06Generator implements IntSupplier, Supplier<String>, Resettable {
 

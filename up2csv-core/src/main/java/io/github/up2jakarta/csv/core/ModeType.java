@@ -6,7 +6,7 @@ package io.github.up2jakarta.csv.core;
 public enum ModeType {
 
     /**
-     * Includes only segment-type. this mode avoids writing the business-reference for each segment except segment.
+     * Includes only segment-type. this mode avoids writing the business-reference for each segment.
      *
      * @see io.github.up2jakarta.csv.api.IRecord
      * @see UnitExporter

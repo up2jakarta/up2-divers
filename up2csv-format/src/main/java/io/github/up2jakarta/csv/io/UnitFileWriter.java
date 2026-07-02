@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.io;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.core.ModeType;
 import io.github.up2jakarta.csv.core.UnitExporter;
-import io.github.up2jakarta.csv.data.Segment;
 import org.apache.commons.csv.CSVFormat;
 
 /**
@@ -10,7 +10,7 @@ import org.apache.commons.csv.CSVFormat;
  *
  * @param <T> the business object type
  */
-public class UnitFileWriter<T extends Segment> extends BaseFileWriter<T> {
+public class UnitFileWriter<T extends Segment> extends AbstractWriter<T> {
 
     public UnitFileWriter(UnitExporter<?, ?, T> exporter, CSVFormat format) {
         super(exporter, format);

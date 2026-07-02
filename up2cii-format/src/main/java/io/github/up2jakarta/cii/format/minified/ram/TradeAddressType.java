@@ -10,7 +10,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TradeAddressType", propOrder = {
         "postcodeCode",
         "lineOne",
@@ -23,27 +23,33 @@ import javax.annotation.processing.Generated;
 public class TradeAddressType {
 
     // BT-38, BT-53, EXT-FR-FE-18, EXT-FR-FE-36, EXT-FR-FE-59, EXT-FR-FE-81, EXT-FR-FE-105 and (4) specifications too.
+    @XmlElement(name = "PostcodeCode")
     private String postcodeCode;
 
     // BT-35, BT-50, EXT-FR-FE-15, EXT-FR-FE-32, EXT-FR-FE-55, EXT-FR-FE-78, EXT-FR-FE-101 and (4) specifications too.
+    @XmlElement(name = "LineOne")
     private String lineOne;
 
     // BT-36, BT-51, EXT-FR-FE-16, EXT-FR-FE-33, EXT-FR-FE-56, EXT-FR-FE-79, EXT-FR-FE-102 and (4) specifications too.
+    @XmlElement(name = "LineTwo")
     private String lineTwo;
 
     // BT-162, BT-163, EXT-FR-FE-17, EXT-FR-FE-34, EXT-FR-FE-57, EXT-FR-FE-80, EXT-FR-FE-103 and (4) specifications too.
+    @XmlElement(name = "LineThree")
     private String lineThree;
 
     // BT-37, BT-52, EXT-FR-FE-19, EXT-FR-FE-35, EXT-FR-FE-58, EXT-FR-FE-82, EXT-FR-FE-104 and (4) specifications too.
+    @XmlElement(name = "CityName")
     private String cityName;
 
     // BT-40, BT-55, EXT-FR-FE-21, EXT-FR-FE-38, EXT-FR-FE-61, EXT-FR-FE-84, EXT-FR-FE-107 and (4) specifications too.
+    @XmlElement(name = "CountryID")
     private CountryIDType countryId;
 
     // BT-39, BT-54, EXT-FR-FE-20, EXT-FR-FE-37, EXT-FR-FE-60, EXT-FR-FE-83, EXT-FR-FE-106 and (4) specifications too.
+    @XmlElement(name = "CountrySubDivisionName")
     private String countrySubDivisionName;
 
-    @XmlElement(name = "PostcodeCode")
     public String getPostcodeCode() {
         return this.postcodeCode;
     }
@@ -52,7 +58,6 @@ public class TradeAddressType {
         this.postcodeCode = postcodeCode;
     }
 
-    @XmlElement(name = "LineOne")
     public String getLineOne() {
         return this.lineOne;
     }
@@ -61,7 +66,6 @@ public class TradeAddressType {
         this.lineOne = lineOne;
     }
 
-    @XmlElement(name = "LineTwo")
     public String getLineTwo() {
         return this.lineTwo;
     }
@@ -70,7 +74,6 @@ public class TradeAddressType {
         this.lineTwo = lineTwo;
     }
 
-    @XmlElement(name = "LineThree")
     public String getLineThree() {
         return this.lineThree;
     }
@@ -79,7 +82,6 @@ public class TradeAddressType {
         this.lineThree = lineThree;
     }
 
-    @XmlElement(name = "CityName")
     public String getCityName() {
         return this.cityName;
     }
@@ -88,7 +90,6 @@ public class TradeAddressType {
         this.cityName = cityName;
     }
 
-    @XmlElement(name = "CountryID")
     public CountryIDType getCountryId() {
         return this.countryId;
     }
@@ -97,7 +98,6 @@ public class TradeAddressType {
         this.countryId = countryId;
     }
 
-    @XmlElement(name = "CountrySubDivisionName")
     public String getCountrySubDivisionName() {
         return this.countrySubDivisionName;
     }

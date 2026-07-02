@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.core;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.data.Resettable;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.core.AccessException;
 
 import java.io.Closeable;

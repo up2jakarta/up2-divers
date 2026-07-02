@@ -11,7 +11,7 @@ import io.github.up2jakarta.test.core.misc.ext.Dummy4;
 import io.github.up2jakarta.test.core.misc.prc.Test2Processor;
 import io.github.up2jakarta.test.core.misc.prc.Test5Processor;
 import io.github.up2jakarta.test.core.misc.prc.Test6Processor;
-import io.github.up2jakarta.test.impl.GroupType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +29,17 @@ public class Up2ProcessorTests {
 
     static final String EX_CAUSE = DummyException.class.getName();
 
-    private final Up2Factory<GroupType> factory;
+    private final Up2Factory<TermType> factory;
 
     @Autowired
-    Up2ProcessorTests(Up2Factory<GroupType> factory) {
+    Up2ProcessorTests(Up2Factory<TermType> factory) {
         this.factory = factory;
     }
 
     @Test
     void testTrim() {
         // GIVEN
-        final String[] data = {null, "", " \t\n", "- \t\n", "\n\t - \t\n", "\n\t DATA \t\n", "DA - TA"};
+        final String[] data = {null, "", " \t\n\r", "- \t\n", "\n\t - \t\n", "\n\t DATA \t\n", "DA - TA"};
         // WHEN
         TrimProcessor.trim(data, "", "-");
         // THEN
@@ -64,7 +64,7 @@ public class Up2ProcessorTests {
     @Test
     void testNotSkipException() throws BeanException {
         // Given
-        final Up2Mapper<Test6Processor, ?> mapper = factory.build(Test6Processor.class);
+        final Up2Mapper<Test6Processor, ?> mapper = factory.mapper(Test6Processor.class);
         {
             // Then
             final FailureException thrown = assertThrows(FailureException.class, () -> mapper.map("dummy"));
@@ -99,7 +99,7 @@ public class Up2ProcessorTests {
     @Test
     void testSkipWarnings() throws BeanException {
         // Given
-        final Up2Mapper<Test2Processor, ?> mapper = factory.build(Test2Processor.class);
+        final Up2Mapper<Test2Processor, ?> mapper = factory.mapper(Test2Processor.class);
         {
             // When
             final Test2Processor result = mapper.map("dummy");
@@ -123,7 +123,7 @@ public class Up2ProcessorTests {
     @Test
     void testLocalClass() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test5Processor.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(Test5Processor.class));
         // THEN
         assertEquals(Dummy4.class, thrown.getSource());
         assertEquals(CLASS, thrown.getLocator());

@@ -7,8 +7,6 @@ import io.github.up2jakarta.lov.core.Resolver;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.util.function.Consumer;
-import java.util.function.IntSupplier;
-import java.util.logging.Logger;
 
 /**
  * Base Implementation of Memory Cache that supports full concurrency for retrievals and updates.
@@ -18,25 +16,17 @@ import java.util.logging.Logger;
  */
 public abstract class Cache<K, V> {
 
-    protected static final Logger LOG = Logger.getLogger(Cache.class.getName());
-
     /**
      * Evicts the cache entries from the specified reference queue.
      *
-     * @param queue    the queue of cache entries
-     * @param supplier the cache size supplier
-     * @param action   the remove action
-     * @param <E>      the cache entry type
+     * @param queue  the queue of cache entries
+     * @param action the remove action
+     * @param <E>    the cache entry type
      */
-    protected static <E> void evict(ReferenceQueue<?> queue, IntSupplier supplier, Consumer<E> action) {
-        final int size = supplier.getAsInt();
-        var gc = false;
-        for (Object expired; (expired = queue.poll()) != null; gc = true) {
+    protected static <E> void evict(ReferenceQueue<?> queue, Consumer<E> action) {
+        for (Object expired; (expired = queue.poll()) != null; ) {
             //noinspection unchecked
             action.accept((E) expired);
-        }
-        if (gc) {
-            LOG.fine(() -> "Evicting " + (size - supplier.getAsInt()) + "/" + size + " entries");
         }
     }
 

@@ -9,7 +9,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "LineTradeAgreementType", propOrder = {
         "sellerOrderReferencedDocument",
         "buyerOrderReferencedDocument",
@@ -19,15 +19,18 @@ import javax.annotation.processing.Generated;
 public class LineTradeAgreementType {
 
     // EXT-FR-FE-BG-09
+    @XmlElement(name = "SellerOrderReferencedDocument")
     private ReferencedDocumentType sellerOrderReferencedDocument;
 
+    @XmlElement(name = "BuyerOrderReferencedDocument")
     private ReferencedDocumentType buyerOrderReferencedDocument;
 
+    @XmlElement(name = "GrossPriceProductTradePrice")
     private TradePriceType grossPriceProductTradePrice;
 
+    @XmlElement(name = "NetPriceProductTradePrice")
     private TradePriceType netPriceProductTradePrice;
 
-    @XmlElement(name = "SellerOrderReferencedDocument")
     public ReferencedDocumentType getSellerOrderReferencedDocument() {
         return this.sellerOrderReferencedDocument;
     }
@@ -36,7 +39,6 @@ public class LineTradeAgreementType {
         this.sellerOrderReferencedDocument = sellerOrderReferencedDocument;
     }
 
-    @XmlElement(name = "BuyerOrderReferencedDocument")
     public ReferencedDocumentType getBuyerOrderReferencedDocument() {
         return this.buyerOrderReferencedDocument;
     }
@@ -45,7 +47,6 @@ public class LineTradeAgreementType {
         this.buyerOrderReferencedDocument = buyerOrderReferencedDocument;
     }
 
-    @XmlElement(name = "GrossPriceProductTradePrice")
     public TradePriceType getGrossPriceProductTradePrice() {
         return this.grossPriceProductTradePrice;
     }
@@ -54,7 +55,6 @@ public class LineTradeAgreementType {
         this.grossPriceProductTradePrice = grossPriceProductTradePrice;
     }
 
-    @XmlElement(name = "NetPriceProductTradePrice")
     public TradePriceType getNetPriceProductTradePrice() {
         return this.netPriceProductTradePrice;
     }

@@ -12,11 +12,11 @@ import javax.annotation.processing.Generated;
 public class IDType extends AbstractIDType<String> {
 
     // BT-90
-    private String schemeId;
-
     @XmlAttribute(name = "schemeID")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")
+    private String schemeId;
+
     @Override
     public String getSchemeId() {
         return this.schemeId;

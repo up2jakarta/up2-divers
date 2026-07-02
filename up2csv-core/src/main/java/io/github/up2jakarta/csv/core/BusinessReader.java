@@ -1,32 +1,34 @@
 package io.github.up2jakarta.csv.core;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.data.*;
+import io.github.up2jakarta.csv.data.BusinessCreator;
+import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.data.Up2Aggregator;
+import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.lov.core.AccessException;
 
 /**
  * Up2J Base business reader for multi-segments format, that's able to read business-objects from input stream.
  *
  * @param <T> the business object type
- * @param <B> the business data type
+ * @param <B> the business term type
  * @param <I> the input segment type
  * @param <R> the input record type
  * @param <E> the event type
  */
-public abstract class BusinessReader<B extends DataType<B>, I extends IType<B, I>, T extends Segment, R extends IRecord<I>, E extends IEvent<B>> extends Up2Aggregator<R> {
+public abstract class BusinessReader<B extends ITerm<B>, I extends Enum<I> & IType<I>, T extends Segment, R extends IRecord<I>, E extends IEvent<B>> extends Up2Aggregator<R> {
 
-    protected final I root;
+    protected final I main;
     protected final ModeType mode;
-    protected final BusinessImporter<B, I, T, ?, ?>.Typing typing;
-    private final BusinessImporter<B, I, T, R, E> exporter;
+    protected final BusinessImporter<B, I, T, R, E> importer;
 
-    protected BusinessReader(BusinessImporter<B, I, T, R, E> exporter) {
-        this.typing = exporter.typing;
-        this.mode = exporter.mode;
-        this.root = exporter.root;
-        this.exporter = exporter;
+    protected BusinessReader(BusinessImporter<B, I, T, R, E> importer) {
+        this.importer = importer;
+        this.mode = importer.mode;
+        this.main = importer.tree.key;
     }
 
     /**
@@ -38,7 +40,7 @@ public abstract class BusinessReader<B extends DataType<B>, I extends IType<B, I
      */
     @SuppressWarnings("unused")
     public final <C> C read(BusinessCreator<C, T, E> creator) throws AccessException {
-        return exporter.parse(super.next(), creator);
+        return importer.parse(super.next(), creator);
     }
 
     /**
@@ -48,7 +50,7 @@ public abstract class BusinessReader<B extends DataType<B>, I extends IType<B, I
      * @throws AccessException for any problem when setting properties of java-beans from input record
      */
     public final Up2Result<T, E> read() throws AccessException {
-        return exporter.parse(super.next());
+        return importer.parse(super.next());
     }
 
 }

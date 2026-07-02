@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.core.hdl;
 
-import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.SeverityType;
 
 import java.util.LinkedList;
@@ -8,9 +8,9 @@ import java.util.LinkedList;
 /**
  * Simple events collector of {@link BusinessHandler} that collects events of type {@link SimpleEvent} .
  *
- * @param <D> the business data type
+ * @param <D> the business term type
  */
-public class SimpleCollector<D extends DataType<D>> extends EventCollector<D, SimpleEvent<D>> {
+public class SimpleCollector<D extends ITerm<D>> extends EventCollector<D, SimpleEvent<D>> {
 
     public SimpleCollector() {
         super(new LinkedList<>());

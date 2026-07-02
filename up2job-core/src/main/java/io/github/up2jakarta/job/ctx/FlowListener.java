@@ -13,8 +13,7 @@ import static io.github.up2jakarta.job.ctx.Flows.*;
 import static java.util.function.Predicate.not;
 
 @SuppressWarnings("unused")
-public abstract class FlowListener<B extends ContextAware, I extends SupportAware, T extends B>
-        extends Timer implements JobExecutionListener {
+public abstract class FlowListener<B extends ContextAware, I extends SupportAware, T extends B> extends Loggable implements JobExecutionListener {
 
     private final List<FlowHolder<T>> holders;
 

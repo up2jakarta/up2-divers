@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 import static io.github.up2jakarta.test.misc.Tests.*;
 
 @Service
-public class InvoiceUnitImporter extends UnitImporter<GroupType, SegmentType, Invoice, TURecord, TUError> {
+public class InvoiceUnitImporter extends UnitImporter<TermType, SegmentType, Invoice, TURecord, TUError> {
 
     @Autowired
-    public InvoiceUnitImporter(Up2Factory<GroupType> factory) throws BeanException {
-        super(factory, Invoice.class, SegmentType.S01);
+    public InvoiceUnitImporter(Up2Factory<TermType> factory) throws BeanException {
+        super(factory, Invoice.class, SegmentType.class);
     }
 
     @Override

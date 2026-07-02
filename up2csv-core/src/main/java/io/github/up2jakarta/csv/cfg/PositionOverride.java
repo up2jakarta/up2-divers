@@ -9,9 +9,9 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+@Documented
 @Retention(RUNTIME)
 @Target({FIELD, TYPE})
-@Documented
 @Repeatable(value = PositionOverride.List.class)
 public @interface PositionOverride {
 
@@ -19,6 +19,8 @@ public @interface PositionOverride {
      * The mapping type will remain the same as is defined in the segment class unless overridden.
      * <p>
      * If the offset is negative, the annotated property will be excluded i.e. is not mapped anymore.
+     * <p>
+     * <b>Note that this one will completely erase the other one defined at property level</b>
      *
      * @return the new position configuration
      */

@@ -1,12 +1,11 @@
 package io.github.up2jakarta.csv.slv;
 
+import io.github.up2jakarta.csv.api.Argument;
+import io.github.up2jakarta.csv.api.Container;
 import io.github.up2jakarta.csv.api.ext.TypeResolver;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Up2CodeList;
-import io.github.up2jakarta.csv.core.BeanContext;
 import io.github.up2jakarta.lov.*;
-import io.github.up2jakarta.lov.Support.Argument;
-import io.github.up2jakarta.lov.Support.Parameter;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.lov.core.Overrides;
 import io.github.up2jakarta.lov.core.TypeContext;
@@ -21,22 +20,21 @@ import static io.github.up2jakarta.csv.api.IEvent.EC_CODE_LIST;
 import static io.github.up2jakarta.csv.core.ext.Beans.*;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static java.lang.String.join;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Predicate.not;
 
 @Named
 @Singleton
 public final class CodeListChecker implements TypeResolver<CodeList<?>, Up2CodeList> {
 
-    private final BeanContext context;
+    private final Container context;
 
     @Inject
-    public CodeListChecker(BeanContext context) {
+    public CodeListChecker(Container context) {
         this.context = context;
     }
 
     private static Map<String, String> arguments(Field pf, Argument[] args, Parameter[] ps) throws BeanException {
-        final Map<String, String> result = new LinkedHashMap<>(ps.length);
+        final Map<String, String> result = new HashMap<>(ps.length);
         for (final Argument arg : args) {
             result.put(arg.key(), arg.value());
         }
@@ -53,7 +51,7 @@ public final class CodeListChecker implements TypeResolver<CodeList<?>, Up2CodeL
         if (!keys.isEmpty()) {
             throw new BeanException(pf, "@Up2CodeList[value] does not recognize arguments: " + join(", " + keys));
         }
-        return unmodifiableMap(result);
+        return Map.copyOf(result);
     }
 
     private CodeListResolver<? extends CodeList<?>> get(Field pf, Class<?> pt, Up2CodeList config) throws BeanException {
@@ -68,7 +66,7 @@ public final class CodeListChecker implements TypeResolver<CodeList<?>, Up2CodeL
         if (DynamicProvider.class.equals(clp)) {
             return DynamicProvider.INSTANCE;
         }
-        return getBean(context, clp, config.name());
+        return Container.from(context, clp, config.name());
     }
 
     @Override

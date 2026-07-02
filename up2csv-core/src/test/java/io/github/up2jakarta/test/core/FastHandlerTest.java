@@ -21,9 +21,9 @@ import io.github.up2jakarta.test.core.misc.lov.MeasurementUnitConverter;
 import io.github.up2jakarta.test.core.misc.map.ValidBean;
 import io.github.up2jakarta.test.core.misc.prc.Test3Processor;
 import io.github.up2jakarta.test.core.misc.vld.Up2Warn;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.InputRecord;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,20 +44,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 public class FastHandlerTest {
 
-    private final Up2Factory<GroupType> factory;
+    private final Up2Factory<TermType> factory;
 
     @Autowired
-    FastHandlerTest(Up2Factory<GroupType> factory) {
+    FastHandlerTest(Up2Factory<TermType> factory) {
         this.factory = factory;
     }
 
     @Test
     void testNull() throws BeanException {
         // Given
-        final Up2Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
+        final Up2Mapper<ValidBean, TermType> mapper = factory.mapper(ValidBean.class);
         final InputRecord row = record(SegmentType.S00, "");
         // When
-        final EventHandler<GroupType> handler = null;
+        final EventHandler<TermType> handler = null;
         final AccessException npe1 = assertThrows(AccessException.class, () -> mapper.map(row, null));
         final AccessException npe2 = assertThrows(AccessException.class, () -> mapper.map(handler, ""));
         // Then
@@ -71,8 +71,8 @@ public class FastHandlerTest {
     @Test
     void testValidator() throws BeanException {
         // Given
-        final Up2Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class);
-        final EventHandler<GroupType> handler = FastHandler.of(WARNING);
+        final Up2Mapper<Test1Validator, TermType> mapper = factory.mapper(Test1Validator.class);
+        final EventHandler<TermType> handler = FastHandler.of(WARNING);
         {
             // When
             final String[] row = new String[]{"+1", "1", "1", "1", "1", "1", "1"};
@@ -153,8 +153,8 @@ public class FastHandlerTest {
     @Test
     void testResolver() throws BeanException {
         // Given
-        final Up2Mapper<Test1Resolver, GroupType> mapper = factory.build(Test1Resolver.class);
-        final EventHandler<GroupType> handler = FastHandler.of(WARNING);
+        final Up2Mapper<Test1Resolver, TermType> mapper = factory.mapper(Test1Resolver.class);
+        final EventHandler<TermType> handler = FastHandler.of(WARNING);
         {
             // When
             final String[] row = new String[]{"ISL", "KGM", "PT24H"};
@@ -194,8 +194,8 @@ public class FastHandlerTest {
     @Test
     void testConverter() throws BeanException {
         // Given
-        final Up2Mapper<Test1Converter, GroupType> mapper = factory.build(Test1Converter.class);
-        final EventHandler<GroupType> handler = FastHandler.of(WARNING);
+        final Up2Mapper<Test1Converter, TermType> mapper = factory.mapper(Test1Converter.class);
+        final EventHandler<TermType> handler = FastHandler.of(WARNING);
         {
             final String[] row = new String[]{"ILS", "1"};
             final FailureException error = assertThrows(FailureException.class, () -> mapper.map(handler, row));
@@ -224,8 +224,8 @@ public class FastHandlerTest {
     @Test
     void testProcessor() throws BeanException {
         // Given
-        final Up2Mapper<Test3Processor, GroupType> mapper = factory.build(Test3Processor.class);
-        final EventHandler<GroupType> handler = FastHandler.of(WARNING);
+        final Up2Mapper<Test3Processor, TermType> mapper = factory.mapper(Test3Processor.class);
+        final EventHandler<TermType> handler = FastHandler.of(WARNING);
         {
             final String[] row = new String[]{"property"};
             final FailureException error = assertThrows(FailureException.class, () -> mapper.map(handler, row));

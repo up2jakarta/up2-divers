@@ -16,10 +16,11 @@ import io.github.up2jakarta.test.core.misc.ext.DummyConverter;
 import io.github.up2jakarta.test.core.misc.map.Test1Exception;
 import io.github.up2jakarta.test.core.misc.map.Test2Exception;
 import io.github.up2jakarta.test.core.misc.prc.Test6Processor;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.InputCollector;
 import io.github.up2jakarta.test.impl.InputError;
 import io.github.up2jakarta.test.impl.InputRecord;
+import io.github.up2jakarta.test.impl.TermType;
+import org.junit.jupiter.api.AssertionFailureBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +33,13 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-import static io.github.up2jakarta.test.core.BusinessTests.CSV_MODULE;
+import static io.github.up2jakarta.test.core.BusinessTests.TU_MODULE;
 import static io.github.up2jakarta.test.fmt.misc.Tests.*;
 import static io.github.up2jakarta.test.impl.SegmentType.S00;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -46,13 +50,41 @@ public class Up2ErrorTests {
     static final String EX_EVENT = TypeException.class.getName();
     static final String EX_FAILURE = FailureException.class.getName();
     static final String EX_EVENT_FAILURE = PropertyFailureException.class.getName();
-    static final String LOV_MODULE = CodeList.class.getModule().getName();
+    static final String LOV_MODULE = name(CodeList.class.getModule());
 
-    private final Up2Factory<GroupType> factory;
+    private final Up2Factory<TermType> factory;
 
     @Autowired
-    Up2ErrorTests(Up2Factory<GroupType> factory) {
+    Up2ErrorTests(Up2Factory<TermType> factory) {
         this.factory = factory;
+    }
+
+    public static String name(Module m) {
+        if (m == null || m.getDescriptor() == null) {
+            return null;
+        }
+        return m.getDescriptor().toNameAndVersion();
+    }
+
+    public static String name(String m, Class<?> c) {
+        if (m == null) {
+            return c.getName();
+        }
+        return m + '/' + c.getName();
+    }
+
+    @SafeVarargs
+    public static <T> void assertIn(T actual, T... expected) {
+        for (final T value : expected) {
+            if (Objects.equals(actual, value)) {
+                return;
+            }
+        }
+        AssertionFailureBuilder.assertionFailure()
+                .reason("not in")
+                .expected(stream(expected).map(Objects::toString).collect(joining("], [", "[", "]")))
+                .actual(actual)
+                .buildAndThrow();
     }
 
     static void assertTrace(String buffer, String... expected) {
@@ -74,7 +106,7 @@ public class Up2ErrorTests {
     @Test
     void testWithoutCauses() throws BeanException {
         // Given
-        final Up2Mapper<Test6Processor, ?> mapper = factory.build(Test6Processor.class);
+        final Up2Mapper<Test6Processor, ?> mapper = factory.mapper(Test6Processor.class);
         final List<String> expected = Arrays.asList(
                 EX_FAILURE + ": #[1] throws #[UP2-P001] " + EX_CAUSE + ": dummy message",
                 "Caused by: " + EX_CAUSE + ": dummy message"
@@ -127,7 +159,7 @@ public class Up2ErrorTests {
     @Test
     void testWithinCauses() throws BeanException {
         // Given
-        final Up2Mapper<Test1Exception, GroupType> mapper = factory.build(Test1Exception.class);
+        final Up2Mapper<Test1Exception, TermType> mapper = factory.mapper(Test1Exception.class);
         final List<String> expected = Arrays.asList(
                 EX_EVENT_FAILURE + ": #[3] throws #[F003] dummy message",
                 "Caused by: " + EX_EVENT + ": #[F003] dummy message",
@@ -186,7 +218,7 @@ public class Up2ErrorTests {
     @Test
     void testStackTrace() throws BeanException {
         // Given
-        final Up2Mapper<Test2Exception, GroupType> mapper = factory.build(Test2Exception.class);
+        final Up2Mapper<Test2Exception, TermType> mapper = factory.mapper(Test2Exception.class);
         final List<String> expected = Arrays.asList(
                 EX_EVENT_FAILURE + ": #[2] throws #[F003] dummy message",
                 "Caused by: " + EX_EVENT + ": #[F003] dummy message",
@@ -247,7 +279,7 @@ public class Up2ErrorTests {
     @Test
     void testErrorTrace1() throws BeanException {
         // Given
-        final Up2Mapper<Test1Exception, GroupType> mapper = factory.build(Test1Exception.class);
+        final Up2Mapper<Test1Exception, TermType> mapper = factory.mapper(Test1Exception.class);
         final InputRecord row = record(S00, "TN", "TND", "null");
         final InputCollector handler = new InputCollector(row);
         // Then
@@ -255,18 +287,19 @@ public class Up2ErrorTests {
         // THEN
         assertEquals(1, handler.toList().size());
         final InputError error = handler.toList().getFirst();
+        final String cn = name(TU_MODULE, Dummy1Processor.class);
         assertTrace(error.getTrace(),
                 "java.lang.NullPointerException: null message",
-                "\t" + CSV_MODULE + "/" + Dummy1Processor.class.getName() + ".process(Dummy1Processor.java:19)",
-                "\t" + CSV_MODULE + "/" + Dummy1Processor.class.getName() + ".process(Dummy1Processor.java:31)",
-                "\t" + CSV_MODULE + "/" + Dummy1Processor.class.getName() + ".process(Dummy1Processor.java:9)"
+                "\t" + cn + ".process(Dummy1Processor.java:19)",
+                "\t" + cn + ".process(Dummy1Processor.java:32)",
+                "\t" + cn + ".process(Dummy1Processor.java:9)"
         );
     }
 
     @Test
     void testErrorTrace2() throws BeanException {
         // Given
-        final Up2Mapper<Test1Converter, GroupType> mapper = factory.build(Test1Converter.class);
+        final Up2Mapper<Test1Converter, TermType> mapper = factory.mapper(Test1Converter.class);
         final InputRecord row = record(S00, "USD");
         final InputCollector handler = new InputCollector(row);
         // Then
@@ -281,7 +314,7 @@ public class Up2ErrorTests {
     @Test
     void testErrorTrace3() throws BeanException {
         // Given
-        final Up2Mapper<Test1Converter, GroupType> mapper = factory.build(Test1Converter.class);
+        final Up2Mapper<Test1Converter, TermType> mapper = factory.mapper(Test1Converter.class);
         final InputRecord row = record(S00, "TND", "dummy");
         final InputCollector handler = new InputCollector(row);
         // Then
@@ -291,14 +324,14 @@ public class Up2ErrorTests {
         final InputError error = handler.toList().getFirst();
         assertTrace(error.getTrace(),
                 EX_CAUSE + ": dummy wrapped message",
-                "\t" + CSV_MODULE + "/" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:23)",
-                "\t" + CSV_MODULE + "/" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:8)",
-                "\t" + LOV_MODULE + "@1.6.4/" + SafeAdapter.class.getName() + ".parse(SafeAdapter.java:73)",
+                "\t" + name(TU_MODULE, DummyConverter.class) + ".doParse(DummyConverter.java:23)",
+                "\t" + name(TU_MODULE, DummyConverter.class) + ".doParse(DummyConverter.java:8)",
+                "\t" + name(LOV_MODULE, SafeAdapter.class) + ".parse(SafeAdapter.java:73)",
                 "Caused by java.lang.RuntimeException: NPE message",
-                "\t" + CSV_MODULE + "/" + Dummy1Processor.class.getName() + ".process(Dummy1Processor.java:27)",
-                "\t" + CSV_MODULE + "/" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:21)",
-                "\t" + CSV_MODULE + "/" + DummyConverter.class.getName() + ".doParse(DummyConverter.java:8)",
-                "\t" + LOV_MODULE + "@1.6.4/" + SafeAdapter.class.getName() + ".parse(SafeAdapter.java:73)"
+                "\t" + name(TU_MODULE, Dummy1Processor.class) + ".process(Dummy1Processor.java:27)",
+                "\t" + name(TU_MODULE, DummyConverter.class) + ".doParse(DummyConverter.java:21)",
+                "\t" + name(TU_MODULE, DummyConverter.class) + ".doParse(DummyConverter.java:8)",
+                "\t" + name(LOV_MODULE, SafeAdapter.class) + ".parse(SafeAdapter.java:73)"
         );
     }
 

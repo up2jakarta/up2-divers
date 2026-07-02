@@ -1,6 +1,7 @@
 package io.github.up2jakarta.test.core;
 
 import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Mapper;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -10,10 +11,10 @@ import io.github.up2jakarta.test.core.misc.lov.CountryCodeType;
 import io.github.up2jakarta.test.core.misc.lov.CurrencyCodeType;
 import io.github.up2jakarta.test.core.misc.lov.MeasurementUnitCode;
 import io.github.up2jakarta.test.core.misc.lov.Test4CodeList;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.InputCollector;
 import io.github.up2jakarta.test.impl.InputError;
 import io.github.up2jakarta.test.impl.InputRecord;
+import io.github.up2jakarta.test.impl.TermType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +36,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 class Up2ConverterTests {
 
-    private final Up2Factory<GroupType> factory;
+    private final Up2Factory<TermType> factory;
 
     @Autowired
-    Up2ConverterTests(Up2Factory<GroupType> factory) {
+    Up2ConverterTests(Up2Factory<TermType> factory) {
         this.factory = factory;
     }
 
@@ -46,7 +47,7 @@ class Up2ConverterTests {
     void testSupport() throws BeanException {
         // GIVEN
         final String[] data = {"100", "Test\t 100", "2024-07-25", "57.000001", "TND", "4.06250001", "C62", "Y", "P1W", "TN"};
-        final Up2Mapper<SupportEntity, GroupType> parser = factory.build(SupportEntity.class);
+        final Up2Mapper<SupportEntity, TermType> parser = factory.mapper(SupportEntity.class);
         final InputRecord row = new InputRecord(null, S00, null, data);
         final InputCollector handler = new InputCollector(row);
         // WHEN
@@ -67,10 +68,23 @@ class Up2ConverterTests {
     }
 
     @Test
+    void testUp2Date() throws BeanException {
+        // Given
+        final Up2Mapper<Test4Converter, ?> parser = factory.mapper(Test4Converter.class);
+        final Up2Flatter<Test4Converter, ?> format = parser.toFlatter();
+        final String[] data = new String[]{"2026-08-21 15:32:49", "2026-08-21", "15:32:49", "2026-08-21 15:32:49.555"};
+        // When
+        final Test4Converter bean = parser.map(data);
+        final String[] out = format.unmap(bean);
+        // Then
+        assertArrayEquals(data, out);
+    }
+
+    @Test
     void testJSR_303_Validation() throws BeanException {
         // GIVEN
         final String[] data = {"100", "8888_8888", "2024-07-25", "57.000001", "EUR", "4.06250001", "KGM", "Y", "P1W", "FR"};
-        final Up2Mapper<SupportEntity, GroupType> parser = factory.build(SupportEntity.class);
+        final Up2Mapper<SupportEntity, TermType> parser = factory.mapper(SupportEntity.class);
         final InputRecord row = new InputRecord(null, S00, null, data);
         final InputCollector handler = new InputCollector(row);
         // WHEN
@@ -104,7 +118,7 @@ class Up2ConverterTests {
     void testError() throws BeanException {
         // GIVEN
         final String[] data = {"100", "99998888", "2024-07-25", "57.000001", "ILS", "4.06250001", "KGM", "Y", "P1W", "IL"};
-        final Up2Mapper<SupportEntity, GroupType> parser = factory.build(SupportEntity.class);
+        final Up2Mapper<SupportEntity, TermType> parser = factory.mapper(SupportEntity.class);
         final InputRecord row = new InputRecord(null, S00, null, data);
         final InputCollector handler = new InputCollector(row);
         // WHEN
@@ -151,7 +165,7 @@ class Up2ConverterTests {
     @Test
     void testMultipleExtensions() throws BeanException {
         // GIVEN
-        final Up2Mapper<Test7Resolver, GroupType> mapper = factory.build(Test7Resolver.class);
+        final Up2Mapper<Test7Resolver, TermType> mapper = factory.mapper(Test7Resolver.class);
         // WHEN
         final Test7Resolver bean = mapper.map("1");
         // THEN
@@ -164,7 +178,7 @@ class Up2ConverterTests {
     @Test
     void testInvalidCodeList1Entity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(CodeList1Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(CodeList1Entity.class));
         // THEN
         assertEquals(CodeList1Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -174,7 +188,7 @@ class Up2ConverterTests {
     @Test
     void testInvalidCodeList2Entity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(CodeList2Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(CodeList2Entity.class));
         // THEN
         assertEquals(CodeList2Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -184,7 +198,7 @@ class Up2ConverterTests {
     @Test
     void testInvalidCodeList3Entity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(CodeList3Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(CodeList3Entity.class));
         // THEN
         assertEquals(CodeList3Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -194,7 +208,7 @@ class Up2ConverterTests {
     @Test
     void testInvalidCodeList4Entity() {
         // GIVEN
-        final AccessException error = assertThrows(AccessException.class, () -> factory.build(CodeList4Entity.class));
+        final AccessException error = assertThrows(AccessException.class, () -> factory.mapper(CodeList4Entity.class));
         // THEN
         assertEquals(Test4CodeList.class, error.getSource());
         assertEquals("*", error.getLocator());
@@ -205,7 +219,7 @@ class Up2ConverterTests {
     @Test
     void testDefaultValue() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(DefaultBean.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(DefaultBean.class));
         // THEN
         assertEquals(DefaultBean.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -215,7 +229,7 @@ class Up2ConverterTests {
     @Test
     void testConverterArgument() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test3Converter.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test3Converter.class));
         final String cn = CurrencyCodeType.class.getTypeName();
         // THEN
         assertEquals(Test3Converter.class, error.getSource());
@@ -226,7 +240,7 @@ class Up2ConverterTests {
     @Test
     void testResolver1Support() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test4Resolver.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test4Resolver.class));
         // THEN
         assertEquals(Test4Resolver.class, error.getSource());
         assertEquals("test", error.getLocator());
@@ -236,7 +250,7 @@ class Up2ConverterTests {
     @Test
     void testResolver2Support() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test5Resolver.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test5Resolver.class));
         // THEN
         assertEquals(Test5Resolver.class, error.getSource());
         assertEquals("test", error.getLocator());
@@ -246,7 +260,7 @@ class Up2ConverterTests {
     @Test
     void testResolver3Support() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test6Resolver.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test6Resolver.class));
         // THEN
         assertEquals(Test6Resolver.class, error.getSource());
         assertEquals("test", error.getLocator());
@@ -256,7 +270,7 @@ class Up2ConverterTests {
     @Test
     void testResolver4Support() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test8Resolver.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test8Resolver.class));
         // THEN
         assertEquals(Test8Resolver.class, error.getSource());
         assertEquals("test", error.getLocator());
@@ -266,7 +280,7 @@ class Up2ConverterTests {
     @Test
     void testResolver5Support() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test9Resolver.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test9Resolver.class));
         // THEN
         assertEquals(Test9Resolver.class, error.getSource());
         assertEquals("test", error.getLocator());

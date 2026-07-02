@@ -1,6 +1,5 @@
 package io.github.up2jakarta.lov;
 
-import io.github.up2jakarta.lov.Support.Parameter;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.TypeContext;
 
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static io.github.up2jakarta.lov.DynamicProvider.FILE;
+import static java.lang.Thread.currentThread;
 
 /**
  * <ul>
@@ -32,7 +32,7 @@ public final class DynamicProvider extends CodeListProvider<DynamicCode> {
 
     public static List<DynamicCode> values(TypeContext context) {
         final Properties ps = new Properties();
-        try (final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(context.get(FILE))) {
+        try (final InputStream is = currentThread().getContextClassLoader().getResourceAsStream(context.get(FILE))) {
             ps.load(is);
         } catch (IOException cause) {
             throw new AccessException(context, cause);

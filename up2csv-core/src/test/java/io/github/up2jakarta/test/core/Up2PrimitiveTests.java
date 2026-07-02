@@ -1,10 +1,10 @@
 package io.github.up2jakarta.test.core;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Mapper;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.CodeList;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
@@ -12,7 +12,7 @@ import io.github.up2jakarta.test.core.misc.Test1Primitive;
 import io.github.up2jakarta.test.core.misc.Test2Primitive;
 import io.github.up2jakarta.test.core.misc.Test3Primitive;
 import io.github.up2jakarta.test.core.misc.Test4Primitive;
-import io.github.up2jakarta.test.impl.GroupType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,23 +27,24 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TUConfiguration.class)
 public class Up2PrimitiveTests {
-    private final Up2Factory<GroupType> factory;
+    private final Up2Factory<TermType> factory;
 
     @Autowired
-    Up2PrimitiveTests(Up2Factory<GroupType> f) {
+    Up2PrimitiveTests(Up2Factory<TermType> f) {
         this.factory = f;
     }
 
     @Test
     void testDefaultValues() throws BeanException {
         // Given
-        final Up2Mapper<Test2Primitive, GroupType> mapper = factory.build(Test2Primitive.class);
+        final Up2Mapper<Test2Primitive, TermType> mapper = factory.mapper(Test2Primitive.class);
         // When
         final Test2Primitive bean = mapper.map();
         // Then
         assertNotNull(bean);
         assertFalse(bean.isABoolean());
         assertEquals(0, bean.getAByte());
+        assertEquals('\0', bean.getAChar());
         assertEquals(0, bean.getAShort());
         assertEquals(0, bean.getAnInt());
         assertEquals(0L, bean.getALong());
@@ -55,35 +56,37 @@ public class Up2PrimitiveTests {
     @Test
     void testMapDefault() throws BeanException {
         // Given
-        final Up2Mapper<Test1Primitive, GroupType> mapper = factory.build(Test1Primitive.class);
+        final Up2Mapper<Test1Primitive, TermType> mapper = factory.mapper(Test1Primitive.class);
         // When
         final Test1Primitive bean = mapper.map();
         // Then
         assertNotNull(bean);
         assertFalse(bean.isABoolean());
         assertEquals(1, bean.getAByte());
-        assertEquals(2, bean.getAShort());
-        assertEquals(3, bean.getAnInt());
-        assertEquals(4L, bean.getALong());
-        assertEquals(5.56F, bean.getAFloat());
-        assertEquals(6.6667D, bean.getADouble());
+        assertEquals('2', bean.getAChar());
+        assertEquals(3, bean.getAShort());
+        assertEquals(4, bean.getAnInt());
+        assertEquals(5L, bean.getALong());
+        assertEquals(6.66F, bean.getAFloat());
+        assertEquals(7.77D, bean.getADouble());
     }
 
     @Test
     void testKeepDefault() throws BeanException {
         // Given
-        final Up2Mapper<Test4Primitive, GroupType> mapper = factory.build(Test4Primitive.class);
+        final Up2Mapper<Test4Primitive, TermType> mapper = factory.mapper(Test4Primitive.class);
         // When
         final Test4Primitive bean = mapper.map();
         // Then
         assertEquals(1.0F, bean.getAFloat());
         assertEquals(2.0D, bean.getADouble());
+        assertEquals('*', bean.getAChar());
     }
 
     @Test
     void testUnmapDecimal() throws BeanException {
         // Given
-        final Up2Flatter<Test3Primitive, GroupType> format = factory.format(Test3Primitive.class);
+        final Up2Flatter<Test3Primitive, TermType> format = factory.flatter(Test3Primitive.class);
         final Test3Primitive bean = new Test3Primitive() {{
             setAFloat(3.140009F);
             setADouble(3.111409D);
@@ -103,7 +106,7 @@ public class Up2PrimitiveTests {
             public @SuppressWarnings("unused") int value;
         }
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.flatter(Bean.class));
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
@@ -118,7 +121,7 @@ public class Up2PrimitiveTests {
             public @SuppressWarnings("unused") double value;
         }
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.flatter(Bean.class));
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
@@ -133,11 +136,26 @@ public class Up2PrimitiveTests {
             public @SuppressWarnings("unused") boolean value;
         }
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.flatter(Bean.class));
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
         assertEquals("should be annotated with @Up2Boolean", thrown.getMessage());
+    }
+
+    @Test
+    void testBeanWithCharacter() {
+        // GIVEN
+        final class Bean implements Segment {
+            @Position(0)
+            public @SuppressWarnings("unused") char value;
+        }
+        // WHEN
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.flatter(Bean.class));
+        // THEN
+        assertEquals(Bean.class, thrown.getSource());
+        assertEquals("value", thrown.getLocator());
+        assertEquals("should be annotated with @Up2Character", thrown.getMessage());
     }
 
     @Test
@@ -148,7 +166,7 @@ public class Up2PrimitiveTests {
             public @SuppressWarnings("unused") CodeList<?> value;
         }
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.flatter(Bean.class));
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
@@ -163,7 +181,7 @@ public class Up2PrimitiveTests {
             public @SuppressWarnings("unused") LocalDate value;
         }
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.flatter(Bean.class));
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
@@ -178,7 +196,7 @@ public class Up2PrimitiveTests {
             public @SuppressWarnings("unused") Period value;
         }
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.flatter(Bean.class));
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());
@@ -193,7 +211,7 @@ public class Up2PrimitiveTests {
             public @SuppressWarnings("unused") byte[] value;
         }
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.format(Bean.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.flatter(Bean.class));
         // THEN
         assertEquals(Bean.class, thrown.getSource());
         assertEquals("value", thrown.getLocator());

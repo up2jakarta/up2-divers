@@ -10,6 +10,7 @@ module up2jakarta.test {
     requires spring.core;
 
     exports io.github.up2jakarta.test.impl to spring.beans;
+    exports io.github.up2jakarta.test.impl.sln to spring.beans;
     opens io.github.up2jakarta.test.dto to up2jakarta.csv.core;
     opens io.github.up2jakarta.test.impl to up2jakarta.lov.core;
     opens io.github.up2jakarta.test to spring.core, spring.beans, spring.context, org.junit.platform.commons;

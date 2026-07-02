@@ -33,17 +33,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 public class ErrorSupportTest {
 
-    private final Up2Factory<GroupType> factory;
+    private final Up2Factory<TermType> factory;
 
     @Autowired
-    ErrorSupportTest(Up2Factory<GroupType> factory) {
+    ErrorSupportTest(Up2Factory<TermType> factory) {
         this.factory = factory;
     }
 
     @Test
     void testProcessorWithoutError() throws BeanException {
         // Given
-        final Up2Mapper<Test3Processor, GroupType> mapper = factory.build(Test3Processor.class);
+        final Up2Mapper<Test3Processor, TermType> mapper = factory.mapper(Test3Processor.class);
         final InputRecord row = record(SegmentType.S00, "property", "dummy");
         // When
         final InputCollector handler = new InputCollector(row);
@@ -78,7 +78,7 @@ public class ErrorSupportTest {
     @Test
     void testProcessorWithinError() throws BeanException {
         // Given
-        final Up2Mapper<Test4Processor, GroupType> mapper = factory.build(Test4Processor.class);
+        final Up2Mapper<Test4Processor, TermType> mapper = factory.mapper(Test4Processor.class);
         final InputRecord row = record(SegmentType.S00, "property", "dummy");
         // When
         final InputCollector handler = new InputCollector(row);
@@ -113,7 +113,7 @@ public class ErrorSupportTest {
     @Test
     void testConverterWithoutError() throws BeanException {
         // Given
-        final Up2Mapper<Test1Converter, GroupType> mapper = factory.build(Test1Converter.class);
+        final Up2Mapper<Test1Converter, TermType> mapper = factory.mapper(Test1Converter.class);
         final InputRecord row = record(SegmentType.S00, "ILS", "int");
         // When
         final InputCollector handler = new InputCollector(row);
@@ -148,7 +148,7 @@ public class ErrorSupportTest {
     @Test
     void testConverterWithinError() throws BeanException {
         // Given
-        final Up2Mapper<Test2Converter, GroupType> mapper = factory.build(Test2Converter.class);
+        final Up2Mapper<Test2Converter, TermType> mapper = factory.mapper(Test2Converter.class);
         final InputRecord row = record(SegmentType.S00, "ILS", "int");
         // When
         final InputCollector handler = new InputCollector(row);
@@ -183,7 +183,7 @@ public class ErrorSupportTest {
     @Test
     void testResolverWithoutError() throws BeanException {
         // Given
-        final Up2Mapper<Test1Resolver, GroupType> mapper = factory.build(Test1Resolver.class);
+        final Up2Mapper<Test1Resolver, TermType> mapper = factory.mapper(Test1Resolver.class);
         final InputRecord row = record(SegmentType.S00, "ISL", "XGM", "XPT24H");
         // When
         final InputCollector handler = new InputCollector(row);
@@ -228,7 +228,7 @@ public class ErrorSupportTest {
     @Test
     void testResolverWithinError() throws BeanException {
         // Given
-        final Up2Mapper<Test2Resolver, GroupType> mapper = factory.build(Test2Resolver.class);
+        final Up2Mapper<Test2Resolver, TermType> mapper = factory.mapper(Test2Resolver.class);
         final InputRecord row = record(SegmentType.S00, "date", "duration");
         // When
         final InputCollector handler = new InputCollector(row);
@@ -263,7 +263,7 @@ public class ErrorSupportTest {
     @Test
     void testValidatorWithoutError() throws BeanException {
         // Given
-        final Up2Mapper<Test1Validator, GroupType> mapper = factory.build(Test1Validator.class);
+        final Up2Mapper<Test1Validator, TermType> mapper = factory.mapper(Test1Validator.class);
         final InputRecord row = record(SegmentType.S00, "+1", "101", "", null, "-1");
         // When
         final InputCollector handler = new InputCollector(row);
@@ -342,7 +342,7 @@ public class ErrorSupportTest {
     @Test
     void testValidatorWithinError() throws BeanException {
         // Given
-        final Up2Mapper<Test2Validator, GroupType> mapper = factory.build(Test2Validator.class);
+        final Up2Mapper<Test2Validator, TermType> mapper = factory.mapper(Test2Validator.class);
         final InputRecord row = record(SegmentType.S00, "", null);
         // When
         final InputCollector handler = new InputCollector(row);

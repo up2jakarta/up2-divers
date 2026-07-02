@@ -1,9 +1,9 @@
 package io.github.up2jakarta.test.core.misc.cvr;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2EnableJPA;
 import io.github.up2jakarta.csv.cfg.Up2EnableXML;
-import io.github.up2jakarta.csv.data.Segment;
 import jakarta.persistence.Convert;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 

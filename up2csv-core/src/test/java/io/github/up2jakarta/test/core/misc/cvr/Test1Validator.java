@@ -1,9 +1,9 @@
 package io.github.up2jakarta.test.core.misc.cvr;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.Warning;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.test.core.misc.vld.Up2NotEmpty;
 import io.github.up2jakarta.test.core.misc.vld.Up2Warn;
 import jakarta.validation.Valid;

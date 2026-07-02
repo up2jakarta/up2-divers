@@ -1,7 +1,6 @@
 module up2jakarta.lov.core {
     requires jakarta.persistence;
     requires jakarta.xml.bind;
-    requires java.logging;
     requires java.sql;
 
     exports io.github.up2jakarta.lov;

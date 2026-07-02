@@ -9,7 +9,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TradeContactType", propOrder = {
         "personName",
         "departmentName",
@@ -19,16 +19,19 @@ import javax.annotation.processing.Generated;
 public class TradeContactType {
 
     // BT-41, BT-56, EXT-FR-FE-23, EXT-FR-FE-40, EXT-FR-FE-63, EXT-FR-FE-86, EXT-FR-FE-109 and (1) specifications too.
+    @XmlElement(name = "PersonName")
     private String personName;
 
     // BT-41, BT-56, EXT-FR-FE-23
+    @XmlElement(name = "DepartmentName")
     private String departmentName;
 
+    @XmlElement(name = "TelephoneUniversalCommunication")
     private UniversalCommunicationType telephoneUniversalCommunication;
 
+    @XmlElement(name = "EmailURIUniversalCommunication")
     private UniversalCommunicationType emailURIUniversalCommunication;
 
-    @XmlElement(name = "PersonName")
     public String getPersonName() {
         return this.personName;
     }
@@ -37,7 +40,6 @@ public class TradeContactType {
         this.personName = personName;
     }
 
-    @XmlElement(name = "DepartmentName")
     public String getDepartmentName() {
         return this.departmentName;
     }
@@ -46,7 +48,6 @@ public class TradeContactType {
         this.departmentName = departmentName;
     }
 
-    @XmlElement(name = "TelephoneUniversalCommunication")
     public UniversalCommunicationType getTelephoneUniversalCommunication() {
         return this.telephoneUniversalCommunication;
     }
@@ -55,7 +56,6 @@ public class TradeContactType {
         this.telephoneUniversalCommunication = telephoneUniversalCommunication;
     }
 
-    @XmlElement(name = "EmailURIUniversalCommunication")
     public UniversalCommunicationType getEmailURIUniversalCommunication() {
         return this.emailURIUniversalCommunication;
     }

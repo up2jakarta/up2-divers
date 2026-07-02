@@ -10,7 +10,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static io.github.up2jakarta.lov.core.AccessException.notNull;
-import static java.util.Collections.unmodifiableMap;
 
 /**
  * Immutable type-context of {@link io.github.up2jakarta.lov.CodeListResolver} arguments.
@@ -24,7 +23,7 @@ public final class TypeContext implements Type {
     private final String name;
 
     public TypeContext(Member source, String name, SeverityType level, String code, Map<String, String> args) {
-        this.args = unmodifiableMap(notNull(args, TypeContext.class, "arguments"));
+        this.args = Map.copyOf(notNull(args, TypeContext.class, "arguments"));
         this.source = notNull(source, TypeContext.class, "source");
         this.level = notNull(level, TypeContext.class, "level");
         this.code = notNull(code, TypeContext.class, "code");

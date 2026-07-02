@@ -3,14 +3,13 @@ package io.github.up2jakarta.test.core.misc.acs;
 import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.core.Wrapper;
 import io.github.up2jakarta.test.core.misc.acs.Final2Segment.SFragment;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
 @Valid
-public class Final10Segment implements Segment {
+public class Final10Segment implements FinalSegment {
 
     @Position(0)
     @Up2Number
@@ -29,15 +28,18 @@ public class Final10Segment implements Segment {
         this.fragment = fragment;
     }
 
-    public Integer getKey() {
+    @Override
+    public final Integer getKey() {
         return key;
     }
 
-    public String getCode() {
+    @Override
+    public final String getCode() {
         return code.get();
     }
 
-    public String getValue() {
+    @Override
+    public final String getValue() {
         return fragment.map(SFragment::getValue, null);
     }
 }

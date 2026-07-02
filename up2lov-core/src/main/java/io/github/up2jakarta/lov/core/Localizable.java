@@ -11,7 +11,7 @@ public sealed interface Localizable extends IMessage permits BeanException, Acce
 
     String CLASS = "class";
     String PACKAGE = "info";
-    String CONSTRUCTOR = "new";
+    String CREATOR = "new";
     String FORMAT = "%s[%s] %s";
 
     /**

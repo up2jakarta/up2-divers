@@ -9,7 +9,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SupplyChainTradeLineItemType", propOrder = {
         "associatedDocumentLineDocument",
         "specifiedTradeProduct",
@@ -19,19 +19,23 @@ import javax.annotation.processing.Generated;
 })
 public class SupplyChainTradeLineItemType {
 
+    @XmlElement(name = "AssociatedDocumentLineDocument", required = true)
     private DocumentLineDocumentType associatedDocumentLineDocument;
 
     // BG-31
+    @XmlElement(name = "SpecifiedTradeProduct")
     private TradeProductType specifiedTradeProduct;
 
     // BG-29
+    @XmlElement(name = "SpecifiedLineTradeAgreement")
     private LineTradeAgreementType specifiedLineTradeAgreement;
 
+    @XmlElement(name = "SpecifiedLineTradeDelivery")
     private LineTradeDeliveryType specifiedLineTradeDelivery;
 
+    @XmlElement(name = "SpecifiedLineTradeSettlement", required = true)
     private LineTradeSettlementType specifiedLineTradeSettlement;
 
-    @XmlElement(name = "AssociatedDocumentLineDocument", required = true)
     public DocumentLineDocumentType getAssociatedDocumentLineDocument() {
         return this.associatedDocumentLineDocument;
     }
@@ -40,7 +44,6 @@ public class SupplyChainTradeLineItemType {
         this.associatedDocumentLineDocument = associatedDocumentLineDocument;
     }
 
-    @XmlElement(name = "SpecifiedTradeProduct")
     public TradeProductType getSpecifiedTradeProduct() {
         return this.specifiedTradeProduct;
     }
@@ -49,7 +52,6 @@ public class SupplyChainTradeLineItemType {
         this.specifiedTradeProduct = specifiedTradeProduct;
     }
 
-    @XmlElement(name = "SpecifiedLineTradeAgreement")
     public LineTradeAgreementType getSpecifiedLineTradeAgreement() {
         return this.specifiedLineTradeAgreement;
     }
@@ -58,7 +60,6 @@ public class SupplyChainTradeLineItemType {
         this.specifiedLineTradeAgreement = specifiedLineTradeAgreement;
     }
 
-    @XmlElement(name = "SpecifiedLineTradeDelivery")
     public LineTradeDeliveryType getSpecifiedLineTradeDelivery() {
         return this.specifiedLineTradeDelivery;
     }
@@ -67,7 +68,6 @@ public class SupplyChainTradeLineItemType {
         this.specifiedLineTradeDelivery = specifiedLineTradeDelivery;
     }
 
-    @XmlElement(name = "SpecifiedLineTradeSettlement", required = true)
     public LineTradeSettlementType getSpecifiedLineTradeSettlement() {
         return this.specifiedLineTradeSettlement;
     }

@@ -1,8 +1,8 @@
 package io.github.up2jakarta.test.core.misc.jpa.checker;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Up2EnableJPA;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.test.core.misc.jpa.XML1Enum;
 import io.github.up2jakarta.test.core.misc.jpa.XML2Enum;
 import io.github.up2jakarta.test.core.misc.lov.TestCodeList;
@@ -13,8 +13,6 @@ import jakarta.persistence.*;
 @Up2EnableJPA
 @Table(name = "TU_SEGMENT")
 public class Test1Bean implements Segment {
-
-    public static final String JPA_XXX = "JPA-XXX";
 
     @Position(0)
     @Enumerated(EnumType.STRING)

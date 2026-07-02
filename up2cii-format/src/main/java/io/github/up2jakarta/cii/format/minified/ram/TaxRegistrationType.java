@@ -10,14 +10,14 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TaxRegistrationType", propOrder = {"id"})
 public class TaxRegistrationType {
 
     // BT-31, BT-32, BT-48, EXT-FR-FE-10, EXT-FR-FE-27, EXT-FR-FE-50, EXT-FR-FE-73, EXT-FR-FE-96 and (2) specifications too.
+    @XmlElement(name = "ID")
     private FiscalIDType id;
 
-    @XmlElement(name = "ID")
     public FiscalIDType getId() {
         return this.id;
     }

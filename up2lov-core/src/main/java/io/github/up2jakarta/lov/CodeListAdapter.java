@@ -2,8 +2,6 @@ package io.github.up2jakarta.lov;
 
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.SafeAdapter;
-import jakarta.persistence.AttributeConverter;
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +13,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Comparator.comparing;
 
 /**
- * Binary search implementation of {@link CodeList} {@link TypeAdapter}
- * that supports {@link XmlAdapter} and JPA {@link AttributeConverter}.
+ * Binary search based implementation of {@link TypeAdapter} for {@link CodeList}.
  *
  * @param <C> the code-list type
  */
@@ -35,7 +32,7 @@ public class CodeListAdapter<C extends CodeList<?>> extends SafeAdapter<C> {
      */
     public CodeListAdapter(Class<C> type, String name, SeverityType level, String code, List<C> lov) {
         super(type, level, code);
-        values = safe(type, lov);
+        values = this.safe(type, lov);
         this.name = name;
     }
 
@@ -72,7 +69,7 @@ public class CodeListAdapter<C extends CodeList<?>> extends SafeAdapter<C> {
         this(type, ERROR, code);
     }
 
-    protected List<C> safe(Class<C> type, List<C> values) {
+    private List<C> safe(Class<C> type, List<C> values) {
         notNull(values, CodeListAdapter.class, "values");
         final List<C> lov = new ArrayList<>(values);
         lov.removeIf(c -> c == null || c.getCode() == null);

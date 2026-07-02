@@ -9,22 +9,26 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CodeType", propOrder = {"value"})
 public class ProductClassCodeType {
 
     // BT-158
-    private String value;
-
-    // BT-158-1
-    private ItemTypeIDCodeType listId;
-
-    // BT-158-2
-    private String listVersionId;
-
     @XmlValue
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")
+    private String value;
+
+    // BT-158-1
+    @XmlAttribute(name = "listID")
+    private ItemTypeIDCodeType listId;
+
+    // BT-158-2
+    @XmlAttribute(name = "listVersionID")
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    @XmlSchemaType(name = "token")
+    private String listVersionId;
+
     public String getValue() {
         return this.value;
     }
@@ -33,7 +37,6 @@ public class ProductClassCodeType {
         this.value = value;
     }
 
-    @XmlAttribute(name = "listID")
     public ItemTypeIDCodeType getListId() {
         return this.listId;
     }
@@ -42,9 +45,6 @@ public class ProductClassCodeType {
         this.listId = listId;
     }
 
-    @XmlAttribute(name = "listVersionID")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "token")
     public String getListVersionId() {
         return this.listVersionId;
     }

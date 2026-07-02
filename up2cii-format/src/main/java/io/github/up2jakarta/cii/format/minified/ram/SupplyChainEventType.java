@@ -10,14 +10,14 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SupplyChainEventType", propOrder = {"occurrenceDateTime"})
 public class SupplyChainEventType {
 
     // EXT-FR-FE-158-0
+    @XmlElement(name = "OccurrenceDateTime")
     private DateTimeType occurrenceDateTime;
 
-    @XmlElement(name = "OccurrenceDateTime")
     public DateTimeType getOccurrenceDateTime() {
         return this.occurrenceDateTime;
     }

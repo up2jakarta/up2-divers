@@ -12,7 +12,7 @@ import java.util.List;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ExchangedDocumentType", propOrder = {
         "id",
         "typeCode",
@@ -22,17 +22,20 @@ import java.util.List;
 public class ExchangedDocumentType {
 
     // BT-1
+    @XmlElement(name = "ID", required = true)
     private String id;
 
     // BT-3
+    @XmlElement(name = "TypeCode")
     private InvoiceCodeType typeCode;
 
+    @XmlElement(name = "IssueDateTime", required = true)
     private DateTimeType issueDateTime;
 
     // BG-1
+    @XmlElement(name = "IncludedNote")
     private List<NoteType> includedNote;
 
-    @XmlElement(name = "ID", required = true)
     public String getId() {
         return this.id;
     }
@@ -41,7 +44,6 @@ public class ExchangedDocumentType {
         this.id = id;
     }
 
-    @XmlElement(name = "TypeCode")
     public InvoiceCodeType getTypeCode() {
         return this.typeCode;
     }
@@ -50,7 +52,6 @@ public class ExchangedDocumentType {
         this.typeCode = typeCode;
     }
 
-    @XmlElement(name = "IssueDateTime", required = true)
     public DateTimeType getIssueDateTime() {
         return this.issueDateTime;
     }
@@ -59,7 +60,6 @@ public class ExchangedDocumentType {
         this.issueDateTime = issueDateTime;
     }
 
-    @XmlElement(name = "IncludedNote")
     public List<NoteType> getIncludedNote() {
         return this.includedNote;
     }

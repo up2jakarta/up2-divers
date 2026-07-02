@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.api.hdl;
 
 import io.github.up2jakarta.csv.api.ICreator;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.IError;
 
 /**
@@ -10,20 +10,20 @@ import io.github.up2jakarta.lov.IError;
  * useful for events persistence.
  *
  * @param <R> the input record type
- * @param <D> the business data type
+ * @param <D> the business term type
  * @param <E> the event type
  * @see IBusinessEvent
  * @see io.github.up2jakarta.csv.core.hdl.BusinessCollector#MODE
  */
 @FunctionalInterface
-public interface IBusinessCreator<D extends DataType<D>, R extends IRecord<?>, E extends IBusinessEvent<D, R, ?>> extends ICreator<R, E> {
+public interface IBusinessCreator<D extends ITerm<D>, R extends IRecord<?>, E extends IBusinessEvent<D, R, ?>> extends ICreator<R, E> {
 
     /**
      * Creates and returns the input event that is being full-filled from the specified arguments.
      *
      * @param record the input record source
      * @param order  the event order
-     * @param type   the business data type
+     * @param type   the business term
      * @param offset the input data index
      * @param cause  the event cause
      * @param trace  the stack trace of the cause exception

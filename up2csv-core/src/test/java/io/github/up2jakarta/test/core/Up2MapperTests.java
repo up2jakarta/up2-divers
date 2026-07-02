@@ -1,19 +1,16 @@
 package io.github.up2jakarta.test.core;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Mapper;
 import io.github.up2jakarta.csv.core.hdl.FailureException;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.csv.fmt.UnitRecord;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
-import io.github.up2jakarta.test.core.misc.acs.Access4Bean;
-import io.github.up2jakarta.test.core.misc.acs.BIdOptionalBean;
-import io.github.up2jakarta.test.core.misc.acs.Final2Segment;
-import io.github.up2jakarta.test.core.misc.acs.Optional8Bean;
+import io.github.up2jakarta.test.core.misc.acs.*;
 import io.github.up2jakarta.test.core.misc.cvr.ValidEntity;
 import io.github.up2jakarta.test.core.misc.jpa.NoteEntity;
 import io.github.up2jakarta.test.core.misc.lov.CountryCodeType;
@@ -26,10 +23,10 @@ import io.github.up2jakarta.test.core.misc.map.oneshot.ComplexAddress;
 import io.github.up2jakarta.test.core.misc.map.oneshot.SimpleAddress;
 import io.github.up2jakarta.test.core.misc.prc.ProcessorBean;
 import io.github.up2jakarta.test.core.misc.vld.Validator3Bean;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.InputCollector;
 import io.github.up2jakarta.test.impl.InputRecord;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +37,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_CONVERTER;
-import static io.github.up2jakarta.csv.data.DataResolver.dynamic;
+import static io.github.up2jakarta.csv.data.TermResolver.header;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.lov.core.Localizable.CLASS;
 import static io.github.up2jakarta.test.core.Reflections.list;
@@ -52,19 +49,19 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 class Up2MapperTests {
 
-    private final Up2Factory<GroupType> factory;
+    private final Up2Factory<TermType> factory;
 
     @Autowired
-    Up2MapperTests(Up2Factory<GroupType> factory) {
+    Up2MapperTests(Up2Factory<TermType> factory) {
         this.factory = factory;
     }
 
     @Test
     void testCache1() throws BeanException {
         // Given
-        final Up2Mapper<ValidBean, GroupType> mapper1 = factory.build(ValidBean.class);
+        final Up2Mapper<ValidBean, TermType> mapper1 = factory.mapper(ValidBean.class);
         // When
-        final Up2Mapper<ValidBean, GroupType> mapper2 = factory.build(ValidBean.class);
+        final Up2Mapper<ValidBean, TermType> mapper2 = factory.mapper(ValidBean.class);
         // Then
         assertNotSame(mapper1, mapper2);
         assertSame(node(mapper1), node(mapper2));
@@ -73,8 +70,8 @@ class Up2MapperTests {
     @Test
     void testCache2() throws BeanException {
         // GIVEN
-        final Up2Mapper<ValidEntity, ?> mapper1 = factory.build(ValidEntity.class);
-        final Up2Mapper<ValidEntity, ?> mapper2 = factory.build(ValidEntity.class, dynamic());
+        final Up2Mapper<ValidEntity, ?> mapper1 = factory.mapper(ValidEntity.class);
+        final Up2Mapper<ValidEntity, ?> mapper2 = new Up2Factory<>(factory, header()).mapper(ValidEntity.class);
         // THEN
         assertNotSame(mapper1, mapper2);
         assertNotSame(node(mapper1), node(mapper2));
@@ -83,7 +80,7 @@ class Up2MapperTests {
     @Test
     void testCache3() throws BeanException {
         // GIVEN
-        final Up2Mapper<ValidEntity, ?> mapper1 = factory.build(ValidEntity.class);
+        final Up2Mapper<ValidEntity, ?> mapper1 = factory.mapper(ValidEntity.class);
         final Up2Mapper<ValidEntity, ?> mapper2 = mapper1.toFlatter().toMapper();
         // THEN
         assertNotSame(mapper1, mapper2);
@@ -93,8 +90,8 @@ class Up2MapperTests {
     @Test
     void testReverse1() throws BeanException {
         // GIVEN
-        final Up2Mapper<ValidEntity, ?> mapper = factory.build(ValidEntity.class);
-        final Up2Flatter<ValidEntity, ?> flatter = factory.format(ValidEntity.class);
+        final Up2Mapper<ValidEntity, ?> mapper = factory.mapper(ValidEntity.class);
+        final Up2Flatter<ValidEntity, ?> flatter = factory.flatter(ValidEntity.class);
         // THEN
         assertSame(list(flatter), list(mapper));
     }
@@ -102,8 +99,8 @@ class Up2MapperTests {
     @Test
     void testReverse2() throws BeanException {
         // GIVEN
-        final Up2Flatter<Access4Bean, ?> flatter1 = factory.format(Access4Bean.class);
-        final Up2Flatter<ValidEntity, ?> flatter2 = factory.format(ValidEntity.class);
+        final Up2Flatter<Access4Bean, ?> flatter1 = factory.flatter(Access4Bean.class);
+        final Up2Flatter<ValidEntity, ?> flatter2 = factory.flatter(ValidEntity.class);
         final Up2Mapper<ValidEntity, ?> mapper = flatter2.toMapper();
         // THEN
         assertNotSame(list(flatter1), list(mapper));
@@ -113,8 +110,8 @@ class Up2MapperTests {
     @Test
     void testReverse3() throws BeanException {
         // GIVEN
-        final Up2Mapper<Final2Segment, ?> mapper = factory.build(Final2Segment.class);
-        final Up2Flatter<Final2Segment, ?> flatter = factory.format(Final2Segment.class);
+        final Up2Mapper<Final2Segment, ?> mapper = factory.mapper(Final2Segment.class);
+        final Up2Flatter<Final2Segment, ?> flatter = factory.flatter(Final2Segment.class);
         // THEN
         assertNotSame(list(flatter), list(mapper));
     }
@@ -124,7 +121,7 @@ class Up2MapperTests {
     void testNull() throws BeanException {
         // Given
         final String[] data = null;
-        final Up2Mapper<ValidBean, GroupType> mapper = factory.build(ValidBean.class);
+        final Up2Mapper<ValidBean, TermType> mapper = factory.mapper(ValidBean.class);
         final InputRecord row3 = record(SegmentType.S00, data);
         final InputCollector handler3 = new InputCollector(row3);
         // When
@@ -140,7 +137,7 @@ class Up2MapperTests {
     @Test
     void testFastHandler() throws BeanException {
         // Given
-        final Up2Mapper<Validator3Bean, GroupType> mapper = factory.build(Validator3Bean.class);
+        final Up2Mapper<Validator3Bean, TermType> mapper = factory.mapper(Validator3Bean.class);
         final InputRecord row = record(SegmentType.S00, ".");
         // When
         final FailureException error = assertThrows(FailureException.class, () -> mapper.map(row));
@@ -157,7 +154,7 @@ class Up2MapperTests {
     @Test
     void testValidRecordable() throws BeanException {
         // Given
-        final Up2Mapper<Validator3Bean, GroupType> mapper = factory.build(Validator3Bean.class);
+        final Up2Mapper<Validator3Bean, TermType> mapper = factory.mapper(Validator3Bean.class);
         final InputRecord row = record(SegmentType.S00, "1.");
         // When
         final Validator3Bean bean = mapper.map(row);
@@ -170,7 +167,7 @@ class Up2MapperTests {
     @Test
     void testInvalidRecordable() throws BeanException {
         // Given
-        final Up2Mapper<Validator3Bean, GroupType> mapper = factory.build(Validator3Bean.class);
+        final Up2Mapper<Validator3Bean, TermType> mapper = factory.mapper(Validator3Bean.class);
         final UnitRecord<SegmentType> row = new UnitRecord<>(SegmentType.S00, "1.");
         // When
         final AccessException error = assertThrows(AccessException.class, () -> mapper.map(row));
@@ -182,7 +179,7 @@ class Up2MapperTests {
     @Test
     void testOneShot() throws BeanException {
         // Given
-        final Up2Mapper<ClientSegment, GroupType> mapper = factory.build(ClientSegment.class);
+        final Up2Mapper<ClientSegment, TermType> mapper = factory.mapper(ClientSegment.class);
         final String[] data = new String[]{
                 "AAB", "UP2", "CSV", "TN-0000-1111-9999", "TND",
                 "TN", "Tunis", "1001", "11 FreeAvenue",
@@ -215,7 +212,7 @@ class Up2MapperTests {
         assertEquals("Building B9", complexAddress.getAddressLine2());
         assertEquals("6th floor, D26", complexAddress.getAddressLine3());
         // When Unmapping
-        final Up2Flatter<ClientSegment, GroupType> format = factory.format(ClientSegment.class);
+        final Up2Flatter<ClientSegment, TermType> format = factory.flatter(ClientSegment.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -223,7 +220,7 @@ class Up2MapperTests {
     @Test
     void testDefault1() throws BeanException {
         // Given
-        final Up2Mapper<Default1Bean, GroupType> mapper = factory.build(Default1Bean.class);
+        final Up2Mapper<Default1Bean, TermType> mapper = factory.mapper(Default1Bean.class);
         // When
         final Default1Bean bean = mapper.map();
         // Then Bean
@@ -237,7 +234,7 @@ class Up2MapperTests {
     @Test
     void testDefault2Nullable() throws BeanException {
         // Given
-        final Up2Mapper<Default2Bean, GroupType> mapper = factory.build(Default2Bean.class);
+        final Up2Mapper<Default2Bean, TermType> mapper = factory.mapper(Default2Bean.class);
         // When
         final Default2Bean bean = mapper.map();
         // Then Bean
@@ -249,7 +246,7 @@ class Up2MapperTests {
     @Test
     void validBean() throws BeanException {
         // Given
-        final Up2Mapper<SimpleSegment, GroupType> mapper = factory.build(SimpleSegment.class);
+        final Up2Mapper<SimpleSegment, TermType> mapper = factory.mapper(SimpleSegment.class);
         final String[] data = new String[]{"AAB", "ABBESSI", "Software engineer"};
         // When
         final SimpleSegment bean = mapper.map(data);
@@ -259,7 +256,7 @@ class Up2MapperTests {
         assertEquals("ABBESSI", bean.getName());
         assertEquals("Software engineer", bean.getRole());
         // When Unmapping
-        final Up2Flatter<SimpleSegment, GroupType> format = factory.format(SimpleSegment.class);
+        final Up2Flatter<SimpleSegment, TermType> format = factory.flatter(SimpleSegment.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -267,7 +264,7 @@ class Up2MapperTests {
     @Test
     void validBeanMoreColumns() throws BeanException {
         // Given
-        final Up2Mapper<SimpleSegment, GroupType> mapper = factory.build(SimpleSegment.class);
+        final Up2Mapper<SimpleSegment, TermType> mapper = factory.mapper(SimpleSegment.class);
         // When
         final SimpleSegment bean = mapper.map("AAB", "ABBESSI", "Software engineer", "MORE");
         // Then
@@ -280,7 +277,7 @@ class Up2MapperTests {
     @Test
     void validBeanLessColumns() throws BeanException {
         // Given
-        final Up2Mapper<SimpleSegment, GroupType> mapper = factory.build(SimpleSegment.class);
+        final Up2Mapper<SimpleSegment, TermType> mapper = factory.mapper(SimpleSegment.class);
         // When
         final SimpleSegment bean = mapper.map("AAB", "ABBESSI");
         // Then
@@ -293,8 +290,8 @@ class Up2MapperTests {
     @Test
     void validBeanNullColumn() throws BeanException {
         // Given
-        final Up2Mapper<SimpleSegment, GroupType> mapper = factory.build(SimpleSegment.class);
-        final Up2Flatter<SimpleSegment, GroupType> format = factory.format(SimpleSegment.class);
+        final Up2Mapper<SimpleSegment, TermType> mapper = factory.mapper(SimpleSegment.class);
+        final Up2Flatter<SimpleSegment, TermType> format = factory.flatter(SimpleSegment.class);
         final String[] data = new String[]{"AAB", "ABBESSI", null};
         // When
         final SimpleSegment bean = mapper.map(data);
@@ -311,7 +308,7 @@ class Up2MapperTests {
     @Test
     void validBeanEmptyColumn() throws BeanException {
         // Given
-        final Up2Mapper<SimpleSegment, GroupType> mapper = factory.build(SimpleSegment.class);
+        final Up2Mapper<SimpleSegment, TermType> mapper = factory.mapper(SimpleSegment.class);
         final String[] data = new String[]{"AAB", "ABBESSI", ""};
         // When
         final SimpleSegment bean = mapper.map(data);
@@ -321,7 +318,7 @@ class Up2MapperTests {
         assertEquals("ABBESSI", bean.getName());
         assertEquals("", bean.getRole());
         // When Unmapping
-        final Up2Flatter<SimpleSegment, GroupType> format = factory.format(SimpleSegment.class);
+        final Up2Flatter<SimpleSegment, TermType> format = factory.flatter(SimpleSegment.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -329,7 +326,7 @@ class Up2MapperTests {
     @Test
     void validComplexBean() throws BeanException {
         // Given
-        final Up2Mapper<ComplexSegment, GroupType> mapper = factory.build(ComplexSegment.class);
+        final Up2Mapper<ComplexSegment, TermType> mapper = factory.mapper(ComplexSegment.class);
         final String[] data = new String[]{"AAB", "TN", "Tunisia"};
         // When
         final ComplexSegment bean = mapper.map(data);
@@ -340,7 +337,7 @@ class Up2MapperTests {
         assertEquals("TN", bean.getCountry().getCode());
         assertEquals("Tunisia", bean.getCountry().getName());
         // When Unmapping
-        final Up2Flatter<ComplexSegment, GroupType> format = factory.format(ComplexSegment.class);
+        final Up2Flatter<ComplexSegment, TermType> format = factory.flatter(ComplexSegment.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -348,7 +345,7 @@ class Up2MapperTests {
     @Test
     void validExtendedBean() throws BeanException {
         // Given
-        final Up2Mapper<ExtendedCountryBean, GroupType> mapper = factory.build(ExtendedCountryBean.class);
+        final Up2Mapper<ExtendedCountryBean, TermType> mapper = factory.mapper(ExtendedCountryBean.class);
         final String[] data = new String[]{"TND", "TN", "Tunisia"};
         // When
         final ExtendedCountryBean bean = mapper.map(data);
@@ -358,7 +355,7 @@ class Up2MapperTests {
         assertEquals("TN", bean.getCode());
         assertEquals("Tunisia", bean.getName());
         // When Unmapping
-        final Up2Flatter<ExtendedCountryBean, GroupType> format = factory.format(ExtendedCountryBean.class);
+        final Up2Flatter<ExtendedCountryBean, TermType> format = factory.flatter(ExtendedCountryBean.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -366,7 +363,7 @@ class Up2MapperTests {
     @Test
     void validGenericBean() throws BeanException {
         // Given
-        final Up2Mapper<GenericCountryBean, GroupType> mapper = factory.build(GenericCountryBean.class);
+        final Up2Mapper<GenericCountryBean, TermType> mapper = factory.mapper(GenericCountryBean.class);
         final String[] data = new String[]{"TND", "TN", "Tunisia"};
         // When
         final GenericCountryBean bean = mapper.map(data);
@@ -376,7 +373,7 @@ class Up2MapperTests {
         assertEquals("TN", bean.getCode());
         assertEquals("Tunisia", bean.getName());
         // When Unmapping
-        final Up2Flatter<GenericCountryBean, GroupType> format = factory.format(GenericCountryBean.class);
+        final Up2Flatter<GenericCountryBean, TermType> format = factory.flatter(GenericCountryBean.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -384,7 +381,7 @@ class Up2MapperTests {
     @Test
     void testProcessors() throws BeanException {
         // Given
-        final Up2Mapper<ProcessorBean, GroupType> mapper = factory.build(ProcessorBean.class);
+        final Up2Mapper<ProcessorBean, TermType> mapper = factory.mapper(ProcessorBean.class);
         // When
         final ProcessorBean bean = mapper.map("TND\t\n(Dinar)", "TN\t\n(Tunisia)", "\n\t Tunisian\tDinar \n\t");
         // Then
@@ -401,7 +398,7 @@ class Up2MapperTests {
         class LocalSegment implements Segment {
         }
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(LocalSegment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(LocalSegment.class));
         // THEN
         assertEquals(LocalSegment.class, thrown.getSource());
         assertEquals(CLASS, thrown.getLocator());
@@ -411,7 +408,7 @@ class Up2MapperTests {
     @Test
     void testAbstractClass() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(AbstractAddress.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(AbstractAddress.class));
         // THEN
         assertEquals(AbstractAddress.class, thrown.getSource());
         assertEquals(CLASS, thrown.getLocator());
@@ -421,7 +418,7 @@ class Up2MapperTests {
     @Test
     void testInterface() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(Segment.class));
         // THEN
         assertEquals(Segment.class, thrown.getSource());
         assertEquals(CLASS, thrown.getLocator());
@@ -431,7 +428,7 @@ class Up2MapperTests {
     @Test
     void testGenericClass() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test4Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(Test4Segment.class));
         // THEN
         assertEquals(Test4Segment.class, thrown.getSource());
         assertEquals(CLASS, thrown.getLocator());
@@ -441,7 +438,7 @@ class Up2MapperTests {
     @Test
     void testInner1Class() throws BeanException {
         // When
-        final Up2Mapper<Inner1Segment, GroupType> mapper = factory.build(Inner1Segment.class).toFlatter().toMapper();
+        final Up2Mapper<Inner1Segment, TermType> mapper = factory.mapper(Inner1Segment.class).toFlatter().toMapper();
         final Inner1Segment bean = mapper.map("TU");
         // THEN
         assertNotNull(bean);
@@ -453,7 +450,7 @@ class Up2MapperTests {
     @Test
     void testInner2Class() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Inner2Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(Inner2Segment.class));
         // THEN
         assertEquals(Inner1Segment.InnerFragment.class, thrown.getSource());
         assertEquals(CLASS, thrown.getLocator());
@@ -463,7 +460,7 @@ class Up2MapperTests {
     @Test
     void testInner3Class() throws BeanException {
         // Given
-        final Up2Mapper<Inner3Segment, GroupType> mapper = factory.build(Inner3Segment.class);
+        final Up2Mapper<Inner3Segment, TermType> mapper = factory.mapper(Inner3Segment.class);
         final String[] data = new String[]{"AAB", "ABBESSI"};
         // When
         final Inner3Segment bean = mapper.map(data);
@@ -473,7 +470,7 @@ class Up2MapperTests {
         assertNotNull(bean.getFragment());
         assertEquals("ABBESSI", bean.getFragment().getName());
         // When Unmapping
-        final Up2Flatter<Inner3Segment, GroupType> format = factory.format(Inner3Segment.class);
+        final Up2Flatter<Inner3Segment, TermType> format = factory.flatter(Inner3Segment.class);
         final String[] out = format.unmap(bean);
         assertArrayEquals(data, out);
     }
@@ -481,7 +478,7 @@ class Up2MapperTests {
     @Test
     void testInner4Class() throws BeanException {
         // When
-        final Up2Mapper<Inner4Segment, GroupType> mapper = factory.build(Inner4Segment.class).toFlatter().toMapper();
+        final Up2Mapper<Inner4Segment, TermType> mapper = factory.mapper(Inner4Segment.class).toFlatter().toMapper();
         final Inner4Segment bean = mapper.map("TU");
         // THEN
         assertNotNull(bean);
@@ -493,7 +490,7 @@ class Up2MapperTests {
     @Test
     void testInner5Class() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Inner5Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(Inner5Segment.class));
         // THEN
         assertEquals(Inner5Segment.class, thrown.getSource());
         assertEquals("fragment", thrown.getLocator());
@@ -503,7 +500,7 @@ class Up2MapperTests {
     @Test
     void testInner6Class() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Inner6Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(Inner6Segment.class));
         // THEN
         assertEquals(Inner6Segment.SFragment.class, thrown.getSource());
         assertEquals(CLASS, thrown.getLocator());
@@ -513,7 +510,7 @@ class Up2MapperTests {
     @Test
     void testInnerSegment() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(InnerFragment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(InnerFragment.class));
         // THEN
         assertEquals(InnerFragment.class, thrown.getSource());
         assertEquals(CLASS, thrown.getLocator());
@@ -523,7 +520,7 @@ class Up2MapperTests {
     @Test
     void testRecursiveSegment() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(TestRecursive1Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(TestRecursive1Segment.class));
         // THEN
         assertEquals(TestRecursive1Segment.class, thrown.getSource());
         assertEquals(CLASS, thrown.getLocator());
@@ -533,7 +530,7 @@ class Up2MapperTests {
     @Test
     void testRecursiveInheritance() {
         // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(TestRecursive3Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(TestRecursive3Segment.class));
         // THEN
         assertEquals(TestRecursive1Segment.class, thrown.getSource());
         assertEquals(CLASS, thrown.getLocator());
@@ -543,7 +540,7 @@ class Up2MapperTests {
     @Test
     void testFragment() {
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test1Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(Test1Segment.class));
         // THEN
         assertEquals(Test1Segment.class, thrown.getSource());
         assertEquals("p", thrown.getLocator());
@@ -553,7 +550,7 @@ class Up2MapperTests {
     @Test
     void testFragmentOffset() {
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test2Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(Test2Segment.class));
         // THEN
         assertEquals(Test2Segment.class, thrown.getSource());
         assertEquals("p", thrown.getLocator());
@@ -563,7 +560,7 @@ class Up2MapperTests {
     @Test
     void testPositionOffset() {
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test3Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(Test3Segment.class));
         // THEN
         assertEquals(Test3Segment.class, thrown.getSource());
         assertEquals("p", thrown.getLocator());
@@ -573,7 +570,7 @@ class Up2MapperTests {
     @Test
     void testFieldStatic() {
         // WHEN
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.build(Test7Segment.class));
+        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(Test7Segment.class));
         // THEN
         assertEquals(Test7Segment.class, thrown.getSource());
         assertEquals("staticField", thrown.getLocator());
@@ -583,7 +580,7 @@ class Up2MapperTests {
     @Test
     void testValidRecursive1() throws BeanException {
         // Given
-        final Up2Mapper<TestRecursive7Override, ?> mapper = factory.build(TestRecursive7Override.class);
+        final Up2Mapper<TestRecursive7Override, ?> mapper = factory.mapper(TestRecursive7Override.class);
         final Up2Flatter<TestRecursive7Override, ?> flatter = mapper.toFlatter();
         final String[] data = new String[]{"00", "11", "22"};
         // When
@@ -597,7 +594,7 @@ class Up2MapperTests {
     @Test
     void testValidRecursive2() throws BeanException {
         // GIVEN
-        final Up2Mapper<TestRecursive8Override, ?> mapper = factory.build(TestRecursive8Override.class);
+        final Up2Mapper<TestRecursive8Override, ?> mapper = factory.mapper(TestRecursive8Override.class);
         final Up2Flatter<TestRecursive8Override, ?> flatter = mapper.toFlatter();
         final String[] data = new String[]{"00", "11", "22", "33", "44", "55", "66"};
         // WHEN
@@ -611,7 +608,7 @@ class Up2MapperTests {
     @Test
     void testValidRecursive3() throws BeanException {
         // GIVEN
-        final Up2Mapper<TestRecursive6Segment, ?> mapper = factory.build(TestRecursive6Segment.class);
+        final Up2Mapper<TestRecursive6Segment, ?> mapper = factory.mapper(TestRecursive6Segment.class);
         final Up2Flatter<TestRecursive6Segment, ?> flatter = mapper.toFlatter();
         final String[] data = new String[]{"00", "11", "22", "33"};
         // WHEN
@@ -625,7 +622,7 @@ class Up2MapperTests {
     @Test
     void testMappingNoOrderBean() throws Exception {
         // GIVEN
-        final Up2Mapper<NoOrderBean, GroupType> mapper = factory.build(NoOrderBean.class);
+        final Up2Mapper<NoOrderBean, TermType> mapper = factory.mapper(NoOrderBean.class);
         final Up2Flatter<NoOrderBean, ?> flatter = mapper.toFlatter();
         final String[] data = new String[]{"00", "IGNORE", "22"};
         // WHEN
@@ -640,7 +637,7 @@ class Up2MapperTests {
     @Test
     void testMappingNoPositionBean() throws Exception {
         // GIVEN
-        final Up2Mapper<NoPositionBean, ?> mapper = factory.build(NoPositionBean.class);
+        final Up2Mapper<NoPositionBean, ?> mapper = factory.mapper(NoPositionBean.class);
         final Up2Flatter<NoPositionBean, ?> flatter = mapper.toFlatter();
         final String[] data = new String[]{"00", "11"};
         // WHEN
@@ -654,11 +651,11 @@ class Up2MapperTests {
     @Test
     void testRequired1() throws BeanException {
         // Given
-        final Up2Mapper<NoteEntity, GroupType> mapper = factory.build(NoteEntity.class);
+        final Up2Mapper<NoteEntity, TermType> mapper = factory.mapper(NoteEntity.class);
         final String[] data = new String[]{"ZZZ", "Content", null, "???", "T2", "EUR"};
         // When
         final NoteEntity segment = mapper.map(data);
-        final List<? extends IComplianceEvent<GroupType>> violations = mapper.toFlatter().validate(segment);
+        final List<? extends IComplianceEvent<TermType>> violations = mapper.toFlatter().validate(segment);
         // Then
         assertNotNull(segment);
         assertEquals(0, violations.size());
@@ -673,7 +670,7 @@ class Up2MapperTests {
     @Test
     void testRequired2() throws BeanException {
         // Given
-        final Up2Mapper<NoteEntity, GroupType> mapper = factory.build(NoteEntity.class);
+        final Up2Mapper<NoteEntity, TermType> mapper = factory.mapper(NoteEntity.class);
         final String[] data = new String[]{"ZZZ", "Content", "T1", "FR", null, "EUR"};
         // When
         final NoteEntity bean = mapper.map(data);
@@ -692,7 +689,7 @@ class Up2MapperTests {
     @Test
     void testTrimFragment() throws BeanException {
         // Given
-        final Up2Mapper<ComplexSegment, GroupType> mapper = factory.build(ComplexSegment.class);
+        final Up2Mapper<ComplexSegment, TermType> mapper = factory.mapper(ComplexSegment.class);
         final String[] data = new String[]{"", null};
         // When
         final ComplexSegment segment = mapper.map(data);
@@ -705,9 +702,9 @@ class Up2MapperTests {
     @Test
     void testOptional() throws BeanException {
         // Given
-        final Up2Mapper<BIdOptionalBean, ?> mapper = factory.build(BIdOptionalBean.class);
+        final Up2Mapper<BIdOptionalSegment, ?> mapper = factory.mapper(BIdOptionalSegment.class);
         // When
-        final BIdOptionalBean bean = mapper.map();
+        final BIdOptionalSegment bean = mapper.map();
         // Then
         assertNotNull(bean.fragment);
         assertFalse(bean.fragment.isEmpty());
@@ -718,12 +715,33 @@ class Up2MapperTests {
     @Test
     void testNullableOptional() throws BeanException {
         // Given
-        final Up2Mapper<Optional8Bean, ?> mapper = factory.build(Optional8Bean.class);
+        final Up2Mapper<Optional8Bean, ?> mapper = factory.mapper(Optional8Bean.class);
         // When
         final Optional8Bean bean = mapper.map();
         // Then
         assertNotNull(bean.fragment);
         assertTrue(bean.fragment.isEmpty());
+    }
+
+    @Test
+    void testBusinessEquality() throws BeanException {
+        // GIVEN
+        final Up2Mapper<BIdMultipleSegment, ?> mapper = factory.mapper(BIdMultipleSegment.class);
+        // WHEN
+        final BIdMultipleSegment s2 = mapper.map("B", "2");
+        final BIdMultipleSegment s3 = mapper.map("B", "2");
+        // THEN
+        assertTrue(mapper.equals(s2, s3));
+        assertTrue(mapper.equals(mapper.map(), mapper.map()));
+        assertTrue(mapper.equals(mapper.map(""), mapper.map("")));
+        assertTrue(mapper.equals(mapper.map("B"), mapper.map("B")));
+        assertTrue(mapper.equals(mapper.map("", "2"), mapper.map("", "2")));
+
+        assertFalse(mapper.equals(mapper.map("A", "2"), s2));
+        assertFalse(mapper.equals(mapper.map("B", "1"), s3));
+
+        assertFalse(mapper.equals(mapper.map("B"), s2));
+        assertFalse(mapper.equals(mapper.map("", "2"), s3));
     }
 
 }

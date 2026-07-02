@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.api.ext;
 
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.lov.core.BeanException;
 
 import java.lang.reflect.Field;
@@ -32,10 +32,10 @@ public interface TypeContext {
     }
 
     /**
-     * Listener callback before scanning a segment annotated by {@link io.github.up2jakarta.csv.cfg.Fragment}.
+     * Listener callback before scanning a segment annotated with {@link io.github.up2jakarta.csv.cfg.Fragment}.
      * Before super-class segment handler or listener.
      *
-     * @param fragment the field annotated by {@link io.github.up2jakarta.csv.cfg.Fragment}
+     * @param fragment the field annotated with {@link io.github.up2jakarta.csv.cfg.Fragment}
      * @param type     the fragment type
      * @param offset   the fragment index
      * @throws BeanException for any missing or wrong bean configuration
@@ -44,9 +44,9 @@ public interface TypeContext {
     }
 
     /**
-     * Listener callback after scanning a segment annotated by {@link io.github.up2jakarta.csv.cfg.Fragment}.
+     * Listener callback after scanning a segment annotated with {@link io.github.up2jakarta.csv.cfg.Fragment}.
      *
-     * @param fragment the field annotated by {@link io.github.up2jakarta.csv.cfg.Fragment}
+     * @param fragment the field annotated with {@link io.github.up2jakarta.csv.cfg.Fragment}
      * @param type     the fragment type
      * @throws BeanException for any missing or wrong bean configuration
      */
@@ -54,9 +54,9 @@ public interface TypeContext {
     }
 
     /**
-     * Listener callback before scanning a field annotated by {@link io.github.up2jakarta.csv.cfg.Position}.
+     * Listener callback before scanning a field annotated with {@link io.github.up2jakarta.csv.cfg.Position}.
      *
-     * @param property the field annotated by {@link io.github.up2jakarta.csv.cfg.Position}
+     * @param property the field annotated with {@link io.github.up2jakarta.csv.cfg.Position}
      * @param type     the property type
      * @param offset   the position index
      * @throws BeanException for any missing or wrong bean configuration
@@ -65,7 +65,7 @@ public interface TypeContext {
     }
 
     /**
-     * Listener callback after scanning an unknown property the not annotated by <code>Position</code> and <code>Fragment</code>.
+     * Listener callback after scanning an unknown property the not annotated with <code>Position</code> and <code>Fragment</code>.
      *
      * @param property the unknown field
      * @param type     the unknown field type

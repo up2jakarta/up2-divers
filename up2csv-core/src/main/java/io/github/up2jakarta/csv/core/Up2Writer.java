@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.core;
 
-import io.github.up2jakarta.csv.data.DataType;
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.core.AccessException;
 
 import java.io.Closeable;
@@ -13,9 +13,9 @@ import java.util.Collection;
  * Base writer for mono-segment format, that's able to write segments to output stream.
  *
  * @param <S> the segment type
- * @param <D> the business data type
+ * @param <D> the business term type
  */
-public abstract class Up2Writer<S extends Segment, D extends DataType<D>> implements Closeable, Flushable {
+public abstract class Up2Writer<S extends Segment, D extends ITerm<D>> implements Closeable, Flushable {
 
     private final Up2Flatter<S, D> mapper;
 

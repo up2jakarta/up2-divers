@@ -9,14 +9,14 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "IndicatorType", propOrder = {"indicator"})
 public class IndicatorType {
 
     // BG-20, BG-21, BG-27, BG-28
+    @XmlElement(name = "Indicator")
     private Boolean indicator;
 
-    @XmlElement(name = "Indicator")
     public Boolean isIndicator() {
         return this.indicator;
     }

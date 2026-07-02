@@ -1,27 +1,30 @@
 package io.github.up2jakarta.test.dto;
 
+import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.data.Definition;
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.test.impl.BusinessType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 
+import static io.github.up2jakarta.lov.SeverityType.WARNING;
+import static io.github.up2jakarta.test.impl.TermType.*;
+
 @Valid
+@BusinessType(D005)
 @SuppressWarnings("unused")
+@Error(value = "CSV-C05", level = WARNING)
 public class Note implements Segment {
 
     @Position(0)
     @NotEmpty
-    @Definition(code = "N01", value = "Key")
-    private String key;
+    @BusinessType(A001)
+    private final String key;
 
     @Position(1)
     @NotEmpty
-    @Definition(code = "N02", value = "Content")
-    private String content;
-
-    public Note() {
-    }
+    @BusinessType(A004)
+    private final String content;
 
     public Note(String key, String content) {
         this.key = key;
@@ -32,16 +35,8 @@ public class Note implements Segment {
         return key;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
     public String getContent() {
         return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
 }

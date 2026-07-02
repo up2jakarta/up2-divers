@@ -10,9 +10,9 @@ import javax.annotation.processing.Generated;
 public class FiscalIDType extends AbstractIDType<ReferenceCodeType> {
 
     // BT-31-0, BT-32-0, BT-48-0, EXT-FR-FE-11, EXT-FR-FE-28, EXT-FR-FE-51, EXT-FR-FE-74 and (3) specifications too.
+    @XmlAttribute(name = "schemeID")
     private ReferenceCodeType schemeId;
 
-    @XmlAttribute(name = "schemeID")
     @Override
     public ReferenceCodeType getSchemeId() {
         return this.schemeId;

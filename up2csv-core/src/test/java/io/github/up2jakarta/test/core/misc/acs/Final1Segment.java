@@ -2,7 +2,11 @@ package io.github.up2jakarta.test.core.misc.acs;
 
 import io.github.up2jakarta.csv.cfg.Creator;
 import io.github.up2jakarta.test.core.misc.map.Test6Segment;
+import jakarta.persistence.Access;
 
+import static jakarta.persistence.AccessType.PROPERTY;
+
+@Access(PROPERTY)
 @SuppressWarnings("unused")
 public class Final1Segment extends Test6Segment {
 

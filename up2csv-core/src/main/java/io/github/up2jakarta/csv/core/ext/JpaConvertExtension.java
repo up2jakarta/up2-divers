@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.core.ext;
 
+import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.api.Container;
 import io.github.up2jakarta.csv.api.ext.TypeExtension;
-import io.github.up2jakarta.csv.core.BeanContext;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.TypeAdapter;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.inject.Inject;
@@ -17,7 +17,8 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static io.github.up2jakarta.csv.core.ext.Beans.*;
+import static io.github.up2jakarta.csv.core.ext.Beans.getTypeArguments;
+import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
 import static java.util.Arrays.stream;
 
 /**
@@ -29,21 +30,21 @@ import static java.util.Arrays.stream;
 @Singleton
 public final class JpaConvertExtension implements TypeExtension<Object, Convert> {
 
-    private final BeanContext context;
+    private final Container context;
 
     @Inject
-    public JpaConvertExtension(BeanContext context) {
+    public JpaConvertExtension(Container context) {
         this.context = context;
     }
 
     private static void check(Field p, Class<?> type, Convert jpa) throws BeanException {
         if (!AttributeConverter.class.isAssignableFrom(jpa.converter())) {
-            throw new BeanException(p, "@Convert[converter] must extends AttributeConverter");
+            throw new BeanException(p, "@Convert[converter] must implements AttributeConverter");
         }
         final Type[] types = getTypeArguments(jpa.converter(), AttributeConverter.class);
         if (!(types[0] instanceof Class<?> c) || !c.isAssignableFrom(type) || !String.class.equals(types[1])) {
             final CharSequence cn = getTypeName(type);
-            throw new BeanException(p, "@Convert[converter] should extends AttributeConverter<" + cn + ", String>");
+            throw new BeanException(p, "@Convert[converter] should implements AttributeConverter<" + cn + ", String>");
         }
     }
 
@@ -97,7 +98,7 @@ public final class JpaConvertExtension implements TypeExtension<Object, Convert>
 
     @Override
     public TypeAdapter<?> resolve(Field pf, Class<Object> pt, Convert pc) throws BeanException {
-        final AttributeConverter<Object, String> converter = getBean(context, pc.converter(), "");
+        final AttributeConverter<Object, String> converter = Container.from(context, pc.converter(), "");
         if (converter instanceof TypeAdapter<?> pa) {
             return pa;
         }

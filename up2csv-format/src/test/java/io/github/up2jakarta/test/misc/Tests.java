@@ -8,11 +8,11 @@ import io.github.up2jakarta.csv.core.hdl.PropertyCollector;
 import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
 import io.github.up2jakarta.csv.data.Up2Result;
 import io.github.up2jakarta.csv.fmt.FastRecord;
-import io.github.up2jakarta.csv.io.BaseFileReader;
+import io.github.up2jakarta.csv.io.AbstractReader;
 import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.test.dto.Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -38,18 +38,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class Tests {
 
-    public static class TURecord extends FastRecord<SegmentType, String> {
+    public static class TURecord extends FastRecord<SegmentType> {
         public TURecord(SegmentType type, String businessKey, String... data) {
             super(type, businessKey, data);
         }
     }
 
-    public static class TUHandler extends PropertyCollector<GroupType, TURecord, TUError> {
+    public static class TUHandler extends PropertyCollector<TermType, TURecord, TUError> {
         public TUHandler(TURecord row) {
             super(row, TUError::new);
         }
 
-        public static final class Builder extends EventModeBuilder<GroupType, TURecord, TUError> {
+        public static final class Builder extends EventModeBuilder<TermType, TURecord, TUError> {
             public Builder(int size) {
                 super(size);
             }
@@ -61,8 +61,8 @@ public abstract class Tests {
         }
     }
 
-    public static class TUError extends PropertyEvent<GroupType, TURecord> {
-        public TUError(TURecord row, Integer offset, GroupType type, TypeException cause) {
+    public static class TUError extends PropertyEvent<TermType, TURecord> {
+        public TUError(TURecord row, Integer offset, TermType type, TypeException cause) {
             super(row, offset, type, cause);
         }
     }
@@ -196,7 +196,7 @@ public abstract class Tests {
             return Path.of(input.toFile().getAbsolutePath().replace("import_", "export_"));
         }
 
-        final <BR extends BaseFileReader<Invoice, GroupType, SegmentType, R, ?>> void assertFiles(BR reader1, BR reader2) throws IOException {
+        final <BR extends AbstractReader<Invoice, TermType, SegmentType, R, ?>> void assertFiles(BR reader1, BR reader2) throws IOException {
             while (reader1.hasNext()) {
                 assertTrue(reader2.hasNext());
                 final List<R> source = reader1.next();
@@ -212,7 +212,7 @@ public abstract class Tests {
             reader2.close();
         }
 
-        final void copy(BaseFileReader<Invoice, GroupType, SegmentType, R, ?> reader1, BusinessWriter<Invoice> writer) throws IOException {
+        final void copy(AbstractReader<Invoice, TermType, SegmentType, R, ?> reader1, BusinessWriter<Invoice> writer) throws IOException {
             while (reader1.hasNext()) {
                 final Up2Result<Invoice, ?> item = reader1.read();
                 assertEquals(0, item.toList().size());

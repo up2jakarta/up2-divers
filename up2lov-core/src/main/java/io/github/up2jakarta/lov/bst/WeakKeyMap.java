@@ -24,7 +24,7 @@ public non-sealed class WeakKeyMap<K, V> extends KVTree<K, V> {
 
     @Override
     public final void evict() {
-        Cache.evict(queue, this::size, this::detach);
+        Cache.evict(queue, this::detach);
     }
 
     @Override

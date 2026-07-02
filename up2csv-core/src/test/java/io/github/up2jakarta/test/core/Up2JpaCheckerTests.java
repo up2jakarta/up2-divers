@@ -5,7 +5,7 @@ import io.github.up2jakarta.csv.core.Up2Mapper;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
 import io.github.up2jakarta.test.core.misc.jpa.checker.base.*;
-import io.github.up2jakarta.test.impl.GroupType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +19,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = TUConfiguration.class)
 class Up2JpaCheckerTests {
 
-    private final Up2Factory<GroupType> factory;
+    private final Up2Factory<TermType> factory;
 
     @Autowired
-    Up2JpaCheckerTests(Up2Factory<GroupType> factory) {
+    Up2JpaCheckerTests(Up2Factory<TermType> factory) {
         this.factory = factory;
     }
 
     @Test
     void testActivation() throws BeanException {
         // WHEN
-        final Up2Mapper<Test1Entity, GroupType> mapper = factory.build(Test1Entity.class);
+        final Up2Mapper<Test1Entity, TermType> mapper = factory.mapper(Test1Entity.class);
         // THEN
         assertNotNull(mapper);
     }
@@ -37,7 +37,7 @@ class Up2JpaCheckerTests {
     @Test
     void testColumnNullable1() throws BeanException {
         // WHEN
-        final Up2Mapper<Test17Entity, GroupType> mapper = factory.build(Test17Entity.class);
+        final Up2Mapper<Test17Entity, TermType> mapper = factory.mapper(Test17Entity.class);
         // THEN
         assertNotNull(mapper);
     }
@@ -45,7 +45,7 @@ class Up2JpaCheckerTests {
     @Test
     void testColumnNullable2() throws BeanException {
         // WHEN
-        final Up2Mapper<Test18Entity, GroupType> mapper = factory.build(Test18Entity.class);
+        final Up2Mapper<Test18Entity, TermType> mapper = factory.mapper(Test18Entity.class);
         // THEN
         assertNotNull(mapper);
     }
@@ -55,7 +55,7 @@ class Up2JpaCheckerTests {
     @Test
     void testNoTableEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test2Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test2Entity.class));
         // THEN
         assertEquals(Test2Entity.class, error.getSource());
         assertEquals(CLASS, error.getLocator());
@@ -65,7 +65,7 @@ class Up2JpaCheckerTests {
     @Test
     void testNoTableNameEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test3Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test3Entity.class));
         // THEN
         assertEquals(Test3Entity.class, error.getSource());
         assertEquals(CLASS, error.getLocator());
@@ -75,7 +75,7 @@ class Up2JpaCheckerTests {
     @Test
     void testNoTableNameUpperEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test4Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test4Entity.class));
         // THEN
         assertEquals(Test4Entity.class, error.getSource());
         assertEquals(CLASS, error.getLocator());
@@ -85,7 +85,7 @@ class Up2JpaCheckerTests {
     @Test
     void testNoTableNamePrefixEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test5Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test5Entity.class));
         // THEN
         assertEquals(Test5Entity.class, error.getSource());
         assertEquals(CLASS, error.getLocator());
@@ -95,7 +95,7 @@ class Up2JpaCheckerTests {
     @Test
     void testInvalidTableNameEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test6Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test6Entity.class));
         // THEN
         assertEquals(Test6Entity.class, error.getSource());
         assertEquals(CLASS, error.getLocator());
@@ -105,7 +105,7 @@ class Up2JpaCheckerTests {
     @Test
     void testPrefixUppercaseEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test7Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test7Entity.class));
         // THEN
         assertEquals(Test7Entity.class, error.getSource());
         assertEquals(CLASS, error.getLocator());
@@ -115,7 +115,7 @@ class Up2JpaCheckerTests {
     @Test
     void testPrefixUnderscoreEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test8Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test8Entity.class));
         // THEN
         assertEquals(Test8Entity.class, error.getSource());
         assertEquals(CLASS, error.getLocator());
@@ -125,7 +125,7 @@ class Up2JpaCheckerTests {
     @Test
     void testMissingColumnNameEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test10Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test10Entity.class));
         // THEN
         assertEquals(Test10Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -135,7 +135,7 @@ class Up2JpaCheckerTests {
     @Test
     void testColumnNamePrefixEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test11Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test11Entity.class));
         // THEN
         assertEquals(Test11Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -145,7 +145,7 @@ class Up2JpaCheckerTests {
     @Test
     void testColumnNameUpperEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test12Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test12Entity.class));
         // THEN
         assertEquals(Test12Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -155,7 +155,7 @@ class Up2JpaCheckerTests {
     @Test
     void testColumnNameSpaceEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test13Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test13Entity.class));
         // THEN
         assertEquals(Test13Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -165,7 +165,7 @@ class Up2JpaCheckerTests {
     @Test
     void testNoSizeBean() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test15Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test15Entity.class));
         // THEN
         assertEquals(Test15Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -175,7 +175,7 @@ class Up2JpaCheckerTests {
     @Test
     void testColumnLengthEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test14Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test14Entity.class));
         // THEN
         assertEquals(Test14Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -185,7 +185,7 @@ class Up2JpaCheckerTests {
     @Test
     void testColumnLengthPositive() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test38Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test38Entity.class));
         // THEN
         assertEquals(Test38Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -195,7 +195,7 @@ class Up2JpaCheckerTests {
     @Test
     void testColumnNullableEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test16Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test16Entity.class));
         // THEN
         assertEquals(Test16Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -205,7 +205,7 @@ class Up2JpaCheckerTests {
     @Test
     void testColumnManyNullableEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test19Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test19Entity.class));
         // THEN
         assertEquals(Test19Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -215,7 +215,7 @@ class Up2JpaCheckerTests {
     @Test
     void testSizeMaxPositive() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test39Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test39Entity.class));
         // THEN
         assertEquals(Test39Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -225,7 +225,7 @@ class Up2JpaCheckerTests {
     @Test
     void testSizeMinBean() throws BeanException {
         // GIVEN
-        final Up2Mapper<Test20Entity, GroupType> mapper = factory.build(Test20Entity.class);
+        final Up2Mapper<Test20Entity, TermType> mapper = factory.mapper(Test20Entity.class);
         // THEN
         assertNotNull(mapper);
     }
@@ -233,7 +233,7 @@ class Up2JpaCheckerTests {
     @Test
     void testInvalidNotNullEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test21Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test21Entity.class));
         // THEN
         assertEquals(Test21Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -243,7 +243,7 @@ class Up2JpaCheckerTests {
     @Test
     void testInvalidSizeEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test22Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test22Entity.class));
         // THEN
         assertEquals(Test22Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -253,7 +253,7 @@ class Up2JpaCheckerTests {
     @Test
     void testIntegerPrecisionEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test23Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test23Entity.class));
         // THEN
         assertEquals(Test23Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -263,7 +263,7 @@ class Up2JpaCheckerTests {
     @Test
     void testIntegerScaleEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test24Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test24Entity.class));
         // THEN
         assertEquals(Test24Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -273,7 +273,7 @@ class Up2JpaCheckerTests {
     @Test
     void testIntegerScaleConverter() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test28Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test28Entity.class));
         // THEN
         assertEquals(Test28Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -283,7 +283,7 @@ class Up2JpaCheckerTests {
     @Test
     void testLongPrecisionEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test25Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test25Entity.class));
         // THEN
         assertEquals(Test25Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -293,7 +293,7 @@ class Up2JpaCheckerTests {
     @Test
     void testLongScaleEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test26Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test26Entity.class));
         // THEN
         assertEquals(Test26Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -303,7 +303,7 @@ class Up2JpaCheckerTests {
     @Test
     void testLongScaleConverter() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test27Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test27Entity.class));
         // THEN
         assertEquals(Test27Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -313,7 +313,7 @@ class Up2JpaCheckerTests {
     @Test
     void testShortPrecisionEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test29Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test29Entity.class));
         // THEN
         assertEquals(Test29Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -323,7 +323,7 @@ class Up2JpaCheckerTests {
     @Test
     void testShortScaleEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test30Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test30Entity.class));
         // THEN
         assertEquals(Test30Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -333,7 +333,7 @@ class Up2JpaCheckerTests {
     @Test
     void testShortScaleConverter() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test31Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test31Entity.class));
         // THEN
         assertEquals(Test31Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -343,7 +343,7 @@ class Up2JpaCheckerTests {
     @Test
     void testBytePrecisionEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test32Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test32Entity.class));
         // THEN
         assertEquals(Test32Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -353,7 +353,7 @@ class Up2JpaCheckerTests {
     @Test
     void testByteScaleEntity() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test33Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test33Entity.class));
         // THEN
         assertEquals(Test33Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -363,7 +363,7 @@ class Up2JpaCheckerTests {
     @Test
     void testByteScaleConverter() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test34Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test34Entity.class));
         // THEN
         assertEquals(Test34Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -373,7 +373,7 @@ class Up2JpaCheckerTests {
     @Test
     void testPrecisionPositive() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test35Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test35Entity.class));
         // THEN
         assertEquals(Test35Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -383,7 +383,7 @@ class Up2JpaCheckerTests {
     @Test
     void testScalePositive() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test36Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test36Entity.class));
         // THEN
         assertEquals(Test36Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -393,7 +393,7 @@ class Up2JpaCheckerTests {
     @Test
     void testDigits() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test37Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test37Entity.class));
         // THEN
         assertEquals(Test37Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -403,7 +403,7 @@ class Up2JpaCheckerTests {
     @Test
     void testBigIntegerScale() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test41Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test41Entity.class));
         // THEN
         assertEquals(Test41Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -413,7 +413,7 @@ class Up2JpaCheckerTests {
     @Test
     void testDecimalScale() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test40Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test40Entity.class));
         // THEN
         assertEquals(Test40Entity.class, error.getSource());
         assertEquals("key", error.getLocator());
@@ -423,7 +423,7 @@ class Up2JpaCheckerTests {
     @Test
     void testDecimalConverter() {
         // GIVEN
-        final BeanException error = assertThrows(BeanException.class, () -> factory.build(Test42Entity.class));
+        final BeanException error = assertThrows(BeanException.class, () -> factory.mapper(Test42Entity.class));
         // THEN
         assertEquals(Test42Entity.class, error.getSource());
         assertEquals("key", error.getLocator());

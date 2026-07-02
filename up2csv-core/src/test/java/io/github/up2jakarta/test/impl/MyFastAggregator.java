@@ -5,10 +5,10 @@ import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.impl.dto.Invoice;
 
-public class MyFastAggregator extends FastImporter<GroupType, SegmentType, Invoice, InputRecord, InputError> {
+public class MyFastAggregator extends FastImporter<TermType, SegmentType, Invoice, InputRecord, InputError> {
 
-    public MyFastAggregator(Up2Factory<GroupType> factory) throws BeanException {
-        super(factory, Invoice.class, SegmentType.S01);
+    public MyFastAggregator(Up2Factory<TermType> factory) throws BeanException {
+        super(factory, Invoice.class, SegmentType.class);
     }
 
     @Override

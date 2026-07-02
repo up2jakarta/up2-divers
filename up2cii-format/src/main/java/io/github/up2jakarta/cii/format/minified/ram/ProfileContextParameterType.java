@@ -10,9 +10,9 @@ import javax.annotation.processing.Generated;
 public class ProfileContextParameterType extends DocumentContextParameterType<ProfileType> {
 
     // BT-24
+    @XmlElement(name = "ID")
     private ProfileType id;
 
-    @XmlElement(name = "ID")
     @Override
     public ProfileType getId() {
         return this.id;

@@ -1,7 +1,6 @@
 package io.github.up2jakarta.csv.api.ext;
 
-import io.github.up2jakarta.csv.data.Segment;
-import io.github.up2jakarta.lov.core.BeanException;
+import io.github.up2jakarta.csv.Segment;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -23,7 +22,7 @@ public abstract class SimpleExtension<T, C extends Annotation> implements TypeEx
     }
 
     @Override
-    public final Optional<C> resolve(Class<? extends Segment> st, Field pf, Class<?> pt, Field... ps) throws BeanException {
+    public final Optional<C> resolve(Class<? extends Segment> st, Field pf, Class<?> pt, Field... ps) {
         return Optional.ofNullable(pf.getAnnotation(type));
     }
 

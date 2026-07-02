@@ -1,40 +1,52 @@
 package io.github.up2jakarta.test.core.misc;
 
-import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.cfg.Up2Boolean;
-import io.github.up2jakarta.csv.cfg.Up2Decimal;
-import io.github.up2jakarta.csv.cfg.Up2Number;
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.cfg.*;
 
 public class Test2Primitive implements Segment {
 
     @Position(0)
     @Up2Boolean
-    private boolean aBoolean;
+    private final boolean aBoolean;
 
     @Position(1)
     @Up2Number
-    private byte aByte;
+    private final byte aByte;
 
     @Position(2)
-    @Up2Number
-    private short aShort;
+    @Up2Character
+    private final char aChar;
 
     @Position(3)
     @Up2Number
-    private int anInt;
+    private final short aShort;
 
     @Position(4)
     @Up2Number
-    private long aLong;
+    private final int anInt;
 
     @Position(5)
-    @Up2Decimal(2)
-    private float aFloat;
+    @Up2Number
+    private final long aLong;
 
     @Position(6)
+    @Up2Decimal(2)
+    private final float aFloat;
+
+    @Position(7)
     @Up2Decimal(4)
-    private double aDouble;
+    private final double aDouble;
+
+    public Test2Primitive(boolean aBoolean, byte aByte, char aChar, short aShort, int anInt, long aLong, float aFloat, double aDouble) {
+        this.aBoolean = aBoolean;
+        this.aByte = aByte;
+        this.aChar = aChar;
+        this.aShort = aShort;
+        this.anInt = anInt;
+        this.aLong = aLong;
+        this.aFloat = aFloat;
+        this.aDouble = aDouble;
+    }
 
     public boolean isABoolean() {
         return aBoolean;
@@ -42,6 +54,10 @@ public class Test2Primitive implements Segment {
 
     public byte getAByte() {
         return aByte;
+    }
+
+    public char getAChar() {
+        return aChar;
     }
 
     public short getAShort() {

@@ -1,7 +1,7 @@
 package io.github.up2jakarta.test.core.misc.jpa;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.data.Segment;
 import io.github.up2jakarta.lov.CodeList;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;

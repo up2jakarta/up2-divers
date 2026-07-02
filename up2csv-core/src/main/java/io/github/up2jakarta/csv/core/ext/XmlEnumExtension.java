@@ -1,14 +1,14 @@
 package io.github.up2jakarta.csv.core.ext;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.ext.TypeExtension;
 import io.github.up2jakarta.csv.cfg.Error;
-import io.github.up2jakarta.csv.data.Segment;
+import io.github.up2jakarta.csv.core.Up2Adapter;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.TypeAdapter;
 import io.github.up2jakarta.lov.TypeConverter;
 import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.BeanException;
-import io.github.up2jakarta.lov.core.TypeSupport;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -17,16 +17,11 @@ import jakarta.xml.bind.annotation.XmlEnumValue;
 import jakarta.xml.bind.annotation.XmlType;
 
 import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_XML_ENUM;
-import static io.github.up2jakarta.csv.core.ext.Beans.error;
-import static io.github.up2jakarta.csv.core.ext.Beans.getTypeName;
+import static io.github.up2jakarta.csv.core.ext.Beans.*;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
-import static java.lang.String.format;
-import static java.util.Collections.unmodifiableMap;
 
 /**
  * {@link XmlType} extension that supports {@link XmlEnum}.
@@ -44,17 +39,18 @@ public final class XmlEnumExtension implements TypeExtension<Enum<?>, XmlEnum> {
         super();
     }
 
-    private static Map<Enum<?>, String> inverse(Map<String, Enum<?>> source) {
-        final Map<Enum<?>, String> mapping = new TreeMap<>();
-        for (final Map.Entry<String, Enum<?>> entry : source.entrySet()) {
+    private static <E extends Enum<E>> Map<E, String> inverse(Map<String, E> source, Class<E> type) {
+        final Map<E, String> mapping = new EnumMap<>(type);
+        for (final Map.Entry<String, E> entry : source.entrySet()) {
             mapping.put(entry.getValue(), entry.getKey());
         }
-        return unmodifiableMap(mapping);
+        return Collections.unmodifiableMap(mapping);
     }
 
-    private static <V extends Enum<?>> Map<String, V> getConstants(Class<V> type) throws BeanException {
-        final Map<String, V> mapping = new TreeMap<>();
-        for (final V constant : type.getEnumConstants()) {
+    private static <E extends Enum<E>> Map<String, E> getConstants(Class<E> type) throws BeanException {
+        final E[] values = type.getEnumConstants();
+        final Map<String, E> mapping = new HashMap<>(values.length);
+        for (final E constant : values) {
             var name = constant.name();
             try {
                 final XmlEnumValue xml = type.getField(name).getAnnotation(XmlEnumValue.class);
@@ -67,7 +63,24 @@ public final class XmlEnumExtension implements TypeExtension<Enum<?>, XmlEnum> {
                 throw new BeanException(type, name, "must be unique");
             }
         }
-        return unmodifiableMap(mapping);
+        return Map.copyOf(mapping);
+    }
+
+    private static <E extends Enum<E>> TypeAdapter<E> resolve(Field source, Class<?> type) throws BeanException {
+        final Class<E> et = cast(type);
+        final Map<String, E> mapping = getConstants(et);
+        final Optional<Error> error = error(source, et);
+        final SeverityType level = error.map(Error::level).orElse(ERROR);
+        final String code = error.map(Error::value).orElse(EC_XML_ENUM);
+        final TypeConverter<E> parser = k -> {
+            final E value = mapping.get(k);
+            if (value == null) {
+                throw new TypeException(level, code, String.format(FORMAT, k, getTypeName(et)));
+            }
+            return value;
+        };
+        final Map<E, String> inverse = inverse(mapping, et);
+        return new Up2Adapter<>(et, parser, inverse::get);
     }
 
     @Override
@@ -81,19 +94,7 @@ public final class XmlEnumExtension implements TypeExtension<Enum<?>, XmlEnum> {
 
     @Override
     public TypeAdapter<? extends Enum<?>> resolve(Field pf, Class<Enum<?>> pt, XmlEnum pc) throws BeanException {
-        final Map<String, Enum<?>> mapping = getConstants(pt);
-        final Optional<Error> error = error(pf, pt);
-        final SeverityType level = error.map(Error::level).orElse(ERROR);
-        final String code = error.map(Error::value).orElse(EC_XML_ENUM);
-        final TypeConverter<Enum<?>> parser = k -> {
-            final Enum<?> value = mapping.get(k);
-            if (value == null) {
-                throw new TypeException(level, code, format(FORMAT, k, getTypeName(pt)));
-            }
-            return value;
-        };
-        final Map<Enum<?>, String> inverse = inverse(mapping);
-        return new TypeSupport<>(pt, parser, inverse::get);
+        return resolve(pf, pt);
     }
 
 }

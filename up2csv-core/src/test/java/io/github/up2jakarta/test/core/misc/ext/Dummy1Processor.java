@@ -27,6 +27,7 @@ public class Dummy1Processor implements InputProcessor<Dummy1> {
         throw new RuntimeException(value + " message");
     }
 
+    @Override
     public String process(String value, Dummy1 ignore) {
         return process(value);
     }

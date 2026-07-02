@@ -21,11 +21,14 @@ public final class TrimProcessor implements InputProcessor<Up2Trim> {
      * @return the input data that their values have been trimmed
      */
     public static String[] trim(String[] values, String... nulls) {
-        if (values == null || values.length == 0 || nulls.length == 0) {
+        if (nulls.length == 0 || values == null) {
             return values;
         }
         for (var i = 0; i < values.length; i++) {
-            values[i] = trim(values[i], nulls);
+            final String value = values[i];
+            if (value != null) {
+                values[i] = trim(value.trim(), nulls);
+            }
         }
         return values;
     }
@@ -38,10 +41,6 @@ public final class TrimProcessor implements InputProcessor<Up2Trim> {
      * @return data that has been trimmed
      */
     public static String trim(String value, String... nulls) {
-        if (value == null) {
-            return null;
-        }
-        value = value.trim();
         for (final String nullValue : nulls) {
             if (nullValue.equals(value)) {
                 return null;
@@ -52,7 +51,10 @@ public final class TrimProcessor implements InputProcessor<Up2Trim> {
 
     @Override
     public String process(String value, Up2Trim config) {
-        return trim(value, config.value());
+        if (value != null) {
+            return trim(value.trim(), config.value());
+        }
+        return null;
     }
 
 }

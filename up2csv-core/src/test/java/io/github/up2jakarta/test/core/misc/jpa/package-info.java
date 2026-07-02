@@ -1,4 +1,4 @@
-@Prefix("TU_")
+@Up2Prefix("TU_")
 package io.github.up2jakarta.test.core.misc.jpa;
 
-import io.github.up2jakarta.csv.core.ext.Prefix;
+import io.github.up2jakarta.csv.core.ext.Up2Prefix;

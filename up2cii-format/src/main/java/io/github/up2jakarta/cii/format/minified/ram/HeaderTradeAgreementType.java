@@ -10,7 +10,7 @@ import java.util.List;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HeaderTradeAgreementType", propOrder = {
         "buyerReference",
         "sellerTradeParty",
@@ -27,35 +27,45 @@ import java.util.List;
 public class HeaderTradeAgreementType {
 
     // BT-10
+    @XmlElement(name = "BuyerReference")
     private String buyerReference;
 
     // BG-4
+    @XmlElement(name = "SellerTradeParty")
     private TradePartyType sellerTradeParty;
 
     // BG-7
+    @XmlElement(name = "BuyerTradeParty")
     private TradePartyType buyerTradeParty;
 
     // EXT-FR-FE-BG-03
+    @XmlElement(name = "SalesAgentTradeParty")
     private TradePartyType salesAgentTradeParty;
 
     // BG-11
+    @XmlElement(name = "SellerTaxRepresentativeTradeParty")
     private TradePartyType sellerTaxRepresentativeTradeParty;
 
+    @XmlElement(name = "SellerOrderReferencedDocument")
     private ReferencedDocumentType sellerOrderReferencedDocument;
 
+    @XmlElement(name = "BuyerOrderReferencedDocument")
     private ReferencedDocumentType buyerOrderReferencedDocument;
 
+    @XmlElement(name = "ContractReferencedDocument")
     private ReferencedDocumentType contractReferencedDocument;
 
     // BG-24
+    @XmlElement(name = "AdditionalReferencedDocument")
     private List<ReferencedDocumentType> additionalReferencedDocument;
 
     // EXT-FR-FE-BG-01
+    @XmlElement(name = "BuyerAgentTradeParty")
     private TradePartyType buyerAgentTradeParty;
 
+    @XmlElement(name = "SpecifiedProcuringProject")
     private ProcuringProjectType specifiedProcuringProject;
 
-    @XmlElement(name = "BuyerReference")
     public String getBuyerReference() {
         return this.buyerReference;
     }
@@ -64,7 +74,6 @@ public class HeaderTradeAgreementType {
         this.buyerReference = buyerReference;
     }
 
-    @XmlElement(name = "SellerTradeParty")
     public TradePartyType getSellerTradeParty() {
         return this.sellerTradeParty;
     }
@@ -73,7 +82,6 @@ public class HeaderTradeAgreementType {
         this.sellerTradeParty = sellerTradeParty;
     }
 
-    @XmlElement(name = "BuyerTradeParty")
     public TradePartyType getBuyerTradeParty() {
         return this.buyerTradeParty;
     }
@@ -82,7 +90,6 @@ public class HeaderTradeAgreementType {
         this.buyerTradeParty = buyerTradeParty;
     }
 
-    @XmlElement(name = "SalesAgentTradeParty")
     public TradePartyType getSalesAgentTradeParty() {
         return this.salesAgentTradeParty;
     }
@@ -91,7 +98,6 @@ public class HeaderTradeAgreementType {
         this.salesAgentTradeParty = salesAgentTradeParty;
     }
 
-    @XmlElement(name = "SellerTaxRepresentativeTradeParty")
     public TradePartyType getSellerTaxRepresentativeTradeParty() {
         return this.sellerTaxRepresentativeTradeParty;
     }
@@ -100,7 +106,6 @@ public class HeaderTradeAgreementType {
         this.sellerTaxRepresentativeTradeParty = sellerTaxRepresentativeTradeParty;
     }
 
-    @XmlElement(name = "SellerOrderReferencedDocument")
     public ReferencedDocumentType getSellerOrderReferencedDocument() {
         return this.sellerOrderReferencedDocument;
     }
@@ -109,7 +114,6 @@ public class HeaderTradeAgreementType {
         this.sellerOrderReferencedDocument = sellerOrderReferencedDocument;
     }
 
-    @XmlElement(name = "BuyerOrderReferencedDocument")
     public ReferencedDocumentType getBuyerOrderReferencedDocument() {
         return this.buyerOrderReferencedDocument;
     }
@@ -118,7 +122,6 @@ public class HeaderTradeAgreementType {
         this.buyerOrderReferencedDocument = buyerOrderReferencedDocument;
     }
 
-    @XmlElement(name = "ContractReferencedDocument")
     public ReferencedDocumentType getContractReferencedDocument() {
         return this.contractReferencedDocument;
     }
@@ -127,7 +130,6 @@ public class HeaderTradeAgreementType {
         this.contractReferencedDocument = contractReferencedDocument;
     }
 
-    @XmlElement(name = "AdditionalReferencedDocument")
     public List<ReferencedDocumentType> getAdditionalReferencedDocument() {
         return this.additionalReferencedDocument;
     }
@@ -136,7 +138,6 @@ public class HeaderTradeAgreementType {
         this.additionalReferencedDocument = additionalReferencedDocument;
     }
 
-    @XmlElement(name = "BuyerAgentTradeParty")
     public TradePartyType getBuyerAgentTradeParty() {
         return this.buyerAgentTradeParty;
     }
@@ -145,7 +146,6 @@ public class HeaderTradeAgreementType {
         this.buyerAgentTradeParty = buyerAgentTradeParty;
     }
 
-    @XmlElement(name = "SpecifiedProcuringProject")
     public ProcuringProjectType getSpecifiedProcuringProject() {
         return this.specifiedProcuringProject;
     }

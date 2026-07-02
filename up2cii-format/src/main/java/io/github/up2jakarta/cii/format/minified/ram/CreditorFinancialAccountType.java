@@ -9,7 +9,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CreditorFinancialAccountType", propOrder = {
         "ibanId",
         "accountName"
@@ -17,12 +17,13 @@ import javax.annotation.processing.Generated;
 public class CreditorFinancialAccountType {
 
     // BT-84
+    @XmlElement(name = "IBANID")
     private String ibanId;
 
     // BT-85
+    @XmlElement(name = "AccountName")
     private String accountName;
 
-    @XmlElement(name = "IBANID")
     public String getIbanId() {
         return this.ibanId;
     }
@@ -31,7 +32,6 @@ public class CreditorFinancialAccountType {
         this.ibanId = ibanId;
     }
 
-    @XmlElement(name = "AccountName")
     public String getAccountName() {
         return this.accountName;
     }

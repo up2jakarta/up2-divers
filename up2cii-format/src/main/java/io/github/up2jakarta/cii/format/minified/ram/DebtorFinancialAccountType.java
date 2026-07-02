@@ -9,14 +9,14 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DebtorFinancialAccountType", propOrder = {"ibanId"})
 public class DebtorFinancialAccountType {
 
     // BT-91
+    @XmlElement(name = "IBANID")
     private String ibanId;
 
-    @XmlElement(name = "IBANID")
     public String getIbanId() {
         return this.ibanId;
     }

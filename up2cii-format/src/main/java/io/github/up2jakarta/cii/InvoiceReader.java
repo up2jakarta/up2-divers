@@ -21,7 +21,7 @@ public class InvoiceReader<I> extends XProcessor<I> implements XReader<I> {
     }
 
     @Override
-    public I read(StreamSource xmlFile, boolean failFast, boolean lenient) throws IOException {
+    public I read(StreamSource xmlFile, boolean failFast, boolean lenient) {
         try {
             var handler = newHandler(ErrorEnhancer::enhance, failFast, lenient);
             var unmarshaller = newUnmarshaller(handler);

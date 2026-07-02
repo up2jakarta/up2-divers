@@ -10,7 +10,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "LineTradeDeliveryType", propOrder = {
         "billedQuantity",
         "shipToTradeParty",
@@ -21,21 +21,25 @@ import javax.annotation.processing.Generated;
 public class LineTradeDeliveryType {
 
     // BT-129
+    @XmlElement(name = "BilledQuantity")
     private QuantityType billedQuantity;
 
     // EXT-FR-FE-BG-10
+    @XmlElement(name = "ShipToTradeParty")
     private TradePartyType shipToTradeParty;
 
     // EXT-FR-FE-BG-11
+    @XmlElement(name = "ActualDeliverySupplyChainEvent")
     private SupplyChainEventType actualDeliverySupplyChainEvent;
 
     // EXT-FR-FE-BG-08
+    @XmlElement(name = "DespatchAdviceReferencedDocument")
     private ReferencedDocumentType despatchAdviceReferencedDocument;
 
     // EXT-FR-FE-BG-07
+    @XmlElement(name = "ReceivingAdviceReferencedDocument")
     private ReferencedDocumentType receivingAdviceReferencedDocument;
 
-    @XmlElement(name = "BilledQuantity")
     public QuantityType getBilledQuantity() {
         return this.billedQuantity;
     }
@@ -44,7 +48,6 @@ public class LineTradeDeliveryType {
         this.billedQuantity = billedQuantity;
     }
 
-    @XmlElement(name = "ShipToTradeParty")
     public TradePartyType getShipToTradeParty() {
         return this.shipToTradeParty;
     }
@@ -53,7 +56,6 @@ public class LineTradeDeliveryType {
         this.shipToTradeParty = shipToTradeParty;
     }
 
-    @XmlElement(name = "ActualDeliverySupplyChainEvent")
     public SupplyChainEventType getActualDeliverySupplyChainEvent() {
         return this.actualDeliverySupplyChainEvent;
     }
@@ -62,7 +64,6 @@ public class LineTradeDeliveryType {
         this.actualDeliverySupplyChainEvent = actualDeliverySupplyChainEvent;
     }
 
-    @XmlElement(name = "DespatchAdviceReferencedDocument")
     public ReferencedDocumentType getDespatchAdviceReferencedDocument() {
         return this.despatchAdviceReferencedDocument;
     }
@@ -71,7 +72,6 @@ public class LineTradeDeliveryType {
         this.despatchAdviceReferencedDocument = despatchAdviceReferencedDocument;
     }
 
-    @XmlElement(name = "ReceivingAdviceReferencedDocument")
     public ReferencedDocumentType getReceivingAdviceReferencedDocument() {
         return this.receivingAdviceReferencedDocument;
     }

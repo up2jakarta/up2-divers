@@ -10,14 +10,14 @@ import java.math.BigDecimal;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TradeSettlementLineMonetarySummationType", propOrder = {"lineTotalAmount"})
 public class TradeSettlementLineMonetarySummationType {
 
     // BT-131
+    @XmlElement(name = "LineTotalAmount")
     private BigDecimal lineTotalAmount;
 
-    @XmlElement(name = "LineTotalAmount")
     public BigDecimal getLineTotalAmount() {
         return this.lineTotalAmount;
     }

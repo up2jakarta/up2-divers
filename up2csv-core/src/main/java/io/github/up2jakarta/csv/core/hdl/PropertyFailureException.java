@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.core.hdl;
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.hdl.IBusinessEvent;
 import io.github.up2jakarta.csv.api.hdl.IPropertyEvent;
-import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.csv.data.Listable;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.TypeException;
@@ -27,7 +27,7 @@ public final class PropertyFailureException extends FailureException implements 
 
     private final List<IEvent<?>> events;
 
-    PropertyFailureException(DataType<?> type, Integer offset, TypeException cause, List<? extends IEvent<?>> events) {
+    PropertyFailureException(ITerm<?> type, Integer offset, TypeException cause, List<? extends IEvent<?>> events) {
         super(type, offset, cause.getLevel(), cause.getCode(), cause);
         this.events = List.copyOf(events);
     }

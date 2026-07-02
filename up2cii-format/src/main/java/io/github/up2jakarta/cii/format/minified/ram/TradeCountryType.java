@@ -10,14 +10,14 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "v3.0", comments = "by A.ABBESSI")
 @SuppressWarnings("unused")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TradeCountryType", propOrder = {"id"})
 public class TradeCountryType {
 
     // BT-159
+    @XmlElement(name = "ID")
     private CountryIDType id;
 
-    @XmlElement(name = "ID")
     public CountryIDType getId() {
         return this.id;
     }

@@ -9,6 +9,17 @@ package io.github.up2jakarta.lov;
 public interface CodeList<T extends CodeList<T>> {
 
     /**
+     * Returns string representation of the specified code-list <code>code</code> and <code>name</code>.
+     *
+     * @param code the code-list code
+     * @param name the code-list name
+     * @return the string representation
+     */
+    static String toString(String code, String name) {
+        return "#[" + code + "] " + name;
+    }
+
+    /**
      * @return the code value.
      */
     String getCode();

@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.api.hdl;
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
-import io.github.up2jakarta.csv.data.DataType;
+import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.csv.data.Listable;
 
 /**
@@ -12,12 +12,12 @@ import io.github.up2jakarta.csv.data.Listable;
  * It's responsible to creates {@link BusinessHandler} for multiple records and collects all errors related to each
  * input record during the aggregation of many records to one business-object.
  *
- * @param <D> the business data type
+ * @param <D> the business term type
  * @param <R> the input record type
  * @param <E> the event type
  * @see io.github.up2jakarta.csv.core.BusinessImporter
  */
-public interface IEventBuilder<D extends DataType<D>, R extends IRecord<?>, E extends IEvent<D>> extends Listable<E> {
+public interface IEventBuilder<D extends ITerm<D>, R extends IRecord<?>, E extends IEvent<D>> extends Listable<E> {
 
     /**
      * Creates and returns a valid event-handler for the specified record.

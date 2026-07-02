@@ -21,6 +21,7 @@ module up2jakarta.test {
     exports io.github.up2jakarta.test.dto;
     exports io.github.up2jakarta.test.impl;
 
+    exports io.github.up2jakarta.test.impl.sln to spring.beans;
     exports io.github.up2jakarta.test.impl.fast to spring.beans;
     exports io.github.up2jakarta.test.impl.full to spring.beans;
     exports io.github.up2jakarta.test.impl.unit to spring.beans;

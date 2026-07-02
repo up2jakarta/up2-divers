@@ -1,7 +1,7 @@
 package io.github.up2jakarta.test.core.misc.map.oneshot;
 
+import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.cfg.Position;
-import io.github.up2jakarta.csv.data.Segment;
 
 public abstract class AddressSegment<K extends Comparable<K>> implements Segment {
 

@@ -5,8 +5,8 @@ import io.github.up2jakarta.csv.io.UnitFileReader;
 import io.github.up2jakarta.job.core.SafeTranslator;
 import io.github.up2jakarta.job.core.SafeUtil;
 import io.github.up2jakarta.test.dto.Invoice;
-import io.github.up2jakarta.test.impl.GroupType;
 import io.github.up2jakarta.test.impl.SegmentType;
+import io.github.up2jakarta.test.impl.TermType;
 import org.apache.commons.csv.CSVFormat;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobParameters;
@@ -20,7 +20,7 @@ import java.io.File;
 import static io.github.up2jakarta.test.AbstractJobITest.INPUT_FILE;
 import static java.util.Objects.requireNonNull;
 
-public class InvoiceReader extends UnitFileReader<Invoice, GroupType, SegmentType, InputRecord, InputError> implements ItemReader<Up2Result<Invoice, InputError>>, StepExecutionListener {
+public class InvoiceReader extends UnitFileReader<Invoice, TermType, SegmentType, InputRecord, InputError> implements ItemReader<Up2Result<Invoice, InputError>>, StepExecutionListener {
 
     public InvoiceReader(InvoiceImporter importer, CSVFormat format) {
         super(importer, format, "-");

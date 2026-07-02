@@ -1,10 +1,11 @@
 package io.github.up2jakarta.lov.core;
 
 import java.lang.reflect.*;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import static io.github.up2jakarta.lov.core.Defaults.wrap;
-import static io.github.up2jakarta.lov.core.Localizable.CONSTRUCTOR;
+import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isStatic;
 
 /**
@@ -21,18 +22,6 @@ public abstract class Beans {
             return name.substring(i + 1);
         }
         return type.getSimpleName();
-    }
-
-    private static AccessException translate(Member origin, Throwable cause) {
-        if (cause instanceof AccessException ex) {
-            return ex;
-        }
-        final Class<?> source = origin.getDeclaringClass();
-        final String locator = (origin instanceof Constructor<?>) ? CONSTRUCTOR : origin.getName();
-        if (cause instanceof BeanException ex && source.equals(ex.getSource())) {
-            return new AccessException(source, locator, ex.getMessage());
-        }
-        return new AccessException(source, locator, cause);
     }
 
     private static Type[] interfaceArguments(Class<?> type, Class<?> expected, final Type... arguments) {
@@ -74,6 +63,15 @@ public abstract class Beans {
             sb.insert(0, delimiter).insert(0, typeName(type));
         }
         return sb;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <E> Class<E> cast(Class<?> type) {
+        return (Class<E>) type;
+    }
+
+    public static boolean isInnerType(Class<?> type) {
+        return type.getEnclosingClass() != null && !isStatic(type.getModifiers());
     }
 
     public static String getTypeName(Class<?> type) {
@@ -127,6 +125,20 @@ public abstract class Beans {
             return getter.getReturnType();
         }
         return void.class;
+    }
+
+    public static Type unwrapType(Field field, Type... arguments) throws BeanException {
+        final Class<?> type = field.getType();
+        if (Wrapper.class.isAssignableFrom(type)) {
+            if (!isFinal(field.getModifiers())) {
+                throw new BeanException(field, "should be final or replace Wrapper with Optional");
+            }
+            return getPropertyArguments(field, arguments)[0];
+        }
+        if (Optional.class.isAssignableFrom(type)) {
+            return getPropertyArguments(field, arguments)[0];
+        }
+        return getPropertyType(field, arguments);
     }
 
     public static Type getPropertyType(AccessibleObject property, Type... arguments) {
@@ -228,69 +240,6 @@ public abstract class Beans {
             }
         }
         return defaultType;
-    }
-
-    public static <T> Constructor<T> getDeclaredConstructor(Class<T> type, Class<?>... types) throws BeanException {
-        try {
-            final Constructor<T> constructor = type.getDeclaredConstructor(types);
-            constructor.setAccessible(true);
-            return constructor;
-        } catch (Exception cause) {
-            throw new BeanException(type, CONSTRUCTOR, cause.getMessage());
-        }
-    }
-
-    public static <T> T newInstance(Constructor<T> constructor, Object... arguments) throws AccessException {
-        try {
-            return constructor.newInstance(arguments);
-        } catch (InvocationTargetException cause) {
-            throw translate(constructor, cause.getTargetException());
-        } catch (Exception ex) {
-            throw translate(constructor, ex);
-        }
-    }
-
-    public static <V> void setValue(Object bean, V value, Method setter) throws AccessException {
-        try {
-            setter.invoke(bean, value);
-        } catch (InvocationTargetException cause) {
-            throw translate(setter, cause.getTargetException());
-        } catch (Exception cause) {
-            throw translate(setter, cause);
-        }
-    }
-
-    public static <V> void setValue(Object bean, V value, Field field) throws AccessException {
-        try {
-            field.set(bean, value);
-        } catch (Exception cause) {
-            throw translate(field, cause);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <V> V getValue(Object bean, Method getter) throws AccessException {
-        try {
-            return (V) getter.invoke(bean);
-        } catch (InvocationTargetException cause) {
-            throw translate(getter, cause.getTargetException());
-        } catch (Exception cause) {
-            throw translate(getter, cause);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <V> V getValue(Object bean, Field field) throws AccessException {
-        try {
-            return (V) field.get(bean);
-        } catch (Exception cause) {
-            throw translate(field, cause);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <E> Class<E> cast(Class<?> type) {
-        return (Class<E>) type;
     }
 
 }
