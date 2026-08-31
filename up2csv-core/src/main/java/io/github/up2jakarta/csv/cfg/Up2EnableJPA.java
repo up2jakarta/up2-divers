@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.cfg;
 
-import io.github.up2jakarta.csv.core.ext.*;
+import io.github.up2jakarta.csv.ext.*;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

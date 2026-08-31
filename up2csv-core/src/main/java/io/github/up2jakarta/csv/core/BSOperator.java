@@ -4,21 +4,21 @@ import io.github.up2jakarta.csv.BusinessId;
 import io.github.up2jakarta.csv.BusinessLink;
 import io.github.up2jakarta.csv.ReferenceId;
 import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.BSAccessor.Mode;
 import io.github.up2jakarta.csv.core.BSBuilder.MEP;
 import io.github.up2jakarta.csv.core.BSContext.VContext;
-import io.github.up2jakarta.csv.core.BSLink.RId;
-import io.github.up2jakarta.csv.core.BSLink.TreeBuilder;
-import io.github.up2jakarta.csv.core.BSLink.TreeContext;
+import io.github.up2jakarta.csv.core.BSLink.LBuilder;
+import io.github.up2jakarta.csv.core.BSLink.TContext;
 import io.github.up2jakarta.csv.core.BSManager.Key;
 import io.github.up2jakarta.csv.core.BSManager.Pod;
-import io.github.up2jakarta.csv.core.BSNode.Flat;
 import io.github.up2jakarta.csv.core.BSOperator.Node;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
-import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.core.BusinessExporter.Format;
+import io.github.up2jakarta.csv.core.BusinessImporter.Mapper;
+import io.github.up2jakarta.csv.hdl.BusinessHandler;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.Validator;
@@ -30,29 +30,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static io.github.up2jakarta.csv.api.ILinker.N;
 import static io.github.up2jakarta.csv.core.BSBuilder.name;
 import static io.github.up2jakarta.csv.core.BSBuilder.path;
-import static io.github.up2jakarta.csv.core.ext.Beans.cast;
+import static io.github.up2jakarta.csv.core.ModeType.MESS;
+import static io.github.up2jakarta.csv.ext.Beans.cast;
 import static io.github.up2jakarta.lov.core.AccessException.notNull;
 
 /**
  * Internal business operator.
  */
 abstract sealed class BSOperator<B extends ITerm<B>, I extends Enum<I> & IType<I>, P extends Node<Segment, B, ?>, S extends Node<Segment, B, ?>> permits BusinessExporter, BusinessImporter {
-    protected final ModeType mode;
+    protected static final String ONLY_ONE = "cardinality must be 1 and only one";
+    protected final IMode mode;
     final Up2Factory<B> factory;
     final BSLink<B, I, P> tree;
     final Class<I> type;
     final int length;
 
-    BSOperator(ModeType mode, Up2Factory<B> factory, Class<Segment> st, Class<I> it) throws BeanException {
+    BSOperator(IMode mode, Up2Factory<B> factory, Class<Segment> st, Class<I> it) throws BeanException {
         this.type = it;
         this.mode = mode;
         this.factory = notNull(factory, this.getClass(), "factory");
         final B bt = factory.resolver.get(Optional.empty(), st).orElse(null);
-        final TreeContext<B, I> tc = new TreeContext<>(it, st);
+        final TContext<B, I> tc = new TContext<>(mode, it, st);
         final P mapper = this.build(factory, st, null);
-        final ICreator<B, I, P> mc = (m, l) -> new BSLink<>(mode, tc.type(), this.offset(m), m, bt, l);
+        final ICreator<B, I, P> mc = (m, l) -> new BSLink<>(tc.type(), this.offset(m), m, bt, l);
         this.tree = this.tree(st, tc.type(), mapper, tc, mc);
         this.length = this.tree.maxOrdinal();
         tc.finalize(st);
@@ -66,8 +69,22 @@ abstract sealed class BSOperator<B extends ITerm<B>, I extends Enum<I> & IType<I
         this.tree = this.tree(source.tree);
     }
 
+    /**
+     * @return the mode type
+     */
+    public final IMode mode() {
+        return mode;
+    }
+
+    /**
+     * @return the business-object type
+     */
+    public final I type() {
+        return tree.key;
+    }
+
     private int offset(P mapper) throws BeanException {
-        final int min = mode.getBeanIdIndex();
+        final int min = mode.getOffset();
         if (mapper.offset != 0) {
             if (mapper.offset < min) {
                 throw new BeanException(mapper.node.type, "@Truncated[value] must be greater or equals to " + min);
@@ -77,9 +94,9 @@ abstract sealed class BSOperator<B extends ITerm<B>, I extends Enum<I> & IType<I
         return min;
     }
 
-    private BSLink<B, I, P> tree(Class<Segment> pc, I pt, P pm, TreeContext<B, I> tc, ICreator<B, I, P> cr) throws BeanException {
+    private BSLink<B, I, P> tree(Class<Segment> pc, I pt, P pm, TContext<B, I> tc, ICreator<B, I, P> cr) throws BeanException {
         tc.pushNode(pc, pt, pm);
-        final TreeBuilder<B, I> cc = new TreeBuilder<>(factory.context, tc, mode);
+        final LBuilder<B, I> lb = new LBuilder<>(factory.context, tc, mode);
         final List<BSLink<B, I, P>> links = new ArrayList<>(pm.node.bsLinks.size());
         for (final Field field : pm.node.bsLinks) {
             for (final BusinessLink link : field.getAnnotationsByType(BusinessLink.class)) {
@@ -98,10 +115,10 @@ abstract sealed class BSOperator<B extends ITerm<B>, I extends Enum<I> & IType<I
                         throw new BeanException(sc, "must have one property annotated with @BusinessId");
                     }
                     tc.pushKey(ct);
-                    node = this.tree(sc, ct, cm, tc, (m, l) -> new BSLink<>(field, link, ct, m, term, l, cc));
+                    node = this.tree(sc, ct, cm, tc, (m, l) -> new BSLink<>(field, link, ct, m, term, l, lb));
                     tc.pollKey();
                 } else {
-                    node = this.tree(sc, ct, cm, tc, (m, l) -> new BSLink<>(field, link, ct, m, term, l, cc));
+                    node = this.tree(sc, ct, cm, tc, (m, l) -> new BSLink<>(field, link, ct, m, term, l, lb));
                 }
                 tc.pollLink();
                 links.add(node);
@@ -119,6 +136,18 @@ abstract sealed class BSOperator<B extends ITerm<B>, I extends Enum<I> & IType<I
             links.add(node);
         }
         return new BSLink<>(tree, mapper, links);
+    }
+
+    String validate(BSLink<B, ?, ?> ln, int size) {
+        if (ln.min > size || size > ln.max) {
+            if (ln.min == 1 && ln.max == 1) {
+                return ONLY_ONE;
+            } else if (ln.max == N) {
+                return "cardinality must be greater than or equal to " + ln.min;
+            }
+            return "cardinality must be between " + ln.min + " and " + ln.max;
+        }
+        return null;
     }
 
     abstract P build(Up2Factory<B> factory, Class<Segment> type, S source) throws BeanException;
@@ -367,7 +396,7 @@ abstract sealed class BSOperator<B extends ITerm<B>, I extends Enum<I> & IType<I
         final BId<Segment, Object, D> businessId;
         final boolean identifiable;
 
-        Node(Validator validator, BSManager.Key<D, S> key, T node) throws BeanException {
+        Node(Validator validator, Key<D, S> key, T node) throws BeanException {
             super(validator, key, node);
             if (node.bsIds.isEmpty()) {
                 //noinspection unchecked
@@ -389,78 +418,47 @@ abstract sealed class BSOperator<B extends ITerm<B>, I extends Enum<I> & IType<I
     }
 
     /**
-     * Internal Business Flatter.
+     * Extended {@link IMode} for {@link ModeType#MESS}
      */
-    static final class Format<S extends Segment, D extends ITerm<D>> extends Node<S, D, BSNode.Flat<S, D>> {
-        Format(Validator validator, BSManager.Key<D, S> key, BSNode.Flat<S, D> node) throws BeanException {
-            super(validator, key, node);
+    static final class XMode implements IMode {
+        private static final XMode FULL = new XMode(1);
+        private final int index, offset, length;
+
+        private XMode(int size) {
+            this.length = MESS.getLength() + size;
+            this.offset = MESS.getOffset() + size;
+            this.index = MESS.getIndex() + size;
         }
 
-        private void format(Flat<?, D> node, String[] result, int offset, Segment bean, List<RId<D>> rids) {
-            if (bean == null) {
-                node.defaultValues(result, offset);
-            } else {
-                for (final BSProperty<?, D> p : node.properties) {
-                    if (p.getClass() == PFragment.class) {
-                        //noinspection unchecked
-                        final PFragment<Segment, D> fp = (PFragment<Segment, D>) p;
-                        format((Flat<?, D>) fp.node, result, offset, fp.value(bean), rids);
-                    } else {
-                        boolean mapped = true;
-                        for (final RId<D> rid : rids) {
-                            if (rid.reference.property.offset == p.offset) {
-                                mapped = false;
-                                break;
-                            }
-                        }
-                        if (mapped) {
-                            //noinspection unchecked
-                            final PPosition<Object, D> pp = (PPosition<Object, D>) p;
-                            result[offset + p.offset] = pp.format(pp.value(bean));
-                        }
-                    }
-                }
+        static IMode of(int size) {
+            if (size < 0) {
+                throw new AccessException(IMode.class, "size", "must be positive");
             }
+            return switch (size) {
+                case 0 -> MESS;
+                case 1 -> XMode.FULL;
+                default -> new XMode(size);
+            };
         }
 
-        void format(String[] result, int offset, Segment bean, List<RId<D>> rids) {
-            this.format(this.node, result, offset, bean, rids);
+        @Override
+        public int getIndex() {
+            return index;
         }
 
-        String[][] specs(int offset) {
-            final String[][] result = new String[4][length + offset];
-            if (this.length != 0) {
-                this.node.visit(p -> {
-                    final int i = offset + p.offset;
-                    result[0][i] = String.valueOf(i);
-                    if (p.dataType != null) {
-                        result[1][i] = p.dataType.getCode();
-                        result[2][i] = p.dataType.getName();
-                    } else {
-                        result[1][i] = p.getName();
-                    }
-                    result[3][i] = p.format(null);
-                });
-            }
-            return result;
+        @Override
+        public int getOffset() {
+            return offset;
         }
 
-        Mapper<S, D> reverse() throws BeanException {
-            return BSManager.mp(this).build(validator, Mapper::new);
-        }
-    }
-
-    /**
-     * Internal Business Mapper.
-     */
-    static final class Mapper<S extends Segment, D extends ITerm<D>> extends Node<S, D, BSNode.Bean<S, D, ?>> {
-        Mapper(Validator validator, Key<D, S> key, BSNode.Bean<S, D, ?> node) throws BeanException {
-            super(validator, key, node);
-            this.check(node);
+        @Override
+        public int getLength() {
+            return length;
         }
 
-        public Format<S, D> reverse() throws BeanException {
-            return BSManager.ft(this).build(validator, Format::new);
+        @Override
+        public String toString() {
+            return "FULL";
         }
     }
 }

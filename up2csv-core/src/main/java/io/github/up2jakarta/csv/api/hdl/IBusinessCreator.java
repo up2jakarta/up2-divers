@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.api.hdl;
 
 import io.github.up2jakarta.csv.api.ICreator;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.lov.IError;
 
 /**
@@ -13,7 +13,7 @@ import io.github.up2jakarta.lov.IError;
  * @param <D> the business term type
  * @param <E> the event type
  * @see IBusinessEvent
- * @see io.github.up2jakarta.csv.core.hdl.BusinessCollector#MODE
+ * @see io.github.up2jakarta.csv.hdl.BusinessCollector#MODE
  */
 @FunctionalInterface
 public interface IBusinessCreator<D extends ITerm<D>, R extends IRecord<?>, E extends IBusinessEvent<D, R, ?>> extends ICreator<R, E> {

@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.IOException;
-
 import static io.github.up2jakarta.test.fmt.misc.Tests.*;
 import static io.github.up2jakarta.test.impl.SegmentType.*;
 import static io.github.up2jakarta.test.impl.TermType.A002;
@@ -61,7 +59,7 @@ class FullDummy2Tests extends AFullTest<Dummy2Invoice, TURecord, TUError> {
     }
 
     @Test
-    void testCardinality3() {
+    void testCardinality3() throws BeanException {
         // Given
         final TURecord[] rows = {
                 record(S21, "2025-03-12", "120", "100", "20"),
@@ -71,11 +69,11 @@ class FullDummy2Tests extends AFullTest<Dummy2Invoice, TURecord, TUError> {
                 record(S04, "1199", "Software", "2", "120", "100", "20"),
         };
         // When & Then
-        checkCardinality3(S02, rows);
+        checkCardinality3(S02, rows, importer.toExporter());
     }
 
     @Test
-    void testCardinality4() {
+    void testCardinality4() throws BeanException {
         // Given
         final TURecord[] rows = {
                 record(S21, "2025-03-12", "120", "100", "20"),
@@ -83,7 +81,7 @@ class FullDummy2Tests extends AFullTest<Dummy2Invoice, TURecord, TUError> {
                 record(S03, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
         };
         // When & Then
-        checkCardinality4(S21, rows);
+        checkCardinality4(S21, rows, importer.toExporter());
     }
 
     @Test
@@ -102,15 +100,15 @@ class FullDummy2Tests extends AFullTest<Dummy2Invoice, TURecord, TUError> {
     }
 
     @Test
-    void testValid1() throws BeanException, IOException {
+    void testValid1() throws BeanException {
         // Given
-        final TURecord[] rows = fastInvoice(S21);
+        final TURecord[] rows = messInvoice(S21);
         // When & Then
         checkValid1(rows);
     }
 
     @Test
-    void testValid2() throws IOException {
+    void testValid2() {
         // Given
         final TURecord[] rows = {
                 record(S21, "2025-03-12", "120", "100", "20"),

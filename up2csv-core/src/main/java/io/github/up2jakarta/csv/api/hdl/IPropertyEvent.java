@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.api.hdl;
 
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.lov.IException;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.TypeException;
@@ -13,7 +13,7 @@ import io.github.up2jakarta.lov.TypeException;
  * @param <R> the input record type
  * @param <D> the business term type
  * @see IPropertyCreator
- * @see io.github.up2jakarta.csv.core.hdl.PropertyCollector#MODE
+ * @see io.github.up2jakarta.csv.hdl.PropertyCollector#MODE
  */
 public interface IPropertyEvent<D extends ITerm<D>, R extends IRecord<?>> extends IException, IEvent<D> {
 

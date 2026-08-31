@@ -4,7 +4,7 @@
 
     <groupId>io.github.up2jakarta</groupId>
     <artifactId>up2-divers</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
     <packaging>pom</packaging>
 
     <name>Up2Jakarta :: Divers</name>
@@ -55,11 +55,11 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.encoding}</project.reporting.outputEncoding>
-        <spring.boot.version>3.5.14</spring.boot.version>
+        <spring.boot.version>3.5.16</spring.boot.version>
         <apache.csv.version>1.14.1</apache.csv.version>
         <jakarta.cdi.version>4.1.0</jakarta.cdi.version>
         <log.jboss.version>3.5.3.Final</log.jboss.version>
-        <micrometer.version>1.15.11</micrometer.version>
+        <micrometer.version>1.15.12</micrometer.version>
         <mock.version>5.17.0</mock.version>
         <mock.path>org/mockito/mockito-core/${mock.version}/mockito-core-${mock.version}.jar</mock.path>
         <mock.java.agent>-javaagent:${settings.localRepository}/${mock.path} -Xshare:off</mock.java.agent>
@@ -71,32 +71,32 @@
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2cii-format</artifactId>
-                <version>1.7.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2csv-core</artifactId>
-                <version>1.7.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2csv-format</artifactId>
-                <version>1.7.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2job-core</artifactId>
-                <version>1.7.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2xml-core</artifactId>
-                <version>1.7.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2lov-core</artifactId>
-                <version>1.7.0</version>
+                <version>1.7.1</version>
             </dependency>
             <!-- Dependencies -->
             <dependency>

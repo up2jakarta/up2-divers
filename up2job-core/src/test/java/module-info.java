@@ -22,9 +22,9 @@ module up2jakarta.test {
     exports io.github.up2jakarta.test.impl;
 
     exports io.github.up2jakarta.test.impl.sln to spring.beans;
-    exports io.github.up2jakarta.test.impl.fast to spring.beans;
+    exports io.github.up2jakarta.test.impl.mess to spring.beans;
     exports io.github.up2jakarta.test.impl.full to spring.beans;
-    exports io.github.up2jakarta.test.impl.unit to spring.beans;
+    exports io.github.up2jakarta.test.impl.neat to spring.beans;
 
     opens io.github.up2jakarta.test.impl to up2jakarta.lov.core;
     opens io.github.up2jakarta.test.dto to up2jakarta.csv.core, org.hibernate.validator;

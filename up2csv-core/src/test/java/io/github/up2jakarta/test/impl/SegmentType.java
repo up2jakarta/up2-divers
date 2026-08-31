@@ -25,7 +25,7 @@ public enum SegmentType implements IType<SegmentType> {
     S11("11", "Dummy1Invoice"),
     // Test 2 (Full truncated)
     S21("21", "Dummy2Invoice"),
-    // Test 3 (Fast truncated)
+    // Test 3 (Mess truncated)
     S31("31", "Dummy3Invoice"),
     // Test 4 (Null reference)
     S41("41", "Dummy4Invoice"),

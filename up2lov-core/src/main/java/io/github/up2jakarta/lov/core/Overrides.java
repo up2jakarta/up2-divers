@@ -3,11 +3,10 @@ package io.github.up2jakarta.lov.core;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -62,18 +61,19 @@ public final class Overrides {
     public static <A extends Annotation> A get(Class<A> t, Map<Path, A> ps, Field f, Function<A, String[]> m) throws BeanException {
         return ps.entrySet().stream()
                 .filter(e -> e.getKey().equals(f))
-                .map(Map.Entry::getValue)
-                .findAny()
+                .peek(e -> e.getKey().used.accept(true))
+                .map(Entry::getValue)
+                .findFirst()
                 .orElse(get(t, f, m));
     }
 
     public static <O extends Annotation, A extends Annotation> A get(Class<A> t, Map<Path, O> ps, Field f, Function<O, A> m, Predicate<A> p) {
-        final Optional<O> override = ps.entrySet().stream()
+        final Optional<Entry<Path, O>> override = ps.entrySet().stream()
                 .filter(e -> e.getKey().equals(f))
-                .map(Map.Entry::getValue)
-                .findAny();
+                .peek(e -> e.getKey().used.accept(true))
+                .findFirst();
         if (override.isPresent()) {
-            final A result = m.apply(override.get());
+            final A result = m.apply(override.get().getValue());
             return p.test(result) ? result : null;
         }
         return f.getAnnotation(t);
@@ -90,7 +90,7 @@ public final class Overrides {
         final A[] overrides = e.getAnnotationsByType(t);
         for (int i = 0; i < overrides.length; i++) {
             final A override = overrides[i];
-            final Path source = new Path(m.apply(override));
+            final Path source = new Path(e, m.apply(override));
             for (int j = i + 1; j < overrides.length; j++) {
                 if (equals(m.apply(overrides[j]), source.path, 0)) {
                     throw BeanException.of(e, "multiple @" + getTypeName(t) + "(path = " + source + ")");
@@ -100,16 +100,53 @@ public final class Overrides {
         }
     }
 
+    public static List<BeanException> check(Set<Path> overrides, Class<? extends Annotation> type, Filter cf) {
+        final String format = "@" + getTypeName(type) + "(path = %s) is never used";
+        return overrides.stream()
+                .filter(p -> p.mine)
+                .filter(p -> !p.used.or(false))
+                .filter(p -> cf.test(p.src, p.path.length))
+                .map(p -> BeanException.of(p.src, String.format(format, p)))
+                .toList();
+    }
+
+    /**
+     * Override Path Filter
+     */
+    @FunctionalInterface
+    public interface Filter extends BiPredicate<AnnotatedElement, Integer> {
+        Filter ALL = (e, s) -> true;
+
+        default Filter and(Filter that) {
+            return (e, s) -> this.test(e, s) && that.test(e, s);
+        }
+    }
+
+    /**
+     * Override Path Element
+     */
     public static final class Path {
-
+        private final Wrapper<Boolean> used;
+        private final AnnotatedElement src;
         private final String[] path;
+        private final boolean mine;
 
-        private Path(String... path) {
+        private Path(AnnotatedElement src, String... path) {
+            this.used = new Wrapper<>(false);
+            this.src = src;
             this.path = path;
+            this.mine = true;
+        }
+
+        private Path(Path source) {
+            this.mine = false;
+            this.src = source.src;
+            this.used = source.used;
+            this.path = copyOfRange(source.path, 1, source.path.length);
         }
 
         public Path next() {
-            return new Path(copyOfRange(path, 1, path.length));
+            return new Path(this);
         }
 
         public boolean equals(Field property) {

@@ -1,9 +1,9 @@
 package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Writer;
-import io.github.up2jakarta.csv.data.ITerm;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class SingleWriter<S extends Segment, D extends ITerm<D>> extends Up2Writer<S, D> {
@@ -22,7 +23,7 @@ public final class SingleWriter<S extends Segment, D extends ITerm<D>> extends U
 
     public SingleWriter(Up2Flatter<S, D> mapper, CSVFormat format) {
         super(mapper);
-        this.format = format;
+        this.format = notNull(format, this.getClass(), "format");
     }
 
     /**

@@ -1,7 +1,7 @@
 package io.github.up2jakarta.test.impl.full;
 
+import io.github.up2jakarta.csv.data.Fixed06Generator;
 import io.github.up2jakarta.csv.data.Up2Result;
-import io.github.up2jakarta.csv.fmt.Fixed06Generator;
 import io.github.up2jakarta.csv.io.FullFileWriter;
 import io.github.up2jakarta.job.ConditionalWriter;
 import io.github.up2jakarta.job.core.SafeTranslator;

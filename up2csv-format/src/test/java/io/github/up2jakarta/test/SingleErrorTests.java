@@ -1,12 +1,10 @@
 package io.github.up2jakarta.test;
 
-import io.github.up2jakarta.csv.api.Container;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.core.Up2Flatter;
+import io.github.up2jakarta.csv.data.FullError;
+import io.github.up2jakarta.csv.data.FullRecord;
+import io.github.up2jakarta.csv.data.HeaderResolver;
 import io.github.up2jakarta.csv.data.HeaderType;
-import io.github.up2jakarta.csv.data.TermResolver;
-import io.github.up2jakarta.csv.fmt.FullError;
-import io.github.up2jakarta.csv.fmt.FullRecord;
 import io.github.up2jakarta.csv.io.SingleWriter;
 import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -45,10 +43,9 @@ public class SingleErrorTests {
     private final CSVFormat format;
 
     @Autowired
-    SingleErrorTests(Container container, CSVFormat fmt) throws BeanException {
-        final Up2Factory<HeaderType> factory = new Up2Factory<>(container, TermResolver.header());
-        final Up2Flatter<TSError, HeaderType> format = factory.flatter(TSError.class);
-        this.writer = new SingleWriter<>(format, fmt);
+    SingleErrorTests(Up2Factory<?> dmf, CSVFormat fmt) throws BeanException {
+        final Up2Factory<HeaderType> factory = dmf.of(HeaderResolver.getInstance());
+        this.writer = new SingleWriter<>(factory.flatter(TSError.class), fmt);
         this.format = fmt;
     }
 

@@ -1,6 +1,7 @@
 # Up2CSV :: Core Framework
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2csv-core?style=for-the-badge&color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2csv-core)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2csv-core?color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2csv-core)
+[![Mvn Repository](https://badges.mvnrepository.com/badge/io.github.up2jakarta/up2csv-core/badge.svg?color=green)](https://mvnrepository.com/artifact/io.github.up2jakarta/up2csv-core)
 
 - `Up2CSV` is an open-source, light and modern framework that maps and validates easily flat-data to javaBeans and also
   export java-beans to flat-data.
@@ -42,7 +43,7 @@ approach.
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.7.0</version>
+        <version>1.7.1</version>
     </dependency>
     <!-- Optional JSR-303 Provider -->
     <!-- Optional CDI/IoC Provider -->
@@ -76,12 +77,12 @@ public void test() {
 
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Mapper;
-import io.github.up2jakarta.csv.core.hdl.SimpleCollector;
-import io.github.up2jakarta.csv.core.hdl.SimpleEvent;
 import io.github.up2jakarta.csv.data.HeaderType;
+import io.github.up2jakarta.csv.hdl.SimpleCollector;
+import io.github.up2jakarta.csv.hdl.SimpleEvent;
 
 @Inject
-private Up2Factory<DynamicType> factory;
+private Up2Factory<HeaderType> factory;
 
 public void test() {
     // GIVEN Singletons
@@ -357,7 +358,7 @@ public class Up2Segment implements Segment {
 }
 ```
 
-### @Up2Up2OptionalInt
+### @Up2OptionalInt
 
 This annotation allows the automatic conversion of `OptionalInt`.
 
@@ -841,19 +842,16 @@ public class TestSegment implements Segment {
 `Up2CSV` is able to gathering all events (errors or warnings) and continue
 processing flat-data within fault-tolerance principle.
 
-1. [ComplianceHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/ComplianceHandler.java) for validation
-   only
-    - [ComplianceCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/ComplianceCollector.java)
-2. [EventHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/EventHandler.java) for both validation and
-   mapping modes
-    - [FastHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/FastHandler.java)
-3. [BusinessHandler.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/BusinessHandler.java) for all processing
-   modes include import/aggregation
-    - [EventCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/EventCollector.java)
-    - [EventModeCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/EventModeCollector.java)
-        - [BusinessCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/BusinessCollector.java)
-        - [PropertyCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/PropertyCollector.java)
-        - [PropertyFailureCollector.java](./src/main/java/io/github/up2jakarta/csv/core/hdl/PropertyFailureCollector.java)
+1. [ComplianceHandler](./src/main/java/io/github/up2jakarta/csv/hdl/ComplianceHandler.java) for validation only
+    - [ComplianceCollector](./src/main/java/io/github/up2jakarta/csv/hdl/ComplianceCollector.java)
+2. [EventHandler](./src/main/java/io/github/up2jakarta/csv/hdl/EventHandler.java) for both validation and mapping modes
+    - [FastHandler](./src/main/java/io/github/up2jakarta/csv/hdl/FastHandler.java)
+3. [BusinessHandler](./src/main/java/io/github/up2jakarta/csv/hdl/BusinessHandler.java) for all processing modes include import/aggregation
+    - [EventCollector](./src/main/java/io/github/up2jakarta/csv/hdl/EventCollector.java)
+    - [EventModeCollector](./src/main/java/io/github/up2jakarta/csv/hdl/EventModeCollector.java)
+        - [BusinessCollector](./src/main/java/io/github/up2jakarta/csv/hdl/BusinessCollector.java)
+        - [PropertyCollector](./src/main/java/io/github/up2jakarta/csv/hdl/PropertyCollector.java)
+        - [PropertyFailureCollector](./src/main/java/io/github/up2jakarta/csv/hdl/PropertyFailureCollector.java)
 
 ## @Truncated
 
@@ -1106,14 +1104,13 @@ See [Sample implementations here](./src/test/java/io/github/up2jakarta/test/impl
 
 ## Contract
 
-- [ITerm](./src/main/java/io/github/up2jakarta/csv/data/ITerm.java) base interface
-- [TermResolver](./src/main/java/io/github/up2jakarta/csv/data/TermResolver.java) base resolver
+- [ITerm](./src/main/java/io/github/up2jakarta/csv/api/ITerm.java) base interface
+- [TermResolver](./src/main/java/io/github/up2jakarta/csv/api/TermResolver.java) base resolver
 
 ## Simple implementation
 
-- [@Header](./src/main/java/io/github/up2jakarta/csv/data/Header.java) annotation based definition of business terms
-- [TermResolver.header()](./src/main/java/io/github/up2jakarta/csv/data/TermResolver.java) for `@Header`
-- [TermResolver.empty()](./src/main/java/io/github/up2jakarta/csv/data/TermResolver.java) NoOP implementation
+- [HeaderResolver](./src/main/java/io/github/up2jakarta/csv/data/HeaderResolver.java) based
+  on [@Up2Header](./src/main/java/io/github/up2jakarta/csv/data/Up2Header.java) annotation.
 
 # Format API
 
@@ -1148,31 +1145,29 @@ It's impossible to present a `business-property` within `0..n` cardinality
 
 ## Business Aggregation & Segregation
 
-- [BusinessExporter.java](src/main/java/io/github/up2jakarta/csv/core/BusinessExporter.java) to segregate and export
-  java-bean to flat-data
-    1. [FullExporter.java](src/main/java/io/github/up2jakarta/csv/core/FullExporter.java) for `FULL` mode
-    2. [FastExporter.java](src/main/java/io/github/up2jakarta/csv/core/FastExporter.java) for `FAST` mode
-    3. [UnitExporter.java](src/main/java/io/github/up2jakarta/csv/core/UnitExporter.java) for `UNIT` mode
-- [BusinessImporter.java](src/main/java/io/github/up2jakarta/csv/core/BusinessImporter.java) to aggregate and import
-  java-bean from flat-data
-    1. [FullImporter.java](src/main/java/io/github/up2jakarta/csv/core/FullImporter.java) for `FULL` mode
-    2. [FastImporter.java](src/main/java/io/github/up2jakarta/csv/core/FastImporter.java) for `FAST` mode
-    3. [UnitImporter.java](src/main/java/io/github/up2jakarta/csv/core/UnitImporter.java) for `UNIT`mode
+- [BusinessExporter](src/main/java/io/github/up2jakarta/csv/core/BusinessExporter.java) to export and segregate java-bean to flat-data
+    1. [FullExporter](src/main/java/io/github/up2jakarta/csv/data/FullExporter.java) for `FULL` mode
+    2. [MessExporter](src/main/java/io/github/up2jakarta/csv/core/MessExporter.java) for `MESS` mode
+    3. [NeatExporter](src/main/java/io/github/up2jakarta/csv/core/NeatExporter.java) for `NEAT` mode
+- [BusinessImporter](src/main/java/io/github/up2jakarta/csv/core/BusinessImporter.java) to import and aggregate java-bean from flat-data
+    1. [FullImporter](src/main/java/io/github/up2jakarta/csv/data/FullImporter.java) for `FULL` mode
+    2. [MessImporter](src/main/java/io/github/up2jakarta/csv/core/MessImporter.java) for `MESS` mode
+    3. [NeatImporter](src/main/java/io/github/up2jakarta/csv/core/NeatImporter.java) for `NEAT`mode
 - Simple Implementations
-    1. [SimpleFullImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/SimpleFullImporter.java) for `FULL` mode
-    2. [SimpleFastImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/SimpleFastImporter.java) for `FAST` mode
-    3. [SimpleUnitImporter.java](src/main/java/io/github/up2jakarta/csv/fmt/SimpleUnitImporter.java) for `UNIT`mode
+    1. [SimpleFullImporter](src/main/java/io/github/up2jakarta/csv/data/SimpleFullImporter.java) for `FULL` mode
+    2. [SimpleMessImporter](src/main/java/io/github/up2jakarta/csv/data/SimpleMessImporter.java) for `MESS` mode
+    3. [SimpleNeatImporter](src/main/java/io/github/up2jakarta/csv/data/SimpleNeatImporter.java) for `NEAT`mode
 
 ## Use cases
 
 1. See [BusinessFullTests](src/test/java/io/github/up2jakarta/test/fmt/BusinessFullTests.java) for `FULL` mode.
-2. See [BusinessFastTests](src/test/java/io/github/up2jakarta/test/fmt/BusinessFastTests.java) for `FAST` mode.
-3. See [BusinessUnitTests](src/test/java/io/github/up2jakarta/test/fmt/BusinessUnitTests.java) for `UNIT` mode.
+2. See [BusinessMessTests](src/test/java/io/github/up2jakarta/test/fmt/BusinessMessTests.java) for `MESS` mode.
+3. See [BusinessNeatTests](src/test/java/io/github/up2jakarta/test/fmt/BusinessNeatTests.java) for `NEAT` mode.
 
 # Stream API (Batch processing)
 
-- [BusinessReader.java](src/main/java/io/github/up2jakarta/csv/core/BusinessReader.java) for stream inputs
-- [BusinessWriter.java](src/main/java/io/github/up2jakarta/csv/core/BusinessWriter.java) for stream outputs
+- [BusinessReader](src/main/java/io/github/up2jakarta/csv/data/BusinessReader.java) for stream inputs
+- [BusinessWriter](src/main/java/io/github/up2jakarta/csv/data/BusinessWriter.java) for stream outputs
 
 See [up2csv-format](../up2csv-format/README.md) for CSV files implementation.
 

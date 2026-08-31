@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_UTIL_DATE;
-import static io.github.up2jakarta.csv.core.ext.Beans.error;
+import static io.github.up2jakarta.csv.ext.Beans.error;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 
 @Named

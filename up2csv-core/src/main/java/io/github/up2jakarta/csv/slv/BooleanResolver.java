@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_BOOLEAN;
-import static io.github.up2jakarta.csv.core.ext.Beans.error;
+import static io.github.up2jakarta.csv.ext.Beans.error;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 
 @Named

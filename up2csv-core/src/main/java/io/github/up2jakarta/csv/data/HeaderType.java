@@ -1,7 +1,12 @@
 package io.github.up2jakarta.csv.data;
 
-public final class HeaderType implements ITerm<HeaderType> {
+import io.github.up2jakarta.csv.api.ITerm;
+import io.github.up2jakarta.lov.CodeList;
 
+/**
+ * Dynamic {@link ITerm} Model for {@link Up2Header} annotation.
+ */
+public final class HeaderType implements ITerm<HeaderType> {
     private final String name;
     private final String code;
 
@@ -20,4 +25,8 @@ public final class HeaderType implements ITerm<HeaderType> {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return CodeList.toString(code, name);
+    }
 }

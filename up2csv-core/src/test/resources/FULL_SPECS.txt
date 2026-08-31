@@ -100,7 +100,7 @@ Specification of Invoice FULL Format
 
 #[009] Item attributes
 - Segment: #[09] Attributes
-- Cardinality: 0..n
+- Cardinality: 0..2
 - Class: io.github.up2jakarta.test.impl.dto.Attribute
 |ΞΞΞΞΞΞΞΞΞ|ΞΞΞΞΞΞΞΞΞ|ΞΞΞΞΞΞΞΞΞΞ|ΞΞΞΞΞΞΞΞΞΞΞΞ|ΞΞΞΞΞΞΞΞΞ|ΞΞΞΞΞ|ΞΞΞΞΞΞΞ|
 |         | 1       | 2        | 3          | 4       | 5   | 6     |

@@ -1,6 +1,6 @@
 package io.github.up2jakarta.test.impl;
 
-import io.github.up2jakarta.csv.fmt.FullRecord;
+import io.github.up2jakarta.csv.data.FullRecord;
 
 public class InputRecord extends FullRecord<SegmentType> {
 

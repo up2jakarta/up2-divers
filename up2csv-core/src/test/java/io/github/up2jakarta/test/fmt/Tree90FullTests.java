@@ -2,7 +2,7 @@ package io.github.up2jakarta.test.fmt;
 
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.fmt.*;
+import io.github.up2jakarta.csv.data.*;
 import io.github.up2jakarta.lov.CodeListException;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
@@ -16,13 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_COMPLIANCE;
-import static io.github.up2jakarta.csv.core.BusinessImporter.DETACHED;
+import static io.github.up2jakarta.csv.core.MessImporter.DETACHED;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.lov.SeverityType.WARNING;
 import static io.github.up2jakarta.test.impl.TermType.NODE;
@@ -62,7 +61,7 @@ class Tree90FullTests {
     }
 
     @Test
-    void testLevel0() throws IOException {
+    void testLevel0() {
         // Given
         final FullRecord<SegmentType>[] records = new FullRecord[]{
                 record("up2v06", "90", "00", "$")
@@ -83,12 +82,16 @@ class Tree90FullTests {
         }
         // When Formating
         final AFullTester<FullRecord<SegmentType>> tc = new AFullTester<>(root, records);
-        exporter.format(root, new Fixed06Generator(), tc::assertExists);
+        final Fixed06Generator uid = new Fixed06Generator();
+        exporter.format(root, d -> {
+            d[0] = uid.get();
+            tc.assertExists(d);
+        });
         tc.assertEmpty();
     }
 
     @Test
-    void testLevel1() throws IOException {
+    void testLevel1() {
         // Given
         final FullRecord<SegmentType>[] records = new FullRecord[]{
                 record("up2v06", "90", "00", "$"),
@@ -112,12 +115,16 @@ class Tree90FullTests {
         }
         // When Formating
         final AFullTester<FullRecord<SegmentType>> tc = new AFullTester<>(root, records);
-        exporter.format(root, new Fixed06Generator(), tc::assertExists);
+        final Fixed06Generator uid = new Fixed06Generator();
+        exporter.format(root, d -> {
+            d[0] = uid.get();
+            tc.assertExists(d);
+        });
         tc.assertEmpty();
     }
 
     @Test
-    void testLevel2() throws IOException {
+    void testLevel2() {
         // Given
         final FullRecord<SegmentType>[] records = new FullRecord[]{
                 record("up2v06", "90", "00", "$"),
@@ -144,12 +151,16 @@ class Tree90FullTests {
         }
         // When Formating
         final AFullTester<FullRecord<SegmentType>> tc = new AFullTester<>(root, records);
-        exporter.format(root, new Fixed06Generator(), tc::assertExists);
+        final Fixed06Generator uid = new Fixed06Generator();
+        exporter.format(root, d -> {
+            d[0] = uid.get();
+            tc.assertExists(d);
+        });
         tc.assertEmpty();
     }
 
     @Test
-    void testLevel3() throws IOException {
+    void testLevel3() {
         // Given
         final FullRecord<SegmentType>[] records = new FullRecord[]{
                 record("up2v06", "90", "00", "$"),
@@ -179,12 +190,16 @@ class Tree90FullTests {
         }
         // When Formating
         final AFullTester<FullRecord<SegmentType>> tc = new AFullTester<>(root, records);
-        exporter.format(root, new Fixed06Generator(), tc::assertExists);
+        final Fixed06Generator uid = new Fixed06Generator();
+        exporter.format(root, d -> {
+            d[0] = uid.get();
+            tc.assertExists(d);
+        });
         tc.assertEmpty();
     }
 
     @Test
-    void testLevel4() throws IOException {
+    void testLevel4() {
         // Given
         final FullRecord<SegmentType>[] records = new FullRecord[]{
                 record("up2v06", "90", "00", "$"),
@@ -216,7 +231,11 @@ class Tree90FullTests {
         }
         // When Formating
         final AFullTester<FullRecord<SegmentType>> tc = new AFullTester<>(root, records);
-        exporter.format(root, new Fixed06Generator(), tc::assertExists);
+        final Fixed06Generator uid = new Fixed06Generator();
+        exporter.format(root, d -> {
+            d[0] = uid.get();
+            tc.assertExists(d);
+        });
         tc.assertEmpty();
     }
 
@@ -387,7 +406,7 @@ class Tree90FullTests {
     }
 
     @Test
-    void testImportValidation() throws IOException {
+    void testImportValidation() {
         // Given
         final FullRecord<SegmentType>[] records = new FullRecord[]{
                 record("up2v06", "90", "00", null),
@@ -436,7 +455,11 @@ class Tree90FullTests {
         }
         // When Formating
         final AFullTester<FullRecord<SegmentType>> tc = new AFullTester<>(root, records);
-        exporter.format(root, new Fixed06Generator(), tc::assertExists);
+        final Fixed06Generator uid = new Fixed06Generator();
+        exporter.format(root, d -> {
+            d[0] = uid.get();
+            tc.assertExists(d);
+        });
         tc.assertEmpty();
     }
 

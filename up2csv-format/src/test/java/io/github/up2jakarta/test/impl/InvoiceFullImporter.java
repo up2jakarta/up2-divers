@@ -1,7 +1,7 @@
 package io.github.up2jakarta.test.impl;
 
-import io.github.up2jakarta.csv.core.FullImporter;
 import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.data.FullImporter;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.dto.Invoice;
 import io.github.up2jakarta.test.misc.InputError;

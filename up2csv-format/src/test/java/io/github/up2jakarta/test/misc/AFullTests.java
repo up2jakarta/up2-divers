@@ -1,8 +1,8 @@
 package io.github.up2jakarta.test.misc;
 
 import io.github.up2jakarta.csv.api.IFullRecord;
-import io.github.up2jakarta.csv.core.FullImporter;
-import io.github.up2jakarta.csv.core.ModeType;
+import io.github.up2jakarta.csv.core.IMode;
+import io.github.up2jakarta.csv.data.FullImporter;
 import io.github.up2jakarta.csv.io.FullFileReader;
 import io.github.up2jakarta.csv.io.FullFileWriter;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -24,7 +24,7 @@ public abstract class AFullTests<R extends IFullRecord<SegmentType>, A extends F
     private final FullFileReader<Invoice, TermType, SegmentType, R, ?> reader2;
 
     protected AFullTests(A importer, CSVFormat format) throws IOException, BeanException {
-        super(ModeType.FULL, format);
+        super(IMode.FULL, format);
         this.reader1 = this.reader(importer, format);
         this.reader2 = this.reader(importer, format);
         this.writer = this.writer(importer, format);

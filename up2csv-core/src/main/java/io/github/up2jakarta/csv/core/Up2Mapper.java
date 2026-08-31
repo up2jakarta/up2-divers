@@ -2,15 +2,15 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.BSAccessor.Input;
 import io.github.up2jakarta.csv.core.BSNode.Bean;
-import io.github.up2jakarta.csv.core.hdl.EventHandler;
-import io.github.up2jakarta.csv.core.hdl.FailureException;
-import io.github.up2jakarta.csv.core.hdl.FastHandler;
-import io.github.up2jakarta.csv.core.hdl.PropertyFailureException;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.hdl.EventHandler;
+import io.github.up2jakarta.csv.hdl.FailureException;
+import io.github.up2jakarta.csv.hdl.FastHandler;
+import io.github.up2jakarta.csv.hdl.PropertyFailureException;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -27,10 +27,12 @@ import static io.github.up2jakarta.lov.core.AccessException.notNull;
  * @param <D> The business term type
  */
 public final class Up2Mapper<S extends Segment, D extends ITerm<D>> extends Pod<S, D, Bean<S, D, ?>> {
+    private final Validator validator;
 
     Up2Mapper(Validator validator, Key<D, S> key, Bean<S, D, ?> node) throws BeanException {
         super(validator, key, node);
-        check(node);
+        this.validator = validator;
+        this.check(node);
     }
 
     /**

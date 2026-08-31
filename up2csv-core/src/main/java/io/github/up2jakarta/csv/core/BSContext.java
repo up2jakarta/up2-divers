@@ -4,21 +4,19 @@ import io.github.up2jakarta.csv.BusinessId;
 import io.github.up2jakarta.csv.BusinessLink;
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.Container;
+import io.github.up2jakarta.csv.api.ITerm;
+import io.github.up2jakarta.csv.api.TermResolver;
 import io.github.up2jakarta.csv.api.ext.TypeExtension;
 import io.github.up2jakarta.csv.api.ext.TypeListener;
 import io.github.up2jakarta.csv.api.ext.TypeResolver;
 import io.github.up2jakarta.csv.cfg.*;
 import io.github.up2jakarta.csv.core.BSAccessor.Mode;
 import io.github.up2jakarta.csv.core.BSManager.Factory;
-import io.github.up2jakarta.csv.core.BSNode.Bean;
-import io.github.up2jakarta.csv.core.BSNode.Flat;
 import io.github.up2jakarta.csv.core.BSOperator.PId;
 import io.github.up2jakarta.csv.core.BSOperator.SId;
 import io.github.up2jakarta.csv.core.BSProperty.IProcessor;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
-import io.github.up2jakarta.csv.data.ITerm;
-import io.github.up2jakarta.csv.data.TermResolver;
 import io.github.up2jakarta.lov.CodeList;
 import io.github.up2jakarta.lov.TypeAdapter;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -37,10 +35,9 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static io.github.up2jakarta.csv.core.BSBuilder.*;
-import static io.github.up2jakarta.csv.core.ext.Beans.*;
+import static io.github.up2jakarta.csv.ext.Beans.*;
 import static io.github.up2jakarta.lov.core.Defaults.wrap;
 import static io.github.up2jakarta.lov.core.Overrides.*;
-import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
@@ -88,10 +85,7 @@ final class BSContext<D extends ITerm<D>> {
         this.offset = 0;
     }
 
-    private BSContext(BSContext<D> origin, int offset, Class<? extends Segment> type, Type... arguments) throws BeanException {
-        add(PositionOverride.class, type, this.positions::put, PositionOverride::path);
-        add(FragmentOverride.class, type, this.fragments::put, FragmentOverride::path);
-        add(ValidOverride.class, type, this.validations::put, ValidOverride::path);
+    private BSContext(BSContext<D> origin, int offset, Class<? extends Segment> type, Type... arguments) {
         this.access = getAccessType(origin.access, type);
         origin.path.forEach(this.path::addLast);
         origin.stack.forEach(this.stack::addLast);
@@ -171,17 +165,14 @@ final class BSContext<D extends ITerm<D>> {
         final long fc = ps.stream().filter(BSProperty::isFinal).count();
         if (fc == 0) {
             return null;
-        }
-        if (fc == ps.size()) {
+        } else if (fc == ps.size()) {
             final Constructor<S>[] dcs = (Constructor<S>[]) t.getDeclaredConstructors();
             final List<Constructor<S>> cs = stream(dcs).filter(c -> c.isAnnotationPresent(Creator.class)).toList();
             if (cs.size() == 1) {
                 return cs.getFirst();
-            }
-            if (t.isRecord()) {
+            } else if (t.isRecord()) {
                 return null;
-            }
-            if (dcs.length == 1) {
+            } else if (dcs.length == 1) {
                 return dcs[0];
             }
             throw new BeanException(t, "one and only one constructor must be annotated with @Creator");
@@ -275,16 +266,16 @@ final class BSContext<D extends ITerm<D>> {
             index = -1;
         }
         if (mode == Mode.RO) {
-            return new Flat<>(index, ft, this, vc, fr, ps);
+            return new BSNode.Flat<>(index, ft, this, vc, fr, ps);
         }
         final Constructor<S> cs = from(ft, ps);
         if (cs == null) {
             if (ft.isRecord()) {
-                return new Bean.JR<>(ft, this, vc, fr, ps);
+                return new BSNode.Bean.JR<>(ft, this, vc, fr, ps);
             }
-            return new Bean.BM<>(index, ft, this, vc, fr, ps);
+            return new BSNode.Bean.BM<>(index, ft, this, vc, fr, ps);
         }
-        return new Bean.JB<>(index, ft, this, vc, fr, ps, cs);
+        return new BSNode.Bean.JB<>(index, ft, this, vc, fr, ps, cs);
     }
 
     private <T> PPosition<T, D> position(Class<T> pt, Field pf, Position pc) throws BeanException {
@@ -299,6 +290,7 @@ final class BSContext<D extends ITerm<D>> {
         this.checker.beforeSegment(type);
         final List<BSProperty<?, D>> ps = BSBuilder.build(type, this);
         this.checker.afterSegment(checker);
+        this.checkOverrides(Filter.ALL);
         return List.copyOf(ps);
     }
 
@@ -326,8 +318,21 @@ final class BSContext<D extends ITerm<D>> {
         return false;
     }
 
-    void end() throws BeanException {
-        checker.afterSuperSegment(stack.getLast());
+    void afterSuperSegment() throws BeanException {
+        final Class<? extends Segment> st = stack.getLast();
+        this.checkOverrides((e, s) -> e == st);
+        checker.afterSuperSegment(st);
+    }
+
+    void checkOverrides(Filter filter) throws BeanException {
+        if (EAC) {
+            final Filter valid = filter.and((e, s) -> s != 0);
+            final List<BeanException> causes = new LinkedList<>();
+            causes.addAll(check(validations.keySet(), ValidOverride.class, valid));
+            causes.addAll(check(positions.keySet(), PositionOverride.class, filter));
+            causes.addAll(check(fragments.keySet(), FragmentOverride.class, filter));
+            rethrow(causes);
+        }
     }
 
     BSContext<D> with(Field field, Fragment fragment, Class<? extends Segment> segmentType) throws BeanException {
@@ -340,6 +345,9 @@ final class BSContext<D extends ITerm<D>> {
         this.positions.forEach((o, p) -> add(o, p, name, result.positions::put));
         this.fragments.forEach((o, p) -> add(o, p, name, result.fragments::put));
         this.validations.forEach((o, p) -> add(o, p, name, result.validations::put));
+        add(PositionOverride.class, segmentType, result.positions::putIfAbsent, PositionOverride::path);
+        add(FragmentOverride.class, segmentType, result.fragments::putIfAbsent, FragmentOverride::path);
+        add(ValidOverride.class, segmentType, result.validations::putIfAbsent, ValidOverride::path);
         add(PositionOverride.class, field, result.positions::putIfAbsent, PositionOverride::path);
         add(FragmentOverride.class, field, result.fragments::putIfAbsent, FragmentOverride::path);
         add(ValidOverride.class, field, result.validations::putIfAbsent, ValidOverride::path);
@@ -355,9 +363,12 @@ final class BSContext<D extends ITerm<D>> {
             arguments = NO_TYPES;
         }
         final BSContext<D> result = new BSContext<>(this, this.offset, superType, arguments);
-        result.positions.putAll(positions);
-        result.fragments.putAll(fragments);
-        result.validations.putAll(validations);
+        result.validations.putAll(this.validations);
+        result.positions.putAll(this.positions);
+        result.fragments.putAll(this.fragments);
+        add(PositionOverride.class, superType, result.positions::putIfAbsent, PositionOverride::path);
+        add(FragmentOverride.class, superType, result.fragments::putIfAbsent, FragmentOverride::path);
+        add(ValidOverride.class, superType, result.validations::putIfAbsent, ValidOverride::path);
         return result;
     }
 
@@ -455,15 +466,15 @@ final class BSContext<D extends ITerm<D>> {
         private VContext build(Field f, Class<? extends Segment> ft, ValidOverride vo) throws BeanException {
             if (enabled) {
                 final boolean hasValid = isAnnotationPresent(f, Valid.class);
-                final Set<Class<?>> groups = new HashSet<>(asList(this.groups));
+                final Set<Class<?>> groups = new HashSet<>(List.of(this.groups));
                 if (vo == null) {
                     final VContext ctx = from(ft);
-                    if (hasValid && ctx.enabled && groups.containsAll(asList(ctx.groups))) {
+                    if (hasValid && ctx.enabled && groups.containsAll(List.of(ctx.groups))) {
                         return DISABLED;
                     }
                     return ctx;
                 } else if (!vo.disable()) {
-                    if (hasValid && groups.containsAll(asList(vo.groups()))) {
+                    if (hasValid && groups.containsAll(List.of(vo.groups()))) {
                         return DISABLED;
                     }
                     return new VContext(true, checkGroups(vo.groups(), f));

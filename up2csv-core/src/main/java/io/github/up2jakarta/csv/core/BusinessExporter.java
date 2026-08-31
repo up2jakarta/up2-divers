@@ -2,115 +2,52 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.IEvent;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.BSLink.RId;
-import io.github.up2jakarta.csv.core.BSLink.VId;
-import io.github.up2jakarta.csv.core.BSOperator.Format;
-import io.github.up2jakarta.csv.core.BSOperator.Mapper;
-import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
-import io.github.up2jakarta.csv.core.hdl.SimpleCollector;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.core.BSManager.Key;
+import io.github.up2jakarta.csv.core.BSNode.Flat;
+import io.github.up2jakarta.csv.core.BSProperty.PFragment;
+import io.github.up2jakarta.csv.core.BSProperty.PPosition;
+import io.github.up2jakarta.csv.core.BusinessExporter.Format;
+import io.github.up2jakarta.csv.core.BusinessImporter.Mapper;
 import io.github.up2jakarta.csv.data.SegmentWriter;
+import io.github.up2jakarta.csv.hdl.BusinessHandler;
+import io.github.up2jakarta.csv.hdl.SimpleCollector;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
+import jakarta.validation.Validator;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static io.github.up2jakarta.csv.core.ModeType.FULL;
-import static io.github.up2jakarta.csv.core.ModeType.UNIT;
+import static io.github.up2jakarta.csv.core.ModeType.NEAT;
 import static io.github.up2jakarta.lov.core.Beans.cast;
 
 /**
- * Up2J Base Processor that's able to segregate and export java-bean to flat-data.
+ * Up2J Business Processor that's able to format and segregate java-bean to flat-data.
+ * <p>
+ * This class cannot be directly inherited, uses {@link NeatExporter} for ordered input or else {@link MessExporter}
  *
  * @param <T> the business object type
  * @param <B> the business term type
  * @param <I> the input segment type
- * @see FastExporter
- * @see FullExporter
- * @see UnitExporter
+ * @see BusinessImporter
  */
 public abstract sealed class BusinessExporter<B extends ITerm<B>, I extends Enum<I> & IType<I>, T extends Segment>
         extends BSOperator<B, I, Format<Segment, B>, Mapper<Segment, B>>
-        permits UnitExporter, FastExporter, FullExporter {
+        permits NeatExporter, MessExporter {
 
-    private final boolean gettable;
-
-    BusinessExporter(ModeType mode, Up2Factory<B> factory, Class<T> st, Class<I> it) throws BeanException {
+    BusinessExporter(IMode mode, Up2Factory<B> factory, Class<T> st, Class<I> it) throws BeanException {
         super(mode, factory, cast(st), it);
-        this.gettable = tree.isGettable(mode);
+        BeanChecker.check(mode, tree.computer);
     }
 
     BusinessExporter(BusinessImporter<B, I, T, ?, ?> importer) throws BeanException {
         super(importer);
-        this.gettable = tree.isGettable(mode);
-    }
-
-    private void format(String[] pids, Segment bean, BSLink<B, I, Format<Segment, B>> link, Filler<I> consumer) throws IOException {
-        final Format<Segment, B> format = link.computer;
-        final int index = link.index + link.offset;
-        final String[] data = new String[index + format.length];
-        if (link.index == link.length) {
-            format.node.format(data, index, bean);
-        } else {
-            format.format(data, index, bean, link.parentIds);
-            for (final RId<B> rid : link.parentIds) {
-                data[rid.offset] = pids[rid.index];
-            }
-        }
-        if (link.index != 0) {
-            var i = link.offset;
-            for (final VId<B> vid : link.virtualIds) {
-                data[i++] = pids[vid.index];
-            }
-        }
-        consumer.accept(bean, link.key, data);
-        final int idx = link.key.ordinal();
-        if (link.computer.identifiable) {
-            pids[idx] = link.computer.businessId.format(bean);
-        }
-        for (final BSLink<B, I, Format<Segment, B>> node : link.links) {
-            final Collection<Segment> values = node.from(bean);
-            if (values == null) continue;
-            for (var value : values) {
-                this.format(pids, value, node, consumer);
-            }
-        }
-        pids[idx] = null;
-    }
-
-    private void validate(Segment bean, BSLink<B, I, Format<Segment, B>> link, BusinessHandler<B> handler) throws AccessException {
-        final Format<Segment, B> format = link.computer;
-        if (format.validate) {
-            format.node.validate(format.validator, handler, bean, link.offset + link.index);
-        }
-        for (final BSLink<B, I, Format<Segment, B>> node : link.links) {
-            final Collection<Segment> values = node.from(bean);
-            if (values == null) continue;
-            if (node.notValid(values.size())) {
-                handler.handle(node.event, link.term, link.message());
-            }
-            for (var value : values) {
-                if (value == null) {
-                    handler.handle(node.event, node.term, "must not be null");
-                } else {
-                    this.validate(value, node, handler);
-                }
-            }
-        }
-    }
-
-    protected void format(T bean, Supplier<String> recordId, SegmentWriter callback) throws IOException {
-        if (bean == null) return;
-        final String reference = (gettable) ? tree.computer.businessId.format(bean) : null;
-        this.format(new String[length], bean, tree, (s, t, d) -> {
-            this.fill(d, recordId, t, reference);
-            callback.accept(d);
-        });
+        BeanChecker.check(mode, tree.computer);
     }
 
     /**
@@ -119,7 +56,7 @@ public abstract sealed class BusinessExporter<B extends ITerm<B>, I extends Enum
      * @param bean    the business-object that is being validated
      * @param handler the event handler
      */
-    public void validate(T bean, BusinessHandler<B> handler) throws AccessException {
+    public final void validate(T bean, BusinessHandler<B> handler) throws AccessException {
         if (bean != null) {
             this.validate(bean, tree, handler);
         }
@@ -131,21 +68,11 @@ public abstract sealed class BusinessExporter<B extends ITerm<B>, I extends Enum
      * @param bean the business-object that is being validated
      * @return the list of collected events
      */
-    public List<? extends IEvent<B>> validate(T bean) throws AccessException {
+    public final List<? extends IEvent<B>> validate(T bean) throws AccessException {
         final SimpleCollector<B> collector = new SimpleCollector<>();
         this.validate(bean, collector);
         return collector.toList();
     }
-
-    @Override
-    final Format<Segment, B> build(Up2Factory<B> factory, Class<Segment> type, Mapper<Segment, B> source) throws BeanException {
-        if (source != null) {
-            return source.reverse();
-        }
-        return factory.ft(type);
-    }
-
-    abstract void fill(String[] target, Supplier<String> recordId, I type, String reference);
 
     /**
      * Computes and returns the list of specifications for each segment in the current business-object.
@@ -157,43 +84,85 @@ public abstract sealed class BusinessExporter<B extends ITerm<B>, I extends Enum
      * @return the list of specifications
      */
     public final List<Spec<I, B>> specs(String offset, String code, String name, String defaultValue) {
-        final List<Spec<I, B>> result = new LinkedList<>();
         final ITerm<?> bid = (tree.computer.businessId instanceof PId<?> w) ? w.property.dataType : null;
+        final List<Spec<I, B>> result = new LinkedList<>();
+        final int index = mode.getIndex();
         tree.visit(1, (d, n) -> {
-            final String[][] data = n.computer.specs(n.index + n.offset + 1);
-            data[0][0] = offset;
-            data[1][0] = code;
-            data[2][0] = name;
-            data[3][0] = defaultValue;
-            var i = mode.getTypeIdIndex() + 1;
-            data[0][i] = String.valueOf(i);
-            data[2][i] = "#Segment";
-            if (mode == UNIT ^ n.offset == mode.length) {
-                i = mode.getBeanIdIndex() + 1;
-                data[0][i] = String.valueOf(i);
+            final String[][] spec = n.computer.specs(n.index + n.offset + 1);
+            spec[0][0] = offset;
+            spec[1][0] = code;
+            spec[2][0] = name;
+            spec[3][0] = defaultValue;
+            var i = mode.getIndex() + 1;
+            spec[0][i] = String.valueOf(i);
+            spec[2][i] = "#Segment";
+            if (mode != NEAT && n.offset == mode.getLength()) {
+                i = mode.getOffset() + 1;
+                spec[0][i] = String.valueOf(i);
                 if (bid != null) {
-                    data[1][i] = bid.getCode();
-                    data[2][i] = bid.getName();
+                    spec[1][i] = bid.getCode();
+                    spec[2][i] = bid.getName();
                 }
             }
-            if (mode == FULL) {
-                data[0][1] = "1";
-                data[2][1] = "#Record";
+            for (i = 1; i <= index; i++) {
+                spec[0][i] = String.valueOf(i);
+                spec[2][i] = this.spec(i - 1);
             }
             i = n.offset + 1;
-            for (final VId<B> vid : n.virtualIds) {
-                data[0][i] = String.valueOf(i);
-                data[1][i] = vid.getCode();
-                data[2][i++] = vid.getName();
+            for (final BSLink.VId<B> vid : n.virtualIds) {
+                spec[0][i] = String.valueOf(i);
+                spec[1][i] = vid.getCode();
+                spec[2][i++] = vid.getName();
             }
-            result.add(new Spec<>(n, d, data));
+            result.add(new Spec<>(n, d, spec));
         });
         return result;
     }
 
-    @FunctionalInterface
-    private interface Filler<I extends Enum<I> & IType<I>> {
-        void accept(Segment source, I type, String[] data) throws IOException;
+    /**
+     * Segregates the given business-object to many records and notifies the callback for each one.
+     *
+     * @param bean     the business object to segregate
+     * @param callback the segment writer
+     * @param <X>      the type of exception can be thrown by writer
+     * @throws X               if the segment writer throws {@link X}
+     * @throws AccessException for any problem when getting properties from the specified business-object
+     */
+    public abstract <X extends Exception> void format(T bean, SegmentWriter<X> callback) throws X, AccessException;
+
+    abstract String spec(int index);
+
+    @Override
+    final Format<Segment, B> build(Up2Factory<B> f, Class<Segment> type, Mapper<Segment, B> src) throws BeanException {
+        if (src != null) {
+            return src.reverse(factory.validator);
+        }
+        return f.ft(type);
+    }
+
+    private void validate(Segment s, BSLink<B, I, Format<Segment, B>> l, BusinessHandler<B> h) throws AccessException {
+        final Format<Segment, B> format = l.computer;
+        if (format.validate) {
+            format.node.validate(factory.validator, h, s, l.offset + l.index);
+        }
+        for (final BSLink<B, I, Format<Segment, B>> node : l.links) {
+            final Collection<Segment> children = node.from(s);
+            if (children == null) continue;
+            final int size = children.size();
+            final String message = this.validate(node, size);
+            if (message != null) {
+                h.handle(node.event, node.term, message);
+            }
+            if (size != 0) {
+                for (final Segment child : children) {
+                    if (child == null) {
+                        h.handle(node.event, node.term, "must not be null");
+                    } else {
+                        this.validate(child, node, h);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -268,7 +237,68 @@ public abstract sealed class BusinessExporter<B extends ITerm<B>, I extends Enum
         public String[][] get() {
             return data;
         }
-
     }
 
+    /**
+     * Internal Business Flatter.
+     */
+    static final class Format<S extends Segment, D extends ITerm<D>> extends Node<S, D, Flat<S, D>> {
+        Format(Validator validator, Key<D, S> key, Flat<S, D> node) throws BeanException {
+            super(validator, key, node);
+        }
+
+        private void format(Flat<?, D> node, String[] result, int offset, Segment bean, List<RId<D>> rids) {
+            if (bean == null) {
+                node.defaultValues(result, offset);
+            } else {
+                for (final BSProperty<?, D> p : node.properties) {
+                    if (p.getClass() == PFragment.class) {
+                        //noinspection unchecked
+                        final PFragment<Segment, D> fp = (PFragment<Segment, D>) p;
+                        format((Flat<?, D>) fp.node, result, offset, fp.value(bean), rids);
+                    } else {
+                        boolean mapped = true;
+                        for (final RId<D> rid : rids) {
+                            if (rid.reference.property.offset == p.offset) {
+                                mapped = false;
+                                break;
+                            }
+                        }
+                        if (mapped) {
+                            //noinspection unchecked
+                            final PPosition<Object, D> pp = (PPosition<Object, D>) p;
+                            result[offset + p.offset] = pp.format(pp.value(bean));
+                        }
+                    }
+                }
+            }
+        }
+
+        void format(String[] result, int offset, Segment bean, List<RId<D>> rids) {
+            this.format(this.node, result, offset, bean, rids);
+        }
+
+        String[][] specs(int offset) {
+            final String[][] result = new String[4][length + offset];
+            if (this.length != 0) {
+                this.node.visit(p -> {
+                    final int i = offset + p.offset;
+                    result[0][i] = String.valueOf(i);
+                    if (p.dataType != null) {
+                        result[1][i] = p.dataType.getCode();
+                        result[2][i] = p.dataType.getName();
+                    } else {
+                        result[1][i] = p.getName();
+                    }
+                    result[3][i] = p.format(null);
+                });
+            }
+            return result;
+        }
+
+        Mapper<S, D> reverse(Validator validator) throws BeanException {
+            return BSManager.mp(this).build(validator, Mapper::new);
+        }
+    }
 }
+

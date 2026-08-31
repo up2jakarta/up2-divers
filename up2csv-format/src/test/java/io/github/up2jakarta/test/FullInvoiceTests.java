@@ -1,8 +1,8 @@
 package io.github.up2jakarta.test;
 
-import io.github.up2jakarta.csv.core.FullImporter;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.fmt.Fixed06Generator;
+import io.github.up2jakarta.csv.data.Fixed06Generator;
+import io.github.up2jakarta.csv.data.FullImporter;
 import io.github.up2jakarta.csv.io.FullFileReader;
 import io.github.up2jakarta.csv.io.FullFileWriter;
 import io.github.up2jakarta.lov.core.BeanException;

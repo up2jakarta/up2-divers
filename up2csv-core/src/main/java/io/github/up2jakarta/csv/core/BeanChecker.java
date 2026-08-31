@@ -9,6 +9,7 @@ import io.github.up2jakarta.csv.cfg.*;
 import io.github.up2jakarta.csv.core.BSAccessor.Mode;
 import io.github.up2jakarta.csv.core.BSNode.Bean;
 import io.github.up2jakarta.csv.core.BSOperator.Node;
+import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.Valid;
@@ -25,7 +26,7 @@ import java.util.Optional;
 
 import static io.github.up2jakarta.csv.core.BSBuilder.name;
 import static io.github.up2jakarta.csv.core.BeanAccessor.getInstance;
-import static io.github.up2jakarta.csv.core.ext.Beans.isInnerType;
+import static io.github.up2jakarta.csv.ext.Beans.isInnerType;
 import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
 import static io.github.up2jakarta.lov.core.Beans.getTypeName;
 import static io.github.up2jakarta.lov.core.Defaults.creator;
@@ -159,9 +160,16 @@ final class BeanChecker implements TypeListener, TypeContext {
         }
         stack.addLast(node);
         for (final BSProperty<?, ?> p : node.properties) {
-            if (p instanceof BSProperty.PFragment<?, ?> fp) {
+            if (p instanceof PFragment<?, ?> fp) {
                 check(stack, (Bean<?, ?, ?>) fp.node);
             }
+        }
+    }
+
+    static void check(IMode mode, BusinessExporter.Format<?, ?> computer) throws BeanException {
+        final boolean readable = mode != ModeType.NEAT;
+        if (readable && !computer.identifiable) {
+            throw new BeanException(computer.node.type, "must have one property annotated with @BusinessId");
         }
     }
 

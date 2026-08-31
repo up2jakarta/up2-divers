@@ -10,8 +10,8 @@ import java.lang.invoke.VarHandle;
 import java.lang.reflect.*;
 
 import static io.github.up2jakarta.csv.api.Container.TRUSTED_MODE;
-import static io.github.up2jakarta.csv.core.ext.Beans.getValue;
-import static io.github.up2jakarta.csv.core.ext.Beans.setValue;
+import static io.github.up2jakarta.csv.ext.Beans.getValue;
+import static io.github.up2jakarta.csv.ext.Beans.setValue;
 import static io.github.up2jakarta.lov.core.Defaults.prototype;
 import static io.github.up2jakarta.lov.core.Localizable.CLASS;
 import static io.github.up2jakarta.lov.core.Localizable.CREATOR;

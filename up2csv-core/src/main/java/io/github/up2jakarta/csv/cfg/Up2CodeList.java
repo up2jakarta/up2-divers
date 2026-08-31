@@ -1,6 +1,6 @@
 package io.github.up2jakarta.csv.cfg;
 
-import io.github.up2jakarta.csv.api.Argument;
+import io.github.up2jakarta.csv.api.ext.Argument;
 import io.github.up2jakarta.csv.slv.CodeListChecker;
 import io.github.up2jakarta.lov.CodeListResolver;
 import io.github.up2jakarta.lov.ConstantProvider;

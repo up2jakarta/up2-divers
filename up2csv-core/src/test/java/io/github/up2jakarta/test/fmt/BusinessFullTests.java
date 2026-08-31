@@ -14,10 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.IOException;
 import java.util.Arrays;
 
-import static io.github.up2jakarta.csv.core.ModeType.FULL;
+import static io.github.up2jakarta.csv.core.IMode.FULL;
 import static io.github.up2jakarta.lov.core.Codes.encodeInt;
 import static io.github.up2jakarta.test.fmt.misc.Tests.invoice;
 import static io.github.up2jakarta.test.impl.SegmentType.*;
@@ -66,7 +65,7 @@ class BusinessFullTests extends AFullTest<Invoice, InputRecord, InputError> {
     }
 
     @Test
-    void testCardinality3() {
+    void testCardinality3() throws BeanException {
         // Given
         final InputRecord[] rows = {
                 record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
@@ -76,11 +75,11 @@ class BusinessFullTests extends AFullTest<Invoice, InputRecord, InputError> {
                 record(S04, "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
         };
         // When & Then
-        checkCardinality3(S02, rows);
+        checkCardinality3(S02, rows, importer.toExporter());
     }
 
     @Test
-    void testCardinality4() {
+    void testCardinality4() throws BeanException {
         // Given
         final InputRecord[] rows = {
                 record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
@@ -88,7 +87,23 @@ class BusinessFullTests extends AFullTest<Invoice, InputRecord, InputError> {
                 record(S03, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
         };
         // When & Then
-        checkCardinality4(S01, rows);
+        checkCardinality4(S01, rows, importer.toExporter());
+    }
+
+    @Test
+    void testCardinality5() throws BeanException {
+        // Given
+        final InputRecord[] rows = {
+                record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),
+                record(S02, "TU2025R0099", "SEL0099", "FR", "Paris", "75020", "99 Rue Up2JS", "Up2JS"),
+                record(S03, "TU2025R0099", "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
+                record(S04, "TU2025R0099", "1199", "Software", "2", "120", "100", "20"),
+                record(S09, "TU2025R0099", "1199", "Duration", "one year"),
+                record(S09, "TU2025R0099", "1199", "Support", "Yes"),
+                record(S09, "TU2025R0099", "1199", "Warn", "0..2"),
+        };
+        // When & Then
+        checkCardinality5(rows, importer.toExporter());
     }
 
     @Test
@@ -107,7 +122,7 @@ class BusinessFullTests extends AFullTest<Invoice, InputRecord, InputError> {
     }
 
     @Test
-    void testValid1() throws BeanException, IOException {
+    void testValid1() throws BeanException {
         // Given
         final InputRecord[] rows = invoice(S01, FULL);
         // When & Then
@@ -115,7 +130,7 @@ class BusinessFullTests extends AFullTest<Invoice, InputRecord, InputError> {
     }
 
     @Test
-    void testValid2() throws IOException {
+    void testValid2() {
         // Given
         final InputRecord[] rows = {
                 record(S01, "TU2025R0099", "2025-03-12", "120", "100", "20"),

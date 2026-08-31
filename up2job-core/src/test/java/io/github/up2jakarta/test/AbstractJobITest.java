@@ -1,5 +1,6 @@
 package io.github.up2jakarta.test;
 
+import io.github.up2jakarta.csv.core.IMode;
 import io.github.up2jakarta.csv.core.ModeType;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static io.github.up2jakarta.csv.fmt.Fixed06Generator.FV_SM;
+import static io.github.up2jakarta.csv.data.Fixed06Generator.FV_SM;
 import static io.github.up2jakarta.lov.core.Codes.fixed;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,7 +41,7 @@ public abstract class AbstractJobITest {
     @Autowired
     protected JobLauncherTestUtils launcher;
 
-    protected AbstractJobITest(ModeType mode, CSVFormat format) throws IOException {
+    protected AbstractJobITest(IMode mode, CSVFormat format) throws IOException {
         this.generator = new TUGenerator(mode, this.getClass(), format);
     }
 
@@ -84,11 +85,11 @@ public abstract class AbstractJobITest {
         private static final Random RANDOM = new Random();
 
         private final Path path;
-        private final ModeType mode;
-        private final InputStream template;
+        private final IMode mode;
         private final CSVFormat format;
+        private final InputStream template;
 
-        TUGenerator(ModeType mode, Class<?> tester, CSVFormat format) throws IOException {
+        TUGenerator(IMode mode, Class<?> tester, CSVFormat format) throws IOException {
             this.format = format;
             this.mode = mode;
             this.template = new ClassPathResource("template.csv").getInputStream();
@@ -106,7 +107,20 @@ public abstract class AbstractJobITest {
         Path generate(String fileName, int size) throws IOException {
             final CSVParser parser = format.parse(new InputStreamReader(template));
             final List<CSVRecord> records = new ArrayList<>(parser.stream().toList());
-            final List<String[]> tmpl = records.stream().map(CSVRecord::values).toList();
+            final List<String[]> tmpl = records.stream()
+                    .map(r -> {
+                        final String[] tpl = r.values();
+                        if (mode == ModeType.NEAT && "09".equals(tpl[0])) {
+                            final String[] rs = new String[tpl.length - 1];
+                            rs[0] = tpl[0];
+                            rs[1] = tpl[1];
+                            rs[2] = tpl[3];
+                            rs[3] = tpl[4];
+                            return rs;
+                        }
+                        return tpl;
+                    })
+                    .toList();
             final Path csv = this.generate(tmpl, fileName, size);
             template.close();
             TUConfiguration.LOG.info("Input file with ({}) invoices -> {}", size, csv);
@@ -157,11 +171,11 @@ public abstract class AbstractJobITest {
 
         private boolean fill(String[] tmpl, String[] data, String invoiceNumber, String year, String randomInt, int ln) {
             final int s, p;
-            if (mode == ModeType.FULL) {
+            if (mode == IMode.FULL) {
                 data[0] = fixed(FV_SM + ln);
                 p = s = 1;
             } else {
-                if (mode == ModeType.UNIT && !"01".equals(tmpl[0])) {
+                if (mode == ModeType.NEAT && !"01".equals(tmpl[0])) {
                     data[0] = tmpl[0];
                     s = 2;
                     p = -1;
@@ -194,10 +208,10 @@ public abstract class AbstractJobITest {
         }
 
         private List<String[]> clone(List<String[]> tmpl) {
-            final int p = (mode == ModeType.FULL) ? 1 : 0;
+            final int p = (mode == IMode.FULL) ? 1 : 0;
             final List<String[]> data = new ArrayList<>(tmpl.size());
             for (final String[] segment : tmpl) {
-                final int s = (mode == ModeType.UNIT && !"01".equals(segment[0])) ? 1 : 0;
+                final int s = (mode == ModeType.NEAT && !"01".equals(segment[0])) ? 1 : 0;
                 final String[] copy = new String[segment.length + p - s];
                 copy[p] = segment[0];
                 data.add(copy);

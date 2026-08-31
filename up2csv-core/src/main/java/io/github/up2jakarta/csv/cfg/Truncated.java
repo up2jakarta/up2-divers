@@ -18,9 +18,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * {@link io.github.up2jakarta.csv.core.BusinessImporter} and {@link io.github.up2jakarta.csv.core.BusinessExporter},
  * but on the underlying segments, the information is taken from related {@link io.github.up2jakarta.csv.core.ModeType}.
  * <ul>
- *     <li> <code>1</code> for {@link io.github.up2jakarta.csv.core.ModeType#UNIT}</li>
- *     <li> <code>2</code> for {@link io.github.up2jakarta.csv.core.ModeType#FAST}</li>
- *     <li> <code>3</code> for {@link io.github.up2jakarta.csv.core.ModeType#FULL}</li>
+ *     <li> <code>1</code> for {@link io.github.up2jakarta.csv.core.ModeType#NEAT}</li>
+ *     <li> <code>1</code> for {@link io.github.up2jakarta.csv.core.ModeType#MESS}</li>
+ *     <li> {@link io.github.up2jakarta.csv.core.IMode#getOffset()} for any mode</li>
  * </ul>
  *
  * @see io.github.up2jakarta.csv.api.IRecord

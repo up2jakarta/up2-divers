@@ -1,6 +1,6 @@
 package io.github.up2jakarta.test.core;
 
-import io.github.up2jakarta.csv.data.Recordable;
+import io.github.up2jakarta.csv.api.Recordable;
 import io.github.up2jakarta.lov.CodeListAdapter;
 import io.github.up2jakarta.test.core.misc.TestConverter;
 import io.github.up2jakarta.test.core.misc.cvr.SupportEntity;

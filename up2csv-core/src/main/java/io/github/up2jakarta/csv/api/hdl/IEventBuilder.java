@@ -2,9 +2,9 @@ package io.github.up2jakarta.csv.api.hdl;
 
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
-import io.github.up2jakarta.csv.data.ITerm;
-import io.github.up2jakarta.csv.data.Listable;
+import io.github.up2jakarta.csv.api.ITerm;
+import io.github.up2jakarta.csv.api.Listable;
+import io.github.up2jakarta.csv.hdl.BusinessHandler;
 
 /**
  * Contract interface for {@link BusinessHandler} builder.

@@ -2,15 +2,20 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.Container;
+import io.github.up2jakarta.csv.api.ITerm;
+import io.github.up2jakarta.csv.api.TermResolver;
 import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.BSAccessor.Mode;
 import io.github.up2jakarta.csv.core.BSBuilder.MEP;
 import io.github.up2jakarta.csv.core.BSBuilder.MST;
 import io.github.up2jakarta.csv.core.BSNode.Bean;
 import io.github.up2jakarta.csv.core.BSNode.Flat;
-import io.github.up2jakarta.csv.core.ext.Beans;
-import io.github.up2jakarta.csv.data.ITerm;
-import io.github.up2jakarta.csv.data.TermResolver;
+import io.github.up2jakarta.csv.core.BSOperator.Node;
+import io.github.up2jakarta.csv.core.BSOperator.PId;
+import io.github.up2jakarta.csv.core.BSProperty.PFragment;
+import io.github.up2jakarta.csv.core.BusinessExporter.Format;
+import io.github.up2jakarta.csv.core.BusinessImporter.Mapper;
+import io.github.up2jakarta.csv.ext.Beans;
 import io.github.up2jakarta.lov.IException;
 import io.github.up2jakarta.lov.bst.Cache;
 import io.github.up2jakarta.lov.core.AccessException;
@@ -24,8 +29,7 @@ import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static io.github.up2jakarta.csv.core.BSOperator.*;
-import static io.github.up2jakarta.csv.core.ext.Beans.getPermittedTypes;
+import static io.github.up2jakarta.csv.ext.Beans.getPermittedTypes;
 import static io.github.up2jakarta.lov.core.AccessException.notNull;
 import static io.github.up2jakarta.lov.core.Beans.getTypeName;
 import static java.util.regex.Pattern.compile;
@@ -34,17 +38,40 @@ import static java.util.regex.Pattern.compile;
  * Internal cache manager.
  */
 class BSManager<D extends ITerm<D>, S extends Segment> {
-
-    private static final Map<MKey, BSManager<?, ?>> CACHE = new HashMap<>();
+    private static final List<String> EXCLUSIONS = getPermittedTypes(MEP.class, MST.class, Beans.class).toList();
+    private static final Map<TermResolver<?>, BSManager<?, ?>> CACHE = new IdentityHashMap<>();
+    private static final String MEP_REGEX = "^jdk\\.internal\\.reflect\\.\\w*Accessor\\w*$";
+    private static final List<String> CN_ENTRIES = getPermittedTypes(MEP.class).toList();
+    private static final Predicate<String> MEP = compile(MEP_REGEX).asMatchPredicate();
     private final Cache<Key<D, S>, Value<D, S>> cache = new WKCache<>();
 
     private BSManager() {
     }
 
+    private static void stackTrace(List<String> cns, Throwable cause, String prefix, PrintWriter printer) {
+        printer.println(prefix + cause);
+        final StackTraceElement[] traces = cause.getStackTrace();
+        for (final StackTraceElement element : traces) {
+            final String cn = element.getClassName();
+            if (MEP.test(cn)) {
+                break;
+            }
+            if (!EXCLUSIONS.contains(cn)) {
+                printer.println("\t" + element);
+            }
+            if (cns.contains(cn)) {
+                break;
+            }
+        }
+        cause = cause.getCause();
+        if (cause != null) {
+            stackTrace(cns, cause, "Caused by ", printer);
+        }
+    }
+
     @SuppressWarnings("unchecked")
-    private static <D extends ITerm<D>, S extends Segment> BSManager<D, S> of(TermResolver<D> r, Validator v) {
-        final MKey key = new MKey(r, v);
-        return (BSManager<D, S>) CACHE.computeIfAbsent(key, k -> new BSManager<D, S>());
+    private static <D extends ITerm<D>, S extends Segment> BSManager<D, S> of(TermResolver<D> r) {
+        return (BSManager<D, S>) CACHE.computeIfAbsent(r, k -> new BSManager<D, S>());
     }
 
     @SuppressWarnings("unchecked")
@@ -159,32 +186,6 @@ class BSManager<D extends ITerm<D>, S extends Segment> {
     }
 
     /**
-     * Internal Key
-     */
-    private static final class MKey {
-        private final TermResolver<?> k1;
-        private final Validator k2;
-
-        MKey(TermResolver<?> k1, Validator k2) {
-            this.k1 = k1;
-            this.k2 = k2;
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            if (!(other instanceof BSManager.MKey that)) {
-                return false;
-            }
-            return (k1 == that.k1) && (k2 == that.k2);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(k1, k2);
-        }
-    }
-
-    /**
      * Internal Cache Key
      */
     static final class Key<D extends ITerm<D>, S extends Segment> implements Comparable<Key<D, S>> {
@@ -216,20 +217,16 @@ class BSManager<D extends ITerm<D>, S extends Segment> {
      * Internal Business Factory.
      */
     abstract static sealed class Factory<D extends ITerm<D>> permits Up2Factory {
-        private static final List<String> CN_ENTRIES = getPermittedTypes(MEP.class).toList();
-        private static final List<String> EXCLUSIONS = getPermittedTypes(MEP.class, MST.class, Beans.class).toList();
-        private static final Predicate<String> MA = compile("^jdk\\.internal\\.reflect\\.\\w*Accessor\\w*$").asMatchPredicate();
-
         final Container context;
         final Validator validator;
         final TermResolver<D> resolver;
         private final BSManager<D, ?> manager;
 
-        Factory(Container context, TermResolver<D> resolver) {
-            this.context = notNull(context, Up2Factory.class, "context");
+        Factory(Container context, TermResolver<D> resolver, Validator validator) {
             this.resolver = notNull(resolver, Up2Factory.class, "resolver");
-            this.validator = defaultValidator(context);
-            this.manager = BSManager.of(resolver, validator);
+            this.context = notNull(context, Up2Factory.class, "context");
+            this.manager = of(resolver);
+            this.validator = validator;
         }
 
         /**
@@ -238,7 +235,7 @@ class BSManager<D extends ITerm<D>, S extends Segment> {
          * @param event the source event
          * @return the stack-trace if exists
          */
-        public static Optional<String> trace(IException event) {
+        public static Optional<String> stackTrace(IException event) {
             while (event.getCause() instanceof IException cause) {
                 event = cause;
             }
@@ -256,41 +253,8 @@ class BSManager<D extends ITerm<D>, S extends Segment> {
          */
         public static String stackTrace(List<String> entryPoints, Throwable cause) {
             final StringWriter writer = new StringWriter();
-            stackTrace(entryPoints, cause, "", new PrintWriter(writer));
+            BSManager.stackTrace(entryPoints, cause, "", new PrintWriter(writer));
             return writer.toString();
-        }
-
-        private static Validator defaultValidator(Container context) {
-            try {
-                return context.getBean(Validator.class);
-            } catch (Exception ignore) {
-            }
-            try {
-                return Up2Factory.validator(null);
-            } catch (Exception ignore) {
-                return null;
-            }
-        }
-
-        private static void stackTrace(List<String> cns, Throwable cause, String prefix, PrintWriter printer) {
-            printer.println(prefix + cause);
-            final StackTraceElement[] traces = cause.getStackTrace();
-            for (final StackTraceElement element : traces) {
-                final String cn = element.getClassName();
-                if (MA.test(cn)) {
-                    break;
-                }
-                if (!EXCLUSIONS.contains(cn)) {
-                    printer.println("\t" + element);
-                }
-                if (cns.contains(cn)) {
-                    break;
-                }
-            }
-            cause = cause.getCause();
-            if (cause != null) {
-                stackTrace(cns, cause, "Caused by ", printer);
-            }
         }
 
         <S extends Segment> Mapper<S, D> mp(Class<S> type) throws BeanException {
@@ -410,13 +374,11 @@ class BSManager<D extends ITerm<D>, S extends Segment> {
         final int length;
         final int offset;
         final boolean validate;
-        final Validator validator;
         private final Key<D, S> key;
 
         Pod(Validator validator, Key<D, S> key, T node) throws BeanException {
             this.key = key;
             this.node = node;
-            this.validator = validator;
             this.length = max(node) + 1;
             this.validate = node.context.enabled(validator);
             final Truncated truncated = node.type.getAnnotation(Truncated.class);
@@ -430,7 +392,7 @@ class BSManager<D extends ITerm<D>, S extends Segment> {
             int max = -1;
             for (final BSProperty<?, ?> p : node.properties) {
                 final int offset;
-                if (p instanceof BSProperty.PFragment<?, ?> fp) {
+                if (p instanceof PFragment<?, ?> fp) {
                     offset = max(fp.node);
                 } else {
                     offset = p.offset;
@@ -444,7 +406,7 @@ class BSManager<D extends ITerm<D>, S extends Segment> {
             int min = Integer.MAX_VALUE;
             for (final BSProperty<?, ?> p : node.properties) {
                 final int offset;
-                if (p instanceof BSProperty.PFragment<?, ?> fp) {
+                if (p instanceof PFragment<?, ?> fp) {
                     offset = max(fp.node);
                 } else {
                     offset = p.offset;

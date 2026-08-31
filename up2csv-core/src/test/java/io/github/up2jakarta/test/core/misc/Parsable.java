@@ -1,7 +1,7 @@
 package io.github.up2jakarta.test.core.misc;
 
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.data.Recordable;
+import io.github.up2jakarta.csv.api.Recordable;
 import io.github.up2jakarta.test.impl.SegmentType;
 import jakarta.persistence.Transient;
 

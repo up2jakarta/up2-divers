@@ -2,6 +2,7 @@ package io.github.up2jakarta.csv.data;
 
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.IEvent;
+import io.github.up2jakarta.csv.api.Listable;
 
 import java.util.List;
 import java.util.function.Supplier;

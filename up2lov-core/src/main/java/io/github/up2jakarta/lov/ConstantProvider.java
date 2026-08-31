@@ -33,20 +33,42 @@ public final class ConstantProvider extends CodeListProvider<CodeList<?>> {
         return false;
     }
 
+    private static <C extends CodeList<?>> void value(C constant, Class<C> type, Class<C> nd, Consumer<C> cl) {
+        try {
+            final Field field = nd.getDeclaredField(((Enum<?>) constant).name());
+            if (!isValid(field)) return;
+        } catch (NoSuchFieldException ignore) {
+        }
+        if (type.isInstance(constant)) {
+            cl.accept(constant);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <C extends CodeList<?>> void value(Field field, Class<C> type, Consumer<C> cl) {
+        try {
+            if (!isPublic(field.getModifiers())) {
+                field.setAccessible(true);
+            }
+            final Object constant = field.get(null);
+            if (type.isInstance(constant)) {
+                cl.accept((C) constant);
+            }
+        } catch (Exception ignore) {
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private static <C extends CodeList<?>> void values(List<Class<C>> cs, Class<C> type, Class<C> nd, Consumer<C> cl) {
         cs.add(nd);
-        for (final Field field : nd.getDeclaredFields()) {
-            if (isValid(field)) {
-                try {
-                    if (!isPublic(field.getModifiers())) {
-                        field.setAccessible(true);
-                    }
-                    final Object constant = field.get(null);
-                    if (type.isInstance(constant)) {
-                        cl.accept((C) constant);
-                    }
-                } catch (Exception ignore) {
+        if (nd.isEnum()) {
+            for (final C constant : nd.getEnumConstants()) {
+                value(constant, type, nd, cl);
+            }
+        } else {
+            for (final Field field : nd.getDeclaredFields()) {
+                if (isValid(field)) {
+                    value(field, type, cl);
                 }
             }
         }

@@ -1,7 +1,7 @@
 package io.github.up2jakarta.csv.slv;
 
-import io.github.up2jakarta.csv.api.Argument;
 import io.github.up2jakarta.csv.api.Container;
+import io.github.up2jakarta.csv.api.ext.Argument;
 import io.github.up2jakarta.csv.api.ext.TypeResolver;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.cfg.Up2CodeList;
@@ -17,7 +17,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_CODE_LIST;
-import static io.github.up2jakarta.csv.core.ext.Beans.*;
+import static io.github.up2jakarta.csv.ext.Beans.*;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static java.lang.String.join;
 import static java.util.function.Predicate.not;

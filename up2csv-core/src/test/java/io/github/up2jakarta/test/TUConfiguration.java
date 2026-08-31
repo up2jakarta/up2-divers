@@ -1,9 +1,10 @@
 package io.github.up2jakarta.test;
 
 import io.github.up2jakarta.csv.api.Container;
+import io.github.up2jakarta.csv.api.TermResolver;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.data.SimpleTermResolver;
-import io.github.up2jakarta.csv.data.TermResolver;
+import io.github.up2jakarta.csv.data.SimpleResolver;
+import io.github.up2jakarta.csv.ext.XmlAdapterExtension;
 import io.github.up2jakarta.csv.prc.TokenProcessor;
 import io.github.up2jakarta.csv.slv.DecimalResolver;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -26,7 +27,7 @@ import java.util.Set;
 
 @Configuration
 @ComponentScan(basePackageClasses = {
-        Up2Factory.class, TokenProcessor.class, DecimalResolver.class,
+        Up2Factory.class, TokenProcessor.class, DecimalResolver.class, XmlAdapterExtension.class,
         DummyConverter.class, CurrencyConverter.class, NumberConverter.class,
         InvoiceItemLinker.class, Tree90Linker.class
 })
@@ -36,7 +37,7 @@ public class TUConfiguration {
     public Validator validator() {
         return Up2Factory.validator(
                 new ParameterMessageInterpolator(
-                        Set.of(Locale.ENGLISH, Locale.FRENCH),
+                        Set.of(Locale.ENGLISH),
                         Locale.ENGLISH,
                         context -> Locale.ENGLISH,
                         false
@@ -61,7 +62,7 @@ public class TUConfiguration {
 
     @Bean
     TermResolver<TermType> resolver() {
-        return new SimpleTermResolver<>(TermType.class, BusinessType.class, BusinessType::value);
+        return new SimpleResolver<>(TermType.class, BusinessType.class, BusinessType::value);
     }
 
     @Bean
@@ -72,14 +73,14 @@ public class TUConfiguration {
 
     @Bean
     @Lazy
-    public MyFastAggregator invoiceFastAggregator(Up2Factory<TermType> factory) throws BeanException {
-        return new MyFastAggregator(factory);
+    public MyMessAggregator invoiceMessAggregator(Up2Factory<TermType> factory) throws BeanException {
+        return new MyMessAggregator(factory);
     }
 
     @Bean
     @Lazy
-    public MyUnitAggregator invoiceUnitAggregator(Up2Factory<TermType> factory) throws BeanException {
-        return new MyUnitAggregator(factory);
+    public MyNeatAggregator invoiceNeatAggregator(Up2Factory<TermType> factory) throws BeanException {
+        return new MyNeatAggregator(factory);
     }
 
 }

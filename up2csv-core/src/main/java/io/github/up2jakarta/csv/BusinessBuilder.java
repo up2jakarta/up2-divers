@@ -1,17 +1,14 @@
 package io.github.up2jakarta.csv;
 
-import io.github.up2jakarta.csv.api.IFastRecord;
-import io.github.up2jakarta.csv.api.IFullRecord;
-import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.api.IType;
+import io.github.up2jakarta.csv.api.*;
 import io.github.up2jakarta.csv.api.hdl.*;
-import io.github.up2jakarta.csv.core.*;
-import io.github.up2jakarta.csv.core.hdl.BusinessCollector;
-import io.github.up2jakarta.csv.core.hdl.PropertyCollector;
-import io.github.up2jakarta.csv.core.hdl.PropertyFailureCollector;
-import io.github.up2jakarta.csv.data.IMutual;
-import io.github.up2jakarta.csv.data.ITerm;
-import io.github.up2jakarta.csv.fmt.*;
+import io.github.up2jakarta.csv.core.MessImporter;
+import io.github.up2jakarta.csv.core.NeatImporter;
+import io.github.up2jakarta.csv.core.Up2Factory;
+import io.github.up2jakarta.csv.data.*;
+import io.github.up2jakarta.csv.hdl.BusinessCollector;
+import io.github.up2jakarta.csv.hdl.PropertyCollector;
+import io.github.up2jakarta.csv.hdl.PropertyFailureCollector;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.lov.core.Identifiable;
@@ -31,42 +28,42 @@ public class BusinessBuilder<B extends ITerm<B>> {
     }
 
     /**
-     * Creates new preconfigured builder for {@link ModeType#UNIT}.
+     * Creates new preconfigured builder for {@link io.github.up2jakarta.csv.core.ModeType#NEAT}.
      *
      * @param type the type of business-object
      * @param <T>  the business object type
      * @return new builder
      */
-    public <T extends Segment> Unit<T> unit(Class<T> type) {
-        return new Unit<>(type);
+    public <T extends Segment> NB<T> neat(Class<T> type) {
+        return new NB<>(type);
     }
 
     /**
-     * Creates new preconfigured builder for {@link ModeType#FAST}.
+     * Creates new preconfigured builder for {@link io.github.up2jakarta.csv.core.ModeType#MESS}.
      *
      * @param type the type of business-object
      * @param <T>  the business object type
      * @return new builder
      */
-    public <T extends Segment> Fast<T> fast(Class<T> type) {
-        return new Fast<>(type);
+    public <T extends Segment> MB<T> mess(Class<T> type) {
+        return new MB<>(type);
     }
 
     /**
-     * Creates new preconfigured builder for {@link ModeType#FULL}.
+     * Creates new preconfigured builder for {@link io.github.up2jakarta.csv.core.IMode#FULL}.
      *
      * @param type the type of business-object
      * @param <T>  business object type
      * @return new builder
      */
-    public <T extends Segment> Full<T> full(Class<T> type) {
-        return new Full<>(type);
+    public <T extends Segment> FB<T> full(Class<T> type) {
+        return new FB<>(type);
     }
 
-    public final class Unit<T extends Segment> {
+    public final class NB<T extends Segment> {
         private final Class<T> st;
 
-        private Unit(Class<T> st) {
+        private NB(Class<T> st) {
             this.st = st;
         }
 
@@ -89,34 +86,34 @@ public class BusinessBuilder<B extends ITerm<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link SimpleUnitExporter}.
+             * Creates new preconfigured instance for {@link SimpleNeatExporter}.
              *
-             * @return new unit-exporter
+             * @return new neat-exporter
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public SimpleUnitExporter<T, B, I> export() throws BeanException {
-                return new SimpleUnitExporter<>(factory, st, it);
+            public SimpleNeatExporter<T, B, I> export() throws BeanException {
+                return new SimpleNeatExporter<>(factory, st, it);
             }
 
             /**
-             * Creates new preconfigured instance for {@link SimpleUnitImporter}.
+             * Creates new preconfigured instance for {@link SimpleNeatImporter}.
              *
-             * @return new simple unit-importer
+             * @return new simple neat-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public SimpleUnitImporter<T, B, I> build() throws BeanException {
-                return new SimpleUnitImporter<>(factory, st, it);
+            public SimpleNeatImporter<T, B, I> build() throws BeanException {
+                return new SimpleNeatImporter<>(factory, st, it);
             }
 
             /**
-             * Creates new preconfigured instance for {@link UnitImporter} with the specified event-creator.
+             * Creates new preconfigured instance for {@link NeatImporter} with the specified event-creator.
              *
              * @param creator the event creator
-             * @return new unit-importer
+             * @return new neat-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IRecord<I>, E extends IPropertyEvent<B, R>> UnitImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator) throws BeanException {
-                return new UnitImporter<>(factory, st, it) {
+            public <R extends IRecord<I>, E extends IPropertyEvent<B, R>> NeatImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator) throws BeanException {
+                return new NeatImporter<>(factory, st, it) {
                     @Override
                     protected PropertyCollector.Builder<B, R, E> newBuilder(int size) {
                         return new PropertyCollector.Builder<>(size, creator);
@@ -125,15 +122,15 @@ public class BusinessBuilder<B extends ITerm<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link UnitImporter} with the specified fast-failure level.
+             * Creates new preconfigured instance for {@link NeatImporter} with the specified fast-failure level.
              *
              * @param creator the event creator
              * @param level   the fast-failure level
-             * @return new unit-importer
+             * @return new neat-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IRecord<I>, E extends IPropertyEvent<B, R>> UnitImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator, SeverityType level) throws BeanException {
-                return new UnitImporter<>(factory, st, it) {
+            public <R extends IRecord<I>, E extends IPropertyEvent<B, R>> NeatImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator, SeverityType level) throws BeanException {
+                return new NeatImporter<>(factory, st, it) {
                     @Override
                     protected PropertyFailureCollector.Builder<B, R, E> newBuilder(int size) {
                         return new PropertyFailureCollector.Builder<>(size, creator, level);
@@ -142,14 +139,14 @@ public class BusinessBuilder<B extends ITerm<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link UnitImporter} with the specified event-creator.
+             * Creates new preconfigured instance for {@link NeatImporter} with the specified event-creator.
              *
              * @param creator the event creator
-             * @return new unit-importer
+             * @return new neat-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IRecord<I> & IMutualRecord<E, R>, E extends IPropertyEvent<B, R> & IMutual<R, E>> UnitImporter<B, I, T, R, E> build(IMutualPropertyCreator<B, R, E> creator) throws BeanException {
-                return new UnitImporter<>(factory, st, it) {
+            public <R extends IRecord<I> & IMutualRecord<E, R>, E extends IPropertyEvent<B, R> & IMutual<R, E>> NeatImporter<B, I, T, R, E> build(IMutualPropertyCreator<B, R, E> creator) throws BeanException {
+                return new NeatImporter<>(factory, st, it) {
                     @Override
                     protected PropertyCollector.Builder<B, R, E> newBuilder(int size) {
                         return new PropertyCollector.Builder<>(size, creator);
@@ -158,14 +155,14 @@ public class BusinessBuilder<B extends ITerm<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link UnitImporter} with the specified event-creator.
+             * Creates new preconfigured instance for {@link NeatImporter} with the specified event-creator.
              *
              * @param creator the event creator
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IRecord<I> & IMutualRecord<E, R> & Identifiable<?>, E extends IBusinessEvent<B, R, ?> & IMutual<R, E>> UnitImporter<B, I, T, R, E> build(IMutualBusinessCreator<B, R, E> creator) throws BeanException {
-                return new UnitImporter<>(factory, st, it) {
+            public <R extends IRecord<I> & IMutualRecord<E, R> & Identifiable<?>, E extends IBusinessEvent<B, R, ?> & IMutual<R, E>> NeatImporter<B, I, T, R, E> build(IMutualBusinessCreator<B, R, E> creator) throws BeanException {
+                return new NeatImporter<>(factory, st, it) {
                     @Override
                     protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
                         return new BusinessCollector.Builder<>(size, creator, r -> 0);
@@ -174,15 +171,15 @@ public class BusinessBuilder<B extends ITerm<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link UnitImporter} with the specified event-creator and repository.
+             * Creates new preconfigured instance for {@link NeatImporter} with the specified event-creator and repository.
              *
              * @param creator    the event creator
              * @param repository the max-order finder to be used as initial value for {@link IBusinessEvent} key-order
-             * @return new unit-importer
+             * @return new neat-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IRecord<I> & Identifiable<?>, E extends IBusinessEvent<B, R, ?>> UnitImporter<B, I, T, R, E> build(IBusinessCreator<B, R, E> creator, IBusinessRepository<R> repository) throws BeanException {
-                return new UnitImporter<>(factory, st, it) {
+            public <R extends IRecord<I> & Identifiable<?>, E extends IBusinessEvent<B, R, ?>> NeatImporter<B, I, T, R, E> build(IBusinessCreator<B, R, E> creator, IBusinessRepository<R> repository) throws BeanException {
+                return new NeatImporter<>(factory, st, it) {
                     @Override
                     protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
                         return new BusinessCollector.Builder<>(size, creator, repository);
@@ -192,10 +189,10 @@ public class BusinessBuilder<B extends ITerm<B>> {
         }
     }
 
-    public final class Fast<T extends Segment> {
+    public final class MB<T extends Segment> {
         private final Class<T> st;
 
-        private Fast(Class<T> st) {
+        private MB(Class<T> st) {
             this.st = st;
         }
 
@@ -218,34 +215,34 @@ public class BusinessBuilder<B extends ITerm<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link SimpleFastExporter}.
+             * Creates new preconfigured instance for {@link SimpleMessExporter}.
              *
-             * @return new fast-exporter
+             * @return new mess-exporter
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public SimpleFastExporter<T, B, I> export() throws BeanException {
-                return new SimpleFastExporter<>(factory, st, it);
+            public SimpleMessExporter<T, B, I> export() throws BeanException {
+                return new SimpleMessExporter<>(factory, st, it);
             }
 
             /**
-             * Creates new preconfigured instance for {@link SimpleFastImporter}.
+             * Creates new preconfigured instance for {@link SimpleMessImporter}.
              *
-             * @return new simple fast-importer
+             * @return new simple mess-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public SimpleFastImporter<T, B, I> build() throws BeanException {
-                return new SimpleFastImporter<>(factory, st, it);
+            public SimpleMessImporter<T, B, I> build() throws BeanException {
+                return new SimpleMessImporter<>(factory, st, it);
             }
 
             /**
-             * Creates new preconfigured instance for {@link FastImporter} with the specified event-creator.
+             * Creates new preconfigured instance for {@link MessImporter} with the specified event-creator.
              *
              * @param creator the event creator
-             * @return new fast-importer
+             * @return new mess-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFastRecord<I>, E extends IPropertyEvent<B, R>> FastImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator) throws BeanException {
-                return new FastImporter<>(factory, st, it) {
+            public <R extends IMessRecord<I>, E extends IPropertyEvent<B, R>> MessImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator) throws BeanException {
+                return new MessImporter<>(factory, st, it) {
                     @Override
                     protected PropertyCollector.Builder<B, R, E> newBuilder(int size) {
                         return new PropertyCollector.Builder<>(size, creator);
@@ -254,15 +251,15 @@ public class BusinessBuilder<B extends ITerm<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link FastImporter} with the specified fast-failure level.
+             * Creates new preconfigured instance for {@link MessImporter} with the specified fast-failure level.
              *
              * @param creator the event creator
              * @param level   the fast-failure level
-             * @return new fast-importer
+             * @return new mess-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFastRecord<I>, E extends IPropertyEvent<B, R>> FastImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator, SeverityType level) throws BeanException {
-                return new FastImporter<>(factory, st, it) {
+            public <R extends IMessRecord<I>, E extends IPropertyEvent<B, R>> MessImporter<B, I, T, R, E> build(IPropertyCreator<B, R, E> creator, SeverityType level) throws BeanException {
+                return new MessImporter<>(factory, st, it) {
                     @Override
                     protected PropertyFailureCollector.Builder<B, R, E> newBuilder(int size) {
                         return new PropertyFailureCollector.Builder<>(size, creator, level);
@@ -271,14 +268,14 @@ public class BusinessBuilder<B extends ITerm<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link FastImporter} with the specified event-creator.
+             * Creates new preconfigured instance for {@link MessImporter} with the specified event-creator.
              *
              * @param creator the event creator
-             * @return new fast-importer
+             * @return new mess-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFastRecord<I> & IMutualRecord<E, R>, E extends IPropertyEvent<B, R> & IMutual<R, E>> FastImporter<B, I, T, R, E> build(IMutualPropertyCreator<B, R, E> creator) throws BeanException {
-                return new FastImporter<>(factory, st, it) {
+            public <R extends IMessRecord<I> & IMutualRecord<E, R>, E extends IPropertyEvent<B, R> & IMutual<R, E>> MessImporter<B, I, T, R, E> build(IMutualPropertyCreator<B, R, E> creator) throws BeanException {
+                return new MessImporter<>(factory, st, it) {
                     @Override
                     protected PropertyCollector.Builder<B, R, E> newBuilder(int size) {
                         return new PropertyCollector.Builder<>(size, creator);
@@ -287,14 +284,14 @@ public class BusinessBuilder<B extends ITerm<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link FastImporter} with the specified event-creator.
+             * Creates new preconfigured instance for {@link MessImporter} with the specified event-creator.
              *
              * @param creator the event creator
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFastRecord<I> & IMutualRecord<E, R> & Identifiable<?>, E extends IBusinessEvent<B, R, ?> & IMutual<R, E>> FastImporter<B, I, T, R, E> build(IMutualBusinessCreator<B, R, E> creator) throws BeanException {
-                return new FastImporter<>(factory, st, it) {
+            public <R extends IMessRecord<I> & IMutualRecord<E, R> & Identifiable<?>, E extends IBusinessEvent<B, R, ?> & IMutual<R, E>> MessImporter<B, I, T, R, E> build(IMutualBusinessCreator<B, R, E> creator) throws BeanException {
+                return new MessImporter<>(factory, st, it) {
                     @Override
                     protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
                         return new BusinessCollector.Builder<>(size, creator, r -> 0);
@@ -303,15 +300,15 @@ public class BusinessBuilder<B extends ITerm<B>> {
             }
 
             /**
-             * Creates new preconfigured instance for {@link FastImporter} with the specified event-creator and repository.
+             * Creates new preconfigured instance for {@link MessImporter} with the specified event-creator and repository.
              *
              * @param creator    the event creator
              * @param repository the max-order finder to be used as initial value for {@link IBusinessEvent} key-order
-             * @return new fast-importer
+             * @return new mess-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFastRecord<I> & Identifiable<?>, E extends IBusinessEvent<B, R, ?>> FastImporter<B, I, T, R, E> build(IBusinessCreator<B, R, E> creator, IBusinessRepository<R> repository) throws BeanException {
-                return new FastImporter<>(factory, st, it) {
+            public <R extends IMessRecord<I> & Identifiable<?>, E extends IBusinessEvent<B, R, ?>> MessImporter<B, I, T, R, E> build(IBusinessCreator<B, R, E> creator, IBusinessRepository<R> repository) throws BeanException {
+                return new MessImporter<>(factory, st, it) {
                     @Override
                     protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {
                         return new BusinessCollector.Builder<>(size, creator, repository);
@@ -321,10 +318,10 @@ public class BusinessBuilder<B extends ITerm<B>> {
         }
     }
 
-    public final class Full<T extends Segment> {
+    public final class FB<T extends Segment> {
         private final Class<T> st;
 
-        private Full(Class<T> st) {
+        private FB(Class<T> st) {
             this.st = st;
         }
 
@@ -412,7 +409,7 @@ public class BusinessBuilder<B extends ITerm<B>> {
              * @return new full-importer
              * @throws BeanException for any missing or wrong java-beans configuration
              */
-            public <R extends IFullRecord<I> & IMutualRecord<E, R> & Identifiable<?>, E extends IBusinessEvent<B, R, ?> & IMutual<R, E>> FullImporter<B, I, T, R, E> build(IMutualBusinessCreator<B, R, E> creator) throws BeanException {
+            public <R extends IFullRecord<I> & Identifiable<?> & IMutualRecord<E, R>, E extends IBusinessEvent<B, R, ?> & IMutual<R, E>> FullImporter<B, I, T, R, E> build(IMutualBusinessCreator<B, R, E> creator) throws BeanException {
                 return new FullImporter<>(factory, st, it) {
                     @Override
                     protected BusinessCollector.Builder<B, R, E> newBuilder(int size) {

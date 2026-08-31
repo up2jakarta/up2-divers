@@ -7,7 +7,7 @@ import io.github.up2jakarta.lov.CodeList;
  *
  * @param <I> self-type implementation
  * @see io.github.up2jakarta.csv.core.BusinessExporter
- * @see io.github.up2jakarta.csv.core.BusinessWriter
+ * @see io.github.up2jakarta.csv.data.BusinessWriter
  * @see io.github.up2jakarta.csv.BusinessObject
  * @see io.github.up2jakarta.csv.BusinessLink
  * @see io.github.up2jakarta.csv.ReferenceId

@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import static io.github.up2jakarta.csv.prc.TrimProcessor.trim;
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class SingleReader<S extends Segment> extends Up2Reader<S> implements Closeable {
@@ -33,9 +34,9 @@ public final class SingleReader<S extends Segment> extends Up2Reader<S> implemen
 
     public SingleReader(Up2Mapper<S, ?> mapper, CSVFormat format, int minLength, String... nullValues) {
         super(mapper);
-        this.format = format;
+        this.nullValues = notNull(nullValues, this.getClass(), "nullValues");
+        this.format = notNull(format, this.getClass(), "format");
         this.minLength = minLength;
-        this.nullValues = nullValues;
     }
 
     /**

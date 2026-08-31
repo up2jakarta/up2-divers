@@ -1,10 +1,10 @@
 package io.github.up2jakarta.test.fmt;
 
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.fmt.Fixed06Generator;
-import io.github.up2jakarta.csv.fmt.FullError;
-import io.github.up2jakarta.csv.fmt.FullRecord;
-import io.github.up2jakarta.csv.fmt.SimpleFullImporter;
+import io.github.up2jakarta.csv.data.Fixed06Generator;
+import io.github.up2jakarta.csv.data.FullError;
+import io.github.up2jakarta.csv.data.FullRecord;
+import io.github.up2jakarta.csv.data.SimpleFullImporter;
 import io.github.up2jakarta.lov.CodeListException;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
@@ -19,11 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_CODE_LIST;
-import static io.github.up2jakarta.csv.core.ModeType.FULL;
+import static io.github.up2jakarta.csv.core.IMode.FULL;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.test.fmt.misc.Tests.invoice;
 import static io.github.up2jakarta.test.impl.SegmentType.*;
@@ -57,12 +57,13 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
     @Test
     void testCodeListException() throws BeanException {
         // Given
+        final List<String[]> rows = Arrays.asList(
+                new String[]{"R01", "RT", "TU2025R0099", null},
+                new String[]{"R02", "01", "TU2025R0099", null}
+        );
         var pingPong = this.fullImporter.toExporter().toImporter();
         // When
-        final CodeListException error = assertThrows(CodeListException.class, () -> {
-            var row = pingPong.transform("R001", "RT", "TU2025R0099", null);
-            pingPong.parse(List.of(row));
-        });
+        final CodeListException error = assertThrows(CodeListException.class, () -> pingPong.transform(rows));
         // Then
         assertEquals(EC_CODE_LIST, error.getCode());
         assertEquals(ERROR, error.getLevel());
@@ -91,7 +92,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
     }
 
     @Test
-    void testCardinality3() {
+    void testCardinality3() throws BeanException {
         // Given
         final InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
@@ -101,11 +102,11 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
                 record(S04, "1199", "Software", "2", "120", "100", "20"),
         };
         // When & Then
-        checkCardinality3(S02, rows);
+        checkCardinality3(S02, rows, importer.toExporter());
     }
 
     @Test
-    void testCardinality4() {
+    void testCardinality4() throws BeanException {
         // Given
         final InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),
@@ -113,7 +114,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
                 record(S03, "BUY0099", "FR", "Paris", "75020", "99 Rue Up2JB", "Up2JB"),
         };
         // When & Then
-        checkCardinality4(S11, rows);
+        checkCardinality4(S11, rows, importer.toExporter());
     }
 
     @Test
@@ -132,7 +133,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
     }
 
     @Test
-    void testValid1() throws BeanException, IOException {
+    void testValid1() throws BeanException {
         // Given
         final InputRecord[] rows = invoice(S11, FULL);
         // When & Then
@@ -140,7 +141,7 @@ class FullDummy1Tests extends AFullTest<Dummy1Invoice, FullRecord<SegmentType>, 
     }
 
     @Test
-    void testValid2() throws IOException {
+    void testValid2() {
         // Given
         final InputRecord[] rows = {
                 record(S11, "TU2025R0099", "2025-03-12", "120", "100", "20"),

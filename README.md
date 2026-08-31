@@ -1,6 +1,7 @@
 # Up2Jakarta :: Divers
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2-divers?style=for-the-badge&color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2-divers)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2-divers?color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2-divers)
+[![Mvn Repository](https://badges.mvnrepository.com/badge/io.github.up2jakarta/up2-divers/badge.svg?color=green)](https://mvnrepository.com/artifact/io.github.up2jakarta/up2-divers)
 
 Up2J - divers frameworks build upon Jakarta EE (JEE)
 

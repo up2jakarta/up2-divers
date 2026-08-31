@@ -2,9 +2,9 @@ package io.github.up2jakarta.test.core;
 
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Mapper;
-import io.github.up2jakarta.csv.core.hdl.EventHandler;
-import io.github.up2jakarta.csv.core.hdl.FailureException;
-import io.github.up2jakarta.csv.core.hdl.FastHandler;
+import io.github.up2jakarta.csv.hdl.EventHandler;
+import io.github.up2jakarta.csv.hdl.FailureException;
+import io.github.up2jakarta.csv.hdl.FastHandler;
 import io.github.up2jakarta.lov.CodeListException;
 import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.AccessException;

@@ -1,54 +1,50 @@
 package io.github.up2jakarta.csv.core;
 
 /**
- * Multi-segment format mode for meta-data columns.
+ * Native {@link IMode}, out-of-the-box supported modes.
  */
-public enum ModeType {
+public enum ModeType implements IMode {
 
     /**
-     * Includes only segment-type. this mode avoids writing the business-reference for each segment.
+     * Includes only the segment {@code type} which used as {@code discriminator} to differentiate segments.
      *
-     * @see io.github.up2jakarta.csv.api.IRecord
-     * @see UnitExporter
-     * @see UnitImporter
+     * @see io.github.up2jakarta.csv.api.IRecord#getType()
+     * @see NeatExporter
+     * @see NeatImporter
      */
-    UNIT(0, 1, 1),
+    NEAT(0, 1),
 
     /**
-     * Includes segment-type and business-reference but excludes record-reference.
+     * Includes the segment {@code type} and the business identifier which used as {@code pivot} to aggregate records.
+     * <p>
+     * This mode is thread-safe in batch processing since inputs could be aggregated regardless of their writing order.
      *
-     * @see io.github.up2jakarta.csv.api.IFastRecord
-     * @see FastExporter
-     * @see FastImporter
+     * @see io.github.up2jakarta.csv.api.IMessRecord#getType()
+     * @see io.github.up2jakarta.csv.api.IMessRecord#getPivot()
+     * @see MessExporter
+     * @see MessImporter
      */
-    FAST(0, 1, 2),
-    /**
-     * Includes all meta-data aka segment-type, business-reference and record-reference
-     *
-     * @see io.github.up2jakarta.csv.api.IFullRecord
-     * @see FullExporter
-     * @see FullImporter
-     */
-    FULL(1, 2, 3);
+    MESS(0, 2);
 
-    final int typeIdIndex;
-    final int beanIdIndex;
-    final int length;
+    private final int index, offset, length;
 
-    ModeType(int typeIdIndex, int beanIdIndex, int length) {
-        this.typeIdIndex = typeIdIndex;
-        this.beanIdIndex = beanIdIndex;
+    ModeType(int index, int length) {
+        this.offset = index + 1;
         this.length = length;
+        this.index = index;
     }
 
-    public int getTypeIdIndex() {
-        return typeIdIndex;
+    @Override
+    public int getIndex() {
+        return index;
     }
 
-    public int getBeanIdIndex() {
-        return beanIdIndex;
+    @Override
+    public int getOffset() {
+        return offset;
     }
 
+    @Override
     public int getLength() {
         return length;
     }

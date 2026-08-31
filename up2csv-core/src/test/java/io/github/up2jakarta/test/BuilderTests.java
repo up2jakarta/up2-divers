@@ -1,13 +1,12 @@
 package io.github.up2jakarta.test;
 
+import io.github.up2jakarta.csv.api.IMutual;
 import io.github.up2jakarta.csv.api.hdl.IMutualRecord;
-import io.github.up2jakarta.csv.core.FastImporter;
-import io.github.up2jakarta.csv.core.FullImporter;
-import io.github.up2jakarta.csv.core.UnitImporter;
+import io.github.up2jakarta.csv.core.MessImporter;
+import io.github.up2jakarta.csv.core.NeatImporter;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.core.hdl.BusinessEvent;
-import io.github.up2jakarta.csv.data.IMutual;
-import io.github.up2jakarta.csv.fmt.*;
+import io.github.up2jakarta.csv.data.*;
+import io.github.up2jakarta.csv.hdl.BusinessEvent;
 import io.github.up2jakarta.lov.IError;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.fmt.misc.Dummy4Invoice;
@@ -58,87 +57,87 @@ public class BuilderTests {
     }
 
     @Test
-    void testSimpleUnitExporter() throws BeanException, IOException {
+    void testSimpleNeatExporter() throws BeanException, IOException {
         // WHEN
-        final SimpleUnitExporter<Invoice, TermType, SegmentType> exporter = factory.builder()
-                .unit(Invoice.class)
+        final SimpleNeatExporter<Invoice, TermType, SegmentType> exporter = factory.builder()
+                .neat(Invoice.class)
                 .build(SegmentType.class)
                 .export();
         assertNotNull(exporter);
         // THEN
-        final String[] root = UNIT_INVOICE[0];
+        final String[] root = NEAT_INVOICE[0];
         exporter.format(INVOICE, d -> assertArrayEquals(root, d));
         // SPECS
-        Tests.specs(exporter, UNIT);
+        Tests.specs(exporter, NEAT);
     }
 
     @Test
-    void testSimpleUnitImporter() throws BeanException, IOException {
+    void testSimpleNeatImporter() throws BeanException {
         // WHEN
-        final SimpleUnitImporter<Dummy4Invoice, TermType, SegmentType> importer = factory.builder()
-                .unit(Dummy4Invoice.class)
+        final SimpleNeatImporter<Dummy4Invoice, TermType, SegmentType> importer = factory.builder()
+                .neat(Dummy4Invoice.class)
                 .build(SegmentType.class)
                 .build();
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, unitInvoice(S41, UnitRecord::new));
+        assertInvoice(importer, neatInvoice(S41, NeatRecord::new));
     }
 
     @Test
-    void testUnit1Importer() throws BeanException, IOException {
+    void testNeat1Importer() throws BeanException {
         // WHEN
-        final UnitImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
-                .unit(Invoice.class)
+        final NeatImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
+                .neat(Invoice.class)
                 .build(SegmentType.class)
                 .build(TUError::new);
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, unitInvoice(S01, TURecord::new));
+        assertInvoice(importer, neatInvoice(S01, TURecord::new));
     }
 
     @Test
-    void testUnit2Importer() throws BeanException, IOException {
+    void testNeat2Importer() throws BeanException {
         // WHEN
-        final UnitImporter<TermType, SegmentType, Invoice, InputRecord, InputError> importer = factory.builder()
-                .unit(Invoice.class)
+        final NeatImporter<TermType, SegmentType, Invoice, InputRecord, InputError> importer = factory.builder()
+                .neat(Invoice.class)
                 .build(SegmentType.class)
                 .build(InputError::new, (r) -> 0);
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, invoice(S01, UNIT));
+        assertInvoice(importer, invoice(S01, NEAT));
     }
 
     @Test
-    void testUnit3Importer() throws BeanException, IOException {
+    void testNeat3Importer() throws BeanException {
         // WHEN
-        final UnitImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
-                .unit(Invoice.class)
+        final NeatImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
+                .neat(Invoice.class)
                 .build(SegmentType.class)
                 .build(TUError::new, ERROR);
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, unitInvoice(S01, TURecord::new));
+        assertInvoice(importer, neatInvoice(S01, TURecord::new));
     }
 
     @Test
-    void testUnit4Importer() throws BeanException, IOException {
+    void testNeat4Importer() throws BeanException {
         // WHEN
-        final UnitImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
-                .unit(Invoice.class)
+        final NeatImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
+                .neat(Invoice.class)
                 .build(SegmentType.class)
                 .build(TUError::new);
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, unitInvoice(S01, TURecord::new));
+        assertInvoice(importer, neatInvoice(S01, TURecord::new));
     }
 
     @Test
-    void testUnit5Importer() throws BeanException, IOException {
+    void testNeat5Importer() throws BeanException {
         // GIVEN
-        final BSRecord[] rows = Arrays.stream(invoice(S01, UNIT)).map(BSRecord::new).toArray(BSRecord[]::new);
+        final BSRecord[] rows = Arrays.stream(invoice(S01, NEAT)).map(BSRecord::new).toArray(BSRecord[]::new);
         // WHEN
-        final UnitImporter<TermType, SegmentType, Invoice, BSRecord, BSError> importer = factory.builder()
-                .unit(Invoice.class)
+        final NeatImporter<TermType, SegmentType, Invoice, BSRecord, BSError> importer = factory.builder()
+                .neat(Invoice.class)
                 .build(SegmentType.class)
                 .build(BSError::new);
         assertNotNull(importer);
@@ -147,87 +146,87 @@ public class BuilderTests {
     }
 
     @Test
-    void testSimpleFastExporter() throws BeanException, IOException {
+    void testSimpleMessExporter() throws BeanException, IOException {
         // WHEN
-        final SimpleFastExporter<Invoice, TermType, SegmentType> exporter = factory.builder()
-                .fast(Invoice.class)
+        final SimpleMessExporter<Invoice, TermType, SegmentType> exporter = factory.builder()
+                .mess(Invoice.class)
                 .build(SegmentType.class)
                 .export();
         assertNotNull(exporter);
         // THEN
-        final String[] root = FAST_INVOICE[0];
+        final String[] root = MESS_INVOICE[0];
         exporter.format(INVOICE, d -> assertArrayEquals(root, d));
         // SPECS
-        Tests.specs(exporter, FAST);
+        Tests.specs(exporter, MESS);
     }
 
     @Test
-    void testSimpleFastImporter() throws BeanException, IOException {
+    void testSimpleMessImporter() throws BeanException {
         // WHEN
-        final SimpleFastImporter<Invoice, TermType, SegmentType> importer = factory.builder()
-                .fast(Invoice.class)
+        final SimpleMessImporter<Invoice, TermType, SegmentType> importer = factory.builder()
+                .mess(Invoice.class)
                 .build(SegmentType.class)
                 .build();
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, fastInvoice(S01));
+        assertInvoice(importer, messInvoice(S01));
     }
 
     @Test
-    void testFast1Importer() throws BeanException, IOException {
+    void testMess1Importer() throws BeanException {
         // WHEN
-        final FastImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
-                .fast(Invoice.class)
+        final MessImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
+                .mess(Invoice.class)
                 .build(SegmentType.class)
                 .build(TUError::new);
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, fastInvoice(S01));
+        assertInvoice(importer, messInvoice(S01));
     }
 
     @Test
-    void testFast2Importer() throws BeanException, IOException {
+    void testMess2Importer() throws BeanException {
         // WHEN
-        final FastImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
-                .fast(Invoice.class)
+        final MessImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
+                .mess(Invoice.class)
                 .build(SegmentType.class)
                 .build(TUError::new, ERROR);
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, fastInvoice(S01));
+        assertInvoice(importer, messInvoice(S01));
     }
 
     @Test
-    void testFast3Importer() throws BeanException, IOException {
+    void testMess3Importer() throws BeanException {
         // WHEN
-        final FastImporter<TermType, SegmentType, Invoice, InputRecord, InputError> importer = factory.builder()
-                .fast(Invoice.class)
+        final MessImporter<TermType, SegmentType, Invoice, InputRecord, InputError> importer = factory.builder()
+                .mess(Invoice.class)
                 .build(SegmentType.class)
                 .build(InputError::new, (r) -> 0);
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, invoice(S01, FAST));
+        assertInvoice(importer, invoice(S01, MESS));
     }
 
     @Test
-    void testFast4Importer() throws BeanException, IOException {
+    void testMess4Importer() throws BeanException {
         // WHEN
-        final FastImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
-                .fast(Invoice.class)
+        final MessImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
+                .mess(Invoice.class)
                 .build(SegmentType.class)
                 .build(TUError::new);
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, fastInvoice(S01));
+        assertInvoice(importer, messInvoice(S01));
     }
 
     @Test
-    void testFast5Importer() throws BeanException, IOException {
+    void testMess5Importer() throws BeanException {
         // GIVEN
-        final BSRecord[] rows = Arrays.stream(invoice(S01, FAST)).map(BSRecord::new).toArray(BSRecord[]::new);
+        final BSRecord[] rows = Arrays.stream(invoice(S01, MESS)).map(BSRecord::new).toArray(BSRecord[]::new);
         // WHEN
-        final FastImporter<TermType, SegmentType, Invoice, BSRecord, BSError> importer = factory.builder()
-                .fast(Invoice.class)
+        final MessImporter<TermType, SegmentType, Invoice, BSRecord, BSError> importer = factory.builder()
+                .mess(Invoice.class)
                 .build(SegmentType.class)
                 .build(BSError::new);
         assertNotNull(importer);
@@ -245,13 +244,17 @@ public class BuilderTests {
         assertNotNull(exporter);
         // THEN
         final String[] root = FULL_INVOICE[0];
-        exporter.format(INVOICE, new Fixed06Generator(), d -> assertArrayEquals(root, d));
+        final Fixed06Generator uid = new Fixed06Generator();
+        exporter.format(INVOICE, d -> {
+            d[0] = uid.get();
+            assertArrayEquals(root, d);
+        });
         // SPECS
         Tests.specs(exporter, FULL);
     }
 
     @Test
-    void testFull1Importer() throws BeanException, IOException {
+    void testFull1Importer() throws BeanException {
         // WHEN
         final FullImporter<TermType, SegmentType, Invoice, InputRecord, InputError> importer = factory.builder()
                 .full(Invoice.class)
@@ -263,7 +266,7 @@ public class BuilderTests {
     }
 
     @Test
-    void testFull2Importer() throws BeanException, IOException {
+    void testFull2Importer() throws BeanException {
         // WHEN
         final FullImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
                 .full(Invoice.class)
@@ -271,11 +274,11 @@ public class BuilderTests {
                 .build(TUError::new, ERROR);
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, fastInvoice(S01));
+        assertInvoice(importer, messInvoice(S01));
     }
 
     @Test
-    void testFull3Importer() throws BeanException, IOException {
+    void testFull3Importer() throws BeanException {
         // WHEN
         final FullImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
                 .full(Invoice.class)
@@ -283,11 +286,11 @@ public class BuilderTests {
                 .build(TUError::new);
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, fastInvoice(S01));
+        assertInvoice(importer, messInvoice(S01));
     }
 
     @Test
-    void testFull4Importer() throws BeanException, IOException {
+    void testFull4Importer() throws BeanException {
         // WHEN
         final FullImporter<TermType, SegmentType, Invoice, TURecord, TUError> importer = factory.builder()
                 .full(Invoice.class)
@@ -295,11 +298,11 @@ public class BuilderTests {
                 .build(TUError::new);
         assertNotNull(importer);
         // THEN
-        assertInvoice(importer, fastInvoice(S01));
+        assertInvoice(importer, messInvoice(S01));
     }
 
     @Test
-    void testFull5Importer() throws BeanException, IOException {
+    void testFull5Importer() throws BeanException {
         // GIVEN
         final BSRecord[] rows = Arrays.stream(invoice(S01, FULL)).map(BSRecord::new).toArray(BSRecord[]::new);
         // WHEN

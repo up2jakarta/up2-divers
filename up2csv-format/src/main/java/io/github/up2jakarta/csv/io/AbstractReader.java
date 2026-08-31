@@ -3,10 +3,10 @@ package io.github.up2jakarta.csv.io;
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.csv.api.IType;
 import io.github.up2jakarta.csv.core.BusinessImporter;
-import io.github.up2jakarta.csv.core.BusinessReader;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.data.BusinessReader;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -16,10 +16,11 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import static io.github.up2jakarta.csv.prc.TrimProcessor.trim;
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Base CSV file reader implementation.
+ * CSV File Reader implementation that supports the out-of-the-box modes
  *
  * @param <T> the business object type
  * @param <B> the business term type
@@ -37,11 +38,11 @@ public abstract class AbstractReader<T extends Segment, B extends ITerm<B>, I ex
     private CSVParser parser;
     private Reader reader;
 
-    AbstractReader(BusinessImporter<B, I, T, R, E> importer, CSVFormat format, String... nullValues) {
+    protected AbstractReader(BusinessImporter<B, I, T, R, E> importer, CSVFormat format, String... nullValues) {
         super(importer);
-        this.format = format;
-        this.nullValues = nullValues;
-        this.length = mode.getLength();
+        this.nullValues = notNull(nullValues, this.getClass(), "nullValues");
+        this.format = notNull(format, this.getClass(), "format");
+        this.length = importer.mode().getLength();
     }
 
     /**

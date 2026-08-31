@@ -1,19 +1,18 @@
 package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.data.ITerm;
-import io.github.up2jakarta.csv.fmt.FullError;
-import io.github.up2jakarta.csv.fmt.FullRecord;
-import io.github.up2jakarta.csv.fmt.SimpleFullImporter;
+import io.github.up2jakarta.csv.data.FullError;
+import io.github.up2jakarta.csv.data.FullRecord;
+import io.github.up2jakarta.csv.data.SimpleFullImporter;
 import org.apache.commons.csv.CSVFormat;
 
 import static io.github.up2jakarta.lov.core.Codes.fixed;
 import static io.github.up2jakarta.lov.core.Codes.token;
 
 /**
- * Base CSV file {@link ModeType#FULL} reader implementation.
+ * Base CSV file {@link io.github.up2jakarta.csv.core.IMode#FULL} reader implementation.
  *
  * @param <T> the business object type
  * @param <B> the business term type

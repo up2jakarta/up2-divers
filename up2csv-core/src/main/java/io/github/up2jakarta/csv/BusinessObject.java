@@ -86,7 +86,7 @@ public @interface BusinessObject {
      *            }
      *       }
      *
-     *       public enum SegmentType implements IType<SegmentType> {
+     *       public enum TreeType implements IType<TreeType> {
      *
      *            D0("0", "1st depth (Tree)"),
      *            D1("1", "2nd depth (Node)"),
@@ -97,7 +97,7 @@ public @interface BusinessObject {
      *            private final String code;
      *            private final String name;
      *
-     *            SegmentType(String code, String name) {
+     *            TreeType(String code, String name) {
      *                 this.code = code;
      *                  this.name = name;
      *            }

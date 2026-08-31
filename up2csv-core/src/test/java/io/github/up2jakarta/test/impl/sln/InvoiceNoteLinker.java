@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.ext.Beans.concat;
+import static io.github.up2jakarta.csv.ext.Beans.concat;
 import static java.util.Arrays.asList;
 
 @Component

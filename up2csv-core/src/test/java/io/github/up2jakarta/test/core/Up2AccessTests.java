@@ -4,8 +4,9 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Mapper;
-import io.github.up2jakarta.csv.core.hdl.SimpleCollector;
+import io.github.up2jakarta.csv.data.HeaderResolver;
 import io.github.up2jakarta.csv.data.HeaderType;
+import io.github.up2jakarta.csv.hdl.SimpleCollector;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
 import io.github.up2jakarta.test.core.misc.acs.*;
@@ -18,8 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.*;
 
-import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
-import static io.github.up2jakarta.csv.data.TermResolver.header;
+import static io.github.up2jakarta.csv.hdl.FastHandler.of;
 import static io.github.up2jakarta.lov.SeverityType.WARNING;
 import static io.github.up2jakarta.lov.core.Localizable.CLASS;
 import static io.github.up2jakarta.lov.core.Localizable.CREATOR;
@@ -91,6 +91,24 @@ class Up2AccessTests {
         final IEvent<?> event = events.getFirst();
         assertEquals(1, event.getOffset());
         assertEquals("must not be blank", event.getMessage());
+    }
+
+    private static void assertPath(BeanException cause, Class<?> source, String locator) {
+        assertEquals(source, cause.getSource());
+        assertEquals(locator, cause.getLocator());
+        assertEquals("@ValidOverride(path = {\"404\"}) is never used", cause.getMessage());
+        final Throwable[] others = cause.getSuppressed();
+        assertEquals(2, others.length);
+        for (int i = 0; i < others.length; i++) {
+            final BeanException ex = assertInstanceOf(BeanException.class, others[i]);
+            assertEquals(source, ex.getSource());
+            assertEquals(locator, ex.getLocator());
+            if (i == 0) {
+                assertEquals("@PositionOverride(path = {\"404\"}) is never used", ex.getMessage());
+            } else {
+                assertEquals("@FragmentOverride(path = {\"404\"}) is never used", ex.getMessage());
+            }
+        }
     }
 
     @Test
@@ -168,7 +186,7 @@ class Up2AccessTests {
     @Test
     void final10Solution() throws BeanException {
         // WHEN
-        var mapper = new Up2Factory<>(factory, header()).mapper(Final10Segment.class);
+        var mapper = factory.of(HeaderResolver.getInstance()).mapper(Final10Segment.class);
         // THEN
         assertSolution(mapper);
         assert1Validation(mapper);
@@ -178,7 +196,7 @@ class Up2AccessTests {
     @Test
     void final11Solution() throws BeanException {
         // WHEN
-        var mapper = new Up2Factory<>(factory, header()).mapper(Final11Segment.class);
+        var mapper = factory.of(HeaderResolver.getInstance()).mapper(Final11Segment.class);
         // THEN
         assertSolution(mapper);
         assert1Validation(mapper);
@@ -188,7 +206,7 @@ class Up2AccessTests {
     @Test
     void optional10Solution() throws BeanException {
         // WHEN
-        var mapper = new Up2Factory<>(factory, header()).mapper(Optional10Segment.class);
+        var mapper = factory.of(HeaderResolver.getInstance()).mapper(Optional10Segment.class);
         // THEN
         assertSolution(mapper);
         assert1Validation(mapper);
@@ -198,7 +216,7 @@ class Up2AccessTests {
     @Test
     void optional11Solution() throws BeanException {
         // WHEN
-        var mapper = new Up2Factory<>(factory, header()).mapper(Optional11Segment.class);
+        var mapper = factory.of(HeaderResolver.getInstance()).mapper(Optional11Segment.class);
         // THEN
         assertSolution(mapper);
         assert1Validation(mapper);
@@ -208,7 +226,7 @@ class Up2AccessTests {
     @Test
     void record7Solution() throws BeanException {
         // WHEN
-        var mapper = new Up2Factory<>(factory, header()).mapper(Record7Segment.class);
+        var mapper = factory.of(HeaderResolver.getInstance()).mapper(Record7Segment.class);
         // THEN
         assertSolution(mapper);
         assert1Validation(mapper);
@@ -218,7 +236,7 @@ class Up2AccessTests {
     @Test
     void record8Solution() throws BeanException {
         // WHEN
-        var mapper = new Up2Factory<>(factory, header()).mapper(Record8Segment.class);
+        var mapper = factory.of(HeaderResolver.getInstance()).mapper(Record8Segment.class);
         // THEN
         assertSolution(mapper);
         assert1Validation(mapper);
@@ -926,6 +944,30 @@ class Up2AccessTests {
         assertEquals("TU", bean.code());
         assertEquals(CSV, bean.source());
         assertArrayEquals(new String[]{"TU"}, data);
+    }
+
+    @Test
+    void invalidOverridePath1() {
+        // When
+        final BeanException cause = assertThrows(BeanException.class, () -> factory.flatter(Path1Bean.class));
+        // Then
+        assertPath(cause, Path1Bean.class, "key");
+    }
+
+    @Test
+    void invalidOverridePath2() {
+        // When
+        final BeanException cause = assertThrows(BeanException.class, () -> factory.flatter(Path2Bean.class));
+        // Then
+        assertPath(cause, Path2Bean.class, CLASS);
+    }
+
+    @Test
+    void invalidOverridePath3() {
+        // When
+        final BeanException cause = assertThrows(BeanException.class, () -> factory.flatter(Path3Bean.class));
+        // Then
+        assertPath(cause, Path3Bean.class.getSuperclass(), CLASS);
     }
 
 }

@@ -2,21 +2,23 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.ITerm;
+import io.github.up2jakarta.csv.api.Recordable;
 import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.core.BSAccessor.Input;
 import io.github.up2jakarta.csv.core.BSAccessor.Mode;
 import io.github.up2jakarta.csv.core.BSBuilder.MST;
 import io.github.up2jakarta.csv.core.BSContext.VContext;
 import io.github.up2jakarta.csv.core.BSManager.Pod;
+import io.github.up2jakarta.csv.core.BSNode.Bean.BC;
+import io.github.up2jakarta.csv.core.BSNode.Bean.BM;
 import io.github.up2jakarta.csv.core.BSOperator.PId;
 import io.github.up2jakarta.csv.core.BSProperty.IParameter;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
 import io.github.up2jakarta.csv.core.BeanAccessor.ICreator;
-import io.github.up2jakarta.csv.core.hdl.ComplianceHandler;
-import io.github.up2jakarta.csv.core.hdl.EventHandler;
-import io.github.up2jakarta.csv.data.ITerm;
-import io.github.up2jakarta.csv.data.Recordable;
+import io.github.up2jakarta.csv.hdl.ComplianceHandler;
+import io.github.up2jakarta.csv.hdl.EventHandler;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -27,14 +29,13 @@ import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static io.github.up2jakarta.csv.core.BSNode.Bean.*;
 import static io.github.up2jakarta.lov.core.Defaults.*;
 import static java.lang.System.arraycopy;
 
 /**
  * Internal business node.
  */
-abstract sealed class BSNode<S extends Segment, D extends ITerm<D>> implements MST permits Flat, Bean {
+abstract sealed class BSNode<S extends Segment, D extends ITerm<D>> implements MST permits BSNode.Flat, BSNode.Bean {
     final List<BSProperty<?, D>> properties;
     final List<Field> bsLinks;
     final List<PId<D>> bsIds;

@@ -1,6 +1,6 @@
 package io.github.up2jakarta.test.impl;
 
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.lov.CodeList;
 
 public enum TermType implements ITerm<TermType> {

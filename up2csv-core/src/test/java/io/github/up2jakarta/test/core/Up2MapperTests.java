@@ -5,8 +5,9 @@ import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Mapper;
-import io.github.up2jakarta.csv.core.hdl.FailureException;
-import io.github.up2jakarta.csv.fmt.UnitRecord;
+import io.github.up2jakarta.csv.data.HeaderResolver;
+import io.github.up2jakarta.csv.data.NeatRecord;
+import io.github.up2jakarta.csv.hdl.FailureException;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
@@ -37,7 +38,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_CONVERTER;
-import static io.github.up2jakarta.csv.data.TermResolver.header;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.lov.core.Localizable.CLASS;
 import static io.github.up2jakarta.test.core.Reflections.list;
@@ -71,7 +71,7 @@ class Up2MapperTests {
     void testCache2() throws BeanException {
         // GIVEN
         final Up2Mapper<ValidEntity, ?> mapper1 = factory.mapper(ValidEntity.class);
-        final Up2Mapper<ValidEntity, ?> mapper2 = new Up2Factory<>(factory, header()).mapper(ValidEntity.class);
+        final Up2Mapper<ValidEntity, ?> mapper2 = factory.of(HeaderResolver.getInstance()).mapper(ValidEntity.class);
         // THEN
         assertNotSame(mapper1, mapper2);
         assertNotSame(node(mapper1), node(mapper2));
@@ -168,7 +168,7 @@ class Up2MapperTests {
     void testInvalidRecordable() throws BeanException {
         // Given
         final Up2Mapper<Validator3Bean, TermType> mapper = factory.mapper(Validator3Bean.class);
-        final UnitRecord<SegmentType> row = new UnitRecord<>(SegmentType.S00, "1.");
+        final NeatRecord<SegmentType> row = new NeatRecord<>(SegmentType.S00, "1.");
         // When
         final AccessException error = assertThrows(AccessException.class, () -> mapper.map(row));
         // Then

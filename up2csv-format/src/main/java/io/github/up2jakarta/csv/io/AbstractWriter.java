@@ -1,7 +1,8 @@
 package io.github.up2jakarta.csv.io;
 
 import io.github.up2jakarta.csv.Segment;
-import io.github.up2jakarta.csv.core.*;
+import io.github.up2jakarta.csv.core.BusinessExporter;
+import io.github.up2jakarta.csv.data.BusinessWriter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -9,35 +10,26 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.function.Supplier;
 
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Base CSV file {@link ModeType#FAST} writer implementation.
+ * CSV File Writer implementation that supports the out-of-the-box modes
  *
  * @param <T> the business object type
  */
 public abstract class AbstractWriter<T extends Segment> extends BusinessWriter<T> {
 
     private final CSVFormat format;
-
+    private final int index;
     private CSVPrinter printer;
     private Writer writer;
 
-    AbstractWriter(FullExporter<?, ?, T> exporter, Supplier<String> generator, CSVFormat format) {
-        super(exporter, generator);
-        this.format = format;
-    }
-
-    AbstractWriter(FastExporter<?, ?, T> exporter, CSVFormat format) {
+    protected AbstractWriter(BusinessExporter<?, ?, T> exporter, CSVFormat format) {
         super(exporter);
-        this.format = format;
-    }
-
-    AbstractWriter(UnitExporter<?, ?, T> exporter, CSVFormat format) {
-        super(exporter);
-        this.format = format;
+        this.index = exporter.mode().getIndex();
+        this.format = notNull(format, this.getClass(), "format");
     }
 
     /**
@@ -67,8 +59,25 @@ public abstract class AbstractWriter<T extends Segment> extends BusinessWriter<T
         printer.printComment("");
     }
 
+    /**
+     * Resets the buffer to the initial state.
+     */
+    protected abstract void reset();
+
+    /**
+     * Returns the extra-data added by the extended mode at the specified {@code index}.
+     *
+     * @param index the index of extra-data starting from {@code 0}
+     */
+    protected abstract String get(int index);
+
     @Override
     protected final void write(String[] record) throws IOException {
+        if (index != 0) {
+            for (var i = 0; i < index; i++) {
+                record[i] = this.get(i);
+            }
+        }
         printer.printRecord((Object[]) record);
     }
 

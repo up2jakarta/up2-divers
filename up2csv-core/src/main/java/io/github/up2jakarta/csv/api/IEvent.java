@@ -1,6 +1,5 @@
 package io.github.up2jakarta.csv.api;
 
-import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.IError;
 
 /**

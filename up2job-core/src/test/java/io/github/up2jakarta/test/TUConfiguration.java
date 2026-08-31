@@ -62,7 +62,7 @@ public class TUConfiguration {
     public Validator validator() {
         return Up2Factory.validator(
                 new ParameterMessageInterpolator(
-                        Set.of(Locale.ENGLISH, Locale.FRENCH),
+                        Set.of(Locale.ENGLISH),
                         Locale.ENGLISH,
                         context -> Locale.ENGLISH,
                         false

@@ -9,14 +9,14 @@ import java.util.List;
 /**
  * Contract interface for record transformer that's able to transform flat-data to framework record representation.
  *
- * @see io.github.up2jakarta.csv.fmt.SimpleUnitImporter
- * @see io.github.up2jakarta.csv.fmt.SimpleFastImporter
- * @see io.github.up2jakarta.csv.fmt.SimpleFullImporter
+ * @see SimpleNeatImporter
+ * @see SimpleMessImporter
+ * @see SimpleFullImporter
  */
 public interface RecordTransformer<R extends IRecord<?>> {
 
     /**
-     * Creates and returns new record from the specified source.
+     * Creates and returns new record from the specified <code>source</code>.
      *
      * @param source the record source
      * @return new related record
@@ -25,13 +25,13 @@ public interface RecordTransformer<R extends IRecord<?>> {
     R transform(String... source) throws CodeListException;
 
     /**
-     * Parses and returns the business-object created from the given records source.
+     * Creates and returns the business-object created from the given <code>records</code> source.
      *
      * @param records the input records source
      * @return the parsed business-object with all collected events
      * @throws AccessException   for any problem when setting properties of java-beans from input record
      * @throws CodeListException if type of one record is unknown
      */
-    Up2Result<?, ?> parse(List<String[]> records) throws AccessException;
+    Up2Result<?, ?> transform(List<String[]> records) throws AccessException;
 
 }

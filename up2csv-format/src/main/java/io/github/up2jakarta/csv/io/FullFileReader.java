@@ -3,17 +3,17 @@ package io.github.up2jakarta.csv.io;
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IFullRecord;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.csv.api.IType;
-import io.github.up2jakarta.csv.core.FullImporter;
-import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.core.IMode;
+import io.github.up2jakarta.csv.data.FullImporter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
 import java.util.Objects;
 
 /**
- * Base CSV file {@link ModeType#FULL} reader implementation.
+ * Base CSV file {@link io.github.up2jakarta.csv.core.IMode#FULL} reader implementation.
  *
  * @param <T> the business object type
  * @param <B> the business term type
@@ -25,6 +25,7 @@ public abstract class FullFileReader<T extends Segment, B extends ITerm<B>, I ex
 
     protected FullFileReader(FullImporter<B, I, T, R, E> importer, CSVFormat format, String... nullValues) {
         super(importer, format, nullValues);
+        assert importer.mode() == IMode.FULL : "issue has been detected";
     }
 
     @Override

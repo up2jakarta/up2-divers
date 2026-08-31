@@ -8,14 +8,14 @@ import io.github.up2jakarta.csv.api.*;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.csv.core.BSAccessor.Mode;
 import io.github.up2jakarta.csv.core.BSContext.VContext;
+import io.github.up2jakarta.csv.core.BSNode.Flat;
 import io.github.up2jakarta.csv.core.BSOperator.BId;
 import io.github.up2jakarta.csv.core.BSOperator.Node;
 import io.github.up2jakarta.csv.core.BSOperator.PId;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
-import io.github.up2jakarta.csv.core.BusinessImporter.Item;
-import io.github.up2jakarta.csv.core.ext.Beans;
-import io.github.up2jakarta.csv.core.hdl.BusinessHandler;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.core.MessImporter.Item;
+import io.github.up2jakarta.csv.ext.Beans;
+import io.github.up2jakarta.csv.hdl.BusinessHandler;
 import io.github.up2jakarta.lov.*;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.lov.core.Wrapper;
@@ -29,14 +29,17 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
+import static io.github.up2jakarta.csv.api.IEvent.EC_CODE_LIST;
 import static io.github.up2jakarta.csv.core.BSBuilder.*;
-import static io.github.up2jakarta.csv.core.ext.Beans.*;
+import static io.github.up2jakarta.csv.core.ModeType.NEAT;
+import static io.github.up2jakarta.csv.ext.Beans.*;
+import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static java.util.stream.Collectors.joining;
 
 /**
  * Internal Business Tree.
  */
-final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends Node<Segment, D, ?>> implements MEP, ILinker<Segment, Segment> {
+final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends Node<Segment, D, ?>> implements MEP {
     final I key;
     final D term;
     final P computer;
@@ -65,7 +68,7 @@ final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends N
         this.bid = source.bid;
     }
 
-    BSLink(ModeType mode, I key, int offset, P computer, D term, List<BSLink<D, I, P>> links) throws BeanException {
+    BSLink(I key, int offset, P computer, D term, List<BSLink<D, I, P>> links) throws BeanException {
         this.key = key;
         this.index = 0;
         this.length = 0;
@@ -78,43 +81,41 @@ final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends N
         this.virtualIds = List.of();
         this.links = List.copyOf(links);
         this.event = getError(computer.node.type);
-        this.bid = this.isSettable(mode) ? Item::mainId : computer.identifiable ? Item::nodeId : Item::nullId;
+        this.bid = this.isSettable() ? Item::mainId : computer.identifiable ? Item::nodeId : Item::nullId;
     }
 
-    BSLink(Field fp, BusinessLink bl, I st, P mp, D bt, List<BSLink<D, I, P>> ls, TreeBuilder<D, I> tb) throws BeanException {
+    BSLink(Field fp, BusinessLink bl, I st, P mp, D bt, List<BSLink<D, I, P>> ls, LBuilder<D, I> lb) throws BeanException {
         this.key = st;
         this.term = bt;
         this.computer = mp;
-        this.offset = tb.offset;
-        this.min = tb.getMin(bl);
-        this.max = tb.getMax(bl);
+        this.offset = lb.offset;
+        this.min = lb.getMin(bl);
+        this.max = lb.getMax(bl);
         this.links = List.copyOf(ls);
-        this.linker = tb.findLinker(fp, bl);
+        this.linker = lb.findLinker(fp, bl);
         this.event = getError(fp, mp.node.type);
-        final Map<I, PId<D>> pids = tb.findParentIds(mp.node);
-        if (tb.isAutomatic(bl)) {
-            this.virtualIds = tb.findVirtualIds(mp.node.type, pids);
-        } else {
-            tb.checkParentIds(mp.node.type, pids);
+        if (lb.mode == ModeType.NEAT) {
+            this.parentIds = List.of();
             this.virtualIds = List.of();
+            this.index = 0;
+        } else {
+            final Map<I, PId<D>> pids = lb.findParentIds(mp.node);
+            if (lb.isAutomatic(bl)) {
+                this.virtualIds = lb.findVirtualIds(mp.node.type, pids);
+            } else {
+                lb.checkParentIds(mp.node.type, pids);
+                this.virtualIds = List.of();
+            }
+            this.index = this.virtualIds.size();
+            this.parentIds = pids.entrySet().stream().map(e -> new RId<>(e, index + offset)).toList();
         }
-        this.index = this.virtualIds.size();
-        this.length = this.index + pids.size();
+        this.length = this.index + parentIds.size();
         this.bid = computer.identifiable ? Item::nodeId : Item::nullId;
-        this.parentIds = pids.entrySet().stream().map(e -> new RId<>(e, index + offset)).toList();
     }
 
-    private boolean isSettable(ModeType mode) {
+    private boolean isSettable() {
         final BId<Segment, ?, D> bid = computer.businessId;
-        return mode != ModeType.UNIT && bid.supports(Mode.WO) && bid.isVirtual();
-    }
-
-    boolean isGettable(ModeType mode) throws BeanException {
-        final boolean readable = mode != ModeType.UNIT;
-        if (readable && !computer.identifiable) {
-            throw new BeanException(computer.node.type, "must have one property annotated with @BusinessId");
-        }
-        return readable;
+        return bid.supports(Mode.WO) && bid.isVirtual();
     }
 
     void visit(int depth, BiConsumer<Integer, BSLink<D, I, P>> handler) {
@@ -133,7 +134,7 @@ final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends N
     TypeConverter<I> toParser(Class<I> type) {
         final List<I> nodes = new LinkedList<>();
         this.visit(0, (d, n) -> nodes.add(n.key));
-        return new HashMapAdapter<>(type, SeverityType.ERROR, IEvent.EC_CODE_LIST, nodes);
+        return new HashMapAdapter<>(type, ERROR, EC_CODE_LIST, nodes);
     }
 
     int maxOrdinal() {
@@ -147,27 +148,16 @@ final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends N
         return max.get() + 1;
     }
 
-    boolean notValid(int size) {
-        return min > size || size > max;
+    Collection<Segment> from(Segment p) {
+        return linker.from(p);
     }
 
-    String message() {
-        if (max == ILinker.N) {
-            return "cardinality must be greater than or equal to " + min;
-        } else if (min == 1 && max == 1) {
-            return "cardinality must be 1 and only one";
+    void link(Segment ps, Segment cs, BSLink<D, ?, ?> pl, BusinessHandler<D> hd) {
+        try {
+            linker.link(ps, cs);
+        } catch (RuntimeException ex) {
+            hd.handle(event, term, "cannot link with Segment#[" + pl.key.getCode() + ']', ex);
         }
-        return "cardinality must be between " + min + " and " + max;
-    }
-
-    @Override
-    public Collection<Segment> from(Segment parent) {
-        return linker.from(parent);
-    }
-
-    @Override
-    public void link(Segment parent, Segment child) {
-        linker.link(parent, child);
     }
 
     @Override
@@ -177,13 +167,13 @@ final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends N
 
     @FunctionalInterface
     interface IComputer<B extends ITerm<B>> {
-        Object apply(Item<B, ?> item, IRecord<?> source);
+        Object apply(Item<B, ?> item, IMessRecord<?> source);
     }
 
     /**
-     * Internal Tree Builder.
+     * Internal Link Builder.
      */
-    static final class TreeBuilder<B extends ITerm<B>, I extends Enum<I> & IType<I>> {
+    static final class LBuilder<B extends ITerm<B>, I extends Enum<I> & IType<I>> {
         private final List<Class<? extends Segment>> types;
         private final Map<I, Node<?, B, ?>> parents;
         private final BusinessLink override;
@@ -192,13 +182,15 @@ final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends N
         private final List<I> paths;
         private final Class<I> type;
         private final int offset;
+        private final IMode mode;
         private final I main;
 
-        TreeBuilder(Container context, TreeContext<B, I> source, ModeType mode) {
+        LBuilder(Container context, TContext<B, I> source, IMode mode) {
             this.context = context;
+            this.mode = source.mode;
             this.type = source.type;
             this.main = source.main;
-            this.offset = mode.length;
+            this.offset = mode.getLength();
             this.paths = List.copyOf(source.paths);
             this.types = List.copyOf(source.types);
             this.parents = Map.copyOf(source.parents);
@@ -240,7 +232,7 @@ final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends N
 
         private Map<I, PId<B>> findParentIds(BSNode<?, B> node) throws BeanException {
             final Map<I, PId<B>> parentIds = new EnumMap<>(type);
-            final Mode mode = (node instanceof BSNode.Flat<?, B>) ? Mode.RO : Mode.WO;
+            final Mode mode = (node instanceof Flat<?, B>) ? Mode.RO : Mode.WO;
             id(node, ReferenceId.class, (fs, pp, pa) -> {
                 final I type = paths.stream().filter(i -> pa.value().equals(i.getCode())).findAny().orElse(null);
                 if (parentIds.containsKey(type)) {
@@ -296,7 +288,7 @@ final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends N
     /**
      * Internal Tree Context.
      */
-    static final class TreeContext<B extends ITerm<B>, I extends Enum<I> & IType<I>> {
+    static final class TContext<B extends ITerm<B>, I extends Enum<I> & IType<I>> {
         private final List<List<Sublink>> replaces = new LinkedList<>();
         private final List<List<String>> excludes = new LinkedList<>();
         private final List<Class<? extends Segment>> types;
@@ -306,9 +298,11 @@ final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends N
         private final List<I> requiredPIds;
         private final List<I> paths;
         private final Class<I> type;
+        private final IMode mode;
         private final I main;
 
-        TreeContext(Class<I> type, Class<Segment> sc) throws BeanException {
+        TContext(IMode mode, Class<I> type, Class<Segment> sc) throws BeanException {
+            this.mode = mode;
             this.type = type;
             final BusinessObject bo;
             this.types = new LinkedList<>();
@@ -318,7 +312,7 @@ final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends N
             if ((bo = sc.getAnnotation(BusinessObject.class)) == null) {
                 throw new BeanException(sc, "must be annotated with @BusinessObject");
             }
-            this.parser = new CodeListAdapter<>(type, SeverityType.ERROR, IEvent.EC_CODE_LIST);
+            this.parser = new CodeListAdapter<>(type, ERROR, EC_CODE_LIST);
             this.main = parser.parse(bo.value());
             this.overrides = new EnumMap<>(type);
             for (final Overlink c : bo.overrides()) {
@@ -399,7 +393,7 @@ final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends N
         }
 
         boolean requireKey(I node, BusinessLink spec, List<?> links) {
-            return node != main && spec.max() > 1 && !links.isEmpty();
+            return mode != NEAT && node != main && spec.max() > 1 && !links.isEmpty();
         }
 
         void pushKey(I type) {

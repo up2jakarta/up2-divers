@@ -1,6 +1,6 @@
 package io.github.up2jakarta.test.impl;
 
-import io.github.up2jakarta.csv.fmt.FullError;
+import io.github.up2jakarta.csv.data.FullError;
 import io.github.up2jakarta.lov.IError;
 
 public class InputError extends FullError<TermType, InputRecord> {

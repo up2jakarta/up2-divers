@@ -2,7 +2,7 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.ILinker;
-import io.github.up2jakarta.csv.core.ext.Beans;
+import io.github.up2jakarta.csv.ext.Beans;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.lov.core.Wrapper;

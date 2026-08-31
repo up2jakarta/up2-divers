@@ -1,6 +1,7 @@
 # Up2LOV :: Core Framework
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2lov-core?style=for-the-badge&color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2lov-core)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2lov-core?color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2lov-core)
+[![Mvn Repository](https://badges.mvnrepository.com/badge/io.github.up2jakarta/up2lov-core/badge.svg?color=green)](https://mvnrepository.com/artifact/io.github.up2jakarta/up2lov-core)
 
 `Up2LOV` is an open-source API for list of values (LOV) manipulation.
 
@@ -10,7 +11,7 @@
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2lov-core</artifactId>
-        <version>1.7.0</version>
+        <version>1.7.1</version>
     </dependency>
 ```
 

@@ -9,8 +9,8 @@ import io.github.up2jakarta.lov.core.Identifiable;
  *
  * @param <R> the input record type
  * @see io.github.up2jakarta.csv.api.hdl.IBusinessEvent.IKey#getOrder()
- * @see io.github.up2jakarta.csv.core.hdl.BusinessCollector
- * @see io.github.up2jakarta.csv.data.LazyCounter
+ * @see io.github.up2jakarta.csv.hdl.BusinessCollector
+ * @see io.github.up2jakarta.csv.hdl.LazyCounter
  */
 @FunctionalInterface
 public interface IBusinessRepository<R extends IRecord<?> & Identifiable<?>> {

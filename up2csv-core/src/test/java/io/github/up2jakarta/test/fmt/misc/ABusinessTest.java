@@ -4,9 +4,10 @@ import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.hdl.IBusinessEvent;
 import io.github.up2jakarta.csv.api.hdl.IPropertyEvent;
+import io.github.up2jakarta.csv.core.BusinessExporter;
 import io.github.up2jakarta.csv.core.BusinessImporter;
-import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.core.hdl.PropertyFailureException;
+import io.github.up2jakarta.csv.core.IMode;
+import io.github.up2jakarta.csv.hdl.PropertyFailureException;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.impl.SegmentType;
 import io.github.up2jakarta.test.impl.TermType;
@@ -15,13 +16,13 @@ import io.github.up2jakarta.test.impl.dto.Amount.Type;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_COMPLIANCE;
 import static io.github.up2jakarta.csv.core.BusinessImporter.DETACHED;
+import static io.github.up2jakarta.csv.core.ModeType.NEAT;
 import static io.github.up2jakarta.lov.SeverityType.*;
 import static io.github.up2jakarta.test.impl.SegmentType.S09;
 import static io.github.up2jakarta.test.impl.TermType.*;
@@ -29,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, E extends IEvent<TermType>> {
 
-    private final ModeType mode;
+    private final IMode mode;
     private final BusinessImporter<TermType, SegmentType, T, R, E> importer;
 
-    protected ABusinessTest(ModeType mode, BusinessImporter<TermType, SegmentType, T, R, E> importer) {
+    protected ABusinessTest(IMode mode, BusinessImporter<TermType, SegmentType, T, R, E> importer) {
         this.importer = importer;
         this.mode = mode;
     }
@@ -76,7 +77,7 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertNotNull(party.getAddress().getAddressLine2());
     }
 
-    protected static void assertValid(ModeType mode, Invoice invoice, int amountSize, int noteSize) {
+    protected static void assertValid(IMode mode, Invoice invoice, int amountSize, int noteSize) {
         assertNotNull(invoice);
         Tests.assertReference(mode, invoice);
         assertNotNull(invoice.getIssueDate());
@@ -114,9 +115,9 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertValid(mode, invoice, 0, 0);
     }
 
-    protected abstract void checkValid1(R[] rows) throws BeanException, IOException;
+    protected abstract void checkValid1(R[] rows) throws BeanException;
 
-    protected abstract void checkValid2(R[] rows) throws IOException;
+    protected abstract void checkValid2(R[] rows);
 
     @SuppressWarnings("unchecked")
     protected final <A extends BusinessImporter<TermType, SegmentType, T, R, E>> A get() {
@@ -139,6 +140,53 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertEquals(0, errors.size());
     }
 
+    private void assertCardinality3(SegmentType type, List<? extends IEvent<TermType>> errors) {
+        for (final IEvent<TermType> error : errors) {
+            if (error instanceof IBusinessEvent<?, ?, ?> t) {
+                assertNull(t.getTrace());
+                assertEquals(type, t.getKey().getRecord().getType());
+            } else if (error instanceof IPropertyEvent<?, ?> c) {
+                assertNull(c.getCause().getCause());
+                assertEquals(type, c.getRecord().getType());
+            }
+            assertEquals(D002, error.getType());
+            assertNull(error.getOffset());
+            assertEquals(ERROR, error.getLevel());
+            assertEquals("CSV-C02", error.getCode());
+            assertEquals("cardinality must be 1 and only one", error.getMessage());
+        }
+    }
+
+    private void assertCardinality4(SegmentType type, IEvent<TermType> error) {
+        if (error instanceof IBusinessEvent<?, ?, ?> t) {
+            assertNull(t.getTrace());
+            assertEquals(type, t.getKey().getRecord().getType());
+        } else if (error instanceof IPropertyEvent<?, ?> c) {
+            assertNull(c.getCause().getCause());
+            assertEquals(type, c.getRecord().getType());
+        }
+        assertEquals(D004, error.getType());
+        assertNull(error.getOffset());
+        assertEquals(ERROR, error.getLevel());
+        assertEquals("CSV-C04", error.getCode());
+        assertEquals("cardinality must be greater than or equal to 1", error.getMessage());
+    }
+
+    private void assertCardinality5(IEvent<TermType> error) {
+        if (error instanceof IBusinessEvent<?, ?, ?> t) {
+            assertNull(t.getTrace());
+            assertEquals(SegmentType.S04, t.getKey().getRecord().getType());
+        } else if (error instanceof IPropertyEvent<?, ?> c) {
+            assertNull(c.getCause().getCause());
+            assertEquals(SegmentType.S04, c.getRecord().getType());
+        }
+        assertEquals(D009, error.getType());
+        assertNull(error.getOffset());
+        assertEquals(WARNING, error.getLevel());
+        assertEquals("CSV-C09", error.getCode());
+        assertEquals("cardinality must be between 0 and 2", error.getMessage());
+    }
+
     protected void checkEmpty(R[] rows) {
         // Given
         final List<E> errors = new LinkedList<>();
@@ -154,7 +202,10 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
 
     protected void check1Cardinality1(R[] rows) {
         // When
-        final PropertyFailureException e = assertThrows(PropertyFailureException.class, () -> importer.parse(rows, (i, r) -> i));
+        final PropertyFailureException e = assertThrows(
+                PropertyFailureException.class,
+                () -> importer.parse(rows, (i, r) -> i)
+        );
         assertEquals(0, e.toList().size());
         // Then
         assertNull(e.getOffset());
@@ -176,19 +227,19 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertNull(invoice);
         assertEquals(2, errors.size());
         // Then
-        for (final E e : errors) {
-            if (e instanceof IBusinessEvent<?, ?, ?> t) {
+        for (final E error : errors) {
+            if (error instanceof IBusinessEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertNotNull(t.getKey());
                 assertNotNull(t.getKey().getRecord());
-            } else if (e instanceof IPropertyEvent<?, ?> c) {
+            } else if (error instanceof IPropertyEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
             }
-            assertNull(e.getOffset());
-            assertEquals(D001, e.getType());
-            assertEquals(FATAL, e.getLevel());
-            assertEquals("CSV-C01", e.getCode());
-            assertEquals("cardinality must be 1 and only one", e.getMessage());
+            assertNull(error.getOffset());
+            assertEquals(D001, error.getType());
+            assertEquals(FATAL, error.getLevel());
+            assertEquals("CSV-C01", error.getCode());
+            assertEquals("cardinality must be 1 and only one", error.getMessage());
         }
     }
 
@@ -204,25 +255,25 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertNull(invoice.getSeller());
         assertNull(invoice.getBuyer());
         assertEquals(3, errors.size());
-        for (var e : errors) {
-            if (e instanceof IBusinessEvent<?, ?, ?> t) {
+        for (final E error : errors) {
+            if (error instanceof IBusinessEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
-            } else if (e instanceof IPropertyEvent<?, ?> c) {
+            } else if (error instanceof IPropertyEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
             }
-            assertNull(e.getOffset());
-            assertEquals(ERROR, e.getLevel());
-            if (e.getType() == D002 || e.getType() == D003) {
-                assertEquals("cardinality must be 1 and only one", e.getMessage());
+            assertNull(error.getOffset());
+            assertEquals(ERROR, error.getLevel());
+            if (error.getType() == D002 || error.getType() == D003) {
+                assertEquals("cardinality must be 1 and only one", error.getMessage());
             } else {
-                assertSame(D004, e.getType());
-                assertEquals("cardinality must be greater than or equal to 1", e.getMessage());
+                assertSame(D004, error.getType());
+                assertEquals("cardinality must be greater than or equal to 1", error.getMessage());
             }
-            assertNotNull(e.getCode());
+            assertNotNull(error.getCode());
         }
     }
 
-    protected void checkCardinality3(SegmentType type, R[] rows) {
+    protected void checkCardinality3(SegmentType type, R[] rows, BusinessExporter<TermType, SegmentType, T> exporter) {
         // Given
         final List<E> errors = new LinkedList<>();
         // When
@@ -235,23 +286,14 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertNull(invoice.getSeller());
         assertNotNull(invoice.getBuyer());
         assertEquals(2, errors.size());
-        for (var e : errors) {
-            if (e instanceof IBusinessEvent<?, ?, ?> t) {
-                assertNull(t.getTrace());
-                assertEquals(type, t.getKey().getRecord().getType());
-            } else if (e instanceof IPropertyEvent<?, ?> c) {
-                assertNull(c.getCause().getCause());
-                assertEquals(type, c.getRecord().getType());
-            }
-            assertEquals(D002, e.getType());
-            assertNull(e.getOffset());
-            assertEquals(ERROR, e.getLevel());
-            assertEquals("CSV-C02", e.getCode());
-            assertEquals("cardinality must be 1 and only one", e.getMessage());
-        }
+        assertCardinality3(type, errors);
+        // Then Validation
+        final List<? extends IEvent<TermType>> events = exporter.validate(invoice);
+        assertEquals(1, events.size());
+        assertCardinality3(type, events);
     }
 
-    protected void checkCardinality4(SegmentType origin, R[] rows) {
+    protected void checkCardinality4(SegmentType type, R[] rows, BusinessExporter<TermType, SegmentType, T> exporter) {
         // Given
         final List<E> errors = new LinkedList<>();
         // When
@@ -264,20 +306,33 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         assertNotNull(invoice.getSeller());
         assertNotNull(invoice.getBuyer());
         assertEquals(1, errors.size());
-        for (var e : errors) {
-            if (e instanceof IBusinessEvent<?, ?, ?> t) {
-                assertNull(t.getTrace());
-                assertEquals(origin, t.getKey().getRecord().getType());
-            } else if (e instanceof IPropertyEvent<?, ?> c) {
-                assertNull(c.getCause().getCause());
-                assertEquals(origin, c.getRecord().getType());
-            }
-            assertEquals(D004, e.getType());
-            assertNull(e.getOffset());
-            assertEquals(ERROR, e.getLevel());
-            assertEquals("CSV-C04", e.getCode());
-            assertEquals("cardinality must be greater than or equal to 1", e.getMessage());
-        }
+        assertCardinality4(type, errors.getFirst());
+        // Then Validation
+        final List<? extends IEvent<TermType>> events = exporter.validate(invoice);
+        assertEquals(1, events.size());
+        assertCardinality4(type, events.getFirst());
+    }
+
+    protected void checkCardinality5(R[] rows, BusinessExporter<TermType, SegmentType, T> exporter) {
+        // Given
+        final List<E> errors = new LinkedList<>();
+        // When
+        final T invoice = importer.parse(rows, (i, r) -> {
+            errors.addAll(r);
+            return i;
+        });
+        // Then
+        assertValid(invoice);
+        assertNotNull(invoice.getSeller());
+        assertNotNull(invoice.getBuyer());
+        assertEquals(1, invoice.getItems().size());
+        assertEquals(3, invoice.getItems().getFirst().getAttributes().size());
+        assertEquals(1, errors.size());
+        assertCardinality5(errors.getFirst());
+        // Then Validation
+        final List<? extends IEvent<TermType>> events = exporter.validate(invoice);
+        assertEquals(1, events.size());
+        assertCardinality5(events.getFirst());
     }
 
     protected void checkDetached(R detached, TermType type, R[] rows) {
@@ -299,32 +354,32 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         // Warning
         assertEquals(1, errors.size());
         {
-            final E e = errors.getFirst();
-            if (e instanceof IBusinessEvent<?, ?, ?> t) {
+            final E error = errors.getFirst();
+            if (error instanceof IBusinessEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertNotNull(t.getKey());
                 assertEquals(detached, t.getKey().getRecord());
-            } else if (e instanceof IPropertyEvent<?, ?> c) {
+            } else if (error instanceof IPropertyEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
             }
             if (detached.getType() != null) {
                 if (detached.getType() == S09) {
-                    assertNull(e.getOffset());
-                    assertEquals(WARNING, e.getLevel());
-                    assertEquals("CSV-C09", e.getCode());
+                    assertNull(error.getOffset());
+                    assertEquals(WARNING, error.getLevel());
+                    assertEquals("CSV-C09", error.getCode());
                 } else {
-                    assertEquals(mode.getTypeIdIndex(), e.getOffset());
-                    assertEquals(WARNING, e.getLevel());
-                    assertEquals(EC_COMPLIANCE, e.getCode());
+                    assertEquals(mode.getIndex(), error.getOffset());
+                    assertEquals(WARNING, error.getLevel());
+                    assertEquals(EC_COMPLIANCE, error.getCode());
                 }
-                assertEquals(type, e.getType());
+                assertEquals(type, error.getType());
             } else {
-                assertEquals(mode.getTypeIdIndex(), e.getOffset());
-                assertEquals(ERROR, e.getLevel());
-                assertEquals(EC_COMPLIANCE, e.getCode());
-                assertNull(e.getType());
+                assertEquals(mode.getIndex(), error.getOffset());
+                assertEquals(ERROR, error.getLevel());
+                assertEquals(EC_COMPLIANCE, error.getCode());
+                assertNull(error.getType());
             }
-            assertEquals(DETACHED, e.getMessage());
+            assertEquals(DETACHED, error.getMessage());
         }
     }
 
@@ -344,19 +399,20 @@ abstract class ABusinessTest<T extends Invoice, R extends IRecord<SegmentType>, 
         // Warning
         assertEquals(1, errors.size());
         {
-            final E e = errors.getFirst();
-            if (e instanceof IBusinessEvent<?, ?, ?> t) {
+            final E error = errors.getFirst();
+            if (error instanceof IBusinessEvent<?, ?, ?> t) {
                 assertNull(t.getTrace());
                 assertNotNull(t.getKey());
                 assertEquals(invalid, t.getKey().getRecord());
-            } else if (e instanceof IPropertyEvent<?, ?> c) {
+            } else if (error instanceof IPropertyEvent<?, ?> c) {
                 assertNull(c.getCause().getCause());
             }
-            assertEquals(mode.getLength() + 2, e.getOffset());
-            assertEquals(ERROR, e.getLevel());
-            Assertions.assertEquals(EC_COMPLIANCE, e.getCode());
-            assertEquals(type, e.getType());
-            assertEquals("must not be empty", e.getMessage());
+            final int offset = (mode == NEAT) ? 1 : 2;
+            assertEquals(mode.getLength() + offset, error.getOffset());
+            assertEquals(ERROR, error.getLevel());
+            Assertions.assertEquals(EC_COMPLIANCE, error.getCode());
+            assertEquals(type, error.getType());
+            assertEquals("must not be empty", error.getMessage());
         }
     }
 

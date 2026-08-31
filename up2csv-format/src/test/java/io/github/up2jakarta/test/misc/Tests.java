@@ -1,13 +1,14 @@
 package io.github.up2jakarta.test.misc;
 
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.core.BusinessWriter;
+import io.github.up2jakarta.csv.core.IMode;
 import io.github.up2jakarta.csv.core.ModeType;
-import io.github.up2jakarta.csv.core.hdl.EventModeBuilder;
-import io.github.up2jakarta.csv.core.hdl.PropertyCollector;
-import io.github.up2jakarta.csv.core.hdl.PropertyEvent;
+import io.github.up2jakarta.csv.data.BusinessWriter;
+import io.github.up2jakarta.csv.data.MessRecord;
 import io.github.up2jakarta.csv.data.Up2Result;
-import io.github.up2jakarta.csv.fmt.FastRecord;
+import io.github.up2jakarta.csv.hdl.EventModeBuilder;
+import io.github.up2jakarta.csv.hdl.PropertyCollector;
+import io.github.up2jakarta.csv.hdl.PropertyEvent;
 import io.github.up2jakarta.csv.io.AbstractReader;
 import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.test.dto.Invoice;
@@ -32,13 +33,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-import static io.github.up2jakarta.csv.fmt.Fixed06Generator.FV_SM;
+import static io.github.up2jakarta.csv.data.Fixed06Generator.FV_SM;
 import static io.github.up2jakarta.lov.core.Codes.fixed;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class Tests {
 
-    public static class TURecord extends FastRecord<SegmentType> {
+    public static class TURecord extends MessRecord<SegmentType> {
         public TURecord(SegmentType type, String businessKey, String... data) {
             super(type, businessKey, data);
         }
@@ -69,13 +70,12 @@ public abstract class Tests {
 
     public static class TUGenerator {
         private static final Random RANDOM = new Random();
-
         private final Path path;
-        private final ModeType mode;
-        private final InputStream template;
+        private final IMode mode;
         private final CSVFormat format;
+        private final InputStream template;
 
-        TUGenerator(ModeType mode, Class<?> tester, CSVFormat format) throws IOException {
+        TUGenerator(IMode mode, Class<?> tester, CSVFormat format) throws IOException {
             this.format = format;
             this.mode = mode;
             this.template = new ClassPathResource("template.csv").getInputStream();
@@ -93,7 +93,20 @@ public abstract class Tests {
         Path generate(String fileName, int size) throws IOException {
             final CSVParser parser = format.parse(new InputStreamReader(template));
             final List<CSVRecord> records = new ArrayList<>(parser.stream().toList());
-            final List<String[]> tmpl = records.stream().map(CSVRecord::values).toList();
+            final List<String[]> tmpl = records.stream()
+                    .map(r -> {
+                        final String[] tpl = r.values();
+                        if (mode == ModeType.NEAT && "09".equals(tpl[0])) {
+                            final String[] rs = new String[tpl.length - 1];
+                            rs[0] = tpl[0];
+                            rs[1] = tpl[1];
+                            rs[2] = tpl[3];
+                            rs[3] = tpl[4];
+                            return rs;
+                        }
+                        return tpl;
+                    })
+                    .toList();
             final Path csv = this.generate(tmpl, fileName, size);
             template.close();
             return csv;
@@ -123,11 +136,11 @@ public abstract class Tests {
 
         private void fill(String[] tmpl, String[] data, String invoiceNumber, String year, String randomInt, int ln) {
             final int s, p;
-            if (mode == ModeType.FULL) {
+            if (mode == IMode.FULL) {
                 data[0] = fixed(FV_SM + ln);
                 p = s = 1;
             } else {
-                if (mode == ModeType.UNIT && !"01".equals(tmpl[0])) {
+                if (mode == ModeType.NEAT && !"01".equals(tmpl[0])) {
                     data[0] = tmpl[0];
                     s = 2;
                     p = -1;
@@ -151,10 +164,10 @@ public abstract class Tests {
         }
 
         private List<String[]> clone(List<String[]> tmpl) {
-            final int p = (mode == ModeType.FULL) ? 1 : 0;
+            final int p = (mode == IMode.FULL) ? 1 : 0;
             final List<String[]> data = new ArrayList<>(tmpl.size());
             for (final String[] segment : tmpl) {
-                final int s = (mode == ModeType.UNIT && !"01".equals(segment[0])) ? 1 : 0;
+                final int s = (mode == ModeType.NEAT && !"01".equals(segment[0])) ? 1 : 0;
                 final String[] copy = new String[segment.length + p - s];
                 copy[p] = segment[0];
                 data.add(copy);
@@ -167,7 +180,7 @@ public abstract class Tests {
     abstract static class AbstractTests<R extends IRecord<SegmentType>> {
         private final TUGenerator generator;
 
-        AbstractTests(ModeType mode, CSVFormat format) throws IOException {
+        AbstractTests(IMode mode, CSVFormat format) throws IOException {
             this.generator = new TUGenerator(mode, this.getClass(), format);
         }
 

@@ -1,8 +1,8 @@
 package io.github.up2jakarta.csv.api.hdl;
 
+import io.github.up2jakarta.csv.api.IMutual;
 import io.github.up2jakarta.csv.api.IRecord;
-import io.github.up2jakarta.csv.data.IMutual;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.api.ITerm;
 
 import java.util.List;
 

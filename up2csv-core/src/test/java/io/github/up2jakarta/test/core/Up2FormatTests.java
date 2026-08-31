@@ -9,7 +9,7 @@ import io.github.up2jakarta.csv.cfg.PositionOverride;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Mapper;
-import io.github.up2jakarta.csv.data.HeaderType;
+import io.github.up2jakarta.csv.data.HeaderResolver;
 import io.github.up2jakarta.lov.IError;
 import io.github.up2jakarta.lov.IException;
 import io.github.up2jakarta.lov.TypeException;
@@ -32,7 +32,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
-import static io.github.up2jakarta.csv.data.TermResolver.header;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.test.core.Reflections.list;
 import static io.github.up2jakarta.test.core.Reflections.node;
@@ -67,7 +66,7 @@ class Up2FormatTests {
     void testCache2() throws BeanException {
         // GIVEN
         final Up2Flatter<ValidEntity, ?> flatter1 = factory.flatter(ValidEntity.class);
-        final Up2Flatter<ValidEntity, ?> flatter2 = new Up2Factory<>(factory, header()).flatter(ValidEntity.class);
+        var flatter2 = factory.of(HeaderResolver.getInstance()).flatter(ValidEntity.class);
         // THEN
         assertNotSame(flatter1, flatter2);
         assertNotSame(node(flatter1), node(flatter2));
@@ -185,7 +184,7 @@ class Up2FormatTests {
     @Test
     void testErrorHeader2() throws BeanException {
         // Given
-        final Up2Flatter<InputError, HeaderType> format = new Up2Factory<>(factory, header()).flatter(InputError.class);
+        var format = factory.of(HeaderResolver.getInstance()).flatter(InputError.class);
         // When
         final String[] export = format.header();
         // Then

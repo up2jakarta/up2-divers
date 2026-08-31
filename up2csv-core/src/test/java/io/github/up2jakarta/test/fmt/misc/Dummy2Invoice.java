@@ -6,7 +6,7 @@ import io.github.up2jakarta.csv.cfg.PositionOverride;
 import io.github.up2jakarta.csv.cfg.Truncated;
 
 /**
- * @see io.github.up2jakarta.csv.core.ModeType#FULL
+ * @see io.github.up2jakarta.csv.core.IMode#FULL
  */
 @Truncated(3)
 @BusinessObject("21")

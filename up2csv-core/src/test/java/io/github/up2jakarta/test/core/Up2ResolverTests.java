@@ -1,11 +1,10 @@
 package io.github.up2jakarta.test.core;
 
-import io.github.up2jakarta.csv.api.Container;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Mapper;
-import io.github.up2jakarta.csv.core.hdl.FailureException;
+import io.github.up2jakarta.csv.data.HeaderResolver;
 import io.github.up2jakarta.csv.data.HeaderType;
-import io.github.up2jakarta.csv.data.TermResolver;
+import io.github.up2jakarta.csv.hdl.FailureException;
 import io.github.up2jakarta.lov.SeverityType;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
@@ -29,8 +28,8 @@ class Up2ResolverTests {
     private final Up2Factory<HeaderType> factory;
 
     @Autowired
-    Up2ResolverTests(Container context) {
-        this.factory = new Up2Factory<>(context, TermResolver.header());
+    Up2ResolverTests(Up2Factory<?> factory) {
+        this.factory = factory.of(HeaderResolver.getInstance());
     }
 
     @Test

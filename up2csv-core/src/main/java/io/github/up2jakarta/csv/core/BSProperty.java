@@ -2,6 +2,7 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.Container;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.csv.api.ext.InputProcessor;
 import io.github.up2jakarta.csv.api.hdl.EventLevel;
 import io.github.up2jakarta.csv.cfg.Error;
@@ -13,8 +14,7 @@ import io.github.up2jakarta.csv.core.BSBuilder.MST;
 import io.github.up2jakarta.csv.core.BSOperator.PId;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
-import io.github.up2jakarta.csv.core.hdl.EventHandler;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.hdl.EventHandler;
 import io.github.up2jakarta.lov.TypeAdapter;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.lov.core.Wrapper;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_PROCESSOR;
-import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
+import static io.github.up2jakarta.csv.hdl.FastHandler.of;
 import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.lov.SeverityType.WARNING;

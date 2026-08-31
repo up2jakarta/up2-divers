@@ -1,13 +1,15 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.Segment;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.lov.core.AccessException;
 
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.util.Collection;
+
+import static io.github.up2jakarta.lov.core.AccessException.notNull;
 
 /**
  * Base writer for mono-segment format, that's able to write segments to output stream.
@@ -20,7 +22,7 @@ public abstract class Up2Writer<S extends Segment, D extends ITerm<D>> implement
     private final Up2Flatter<S, D> mapper;
 
     protected Up2Writer(Up2Flatter<S, D> mapper) {
-        this.mapper = mapper;
+        this.mapper = notNull(mapper, this.getClass(), "mapper");
     }
 
     public final void header() throws IOException {

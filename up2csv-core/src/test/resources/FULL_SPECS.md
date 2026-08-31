@@ -97,7 +97,7 @@
 <h2 id="d009">`009` Item attributes </h2>
 
 - <b>Segment:</b> `09` Attributes
-- <b>Cardinality:</b> `0..n`
+- <b>Cardinality:</b> `0..2`
 - <b>Class:</b> [io.github.up2jakarta.test.impl.dto.Attribute](../java/io/github/up2jakarta/test/impl/dto/Attribute.java)
 
 |         | 1       | 2        | 3          | 4       | 5   | 6     |

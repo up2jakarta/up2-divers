@@ -2,9 +2,9 @@ package io.github.up2jakarta.test.fmt;
 
 import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.fmt.FullError;
-import io.github.up2jakarta.csv.fmt.FullRecord;
-import io.github.up2jakarta.csv.fmt.SimpleFullImporter;
+import io.github.up2jakarta.csv.data.FullError;
+import io.github.up2jakarta.csv.data.FullRecord;
+import io.github.up2jakarta.csv.data.SimpleFullImporter;
 import io.github.up2jakarta.lov.CodeListException;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.test.TUConfiguration;
@@ -17,12 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static io.github.up2jakarta.csv.core.BusinessImporter.DETACHED;
+import static io.github.up2jakarta.csv.core.MessImporter.DETACHED;
 import static io.github.up2jakarta.lov.SeverityType.WARNING;
 import static io.github.up2jakarta.test.impl.SegmentType.*;
 import static io.github.up2jakarta.test.impl.TermType.NODE;
@@ -348,7 +347,7 @@ class Tree80FullTests {
     }
 
     @Test
-    void testExportReferenceIds() throws BeanException, IOException {
+    void testExportReferenceIds() throws BeanException {
         // Given
         final FullRecord<SegmentType>[] records = new FullRecord[]{
                 record(S80, "00", "$"),
@@ -379,7 +378,7 @@ class Tree80FullTests {
         node4.setNode3Id("Ignore R3");
         // Then
         final List<? extends IRecord<?>> store = new ArrayList<>(asList(records));
-        importer.toExporter().format(root, () -> null, row -> {
+        importer.toExporter().format(root, row -> {
             final IRecord<?> found = store.stream().filter(r -> row[1].equals(r.getType().getCode()))
                     .findAny()
                     .orElseThrow();

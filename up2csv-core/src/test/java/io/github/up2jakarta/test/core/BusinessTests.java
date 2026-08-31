@@ -1,17 +1,17 @@
 package io.github.up2jakarta.test.core;
 
 import io.github.up2jakarta.csv.api.IEvent;
-import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.IMessRecord;
 import io.github.up2jakarta.csv.api.hdl.IEventBuilder;
 import io.github.up2jakarta.csv.api.hdl.IPropertyCreator;
-import io.github.up2jakarta.csv.core.FastImporter;
-import io.github.up2jakarta.csv.core.UnitExporter;
-import io.github.up2jakarta.csv.core.UnitImporter;
+import io.github.up2jakarta.csv.core.MessImporter;
+import io.github.up2jakarta.csv.core.NeatExporter;
+import io.github.up2jakarta.csv.core.NeatImporter;
 import io.github.up2jakarta.csv.core.Up2Factory;
-import io.github.up2jakarta.csv.core.hdl.*;
+import io.github.up2jakarta.csv.data.NeatRecord;
+import io.github.up2jakarta.csv.data.SimpleNeatImporter;
 import io.github.up2jakarta.csv.data.Up2Result;
-import io.github.up2jakarta.csv.fmt.SimpleUnitImporter;
-import io.github.up2jakarta.csv.fmt.UnitRecord;
+import io.github.up2jakarta.csv.hdl.*;
 import io.github.up2jakarta.lov.TypeException;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.github.up2jakarta.csv.api.IEvent.EC_COMPLIANCE;
 import static io.github.up2jakarta.csv.api.IEvent.EC_CONVERTER;
-import static io.github.up2jakarta.csv.core.BusinessImporter.DETACHED;
+import static io.github.up2jakarta.csv.core.MessImporter.DETACHED;
 import static io.github.up2jakarta.lov.SeverityType.*;
 import static io.github.up2jakarta.test.core.Up2ErrorTests.*;
 import static io.github.up2jakarta.test.impl.SegmentType.*;
@@ -60,8 +60,8 @@ public class BusinessTests {
 
     private <I extends VirtualItem, T extends VirtualReference<I>> T assertVirtual(Class<T> type) throws BeanException {
         // GIVEN
-        final UnitImporter<TermType, SegmentType, T, BSRecord, BSError> importer = factory.builder()
-                .unit(type)
+        final MessImporter<TermType, SegmentType, T, BSRecord, BSError> importer = factory.builder()
+                .mess(type)
                 .build(SegmentType.class)
                 .build(BSError::new);
         // WHEN
@@ -86,7 +86,7 @@ public class BusinessTests {
             final BSError error = va.getEvents().getFirst();
             assertSame(va, error.getKey().getRecord());
             assertEquals(0, error.getKey().getOrder());
-            assertEquals(1, error.getOffset());
+            assertEquals(2, error.getOffset());
             assertEquals(ERROR, error.getLevel());
             assertEquals(EC_CONVERTER, error.getCode());
             assertEquals(I006, error.getType());
@@ -115,8 +115,8 @@ public class BusinessTests {
     @Test
     void testBusinessId() throws BeanException {
         // GIVEN
-        final FastImporter<TermType, SegmentType, ComplexBId, BSRecord, BSError> importer = factory.builder()
-                .fast(ComplexBId.class)
+        final MessImporter<TermType, SegmentType, ComplexBId, BSRecord, BSError> importer = factory.builder()
+                .mess(ComplexBId.class)
                 .build(SegmentType.class)
                 .build(BSError::new);
         final BSRecord record = new BSRecord(S00, "7");
@@ -131,8 +131,8 @@ public class BusinessTests {
     @Test
     void testValidateBusinessId() throws BeanException {
         // GIVEN
-        final FastImporter<TermType, SegmentType, ComplexBId, BSRecord, BSError> importer = factory.builder()
-                .fast(ComplexBId.class)
+        final MessImporter<TermType, SegmentType, ComplexBId, BSRecord, BSError> importer = factory.builder()
+                .mess(ComplexBId.class)
                 .build(SegmentType.class)
                 .build(BSError::new);
         final BSRecord record = new BSRecord(S00, null);
@@ -171,8 +171,8 @@ public class BusinessTests {
     @Test
     void testNullRecord() throws BeanException {
         // GIVEN
-        final UnitImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
-                .unit(DummyReference.class)
+        final NeatImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
+                .neat(DummyReference.class)
                 .build(SegmentType.class)
                 .build(BSError::new);
         // WHEN
@@ -186,8 +186,8 @@ public class BusinessTests {
     @Test
     void testNullType() throws BeanException {
         // GIVEN
-        final UnitImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = factory.builder()
-                .unit(DummyReference.class)
+        final NeatImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = factory.builder()
+                .neat(DummyReference.class)
                 .build(SegmentType.class)
                 .build(MyError::new);
         final MyRecord record = new MyRecord(null, "*");
@@ -209,8 +209,8 @@ public class BusinessTests {
     @Test
     void testNullData() throws BeanException {
         // GIVEN
-        final UnitImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = factory.builder()
-                .unit(DummyReference.class)
+        final NeatImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = factory.builder()
+                .neat(DummyReference.class)
                 .build(SegmentType.class)
                 .build(MyError::new);
         final MyRecord record = new MyRecord(S71, (String[]) null);
@@ -232,7 +232,7 @@ public class BusinessTests {
     @Test
     void testNullBuilder() throws BeanException {
         // GIVEN
-        final UnitImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = new UnitImporter<>(factory, DummyReference.class, SegmentType.class) {
+        final NeatImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = new NeatImporter<>(factory, DummyReference.class, SegmentType.class) {
             @Override
             protected PropertyCollector.Builder<TermType, MyRecord, MyError> newBuilder(int size) {
                 return null;
@@ -250,7 +250,7 @@ public class BusinessTests {
     @Test
     void testNullHandler() throws BeanException {
         // GIVEN
-        final UnitImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = new UnitImporter<>(factory, DummyReference.class, SegmentType.class) {
+        final NeatImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = new NeatImporter<>(factory, DummyReference.class, SegmentType.class) {
             @Override
             protected IEventBuilder<TermType, MyRecord, MyError> newBuilder(int size) {
                 return new IEventBuilder<>() {
@@ -278,7 +278,7 @@ public class BusinessTests {
     @Test
     void testNullSource() throws BeanException {
         // GIVEN
-        final UnitImporter<TermType, SegmentType, DummyReference, MyRecord, SimpleEvent<TermType>> importer = new UnitImporter<>(factory, DummyReference.class, SegmentType.class) {
+        final MessImporter<TermType, SegmentType, DummyReference, MyRecord, SimpleEvent<TermType>> importer = new MessImporter<>(factory, DummyReference.class, SegmentType.class) {
             @Override
             protected MyHandler newBuilder(int size) {
                 MyHandler.INSTANCE.toList().clear(); // Not Thread-Safe
@@ -308,7 +308,7 @@ public class BusinessTests {
     void testNullEvent() throws BeanException {
         // GIVEN
         final AtomicInteger counter = new AtomicInteger();
-        final UnitImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = new UnitImporter<>(factory, DummyReference.class, SegmentType.class) {
+        final MessImporter<TermType, SegmentType, DummyReference, MyRecord, MyError> importer = new MessImporter<>(factory, DummyReference.class, SegmentType.class) {
             @Override
             protected PropertyCollector.Builder<TermType, MyRecord, MyError> newBuilder(int size) {
                 final IPropertyCreator<TermType, MyRecord, MyError> creator = (a, b, c, d) -> {
@@ -329,14 +329,14 @@ public class BusinessTests {
     }
 
     @Test
-    void testDummyUnitImporter() throws BeanException {
+    void testDummyNeatImporter() throws BeanException {
         // GIVEN
-        final SimpleUnitImporter<DummyReference, TermType, SegmentType> importer = factory.builder()
-                .unit(DummyReference.class)
+        final SimpleNeatImporter<DummyReference, TermType, SegmentType> importer = factory.builder()
+                .neat(DummyReference.class)
                 .build(SegmentType.class)
                 .build();
         // WHEN
-        final Up2Result<DummyReference, ?> result = importer.parse(List.of(new UnitRecord<>(S71, "#01")));
+        final Up2Result<DummyReference, ?> result = importer.parse(List.of(new NeatRecord<>(S71, "#01")));
         //THEN
         assertNotNull(result);
         assertNotNull(result.get());
@@ -345,10 +345,10 @@ public class BusinessTests {
     }
 
     @Test
-    void testDummyFastImporter() throws BeanException {
+    void testDummyMessImporter() throws BeanException {
         // GIVEN
-        final FastImporter<TermType, SegmentType, UnmanagedReference, BSRecord, BSError> importer = factory.builder()
-                .fast(UnmanagedReference.class)
+        final MessImporter<TermType, SegmentType, UnmanagedReference, BSRecord, BSError> importer = factory.builder()
+                .mess(UnmanagedReference.class)
                 .build(SegmentType.class)
                 .build(BSError::new);
         final BSRecord dr = new BSRecord(S71, "$");
@@ -400,8 +400,8 @@ public class BusinessTests {
     @Test
     void testDummy1Importer() throws BeanException {
         // GIVEN
-        final UnitImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
-                .unit(DummyReference.class)
+        final NeatImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
+                .neat(DummyReference.class)
                 .build(SegmentType.class)
                 .build(BSError::new);
         final BSRecord record1 = new BSRecord(S71, null, "#01");
@@ -419,8 +419,8 @@ public class BusinessTests {
     @Test
     void testDummy2Importer() throws BeanException {
         // GIVEN
-        final UnitImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
-                .unit(DummyReference.class)
+        final MessImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
+                .mess(DummyReference.class)
                 .build(SegmentType.class)
                 .build(BSError::new);
         final BSRecord record1 = new BSRecord(S71, null, "#01");
@@ -449,8 +449,8 @@ public class BusinessTests {
     @Test
     void testDummy3Importer() throws BeanException {
         // GIVEN
-        final UnitImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
-                .unit(DummyReference.class)
+        final MessImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
+                .mess(DummyReference.class)
                 .build(SegmentType.class)
                 .build(BSError::new);
         final BSRecord record1 = new BSRecord(S71, null, "#01");
@@ -479,8 +479,8 @@ public class BusinessTests {
     @Test
     void testDummy4Importer() throws BeanException {
         // GIVEN
-        final UnitImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
-                .unit(DummyReference.class)
+        final NeatImporter<TermType, SegmentType, DummyReference, BSRecord, BSError> importer = factory.builder()
+                .neat(DummyReference.class)
                 .build(SegmentType.class)
                 .build(BSError::new);
         final BSRecord record1 = new BSRecord(S71, null, "#01");
@@ -511,8 +511,8 @@ public class BusinessTests {
     @Test
     void test1Validator() throws BeanException {
         // GIVEN
-        final UnitExporter<TermType, SegmentType, DummyReference> importer = factory.builder()
-                .unit(DummyReference.class)
+        final NeatExporter<TermType, SegmentType, DummyReference> importer = factory.builder()
+                .neat(DummyReference.class)
                 .build(SegmentType.class)
                 .export();
         // WHEN
@@ -525,8 +525,8 @@ public class BusinessTests {
     @Test
     void test2Validator() throws BeanException {
         // GIVEN
-        final UnitExporter<TermType, SegmentType, DummyReference> importer = factory.builder()
-                .unit(DummyReference.class)
+        final NeatExporter<TermType, SegmentType, DummyReference> importer = factory.builder()
+                .neat(DummyReference.class)
                 .build(SegmentType.class)
                 .export();
         final DummyReference bean = new DummyReference();
@@ -550,8 +550,8 @@ public class BusinessTests {
     @Test
     void test3Validator() throws BeanException {
         // GIVEN
-        final UnitExporter<TermType, SegmentType, DummyReference> importer = factory.builder()
-                .unit(DummyReference.class)
+        final NeatExporter<TermType, SegmentType, DummyReference> importer = factory.builder()
+                .neat(DummyReference.class)
                 .build(SegmentType.class)
                 .export();
         final DummyReference bean = new DummyReference();
@@ -577,8 +577,8 @@ public class BusinessTests {
     @Test
     void testBIdWrapper() throws BeanException {
         // WHEN
-        final UnitExporter<TermType, SegmentType, BIdWrapperObject> importer = factory.builder()
-                .unit(BIdWrapperObject.class)
+        final NeatExporter<TermType, SegmentType, BIdWrapperObject> importer = factory.builder()
+                .neat(BIdWrapperObject.class)
                 .build(SegmentType.class)
                 .export();
         // THEN
@@ -588,8 +588,8 @@ public class BusinessTests {
     @Test
     void testBIdOptional() throws BeanException {
         // WHEN
-        final UnitExporter<TermType, SegmentType, BIdOptionalObject> importer = factory.builder()
-                .unit(BIdOptionalObject.class)
+        final NeatExporter<TermType, SegmentType, BIdOptionalObject> importer = factory.builder()
+                .neat(BIdOptionalObject.class)
                 .build(SegmentType.class)
                 .export();
         // THEN
@@ -602,7 +602,7 @@ public class BusinessTests {
         final BeanException ex = assertThrows(
                 BeanException.class,
                 () -> factory.builder()
-                        .unit(BIdInvalidObject.class)
+                        .neat(BIdInvalidObject.class)
                         .build(SegmentType.class)
                         .build()
         );
@@ -612,7 +612,7 @@ public class BusinessTests {
         assertEquals("should be annotated with @NotBlank because @BusinessId", ex.getMessage());
     }
 
-    static final class MyRecord implements IRecord<SegmentType> {
+    private static final class MyRecord implements IMessRecord<SegmentType> {
 
         private final SegmentType type;
         private final String[] data;
@@ -631,9 +631,14 @@ public class BusinessTests {
         public String[] getData() {
             return data;
         }
+
+        @Override
+        public String getPivot() {
+            return null;
+        }
     }
 
-    static final class MyError extends PropertyEvent<TermType, MyRecord> {
+    private static final class MyError extends PropertyEvent<TermType, MyRecord> {
         public MyError(MyRecord row, Integer offset, TermType type, TypeException cause) {
             super(row, offset, type, cause);
         }

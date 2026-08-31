@@ -61,7 +61,7 @@ public class Item extends Parsable {
     @BusinessType(I005)
     private BigDecimal taxAmount;
 
-    @BusinessLink(value = "09", automatic = true, bean = @Linker(ItemAttributeLinker.class))
+    @BusinessLink(value = "09", max = 2, automatic = true, bean = @Linker(ItemAttributeLinker.class))
     private final Map<String, Attribute> attributes = new LinkedHashMap<>();
 
     public Long getId() {

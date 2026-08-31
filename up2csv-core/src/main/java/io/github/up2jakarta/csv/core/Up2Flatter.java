@@ -1,12 +1,12 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.csv.api.hdl.IComplianceEvent;
 import io.github.up2jakarta.csv.cfg.Truncated;
 import io.github.up2jakarta.csv.core.BSNode.Flat;
-import io.github.up2jakarta.csv.core.hdl.ComplianceCollector;
-import io.github.up2jakarta.csv.core.hdl.ComplianceHandler;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.hdl.ComplianceCollector;
+import io.github.up2jakarta.csv.hdl.ComplianceHandler;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.ValidationException;
@@ -23,17 +23,19 @@ import static io.github.up2jakarta.csv.core.BSManager.*;
  * @param <D> The business term type
  */
 public final class Up2Flatter<S extends Segment, D extends ITerm<D>> extends Pod<S, D, Flat<S, D>> {
+    private final Validator validator;
 
     Up2Flatter(Validator validator, Key<D, S> key, Flat<S, D> node) throws BeanException {
         super(validator, key, node);
+        this.validator = validator;
     }
 
     /**
      * Computes and returns the header record from the business term types, depending on {@link Up2Factory} resolver.
      *
      * @return the header record
-     * @see io.github.up2jakarta.csv.data.TermResolver
-     * @see io.github.up2jakarta.csv.data.Header
+     * @see io.github.up2jakarta.csv.api.TermResolver
+     * @see io.github.up2jakarta.csv.data.Up2Header
      */
     public String[] header() {
         return this.header(offset);
@@ -44,8 +46,8 @@ public final class Up2Flatter<S extends Segment, D extends ITerm<D>> extends Pod
      *
      * @param offset the number of columns reserved {@link Truncated#value()}
      * @return the header record
-     * @see io.github.up2jakarta.csv.data.TermResolver
-     * @see io.github.up2jakarta.csv.data.Header
+     * @see io.github.up2jakarta.csv.api.TermResolver
+     * @see io.github.up2jakarta.csv.data.Up2Header
      */
     public String[] header(final int offset) {
         final String[] result = new String[length + offset];

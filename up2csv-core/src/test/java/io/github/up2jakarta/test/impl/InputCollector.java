@@ -1,7 +1,7 @@
 package io.github.up2jakarta.test.impl;
 
-import io.github.up2jakarta.csv.core.hdl.BusinessCollector;
-import io.github.up2jakarta.csv.core.hdl.EventModeBuilder;
+import io.github.up2jakarta.csv.hdl.BusinessCollector;
+import io.github.up2jakarta.csv.hdl.EventModeBuilder;
 
 public class InputCollector extends BusinessCollector<TermType, InputRecord, InputError> {
 

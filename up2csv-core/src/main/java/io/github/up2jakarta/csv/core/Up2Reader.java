@@ -3,7 +3,7 @@ package io.github.up2jakarta.csv.core;
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.lov.core.AccessException;
 
-import static io.github.up2jakarta.csv.core.hdl.FastHandler.of;
+import static io.github.up2jakarta.csv.hdl.FastHandler.of;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 
 /**

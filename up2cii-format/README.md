@@ -1,6 +1,7 @@
 # Up2CII :: Format Framework
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2cii-format?style=for-the-badge&color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2cii-format)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.up2jakarta/up2cii-format?color=green)](https://central.sonatype.com/artifact/io.github.up2jakarta/up2cii-format)
+[![Mvn Repository](https://badges.mvnrepository.com/badge/io.github.up2jakarta/up2cii-format/badge.svg?color=green)](https://mvnrepository.com/artifact/io.github.up2jakarta/up2cii-format)
 
 `Up2CII` is an open-source framework for validating, reading and writing CII e-invoices.
 
@@ -10,7 +11,7 @@
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2cii-format</artifactId>
-        <version>1.7.0</version>
+        <version>1.7.1</version>
     </dependency>
 ```
 

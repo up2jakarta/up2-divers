@@ -4,6 +4,7 @@ import io.github.up2jakarta.csv.BusinessLink;
 import io.github.up2jakarta.csv.ReferenceId;
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.Container;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.csv.api.Linker;
 import io.github.up2jakarta.csv.api.Overlink;
 import io.github.up2jakarta.csv.api.ext.TypeContext;
@@ -20,9 +21,10 @@ import io.github.up2jakarta.csv.core.BSOperator.BId;
 import io.github.up2jakarta.csv.core.BSProperty.IProcessor;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
-import io.github.up2jakarta.csv.core.BusinessImporter.Item;
-import io.github.up2jakarta.csv.core.ext.Beans;
-import io.github.up2jakarta.csv.data.ITerm;
+import io.github.up2jakarta.csv.core.BeanAccessor.IGetter;
+import io.github.up2jakarta.csv.core.BeanAccessor.ISetter;
+import io.github.up2jakarta.csv.core.MessImporter.Item;
+import io.github.up2jakarta.csv.ext.Beans;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
 import io.github.up2jakarta.lov.core.Wrapper;
@@ -37,10 +39,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static io.github.up2jakarta.csv.core.BeanAccessor.IGetter;
-import static io.github.up2jakarta.csv.core.BeanAccessor.ISetter;
-import static io.github.up2jakarta.csv.core.ext.Beans.*;
+import static io.github.up2jakarta.csv.ext.Beans.*;
 import static io.github.up2jakarta.lov.core.Localizable.CLASS;
+import static io.github.up2jakarta.lov.core.Overrides.Filter.ALL;
 import static io.github.up2jakarta.lov.core.Overrides.get;
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.asList;
@@ -149,41 +150,43 @@ final class BSBuilder {
         return at != null && stream(types).anyMatch(at::isAnnotationPresent);
     }
 
-    static <D extends ITerm<D>> List<BSProperty<?, D>> build(Class<? extends Segment> beanType, BSContext<D> context) throws BeanException {
-        if (context.push(beanType)) {
-            throw new BeanException(beanType, "cyclic fragment is not allowed");
+    static <D extends ITerm<D>> List<BSProperty<?, D>> build(Class<? extends Segment> st, BSContext<D> cx) throws BeanException {
+        if (cx.push(st)) {
+            throw new BeanException(st, "cyclic fragment is not allowed");
         }
         final List<BSProperty<?, D>> result = new LinkedList<>();
-        final Class<?> superClass = beanType.getSuperclass();
+        final Class<?> superClass = st.getSuperclass();
         if (Segment.class.isAssignableFrom(superClass)) {
             final Class<? extends Segment> superType = (Class<? extends Segment>) superClass;
-            final BSContext<D> superContext = context.with(superType, beanType.getGenericSuperclass());
-            final List<BSProperty<?, D>> superProperties = build(superType, superContext);
-            superContext.end();
+            final BSContext<D> sx = cx.with(superType, st.getGenericSuperclass());
+            final List<BSProperty<?, D>> superProperties = build(superType, sx);
+            sx.afterSuperSegment();
             result.addAll(superProperties);
         }
-        final Field[] fields = beanType.getDeclaredFields();
+        final Field[] fields = st.getDeclaredFields();
         for (final Field field : fields) {
-            final Type fieldType = context.fieldType(field);
-            final Fragment fragment = context.fragment(field);
-            final Position position = context.position(field);
+            final Type fieldType = cx.fieldType(field);
+            final Fragment fragment = cx.fragment(field);
+            final Position position = cx.position(field);
             if (fragment != null) {
                 final Class<? extends Segment> fType = getClass(field, fieldType, fragment);
-                final List<BSProperty<?, D>> fps = build(fType, context.with(field, fragment, fType));
+                final BSContext<D> fx = cx.with(field, fragment, fType);
+                final List<BSProperty<?, D>> fps = build(fType, fx);
+                fx.checkOverrides(ALL);
                 if (!(fragment.nullable() && fps.isEmpty())) {
                     try {
-                        result.add(context.node(fType, field, fragment, fps));
+                        result.add(cx.node(fType, field, fragment, fps));
                     } catch (AccessException ex) {
                         throw new BeanException(field, ex.getMessage());
                     }
                 }
             } else if (position != null) {
                 final Class<?> fieldClass = getClass(field, fieldType, position);
-                final BSProperty<?, D> property = context.property(fieldClass, field, position);
+                final BSProperty<?, D> property = cx.property(fieldClass, field, position);
                 result.add(property);
             } else if (!field.isSynthetic() && !isStatic(field.getModifiers())) {
                 final Class<?> type = getPropertyClass(field, fieldType);
-                context.unknown(field, type);
+                cx.unknown(field, type);
             }
         }
         return result;

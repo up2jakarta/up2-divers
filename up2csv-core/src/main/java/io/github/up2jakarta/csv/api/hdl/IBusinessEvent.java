@@ -2,8 +2,8 @@ package io.github.up2jakarta.csv.api.hdl;
 
 import io.github.up2jakarta.csv.api.IEvent;
 import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.csv.api.hdl.IBusinessEvent.IKey;
-import io.github.up2jakarta.csv.data.ITerm;
 import io.github.up2jakarta.lov.core.Identifiable;
 
 /**
@@ -13,7 +13,7 @@ import io.github.up2jakarta.lov.core.Identifiable;
  * @param <K> the event key type
  * @param <D> the business term type
  * @see IBusinessCreator
- * @see io.github.up2jakarta.csv.core.hdl.BusinessCollector#MODE
+ * @see io.github.up2jakarta.csv.hdl.BusinessCollector#MODE
  */
 public interface IBusinessEvent<D extends ITerm<D>, R extends IRecord<?>, K extends IKey<R>> extends IEvent<D>, Identifiable<K> {
 
