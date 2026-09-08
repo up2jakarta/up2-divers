@@ -13,10 +13,8 @@ module up2jakarta.test {
     requires spring.beans;
     requires spring.core;
     requires spring.test;
-    requires spring.jdbc;
-    requires spring.tx;
     requires org.slf4j;
-    requires java.sql;
+    requires spring.tx;
 
     exports io.github.up2jakarta.test.dto;
     exports io.github.up2jakarta.test.impl;

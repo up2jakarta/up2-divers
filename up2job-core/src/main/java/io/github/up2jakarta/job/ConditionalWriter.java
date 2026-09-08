@@ -1,8 +1,8 @@
 package io.github.up2jakarta.job;
 
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 @SuppressWarnings("unused")
 public abstract class ConditionalWriter<T> implements ItemWriter<T>, StepExecutionListener {

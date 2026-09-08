@@ -1,7 +1,7 @@
 package io.github.up2jakarta.job.flux;
 
 import io.github.up2jakarta.job.zip.ArchiveResource;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 
 public final class FluxResource<R extends ArchiveResource> implements ArchiveResource {
 

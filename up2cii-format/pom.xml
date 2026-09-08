@@ -5,13 +5,19 @@
     <parent>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2-divers</artifactId>
-        <version>1.7.1</version>
+        <version>1.7.2</version>
     </parent>
 
     <artifactId>up2cii-format</artifactId>
     <name>Up2CII :: Format</name>
     <description>Framework for validating, reading and writing CII e-invoices</description>
     <url>https://github.com/up2jakarta/up2-divers/tree/master/up2cii-format</url>
+
+    <scm>
+        <connection>scm:git:git://github.com/up2jakarta/up2-divers.git</connection>
+        <developerConnection>scm:git:ssh://github.com/up2jakarta/up2-divers.git</developerConnection>
+        <url>https://github.com/up2jakarta/up2-divers.git</url>
+    </scm>
 
     <dependencies>
         <dependency>

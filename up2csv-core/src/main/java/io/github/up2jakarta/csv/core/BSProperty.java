@@ -1,5 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
+import io.github.up2jakarta.csv.ReferenceId;
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.Container;
 import io.github.up2jakarta.csv.api.ITerm;
@@ -104,8 +105,8 @@ abstract sealed class BSProperty<T, D extends ITerm<D>> implements MST permits P
 
     abstract BSProperty<T, D> reverse() throws BeanException;
 
-    final <A extends Annotation> A getAnnotation(Class<A> type) {
-        return access.source.getAnnotation(type);
+    final ReferenceId getReferenceId() {
+        return access.source.getAnnotation(ReferenceId.class);
     }
 
     @SafeVarargs

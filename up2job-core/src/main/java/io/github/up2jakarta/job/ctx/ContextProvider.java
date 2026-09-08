@@ -1,7 +1,7 @@
 package io.github.up2jakarta.job.ctx;
 
 import org.slf4j.Logger;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;

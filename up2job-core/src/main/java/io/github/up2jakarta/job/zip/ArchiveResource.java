@@ -1,7 +1,7 @@
 package io.github.up2jakarta.job.zip;
 
 import io.github.up2jakarta.job.core.ResourceAware;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 
 import java.io.Closeable;
 

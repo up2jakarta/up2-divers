@@ -11,11 +11,9 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Up2J Annotation that supports {@link TypeListener} for segment checking.
+ * Up2J Annotation that supports {@link TypeListener} for segments checking when scanning beans.
  * <p>
- * Note that checker is enabled only when assertion is enabled for {@link TypeListener} class,
- * i.e. the JVM started with {@code -ea} or {@code -ea:io.github.up2jakarta.csv.api.ext}
- * or {@code -ea:io.github.up2jakarta.csv.api.ext.TypeListener}.
+ * Note that check can be disabled by the system property {@link io.github.up2jakarta.csv.api.Container#ENABLE_CHECK}.
  */
 @Documented
 @Retention(RUNTIME)

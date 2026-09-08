@@ -1,10 +1,10 @@
 package io.github.up2jakarta.job;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.SynchronizedItemWriter;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.support.SynchronizedItemWriter;
 
 @SuppressWarnings("unused")
 public class SynchronizedWriter<T> extends SynchronizedItemWriter<T> implements StepExecutionListener {

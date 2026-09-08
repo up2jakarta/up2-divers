@@ -2,7 +2,7 @@ package io.github.up2jakarta.job.zip;
 
 import io.github.up2jakarta.job.ConditionalWriter;
 import io.github.up2jakarta.job.core.*;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 

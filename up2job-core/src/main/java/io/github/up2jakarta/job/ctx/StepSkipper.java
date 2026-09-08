@@ -5,14 +5,13 @@ import io.github.up2jakarta.job.core.BusinessException;
 import io.github.up2jakarta.job.core.Cleanable;
 import io.github.up2jakarta.job.core.ReferenceAware;
 import org.slf4j.Logger;
-import org.springframework.batch.core.SkipListener;
+import org.springframework.batch.core.listener.SkipListener;
 
 import static io.github.up2jakarta.job.core.BusinessException.getCause;
 import static io.github.up2jakarta.job.core.BusinessException.getError;
 
 @SuppressWarnings("unused")
-public abstract class StepSkipper<C extends ContextAware, W extends ReferenceAware<C>, P extends ReferenceAware<C>>
-        implements SkipListener<P, W>, SkipProcessor<C, P> {
+public abstract class StepSkipper<C extends ContextAware, W extends ReferenceAware<C>, P extends ReferenceAware<C>> implements SkipListener<P, W>, SkipProcessor<C, P> {
 
     private final C context;
     private final Logger logger;

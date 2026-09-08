@@ -43,7 +43,7 @@ approach.
     <dependency>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2csv-core</artifactId>
-        <version>1.7.1</version>
+        <version>1.7.2</version>
     </dependency>
     <!-- Optional JSR-303 Provider -->
     <!-- Optional CDI/IoC Provider -->

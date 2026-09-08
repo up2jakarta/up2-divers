@@ -17,6 +17,6 @@ public class BIdOptionalObject implements Segment {
     @Position(0)
     @BusinessId
     @Up2Number
-    public Optional<@NotNull Integer> key;
+    public Optional<@NotNull Integer> key = Optional.empty();
 
 }

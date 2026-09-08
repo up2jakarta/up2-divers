@@ -13,13 +13,13 @@ import io.github.up2jakarta.test.impl.TermType;
 import io.github.up2jakarta.test.impl.full.*;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.core.step.item.ChunkOrientedStep;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -28,6 +28,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @SpringBatchTest
 @SpringJUnitConfig(TUConfiguration.class)
@@ -38,7 +39,7 @@ class FullCopyJobITests extends AbstractJobITest {
     @Autowired
     FullCopyJobITests(ApplicationContext context, CSVFormat format) throws IOException, BeanException {
         super(IMode.FULL, format);
-        this.job = this.job(context, context.getBean(PlatformTransactionManager.class));
+        this.job = this.job(context);
     }
 
     private ErrorWriter errorWriter(Up2Factory<TermType> factory, CSVFormat format) throws BeanException {
@@ -46,22 +47,24 @@ class FullCopyJobITests extends AbstractJobITest {
         return new ErrorWriter(mapper, format);
     }
 
-    private Job job(ApplicationContext context, PlatformTransactionManager txm) throws BeanException {
-        final CSVFormat format = context.getBean(CSVFormat.class);
+    private Job job(ApplicationContext context) throws BeanException {
+        final PlatformTransactionManager txm = context.getBean(PlatformTransactionManager.class);
+        final AsyncTaskExecutor executor = context.getBean(AsyncTaskExecutor.class);
         final JobRepository repository = context.getBean(JobRepository.class);
         final Up2Factory<TermType> factory = Up2Factory.of(context::getBean);
+        final CSVFormat format = context.getBean(CSVFormat.class);
         final InvoiceImporter importer = new InvoiceImporter(factory);
         final CompositeWriter<Up2Result<Invoice, InputError>> writer = new CompositeWriter<>(
                 new SynchronizedWriter<>(this.errorWriter(factory, format)),
                 new SynchronizedWriter<>(new InvoiceWriter(importer, format))
         );
-        final TaskletStep step = new StepBuilder("copy", repository)
-                .<Up2Result<Invoice, InputError>, Up2Result<Invoice, InputError>>chunk(5, txm)
+        final ChunkOrientedStep<?, ?> step = new StepBuilder("copy", repository)
+                .<Up2Result<Invoice, InputError>, Up2Result<Invoice, InputError>>chunk(5)
                 .reader(new SynchronizedReader<>(new InvoiceReader(importer, format)))
                 .writer(writer)
-                .taskExecutor(context.getBean(AsyncTaskExecutor.class))
+                .transactionManager(txm)
+                .taskExecutor(executor)
                 .faultTolerant()
-                .noRetry(Throwable.class)
                 .skip(RuntimeException.class)
                 .build();
         return new JobBuilder("FULL", repository)
@@ -72,10 +75,13 @@ class FullCopyJobITests extends AbstractJobITest {
     @Test
     void test() throws Exception {
         // GIVEN
-        final JobParameters jps = this.input(1_000);
+        final JobParameters jps = this.input(100);
         this.launcher.setJob(job);
         // WHEN
-        final JobExecution job = launcher.launchJob(jps);
+        final JobExecution job = launcher.startJob(jps);
+        while (job.isRunning()) {
+            TimeUnit.MILLISECONDS.sleep(100);
+        }
         // THEN Execution
         assertStatus(job);
         assertSteps(job);

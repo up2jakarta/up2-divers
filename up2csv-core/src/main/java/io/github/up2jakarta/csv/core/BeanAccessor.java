@@ -1,5 +1,6 @@
 package io.github.up2jakarta.csv.core;
 
+
 import io.github.up2jakarta.csv.core.BSBuilder.MEP;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -10,12 +11,12 @@ import java.lang.invoke.VarHandle;
 import java.lang.reflect.*;
 
 import static io.github.up2jakarta.csv.api.Container.TRUSTED_MODE;
+import static io.github.up2jakarta.csv.core.BSBuilder.getProperty;
 import static io.github.up2jakarta.csv.ext.Beans.getValue;
 import static io.github.up2jakarta.csv.ext.Beans.setValue;
 import static io.github.up2jakarta.lov.core.Defaults.prototype;
 import static io.github.up2jakarta.lov.core.Localizable.CLASS;
 import static io.github.up2jakarta.lov.core.Localizable.CREATOR;
-import static java.lang.System.getProperty;
 import static java.lang.invoke.MethodHandles.Lookup;
 
 /**
@@ -28,10 +29,17 @@ import static java.lang.invoke.MethodHandles.Lookup;
 public abstract sealed class BeanAccessor permits BeanAccessor.IM, BeanAccessor.RM {
 
     /**
-     * @return the singleton instance depending on the system property.
+     * @return the singleton depends on the system property {@link io.github.up2jakarta.csv.api.Container#TRUSTED_MODE}.
      */
     public static BeanAccessor getInstance() {
         return Holder.INSTANCE;
+    }
+
+    /**
+     * @return {@code true} if the trusted mode is enabled.
+     */
+    public static boolean isTrusted() {
+        return Holder.TRUSTED;
     }
 
     public abstract <V> IGetter<V> toGetter(Method getter) throws AccessException;
@@ -94,7 +102,7 @@ public abstract sealed class BeanAccessor permits BeanAccessor.IM, BeanAccessor.
             return source.getParameters();
         }
 
-        public Object[] getPrototype() {
+        public final Object[] getPrototype() {
             return prototype(source);
         }
     }
@@ -102,12 +110,13 @@ public abstract sealed class BeanAccessor permits BeanAccessor.IM, BeanAccessor.
     /**
      * Internal {@link BeanAccessor} Holder
      */
-    private static class Holder {
+    private static abstract class Holder {
+        private static final boolean TRUSTED;
         private static final BeanAccessor INSTANCE;
 
         static {
-            final boolean trusted = "true".equals(getProperty(TRUSTED_MODE));
-            if (trusted) {
+            TRUSTED = getProperty(TRUSTED_MODE, false);
+            if (TRUSTED) {
                 try {
                     final Field tf = Lookup.class.getDeclaredField("IMPL_LOOKUP");
                     tf.setAccessible(true);

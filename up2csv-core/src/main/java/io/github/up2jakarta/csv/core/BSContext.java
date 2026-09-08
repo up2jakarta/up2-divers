@@ -17,6 +17,7 @@ import io.github.up2jakarta.csv.core.BSOperator.SId;
 import io.github.up2jakarta.csv.core.BSProperty.IProcessor;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
+import io.github.up2jakarta.csv.core.BeanAccessor.ICreator;
 import io.github.up2jakarta.lov.CodeList;
 import io.github.up2jakarta.lov.TypeAdapter;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -27,18 +28,23 @@ import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static io.github.up2jakarta.csv.api.Container.ENABLE_CHECK;
+import static io.github.up2jakarta.csv.api.Container.from;
 import static io.github.up2jakarta.csv.core.BSBuilder.*;
+import static io.github.up2jakarta.csv.core.BSNode.Bean;
 import static io.github.up2jakarta.csv.ext.Beans.*;
 import static io.github.up2jakarta.lov.core.Defaults.wrap;
 import static io.github.up2jakarta.lov.core.Overrides.*;
-import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
 /**
@@ -47,7 +53,7 @@ import static java.util.stream.Collectors.joining;
 @PositionOverride(path = {})
 final class BSContext<D extends ITerm<D>> {
 
-    private static final boolean EAC = TypeListener.class.desiredAssertionStatus();
+    private static final boolean EAC = getProperty(ENABLE_CHECK, TypeListener.class.desiredAssertionStatus());
     private static final Position NAN = BSContext.class.getAnnotation(PositionOverride.class).value();
 
     private final Map<TypeResolver<?, ?>, Class<?>> cache = new LinkedHashMap<>();
@@ -105,7 +111,7 @@ final class BSContext<D extends ITerm<D>> {
         final Extension[] extensions = getAnnotationsByType(Extension.class, st).toArray(Extension[]::new);
         final List<TypeExtension<?, Annotation>> result = new LinkedList<>();
         for (final Extension extension : extensions) {
-            result.add(Container.from(bc, extension.value(), extension.name()));
+            result.add(from(bc, extension.value(), extension.name()));
         }
         return List.copyOf(result);
     }
@@ -160,31 +166,12 @@ final class BSContext<D extends ITerm<D>> {
         return new BeanException(field, "must be annotated with @" + cn + " or one of those shortcuts");
     }
 
-    @SuppressWarnings("unchecked")
-    static <S extends Segment, D extends ITerm<D>> Constructor<S> from(Class<S> t, List<BSProperty<?, D>> ps) throws BeanException {
-        final long fc = ps.stream().filter(BSProperty::isFinal).count();
-        if (fc == 0) {
-            return null;
-        } else if (fc == ps.size()) {
-            final Constructor<S>[] dcs = (Constructor<S>[]) t.getDeclaredConstructors();
-            final List<Constructor<S>> cs = stream(dcs).filter(c -> c.isAnnotationPresent(Creator.class)).toList();
-            if (cs.size() == 1) {
-                return cs.getFirst();
-            } else if (t.isRecord()) {
-                return null;
-            } else if (dcs.length == 1) {
-                return dcs[0];
-            }
-            throw new BeanException(t, "one and only one constructor must be annotated with @Creator");
-        }
-        throw new BeanException(t, "mix final and writable properties is not allowed");
-    }
-
     private <V> BSAccessor<V> accessor(Class<V> type, Field field) throws BeanException {
         final Class<? extends Segment> container = segmentType(stack);
         final AccessType access = getAccessType(field, this.access).orElse(AccessType.FIELD);
         if (Optional.class.isAssignableFrom(field.getType())) {
-            return Mode.wrap(mode.of(access, container, field, type));
+            //noinspection unchecked
+            return Mode.wrap(mode, container, mode.of(access, container, field, (Class<Optional<V>>) type));
         }
         return mode.of(access, container, field, type);
     }
@@ -214,7 +201,7 @@ final class BSContext<D extends ITerm<D>> {
         for (final Annotation config : fp.getAnnotations()) {
             final Resolver resolver = config.annotationType().getAnnotation(Resolver.class);
             if (resolver != null) {
-                final TypeResolver<T, Annotation> cr = Container.from(factory.context, resolver.value(), resolver.name());
+                final TypeResolver<T, Annotation> cr = from(factory.context, resolver.value(), resolver.name());
                 this.checkType(fp, wrappedType, config, cr);
                 founds.add(config);
                 ta.accept(cr.resolve(fp, type, config));
@@ -234,7 +221,7 @@ final class BSContext<D extends ITerm<D>> {
         }
         final Up2Converter pc = converter(field, position);
         if (pc != null) {
-            final TypeAdapter<T> adapter = Container.from(factory.context, pc.value(), pc.name());
+            final TypeAdapter<T> adapter = from(factory.context, pc.value(), pc.name());
             if (!adapter.getType().isAssignableFrom(type)) {
                 throw new BeanException(field, "@Position[converter] does not support " + type);
             }
@@ -254,28 +241,38 @@ final class BSContext<D extends ITerm<D>> {
         return (TypeAdapter<T>) result.orThrow(() -> translate(type, field));
     }
 
-    private <S extends Segment> BSNode<S, D> node(Field fp, Class<S> ft, VContext vc, Fragment fr, List<BSProperty<?, D>> ps) throws BeanException {
-        final int index;
+    private int innerIndex(Field fp, Class<? extends Segment> ft) throws BeanException {
         if (isInnerType(ft)) {
             final Class<?> ec = ft.getEnclosingClass();
             if (ec.isRecord()) {
                 throw new BeanException(fp, "inner class is not allowed inside enclosing record: " + getTypeName(ec));
             }
-            index = stack.lastIndexOf(ec);
-        } else {
-            index = -1;
+            return stack.lastIndexOf(ec);
         }
+        return -1;
+    }
+
+    private <S extends Segment> BSNode<S, D> node(Field fp, Class<S> ft, VContext vc, Fragment fr, List<BSProperty<?, D>> ps) throws BeanException {
+        final int index = this.innerIndex(fp, ft);
         if (mode == Mode.RO) {
             return new BSNode.Flat<>(index, ft, this, vc, fr, ps);
         }
-        final Constructor<S> cs = from(ft, ps);
-        if (cs == null) {
-            if (ft.isRecord()) {
-                return new BSNode.Bean.JR<>(ft, this, vc, fr, ps);
+        return new BCR<>(ft, ps) {
+            @Override
+            Bean.CN<S, D> cn(ICreator<S> cs) throws BeanException {
+                return new Bean.CN<>(index, ft, BSContext.this, vc, fr, ps, cs);
             }
-            return new BSNode.Bean.BM<>(index, ft, this, vc, fr, ps);
-        }
-        return new BSNode.Bean.JB<>(index, ft, this, vc, fr, ps, cs);
+
+            @Override
+            Bean.JB<S, D> jb(ICreator<S> cs) throws BeanException {
+                return new Bean.JB<>(index, ft, BSContext.this, vc, fr, ps, cs);
+            }
+
+            @Override
+            Bean.JR<S, D> jr(ICreator<S> cs) throws BeanException {
+                return new Bean.JR<>(ft, BSContext.this, vc, fr, ps, cs);
+            }
+        }.build();
     }
 
     private <T> PPosition<T, D> position(Class<T> pt, Field pf, Position pc) throws BeanException {

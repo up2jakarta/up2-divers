@@ -2,8 +2,8 @@ package io.github.up2jakarta.job.flux;
 
 import io.github.up2jakarta.job.zip.ArchiveResource;
 import io.github.up2jakarta.job.zip.ArchiveWriter;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.infrastructure.item.Chunk;
 
 @SuppressWarnings("unused")
 public class FluxWriter<T, R extends ArchiveResource> implements ArchiveWriter<T, FluxResource<R>> {

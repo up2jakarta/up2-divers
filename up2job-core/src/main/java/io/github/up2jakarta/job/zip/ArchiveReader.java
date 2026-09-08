@@ -1,7 +1,7 @@
 package io.github.up2jakarta.job.zip;
 
 import io.github.up2jakarta.job.core.LoggerAware;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemReader;
 
 public interface ArchiveReader<T, R extends ArchiveResource> extends ItemReader<T>, LoggerAware {
 

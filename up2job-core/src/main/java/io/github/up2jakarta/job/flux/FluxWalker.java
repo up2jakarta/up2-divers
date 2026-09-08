@@ -7,7 +7,7 @@ import io.github.up2jakarta.job.zip.ArchiveEntry;
 import io.github.up2jakarta.job.zip.ArchiveTranslator;
 import io.github.up2jakarta.job.zip.ArchiveWalker;
 import io.github.up2jakarta.job.zip.EntrySkipper;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 
 import java.util.List;
 

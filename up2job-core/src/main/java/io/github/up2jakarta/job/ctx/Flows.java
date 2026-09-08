@@ -3,9 +3,9 @@ package io.github.up2jakarta.job.ctx;
 import io.github.up2jakarta.job.core.BusinessException;
 import io.github.up2jakarta.job.core.JobStatus;
 import org.slf4j.Logger;
-import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.job.JobExecutionException;
+import org.springframework.batch.core.job.UnexpectedJobExecutionException;
+import org.springframework.batch.core.step.StepExecution;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

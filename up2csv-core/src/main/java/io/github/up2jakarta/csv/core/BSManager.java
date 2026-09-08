@@ -13,6 +13,7 @@ import io.github.up2jakarta.csv.core.BSNode.Flat;
 import io.github.up2jakarta.csv.core.BSOperator.Node;
 import io.github.up2jakarta.csv.core.BSOperator.PId;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
+import io.github.up2jakarta.csv.core.BeanAccessor.ICreator;
 import io.github.up2jakarta.csv.core.BusinessExporter.Format;
 import io.github.up2jakarta.csv.core.BusinessImporter.Mapper;
 import io.github.up2jakarta.csv.ext.Beans;
@@ -25,7 +26,6 @@ import jakarta.validation.Validator;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -151,14 +151,22 @@ class BSManager<D extends ITerm<D>, S extends Segment> {
         final Class<S> type = key.type;
         final BSContext<D> mc = new BSContext<>(factory, type, Mode.WO);
         final List<BSProperty<?, D>> ps = mc.build();
-        final Constructor<S> cs = BSContext.from(type, ps);
-        if (cs == null) {
-            if (type.isRecord()) {
-                return new Bean.JR<>(type, mc, ps);
+        return new BSBuilder.BCR<>(type, ps) {
+            @Override
+            Bean.CN<S, D> cn(ICreator<S> cs) throws BeanException {
+                return new Bean.CN<>(type, mc, ps, cs);
             }
-            return new Bean.BM<>(type, mc, ps);
-        }
-        return new Bean.JB<>(type, mc, ps, cs);
+
+            @Override
+            Bean.JB<S, D> jb(ICreator<S> cs) throws BeanException {
+                return new Bean.JB<>(type, mc, ps, cs);
+            }
+
+            @Override
+            Bean.JR<S, D> jr(ICreator<S> cs) throws BeanException {
+                return new Bean.JR<>(type, mc, ps, cs);
+            }
+        }.build();
     }
 
     private Flat<S, D> ft(Factory<D> factory, Key<D, S> key) throws BeanException {

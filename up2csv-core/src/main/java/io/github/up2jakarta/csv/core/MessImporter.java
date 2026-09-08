@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static io.github.up2jakarta.csv.ext.Beans.update;
 import static io.github.up2jakarta.lov.core.AccessException.notNull;
 import static io.github.up2jakarta.lov.core.Beans.cast;
 
@@ -260,7 +261,7 @@ public abstract non-sealed class MessImporter<B extends ITerm<B>, I extends Enum
             final Input in = Input.of(vld, ln, rc.getData());
             this.bean = mapper.node.parse(in, hdl);
             if (mapper.node.recordable) {
-                mapper.node.update(bean, rc, e -> this.handle("cannot set the source record", e));
+                update(bean, rc, e -> this.handle("cannot set the source record", e));
             }
             this.businessId = ln.bid.apply(this, rc);
             if (mapper.validate) {

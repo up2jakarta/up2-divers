@@ -6,8 +6,12 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.batch.core.*;
-import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.test.JobOperatorTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
@@ -39,7 +43,7 @@ public abstract class AbstractJobITest {
     private final TUGenerator generator;
 
     @Autowired
-    protected JobLauncherTestUtils launcher;
+    protected JobOperatorTestUtils launcher;
 
     protected AbstractJobITest(IMode mode, CSVFormat format) throws IOException {
         this.generator = new TUGenerator(mode, this.getClass(), format);

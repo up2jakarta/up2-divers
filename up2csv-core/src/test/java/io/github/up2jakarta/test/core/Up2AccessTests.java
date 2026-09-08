@@ -1,6 +1,7 @@
 package io.github.up2jakarta.test.core;
 
 import io.github.up2jakarta.csv.api.IEvent;
+import io.github.up2jakarta.csv.core.BeanAccessor;
 import io.github.up2jakarta.csv.core.Up2Factory;
 import io.github.up2jakarta.csv.core.Up2Flatter;
 import io.github.up2jakarta.csv.core.Up2Mapper;
@@ -174,13 +175,27 @@ class Up2AccessTests {
     }
 
     @Test
-    void mixedProperties() {
-        // When
-        final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(Final9Segment.class));
-        // Then
-        assertEquals(Final9Segment.class, thrown.getSource());
-        assertEquals(CLASS, thrown.getLocator());
-        assertEquals("mix final and writable properties is not allowed", thrown.getMessage());
+    void mixedProperties() throws BeanException {
+        if (BeanAccessor.isTrusted()) {
+            // Given
+            final Up2Mapper<Final9Segment, ?> mapper = factory.mapper(Final9Segment.class);
+            final Up2Flatter<Final9Segment, ?> format = mapper.toFlatter();
+            final String[] data = new String[]{"10", "Ten"};
+            // When
+            final Final9Segment bean = mapper.map(data);
+            final String[] out = format.unmap(bean);
+            // Then
+            assertEquals(10, bean.getKey());
+            assertEquals("Ten", bean.getValue());
+            assertArrayEquals(data, out);
+        } else {
+            // When
+            final BeanException thrown = assertThrows(BeanException.class, () -> factory.mapper(Final9Segment.class));
+            // Then
+            assertEquals(Final9Segment.class, thrown.getSource());
+            assertEquals(CLASS, thrown.getLocator());
+            assertEquals("mix final and writable properties is not allowed", thrown.getMessage());
+        }
     }
 
     @Test

@@ -1,10 +1,10 @@
 package io.github.up2jakarta.job;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.support.SynchronizedItemReader;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.support.SynchronizedItemReader;
 
 @SuppressWarnings("unused")
 public class SynchronizedReader<T> extends SynchronizedItemReader<T> implements StepExecutionListener {

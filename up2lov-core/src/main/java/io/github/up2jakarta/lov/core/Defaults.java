@@ -1,11 +1,9 @@
 package io.github.up2jakarta.lov.core;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Parameter;
 import java.util.*;
-
-import static io.github.up2jakarta.lov.core.Beans.isInnerType;
-import static io.github.up2jakarta.lov.core.Localizable.CREATOR;
-import static java.util.Arrays.stream;
 
 /**
  * Default utility class.
@@ -106,21 +104,6 @@ public final class Defaults {
             return range;
         }
         return prototype;
-    }
-
-    public static <T> Constructor<T> creator(Class<T> type) throws BeanException {
-        try {
-            if (type.isRecord()) {
-                final Class<?>[] types = stream(type.getDeclaredFields()).map(Field::getType).toArray(Class<?>[]::new);
-                return type.getDeclaredConstructor(types);
-            } else if (isInnerType(type)) {
-                return type.getDeclaredConstructor(type.getEnclosingClass());
-            } else {
-                return type.getDeclaredConstructor();
-            }
-        } catch (Exception cause) {
-            throw new BeanException(type, CREATOR, cause.getMessage());
-        }
     }
 
 }

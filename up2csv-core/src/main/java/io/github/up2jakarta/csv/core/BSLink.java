@@ -2,7 +2,6 @@ package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.BusinessLink;
 import io.github.up2jakarta.csv.BusinessObject;
-import io.github.up2jakarta.csv.ReferenceId;
 import io.github.up2jakarta.csv.Segment;
 import io.github.up2jakarta.csv.api.*;
 import io.github.up2jakarta.csv.cfg.Error;
@@ -233,7 +232,7 @@ final class BSLink<D extends ITerm<D>, I extends Enum<I> & IType<I>, P extends N
         private Map<I, PId<B>> findParentIds(BSNode<?, B> node) throws BeanException {
             final Map<I, PId<B>> parentIds = new EnumMap<>(type);
             final Mode mode = (node instanceof Flat<?, B>) ? Mode.RO : Mode.WO;
-            id(node, ReferenceId.class, (fs, pp, pa) -> {
+            findRId(node, (fs, pp, pa) -> {
                 final I type = paths.stream().filter(i -> pa.value().equals(i.getCode())).findAny().orElse(null);
                 if (parentIds.containsKey(type)) {
                     throw new BeanException(node.type, "multiple " + name(pa) + "are found");

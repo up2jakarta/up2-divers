@@ -17,6 +17,7 @@ import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.Validator;
 
 import static io.github.up2jakarta.csv.core.BSManager.*;
+import static io.github.up2jakarta.csv.ext.Beans.update;
 import static io.github.up2jakarta.lov.SeverityType.ERROR;
 import static io.github.up2jakarta.lov.core.AccessException.notNull;
 
@@ -125,7 +126,7 @@ public final class Up2Mapper<S extends Segment, D extends ITerm<D>> extends Pod<
         if (record == null) return null;
         final S bean = this.map(handler, offset, record.getData());
         if (node.recordable) {
-            node.update(bean, record, e -> {
+            update(bean, record, e -> {
                 throw new AccessException(bean.getClass(), "setRecord", e);
             });
         }

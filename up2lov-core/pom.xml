@@ -5,13 +5,19 @@
     <parent>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2-divers</artifactId>
-        <version>1.7.1</version>
+        <version>1.7.2</version>
     </parent>
 
     <artifactId>up2lov-core</artifactId>
     <name>Up2LOV :: Core</name>
     <description>CodeList API that represents list of values (LOV)</description>
-    <url>https://github.com/up2jakarta/up2-divers/tree/master/up2xml-core</url>
+    <url>https://github.com/up2jakarta/up2-divers/tree/master/up2lov-core</url>
+
+    <scm>
+        <connection>scm:git:git://github.com/up2jakarta/up2-divers.git</connection>
+        <developerConnection>scm:git:ssh://github.com/up2jakarta/up2-divers.git</developerConnection>
+        <url>https://github.com/up2jakarta/up2-divers.git</url>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -69,21 +75,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <argLine>
-                            --add-reads=org.jboss.logging=org.hibernate.orm.core
-                        </argLine>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 
 </project>

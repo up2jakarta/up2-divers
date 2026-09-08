@@ -1,6 +1,6 @@
 package io.github.up2jakarta.job;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 public class CompositeProcessor<I, O> implements ItemProcessor<I, O> {
 

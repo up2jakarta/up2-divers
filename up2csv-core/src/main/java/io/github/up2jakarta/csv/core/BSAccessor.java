@@ -9,7 +9,10 @@ import io.github.up2jakarta.lov.core.Wrapper;
 import jakarta.persistence.AccessType;
 import jakarta.validation.Validator;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -245,10 +248,12 @@ abstract sealed class BSAccessor<V> implements MST permits BSAccessor.FA, BSAcce
      */
     static final class OA<V> extends BSAccessor<V> {
         private final BSAccessor<Optional<V>> delegate;
+        private final Class<? extends Segment> container;
 
-        private OA(BSAccessor<Optional<V>> delegate) {
+        private OA(Class<? extends Segment> container, BSAccessor<Optional<V>> delegate) {
             super(delegate.source);
             this.delegate = delegate;
+            this.container = container;
         }
 
         @Override
@@ -270,7 +275,7 @@ abstract sealed class BSAccessor<V> implements MST permits BSAccessor.FA, BSAcce
         BSAccessor<V> reverse(Mode mode) throws BeanException {
             final BSAccessor<Optional<V>> reverse = delegate.reverse(mode);
             if (reverse != delegate) {
-                return new OA<>(reverse);
+                return Mode.wrap(mode, container, reverse);
             }
             return this;
         }
@@ -465,7 +470,7 @@ abstract sealed class BSAccessor<V> implements MST permits BSAccessor.FA, BSAcce
         }
 
         private static <V> BSAccessor<V> findAccessor(Field fp, boolean ff) {
-            if (ff) {
+            if (ff && !isTrusted()) {
                 return new FRO<>(fp, getInstance().toGetter(fp));
             }
             return new DRW<>(fp, getInstance().toAccessor(fp));
@@ -481,13 +486,11 @@ abstract sealed class BSAccessor<V> implements MST permits BSAccessor.FA, BSAcce
             return getInstance().toSetter(setter);
         }
 
-        @SuppressWarnings("unchecked")
-        static <T> BSAccessor<T> wrap(BSAccessor<T> delegate) {
-            return new OA<>((BSAccessor<Optional<T>>) delegate);
-        }
-
-        static <T extends Segment> ICreator<T> findCreator(Constructor<T> source) throws BeanException {
-            return getInstance().toCreator(source);
+        static <T> BSAccessor<T> wrap(Mode m, Class<? extends Segment> c, BSAccessor<Optional<T>> a) throws BeanException {
+            if (m == Mode.RO) {
+                BeanChecker.check(c, a);
+            }
+            return new OA<>(c, a);
         }
 
         abstract <V> BSAccessor<V> of(AccessType at, Class<? extends Segment> st, Field fp, Class<V> ft) throws BeanException;

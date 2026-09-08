@@ -1,6 +1,8 @@
 package io.github.up2jakarta.csv.ext;
 
 import io.github.up2jakarta.csv.Segment;
+import io.github.up2jakarta.csv.api.IRecord;
+import io.github.up2jakarta.csv.api.Recordable;
 import io.github.up2jakarta.csv.cfg.Error;
 import io.github.up2jakarta.lov.core.AccessException;
 import io.github.up2jakarta.lov.core.BeanException;
@@ -60,6 +62,15 @@ public final class Beans extends io.github.up2jakarta.lov.core.Beans {
             return c == ft || c.isAssignableFrom(ft);
         }
         return type instanceof TypeVariable<?>;
+    }
+
+    public static void update(Segment target, IRecord<?> source, Consumer<RuntimeException> handler) {
+        try {
+            //noinspection unchecked
+            ((Recordable<IRecord<?>>) target).setRecord(source);
+        } catch (RuntimeException cause) {
+            handler.accept(cause);
+        }
     }
 
     private static Method findSetter(Field fp, Class<?> type, Class<?> ft) throws BeanException {

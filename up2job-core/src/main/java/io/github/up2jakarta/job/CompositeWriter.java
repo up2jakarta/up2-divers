@@ -3,10 +3,10 @@ package io.github.up2jakarta.job;
 import io.github.up2jakarta.job.core.SafeUtil;
 import io.github.up2jakarta.job.core.SafeWrapper;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -9,7 +9,7 @@ import io.github.up2jakarta.lov.core.BeanException;
 public interface Container {
 
     /**
-     * System property name that tell the engine to use trusted mode to access to private properties.
+     * System property that tell the engine to use trusted mode to access to private properties.
      * <p>
      * By default, the trusted mode is disabled and the <code>package</code> that contains segment classes
      * must be open to <code>up2jakarta.csv.core</code> module by one of the following options:
@@ -25,7 +25,19 @@ public interface Container {
      *     <li><code>--add-opens java.base/java.lang.invoke=up2jakarta.csv.core</code></li>
      * </ul>
      */
+    // todo allow set of final properties with access field -> update MD
     String TRUSTED_MODE = "up2jakarta.csv.core.trusted.mode";
+
+    /**
+     * System property that tell the engine to enable {@link io.github.up2jakarta.csv.cfg.Checker} when scanning beans.
+     * <p>
+     * By default, check is enabled only when assertions are enabled for
+     * {@link io.github.up2jakarta.csv.api.ext.TypeListener} class (testing environments),
+     * i.e. the JVM started with {@code -ea} or {@code -ea:io.github.up2jakarta.csv.api.ext}
+     * or {@code -ea:io.github.up2jakarta.csv.api.ext.TypeListener}.
+     *
+     */
+    String ENABLE_CHECK = "up2jakarta.csv.core.enable.check";
 
     /**
      * Returns the bean instance that matches the specified bean class and the qualified name if not empty.

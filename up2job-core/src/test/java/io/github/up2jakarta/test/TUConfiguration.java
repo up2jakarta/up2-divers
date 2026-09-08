@@ -11,9 +11,8 @@ import org.apache.commons.csv.QuoteMode;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.test.StepRunner;
+import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
+import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -21,42 +20,17 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.sql.DataSource;
 import java.util.Locale;
 import java.util.Set;
 
 @Configuration
 @ComponentScan(basePackageClasses = {TokenProcessor.class, DecimalResolver.class, TermType.class})
-@EnableTransactionManagement
 @EnableAutoConfiguration
-public class TUConfiguration {
+public class TUConfiguration extends DefaultBatchConfiguration {
 
     static final Logger LOG = LoggerFactory.getLogger(TUConfiguration.class);
-
-    static {
-        Locale.setDefault(Locale.US);
-    }
-
-    @Bean
-    protected PlatformTransactionManager transactionManager(DataSource dataSource) {
-        final JdbcTransactionManager manager = new JdbcTransactionManager(dataSource);
-        manager.setLazyInit(false);
-        manager.setNestedTransactionAllowed(true);
-        return manager;
-    }
-
-    @Bean
-    public DataSource dataSource() {
-        return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-                .addScript("/org/springframework/batch/core/schema-h2.sql")
-                .build();
-    }
 
     @Bean
     public Validator validator() {
@@ -90,13 +64,15 @@ public class TUConfiguration {
     }
 
     @Bean
-    protected AsyncTaskExecutor asyncTaskExecutor() {
-        return new SimpleAsyncTaskExecutor("ps-");
+    @Override
+    protected PlatformTransactionManager getTransactionManager() {
+        return new ResourcelessTransactionManager();
     }
 
     @Bean
-    protected StepRunner stepRunner(JobLauncher launcher, JobRepository repository) {
-        return new StepRunner(launcher, repository);
+    @Override
+    protected AsyncTaskExecutor getTaskExecutor() {
+        return new SimpleAsyncTaskExecutor("ps-");
     }
 
 }

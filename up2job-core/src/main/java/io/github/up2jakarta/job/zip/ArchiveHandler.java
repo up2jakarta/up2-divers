@@ -5,7 +5,7 @@ import io.github.up2jakarta.job.core.BusinessContext;
 import io.github.up2jakarta.job.core.BusinessType;
 import io.github.up2jakarta.job.ctx.ContextHolder;
 import org.slf4j.Logger;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 
 public interface ArchiveHandler<B extends BusinessType<B>, C extends BusinessContext> extends ContextHolder<C> {
 

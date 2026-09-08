@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static io.github.up2jakarta.csv.core.BSAccessor.Input;
+import static io.github.up2jakarta.csv.ext.Beans.update;
 import static io.github.up2jakarta.lov.core.AccessException.notNull;
 
 /**
@@ -96,7 +97,7 @@ public abstract non-sealed class NeatImporter<B extends ITerm<B>, I extends Enum
         final Input in = Input.of(factory.validator, ln.offset, record.getData());
         final Segment bean = mapper.node.parse(in, hd);
         if (mapper.node.recordable) {
-            mapper.node.update(bean, record, e -> hd.handle(ln.event, ln.term, "cannot set the source record", e));
+            update(bean, record, e -> hd.handle(ln.event, ln.term, "cannot set the source record", e));
         }
         if (mapper.validate) {
             mapper.node.validate(factory.validator, bean, in.offset, hd);

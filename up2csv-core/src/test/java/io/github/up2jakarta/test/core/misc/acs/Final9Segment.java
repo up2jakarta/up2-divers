@@ -19,4 +19,11 @@ public class Final9Segment implements Segment {
         this.key = key;
     }
 
+    public Integer getKey() {
+        return key;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

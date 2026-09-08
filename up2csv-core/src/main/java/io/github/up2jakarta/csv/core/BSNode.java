@@ -1,17 +1,14 @@
 package io.github.up2jakarta.csv.core;
 
 import io.github.up2jakarta.csv.Segment;
-import io.github.up2jakarta.csv.api.IRecord;
 import io.github.up2jakarta.csv.api.ITerm;
 import io.github.up2jakarta.csv.api.Recordable;
 import io.github.up2jakarta.csv.cfg.Fragment;
 import io.github.up2jakarta.csv.core.BSAccessor.Input;
-import io.github.up2jakarta.csv.core.BSAccessor.Mode;
+import io.github.up2jakarta.csv.core.BSBuilder.BCR;
 import io.github.up2jakarta.csv.core.BSBuilder.MST;
 import io.github.up2jakarta.csv.core.BSContext.VContext;
 import io.github.up2jakarta.csv.core.BSManager.Pod;
-import io.github.up2jakarta.csv.core.BSNode.Bean.BC;
-import io.github.up2jakarta.csv.core.BSNode.Bean.BM;
 import io.github.up2jakarta.csv.core.BSOperator.PId;
 import io.github.up2jakarta.csv.core.BSProperty.IParameter;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
@@ -23,17 +20,16 @@ import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static io.github.up2jakarta.lov.core.Defaults.*;
-import static java.lang.System.arraycopy;
+import static io.github.up2jakarta.lov.core.Defaults.EMPTY;
+import static io.github.up2jakarta.lov.core.Defaults.prototype;
 
 /**
- * Internal business node.
+ * Internal Business Node
  */
 abstract sealed class BSNode<S extends Segment, D extends ITerm<D>> implements MST permits BSNode.Flat, BSNode.Bean {
     final List<BSProperty<?, D>> properties;
@@ -121,7 +117,7 @@ abstract sealed class BSNode<S extends Segment, D extends ITerm<D>> implements M
     }
 
     /**
-     * Internal Flat Node.
+     * Internal Flat Node
      */
     static final class Flat<S extends Segment, D extends ITerm<D>> extends BSNode<S, D> {
         private final String[] cache;
@@ -165,7 +161,7 @@ abstract sealed class BSNode<S extends Segment, D extends ITerm<D>> implements M
                         final Flat<Segment, D> node = (Flat<Segment, D>) ((PFragment<?, D>) p).node;
                         final String[] values = node.cache;
                         if (values != EMPTY) {
-                            arraycopy(values, 0, result, node.index, values.length);
+                            System.arraycopy(values, 0, result, node.index, values.length);
                         }
                     } else {
                         result[p.offset] = ((PPosition<?, D>) p).format(null);
@@ -178,7 +174,7 @@ abstract sealed class BSNode<S extends Segment, D extends ITerm<D>> implements M
 
         void defaultValues(String[] result, int offset) {
             if (cache != EMPTY) {
-                arraycopy(cache, 0, result, offset + index, cache.length);
+                System.arraycopy(cache, 0, result, offset + index, cache.length);
             }
         }
 
@@ -230,39 +226,51 @@ abstract sealed class BSNode<S extends Segment, D extends ITerm<D>> implements M
 
         @Override
         Bean<S, D, ?> reverse() throws BeanException {
-            final Constructor<S> cs = BSContext.from(type, properties);
-            if (cs == null) {
-                if (type.isRecord()) {
-                    return new Bean.JR<>(this);
+            return new BCR<>(type, properties) {
+                @Override
+                Bean.CN<S, D> cn(ICreator<S> cs) throws BeanException {
+                    return new Bean.CN<>(Flat.this, cs);
                 }
-                return new Bean.BM<>(this);
-            }
-            return new Bean.JB<>(this, cs);
+
+                @Override
+                Bean.JB<S, D> jb(ICreator<S> cs) throws BeanException {
+                    return new Bean.JB<>(Flat.this, cs);
+                }
+
+                @Override
+                Bean.JR<S, D> jr(ICreator<S> cs) throws BeanException {
+                    return new Bean.JR<>(Flat.this, cs);
+                }
+            }.build();
         }
     }
 
     /**
-     * Internal Mapper Node.
+     * Internal Mapper Node
      */
-    abstract static sealed class Bean<S extends Segment, D extends ITerm<D>, C> extends BSNode<S, D> permits BM, BC {
+    abstract static sealed class Bean<S extends Segment, D extends ITerm<D>, C> extends BSNode<S, D> permits Bean.CN, Bean.CS {
         protected final ICreator<S> creator;
         protected final boolean recordable;
+        protected final Object[] prototype;
 
-        Bean(int i, Class<S> t, BSContext<D> bc, VContext vc, Fragment f, List<BSProperty<?, D>> ps, Constructor<S> cs) throws BeanException {
+        Bean(int i, Class<S> t, BSContext<D> bc, VContext vc, Fragment f, List<BSProperty<?, D>> ps, ICreator<S> cs) throws BeanException {
             super(i, t, bc, vc, f.nullable(), f.prototype(), ps);
             this.recordable = Recordable.class.isAssignableFrom(t);
-            this.creator = Mode.findCreator(cs);
+            this.prototype = cs.getPrototype();
+            this.creator = cs;
         }
 
-        Bean(Class<S> type, BSContext<D> bc, VContext vc, List<BSProperty<?, D>> ps, Constructor<S> cs) throws BeanException {
+        Bean(Class<S> type, BSContext<D> bc, VContext vc, List<BSProperty<?, D>> ps, ICreator<S> cs) throws BeanException {
             super(-1, type, bc, vc, false, false, ps);
             this.recordable = Recordable.class.isAssignableFrom(type);
-            this.creator = Mode.findCreator(cs);
+            this.prototype = cs.getPrototype();
+            this.creator = cs;
         }
 
-        private Bean(Flat<S, D> source, Constructor<S> cs) throws BeanException {
+        private Bean(Flat<S, D> source, ICreator<S> cs) throws BeanException {
             super(source);
-            this.creator = Mode.findCreator(cs);
+            this.creator = cs;
+            this.prototype = creator.getPrototype();
             this.recordable = Recordable.class.isAssignableFrom(type);
         }
 
@@ -298,15 +306,6 @@ abstract sealed class BSNode<S extends Segment, D extends ITerm<D>> implements M
             return nullable && empty;
         }
 
-        protected final void update(S target, IRecord<?> source, Consumer<RuntimeException> handler) {
-            try {
-                //noinspection unchecked
-                ((Recordable<IRecord<?>>) target).setRecord(source);
-            } catch (RuntimeException cause) {
-                handler.accept(cause);
-            }
-        }
-
         @Override
         protected final Flat<S, D> reverse() throws BeanException {
             return new Flat<>(this);
@@ -321,29 +320,34 @@ abstract sealed class BSNode<S extends Segment, D extends ITerm<D>> implements M
         protected abstract <V> void set(C bean, BSProperty<V, D> property, V value);
 
         /**
-         * Internal Mapper Node for java-beans.
+         * Internal Mapper Node for java-beans without constructor setters.
          */
-        static final class BM<S extends Segment, D extends ITerm<D>> extends Bean<S, D, S> {
-            BM(int i, Class<S> t, BSContext<D> bc, VContext vc, Fragment f, List<BSProperty<?, D>> ps) throws BeanException {
-                super(i, t, bc, vc, f, ps, creator(t));
+        static final class CN<S extends Segment, D extends ITerm<D>> extends Bean<S, D, S> {
+            CN(int i, Class<S> t, BSContext<D> bc, VContext vc, Fragment f, List<BSProperty<?, D>> ps, ICreator<S> cs) throws BeanException {
+                super(i, t, bc, vc, f, ps, cs);
             }
 
-            BM(Class<S> type, BSContext<D> bc, List<BSProperty<?, D>> ps) throws BeanException {
-                super(type, bc, bc.context(), ps, creator(type));
+            CN(Class<S> type, BSContext<D> bc, List<BSProperty<?, D>> ps, ICreator<S> cs) throws BeanException {
+                super(type, bc, bc.context(), ps, cs);
             }
 
-            BM(Flat<S, D> source) throws BeanException {
-                super(source, creator(source.type));
+            CN(Flat<S, D> source, ICreator<S> cs) throws BeanException {
+                super(source, cs);
+            }
+
+            private S bean(LinkedList<Segment> stack) {
+                if (ici != -1) {
+                    final Object[] args = new Object[prototype.length];
+                    System.arraycopy(prototype, 0, args, 0, prototype.length);
+                    args[0] = stack.get(ici);
+                    return creator.newInstance(args);
+                }
+                return creator.newInstance(prototype);
             }
 
             @Override
             protected S parse(LinkedList<Segment> stack, Input in, EventHandler<D> handler) {
-                final S bean;
-                if (ici != -1) {
-                    bean = creator.newInstance(stack.get(ici));
-                } else {
-                    bean = creator.newInstance();
-                }
+                final S bean = this.bean(stack);
                 stack.addLast(bean);
                 final boolean empty = this.parse(stack, in, handler, bean);
                 stack.removeLast();
@@ -359,25 +363,21 @@ abstract sealed class BSNode<S extends Segment, D extends ITerm<D>> implements M
         /**
          * Internal Mapper Node for java-beans within constructor setters.
          */
-        abstract static sealed class BC<S extends Segment, D extends ITerm<D>> extends Bean<S, D, Object[]> permits JR, JB {
+        abstract static sealed class CS<S extends Segment, D extends ITerm<D>> extends Bean<S, D, Object[]> permits JR, JB {
             private final Map<BSProperty<?, D>, IParameter> indexes;
-            private final Object[] prototype;
 
-            BC(int i, Class<S> type, BSContext<D> bc, VContext vc, Fragment f, List<BSProperty<?, D>> ps, Constructor<S> cs) throws BeanException {
+            CS(int i, Class<S> type, BSContext<D> bc, VContext vc, Fragment f, List<BSProperty<?, D>> ps, ICreator<S> cs) throws BeanException {
                 super(i, type, bc, vc, f, ps, cs);
-                this.prototype = creator.getPrototype();
                 this.indexes = this.indexes();
             }
 
-            BC(Class<S> type, BSContext<D> bc, VContext vc, List<BSProperty<?, D>> ps, Constructor<S> cs) throws BeanException {
+            CS(Class<S> type, BSContext<D> bc, VContext vc, List<BSProperty<?, D>> ps, ICreator<S> cs) throws BeanException {
                 super(type, bc, vc, ps, cs);
-                this.prototype = creator.getPrototype();
                 this.indexes = this.indexes();
             }
 
-            BC(Flat<S, D> source, Constructor<S> cs) throws BeanException {
+            CS(Flat<S, D> source, ICreator<S> cs) throws BeanException {
                 super(source, cs);
-                this.prototype = creator.getPrototype();
                 this.indexes = this.indexes();
             }
 
@@ -385,46 +385,46 @@ abstract sealed class BSNode<S extends Segment, D extends ITerm<D>> implements M
 
             @Override
             protected final S parse(LinkedList<Segment> stack, Input in, EventHandler<D> handler) {
-                final Object[] arguments = new Object[prototype.length];
-                arraycopy(prototype, 0, arguments, 0, prototype.length);
+                final Object[] args = new Object[prototype.length];
+                System.arraycopy(prototype, 0, args, 0, prototype.length);
                 if (this.ici != -1) {
-                    arguments[0] = stack.get(ici);
+                    args[0] = stack.get(ici);
                 }
                 stack.addLast(null);
-                final boolean empty = this.parse(stack, in, handler, arguments);
+                final boolean empty = this.parse(stack, in, handler, args);
                 stack.removeLast();
-                return empty ? null : creator.newInstance(arguments);
+                return empty ? null : creator.newInstance(args);
             }
 
             @Override
-            protected final <V> void set(Object[] arguments, BSProperty<V, D> property, V value) {
+            protected final <V> void set(Object[] args, BSProperty<V, D> property, V value) {
                 final IParameter parameter = indexes.get(property);
-                arguments[parameter.index] = parameter.wrap(value);
+                args[parameter.index] = parameter.wrap(value);
             }
         }
 
         /**
-         * Internal Mapper Node for java-records.
+         * Internal {@link CS} for java-records
          */
-        static final class JR<S extends Segment, D extends ITerm<D>> extends BC<S, D> {
+        static final class JR<S extends Segment, D extends ITerm<D>> extends CS<S, D> {
 
-            JR(Class<S> type, BSContext<D> bc, VContext vc, Fragment f, List<BSProperty<?, D>> ps) throws BeanException {
-                super(-1, type, bc, vc, f, ps, creator(type));
+            JR(Class<S> type, BSContext<D> bc, VContext vc, Fragment f, List<BSProperty<?, D>> ps, ICreator<S> cs) throws BeanException {
+                super(-1, type, bc, vc, f, ps, cs);
             }
 
-            JR(Class<S> type, BSContext<D> bc, List<BSProperty<?, D>> ps) throws BeanException {
-                super(type, bc, bc.context(), ps, creator(type));
+            JR(Class<S> type, BSContext<D> bc, List<BSProperty<?, D>> ps, ICreator<S> cs) throws BeanException {
+                super(type, bc, bc.context(), ps, cs);
             }
 
-            private JR(Flat<S, D> source) throws BeanException {
-                super(source, creator(source.type));
+            private JR(Flat<S, D> source, ICreator<S> cs) throws BeanException {
+                super(source, cs);
             }
 
             @Override
             protected Map<BSProperty<?, D>, IParameter> indexes() {
-                final Map<BSProperty<?, D>, IParameter> indexes = new HashMap<>(properties.size());
-                final Parameter[] parameters = creator.getParameters();
-                final Iterator<BSProperty<?, D>> it = properties.iterator();
+                final Map<BSProperty<?, D>, IParameter> indexes = new HashMap<>(this.properties.size());
+                final Parameter[] parameters = this.creator.getParameters();
+                final Iterator<BSProperty<?, D>> it = this.properties.iterator();
                 for (var i = 0; it.hasNext() && i < parameters.length; ) {
                     final BSProperty<?, D> p = it.next();
                     var pm = parameters[i];
@@ -438,42 +438,41 @@ abstract sealed class BSNode<S extends Segment, D extends ITerm<D>> implements M
         }
 
         /**
-         * Internal Mapper Node for immutable java-beans.
+         * Internal {@link CS} for immutable java-beans
          */
-        static final class JB<S extends Segment, D extends ITerm<D>> extends BC<S, D> {
+        static final class JB<S extends Segment, D extends ITerm<D>> extends CS<S, D> {
 
-            JB(int i, Class<S> type, BSContext<D> bc, VContext vc, Fragment f, List<BSProperty<?, D>> ps, Constructor<S> cs) throws BeanException {
+            JB(int i, Class<S> type, BSContext<D> bc, VContext vc, Fragment f, List<BSProperty<?, D>> ps, ICreator<S> cs) throws BeanException {
                 super(i, type, bc, vc, f, ps, cs);
             }
 
-            JB(Class<S> type, BSContext<D> bc, List<BSProperty<?, D>> ps, Constructor<S> cs) throws BeanException {
+            JB(Class<S> type, BSContext<D> bc, List<BSProperty<?, D>> ps, ICreator<S> cs) throws BeanException {
                 super(type, bc, bc.context(), ps, cs);
             }
 
-            private JB(Flat<S, D> source, Constructor<S> cs) throws BeanException {
+            private JB(Flat<S, D> source, ICreator<S> cs) throws BeanException {
                 super(source, cs);
             }
 
-            @Override
-            protected Map<BSProperty<?, D>, IParameter> indexes() throws BeanException {
-                final Map<BSProperty<?, D>, IParameter> indexes = new HashMap<>(properties.size());
-                final Parameter[] parameters = creator.getParameters();
-                for (BSProperty<?, D> p : properties) {
-                    indexes.put(p, this.index(parameters, p));
-                }
-                return Map.copyOf(indexes);
-            }
-
-            private IParameter index(Parameter[] parameters, BSProperty<?, D> p) throws BeanException {
-                for (var i = 0; i < parameters.length; i++) {
-                    final Parameter pm = parameters[i];
+            private IParameter index(Parameter[] ps, BSProperty<?, D> p) throws BeanException {
+                for (var i = 0; i < ps.length; i++) {
+                    final Parameter pm = ps[i];
                     if (pm.getName().equals(p.getName())) {
-                        return p.toParameter(type, pm.getParameterizedType(), i);
+                        return p.toParameter(this.type, pm.getParameterizedType(), i);
                     }
                 }
                 throw new BeanException(p.getSource(), "must be in constructor arguments");
             }
+
+            @Override
+            protected Map<BSProperty<?, D>, IParameter> indexes() throws BeanException {
+                final Map<BSProperty<?, D>, IParameter> indexes = new HashMap<>(this.properties.size());
+                final Parameter[] parameters = this.creator.getParameters();
+                for (BSProperty<?, D> p : this.properties) {
+                    indexes.put(p, index(parameters, p));
+                }
+                return Map.copyOf(indexes);
+            }
         }
     }
-
 }

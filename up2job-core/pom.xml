@@ -5,13 +5,19 @@
     <parent>
         <groupId>io.github.up2jakarta</groupId>
         <artifactId>up2-divers</artifactId>
-        <version>1.7.1</version>
+        <version>1.7.2</version>
     </parent>
 
     <artifactId>up2job-core</artifactId>
     <name>Up2Job :: Core</name>
     <description>Spring Batch Extensions</description>
     <url>https://github.com/up2jakarta/up2-divers/tree/master/up2job-core</url>
+
+    <scm>
+        <connection>scm:git:git://github.com/up2jakarta/up2-divers.git</connection>
+        <developerConnection>scm:git:ssh://github.com/up2jakarta/up2-divers.git</developerConnection>
+        <url>https://github.com/up2jakarta/up2-divers.git</url>
+    </scm>
 
     <dependencies>
         <!-- Required API Dependencies -->
@@ -23,10 +29,14 @@
             <groupId>org.springframework.batch</groupId>
             <artifactId>spring-batch-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-test-autoconfigure</artifactId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -47,11 +57,6 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- Optional dependencies -->

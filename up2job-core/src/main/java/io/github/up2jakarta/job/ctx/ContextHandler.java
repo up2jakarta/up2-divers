@@ -1,9 +1,9 @@
 package io.github.up2jakarta.job.ctx;
 
 import org.slf4j.Logger;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
 
 import java.lang.reflect.InvocationHandler;
 import java.util.*;

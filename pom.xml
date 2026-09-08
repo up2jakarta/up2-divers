@@ -4,7 +4,7 @@
 
     <groupId>io.github.up2jakarta</groupId>
     <artifactId>up2-divers</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
     <packaging>pom</packaging>
 
     <name>Up2Jakarta :: Divers</name>
@@ -55,14 +55,10 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.encoding}</project.reporting.outputEncoding>
-        <spring.boot.version>3.5.16</spring.boot.version>
+        <jakarta.cdi.version>3.0.1</jakarta.cdi.version>
+        <spring.boot.version>4.1.1</spring.boot.version>
+        <micrometer.version>1.17.1</micrometer.version>
         <apache.csv.version>1.14.1</apache.csv.version>
-        <jakarta.cdi.version>4.1.0</jakarta.cdi.version>
-        <log.jboss.version>3.5.3.Final</log.jboss.version>
-        <micrometer.version>1.15.12</micrometer.version>
-        <mock.version>5.17.0</mock.version>
-        <mock.path>org/mockito/mockito-core/${mock.version}/mockito-core-${mock.version}.jar</mock.path>
-        <mock.java.agent>-javaagent:${settings.localRepository}/${mock.path} -Xshare:off</mock.java.agent>
     </properties>
 
     <dependencyManagement>
@@ -71,32 +67,32 @@
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2cii-format</artifactId>
-                <version>1.7.1</version>
+                <version>1.7.2</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2csv-core</artifactId>
-                <version>1.7.1</version>
+                <version>1.7.2</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2csv-format</artifactId>
-                <version>1.7.1</version>
+                <version>1.7.2</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2job-core</artifactId>
-                <version>1.7.1</version>
+                <version>1.7.2</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2xml-core</artifactId>
-                <version>1.7.1</version>
+                <version>1.7.2</version>
             </dependency>
             <dependency>
                 <groupId>io.github.up2jakarta</groupId>
                 <artifactId>up2lov-core</artifactId>
-                <version>1.7.1</version>
+                <version>1.7.2</version>
             </dependency>
             <!-- Dependencies -->
             <dependency>
@@ -110,11 +106,6 @@
                 <version>${spring.boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.logging</groupId>
-                <artifactId>jboss-logging</artifactId>
-                <version>${log.jboss.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
@@ -272,10 +263,9 @@
                                 <!-- CSV -->
                                 <exclude>io/github/up2jakarta/csv/core/BS*.java</exclude>
                                 <exclude>io/github/up2jakarta/csv/core/Bean*.java</exclude>
-                                <exclude>io/github/up2jakarta/csv/core/ext/Beans.java</exclude>
+                                <exclude>io/github/up2jakarta/csv/ext/Beans.java</exclude>
                                 <!-- LOV -->
                                 <exclude>io/github/up2jakarta/lov/bst/RedBlackTree.java</exclude>
-                                <exclude>io/github/up2jakarta/lov/core/SafeCache.java</exclude>
                                 <exclude>io/github/up2jakarta/lov/bst/KSNode.java</exclude>
                                 <exclude>io/github/up2jakarta/lov/bst/KVNode.java</exclude>
                                 <exclude>io/github/up2jakarta/lov/bst/KVTree.java</exclude>
@@ -285,6 +275,7 @@
                                 <exclude>io/github/up2jakarta/lov/core/Beans.java</exclude>
                                 <exclude>io/github/up2jakarta/lov/core/Defaults.java</exclude>
                                 <exclude>io/github/up2jakarta/lov/core/Overrides.java</exclude>
+                                <exclude>io/github/up2jakarta/lov/core/SafeCache.java</exclude>
                             </sourceFileExcludes>
                         </configuration>
                     </plugin>

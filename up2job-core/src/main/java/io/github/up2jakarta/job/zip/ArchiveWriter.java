@@ -1,7 +1,7 @@
 package io.github.up2jakarta.job.zip;
 
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 public interface ArchiveWriter<T, R extends ArchiveResource> extends ItemWriter<T> {
 

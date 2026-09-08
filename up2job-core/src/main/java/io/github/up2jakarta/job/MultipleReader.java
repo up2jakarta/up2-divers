@@ -3,9 +3,9 @@ package io.github.up2jakarta.job;
 import io.github.up2jakarta.job.flux.FluxLoader;
 import io.github.up2jakarta.job.zip.ArchiveReader;
 import io.github.up2jakarta.job.zip.ArchiveWalker;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemStreamException;
 
 import java.util.LinkedList;
 import java.util.List;

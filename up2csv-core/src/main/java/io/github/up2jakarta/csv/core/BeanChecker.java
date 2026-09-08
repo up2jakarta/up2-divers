@@ -11,6 +11,7 @@ import io.github.up2jakarta.csv.core.BSNode.Bean;
 import io.github.up2jakarta.csv.core.BSOperator.Node;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
+import io.github.up2jakarta.csv.core.BeanAccessor.ICreator;
 import io.github.up2jakarta.lov.core.BeanException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -18,19 +19,16 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Optional;
 
+import static io.github.up2jakarta.csv.core.BSBuilder.BCR.anyCreator;
 import static io.github.up2jakarta.csv.core.BSBuilder.name;
-import static io.github.up2jakarta.csv.core.BeanAccessor.getInstance;
 import static io.github.up2jakarta.csv.ext.Beans.isInnerType;
 import static io.github.up2jakarta.csv.prc.DefaultProcessor.undefined;
 import static io.github.up2jakarta.lov.core.Beans.getTypeName;
-import static io.github.up2jakarta.lov.core.Defaults.creator;
-import static io.github.up2jakarta.lov.core.Defaults.prototype;
 import static java.lang.String.join;
 import static java.lang.reflect.Modifier.isAbstract;
 import static java.lang.reflect.Modifier.isStatic;
@@ -120,14 +118,21 @@ final class BeanChecker implements TypeListener, TypeContext {
         }
     }
 
+    static void check(Class<? extends Segment> pc, BSAccessor<?> pa) throws BeanException {
+        final ICreator<? extends Segment> c = anyCreator(pc);
+        final Segment s = c.newInstance(c.getPrototype());
+        if (pa.value(s) == null) {
+            throw new BeanException(pa.source, "should be initialized with Optional.empty()");
+        }
+    }
+
     static <L extends ILinker<Segment, ?>> L check(L ln, Class<? extends Segment> pc, Member fp, String cv) throws BeanException {
-        final Constructor<? extends Segment> c = creator(pc);
-        final Object[] p = prototype(c);
-        final Segment s = getInstance().toCreator(c).newInstance(p);
+        final ICreator<? extends Segment> c = anyCreator(pc);
+        final Segment s = c.newInstance(c.getPrototype());
         try {
             ln.from(s);
         } catch (NullPointerException npe) {
-            throw new BeanException(fp, "must be initialized with " + cv);
+            throw new BeanException(fp, "should be initialized with " + cv);
         }
         return ln;
     }
@@ -151,10 +156,10 @@ final class BeanChecker implements TypeListener, TypeContext {
             final Class<?> et = node.type.getEnclosingClass();
             final Optional<Bean<?, ?, ?>> parent = stack.stream().filter(n -> n.type.equals(et)).findAny();
             if (parent.isEmpty()) {
-                var cn = stack.stream().filter(not(Bean.BC.class::isInstance)).map(n -> getTypeName(n.type)).toList();
+                var cn = stack.stream().filter(not(Bean.CS.class::isInstance)).map(n -> getTypeName(n.type)).toList();
                 throw new BeanException(t, "inner class is not allowed outside enclosing segments: " + join(", ", cn));
             }
-            if (parent.get() instanceof Bean.BC<?, ?> n) {
+            if (parent.get() instanceof Bean.CS<?, ?> n) {
                 throw new BeanException(t, "inner class is not allowed inside enclosing segment: " + getTypeName(n.type));
             }
         }

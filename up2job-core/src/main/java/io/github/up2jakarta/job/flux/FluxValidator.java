@@ -7,7 +7,7 @@ import io.github.up2jakarta.job.core.LocalFile;
 import io.github.up2jakarta.job.zip.ArchiveHandler;
 import io.github.up2jakarta.job.zip.ZipWalker;
 import org.slf4j.Logger;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 
 import java.io.IOException;
 import java.util.Enumeration;

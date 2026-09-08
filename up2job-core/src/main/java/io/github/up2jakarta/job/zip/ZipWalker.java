@@ -7,7 +7,7 @@ import io.github.up2jakarta.job.core.LocalFile;
 import io.github.up2jakarta.job.flux.FluxIndex;
 import io.github.up2jakarta.lov.core.Codes;
 import org.slf4j.Logger;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.StepExecution;
 
 import java.io.IOException;
 import java.util.Enumeration;

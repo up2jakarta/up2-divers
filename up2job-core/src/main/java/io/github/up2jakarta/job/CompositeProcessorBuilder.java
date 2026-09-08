@@ -1,6 +1,6 @@
 package io.github.up2jakarta.job;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 import java.util.LinkedList;
 import java.util.List;

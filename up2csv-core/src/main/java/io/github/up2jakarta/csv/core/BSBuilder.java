@@ -9,18 +9,18 @@ import io.github.up2jakarta.csv.api.Linker;
 import io.github.up2jakarta.csv.api.Overlink;
 import io.github.up2jakarta.csv.api.ext.TypeContext;
 import io.github.up2jakarta.csv.api.ext.TypeListener;
-import io.github.up2jakarta.csv.cfg.Checker;
+import io.github.up2jakarta.csv.cfg.*;
 import io.github.up2jakarta.csv.cfg.Error;
-import io.github.up2jakarta.csv.cfg.Fragment;
-import io.github.up2jakarta.csv.cfg.Position;
 import io.github.up2jakarta.csv.core.BSAccessor.Mode;
 import io.github.up2jakarta.csv.core.BSLink.RId;
 import io.github.up2jakarta.csv.core.BSLink.VId;
 import io.github.up2jakarta.csv.core.BSManager.Pod;
+import io.github.up2jakarta.csv.core.BSNode.Bean;
 import io.github.up2jakarta.csv.core.BSOperator.BId;
 import io.github.up2jakarta.csv.core.BSProperty.IProcessor;
 import io.github.up2jakarta.csv.core.BSProperty.PFragment;
 import io.github.up2jakarta.csv.core.BSProperty.PPosition;
+import io.github.up2jakarta.csv.core.BeanAccessor.ICreator;
 import io.github.up2jakarta.csv.core.BeanAccessor.IGetter;
 import io.github.up2jakarta.csv.core.BeanAccessor.ISetter;
 import io.github.up2jakarta.csv.core.MessImporter.Item;
@@ -34,21 +34,23 @@ import jakarta.persistence.AccessType;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.lang.reflect.*;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static io.github.up2jakarta.csv.core.BeanAccessor.getInstance;
 import static io.github.up2jakarta.csv.ext.Beans.*;
 import static io.github.up2jakarta.lov.core.Localizable.CLASS;
+import static io.github.up2jakarta.lov.core.Localizable.CREATOR;
 import static io.github.up2jakarta.lov.core.Overrides.Filter.ALL;
 import static io.github.up2jakarta.lov.core.Overrides.get;
 import static java.lang.reflect.Modifier.isStatic;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
+import static java.util.Arrays.*;
 
 /**
- * Internal business builder.
+ * Internal Business Builder.
  */
 @SuppressWarnings("unchecked")
 final class BSBuilder {
@@ -83,6 +85,11 @@ final class BSBuilder {
             }
         }
         return null;
+    }
+
+    static boolean getProperty(String key, boolean def) {
+        final String value = System.getProperty(key);
+        return (value != null) ? Boolean.parseBoolean(value) : def;
     }
 
     static Optional<AccessType> getAccessType(Optional<AccessType> first, Class<? extends Segment> type) {
@@ -125,19 +132,19 @@ final class BSBuilder {
         return result;
     }
 
-    static <A extends Annotation, B extends ITerm<B>> void id(BSNode<?, B> pn, Class<A> ct, BIdPath<A, B> bc, PFragment<Segment, B>... pp) throws BeanException {
-        for (final BSProperty<?, B> p : pn.properties) {
-            final A config = p.getAnnotation(ct);
+    static <B extends ITerm<B>> void findRId(BSNode<?, B> n, RIdPath<B> r, PFragment<Segment, B>... fs) throws BeanException {
+        for (final BSProperty<?, B> p : n.properties) {
+            final ReferenceId config = p.getReferenceId();
             if (p.getClass() == PFragment.class) {
                 if (config != null) {
-                    throw new BeanException(p.getSource(), "must not be annotated with @" + getTypeName(ct));
+                    throw new BeanException(p.getSource(), "must not be annotated with @ReferenceId");
                 }
                 final PFragment<Segment, B> fn = (PFragment<Segment, B>) p;
-                id(fn.node, ct, bc, concat(pp, fn));
+                findRId(fn.node, r, concat(fs, fn));
             } else if (config != null) {
                 final PPosition<Object, B> property = (PPosition<Object, B>) p;
-                BeanChecker.check(property, ct);
-                bc.accept(pp, property, config);
+                BeanChecker.check(property, ReferenceId.class);
+                r.accept(fs, property, config);
             }
         }
     }
@@ -272,8 +279,8 @@ final class BSBuilder {
     }
 
     @FunctionalInterface
-    interface BIdPath<A extends Annotation, B extends ITerm<B>> {
-        void accept(PFragment<Segment, B>[] path, PPosition<Object, B> property, A config) throws BeanException;
+    interface RIdPath<B extends ITerm<B>> {
+        void accept(PFragment<Segment, B>[] ps, PPosition<Object, B> pp, ReferenceId rid) throws BeanException;
     }
 
     /**
@@ -286,6 +293,65 @@ final class BSBuilder {
      * Class Marker for Entry Point
      */
     sealed interface MEP permits BSLink, RId, VId, Pod, BId, IGetter, ISetter, Item, Up2Adapter {
+    }
+
+    /**
+     * Internal Bean Creator
+     */
+    abstract static class BCR<S extends Segment, D extends ITerm<D>> {
+        private final List<BSProperty<?, D>> ps;
+        private final Class<S> type;
+
+        BCR(Class<S> type, List<BSProperty<?, D>> ps) {
+            this.ps = ps;
+            this.type = type;
+        }
+
+        private static <T extends Segment> ICreator<T> jrCreator(Class<T> type) throws BeanException {
+            try {
+                final Class<?>[] ts = stream(type.getDeclaredFields()).map(Field::getType).toArray(Class<?>[]::new);
+                return getInstance().toCreator(type.getDeclaredConstructor(ts));
+            } catch (Exception cause) {
+                throw new BeanException(type, CREATOR, cause.getMessage());
+            }
+        }
+
+        static <T extends Segment> ICreator<T> anyCreator(Class<T> type) throws BeanException {
+            //noinspection unchecked
+            final Constructor<T>[] dcs = (Constructor<T>[]) type.getDeclaredConstructors();
+            if (dcs.length > 1) {
+                sort(dcs, Comparator.comparingInt(Constructor::getParameterCount));
+            }
+            return getInstance().toCreator(dcs[0]);
+        }
+
+        abstract Bean.CN<S, D> cn(ICreator<S> cs) throws BeanException;
+
+        abstract Bean.JB<S, D> jb(ICreator<S> cs) throws BeanException;
+
+        abstract Bean.JR<S, D> jr(ICreator<S> cs) throws BeanException;
+
+        final Bean<S, D, ?> build() throws BeanException {
+            final long fc = ps.stream().filter(BSProperty::isFinal).count();
+            if (fc == 0) {
+                return this.cn(anyCreator(type));
+            } else if (fc == ps.size()) {
+                //noinspection unchecked
+                final Constructor<S>[] dcs = (Constructor<S>[]) type.getDeclaredConstructors();
+                final List<Constructor<S>> cs = stream(dcs).filter(c -> c.isAnnotationPresent(Creator.class)).toList();
+                if (cs.size() == 1) {
+                    return this.jb(getInstance().toCreator(cs.getFirst()));
+                } else if (type.isRecord()) {
+                    return this.jr(jrCreator(type));
+                } else if (dcs.length == 1) {
+                    return this.jb(getInstance().toCreator(dcs[0]));
+                }
+                throw new BeanException(type, "one and only one constructor must be annotated with @Creator");
+            } else if (BeanAccessor.isTrusted()) {
+                return this.cn(anyCreator(type));
+            }
+            throw new BeanException(type, "mix final and writable properties is not allowed");
+        }
     }
 
     /**
@@ -386,5 +452,4 @@ final class BSBuilder {
         }
 
     }
-
 }
